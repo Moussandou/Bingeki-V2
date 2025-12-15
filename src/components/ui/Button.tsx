@@ -7,11 +7,12 @@ interface ButtonProps extends HTMLMotionProps<"button"> {
     variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
     size?: 'sm' | 'md' | 'lg' | 'icon';
     isLoading?: boolean;
+    icon?: React.ReactNode;
     children: React.ReactNode;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant = 'primary', size = 'md', isLoading, children, ...props }, ref) => {
+    ({ className, variant = 'primary', size = 'md', isLoading, icon, children, ...props }, ref) => {
         return (
             <motion.button
                 ref={ref}
@@ -23,6 +24,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             >
                 {isLoading ? (
                     <span className="animate-spin" style={{ display: 'inline-block', width: '1em', height: '1em', border: '2px solid currentColor', borderRadius: '50%', borderTopColor: 'transparent' }} />
+                ) : icon ? (
+                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</span>
                 ) : null}
                 {children}
             </motion.button>
