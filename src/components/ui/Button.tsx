@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { motion, type HTMLMotionProps } from 'framer-motion';
 import { cn } from '@/utils/cn';
 import styles from './Button.module.css';
 
@@ -8,7 +8,7 @@ interface ButtonProps extends HTMLMotionProps<"button"> {
     size?: 'sm' | 'md' | 'lg' | 'icon';
     isLoading?: boolean;
     icon?: React.ReactNode;
-    children: React.ReactNode;
+    children?: React.ReactNode;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { searchWorks, JikanResult } from '@/services/animeApi';
+import { searchWorks, type JikanResult } from '@/services/animeApi';
 import { Search, PenTool, Globe, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
