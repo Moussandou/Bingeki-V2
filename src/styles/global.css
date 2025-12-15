@@ -63,6 +63,12 @@ html {
     padding: 0 var(--space-md);
 }
 
+@media (max-width: 768px) {
+    .hidden-mobile {
+        display: none !important;
+    }
+}
+
 /* Typography Defaults */
 h1,
 h2,

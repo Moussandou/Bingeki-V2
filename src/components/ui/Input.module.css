@@ -1,6 +1,8 @@
 .inputWrapper {
     position: relative;
     width: 100%;
+    display: flex;
+    align-items: center;
 }
 
 .input {
@@ -9,7 +11,6 @@
     background: var(--color-surface);
     border: 1px solid var(--glass-border);
     border-radius: 4px;
-    /* Anime sharp style */
     color: var(--color-text);
     font-family: var(--font-body);
     font-size: 1rem;
@@ -17,10 +18,28 @@
     outline: none;
 }
 
+.input.hasIcon {
+    padding-left: 2.75rem;
+}
+
+.icon {
+    position: absolute;
+    left: 1rem;
+    color: var(--color-text-dim);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .input:focus {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 2px var(--color-primary-glow);
     background: var(--color-surface-hover);
+}
+
+.input:focus~.icon {
+    color: var(--color-primary);
 }
 
 .input::placeholder {
