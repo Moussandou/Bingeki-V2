@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Badge, MOCK_BADGES } from '@/types/badge';
+import { type Badge, MOCK_BADGES } from '@/types/badge';
 
 interface GamificationState {
     level: number;

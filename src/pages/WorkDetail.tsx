@@ -7,7 +7,7 @@ import { MOCK_ARCS } from '@/types/arc';
 import styles from '@/styles/WorkDetail.module.css';
 import { ArrowLeft, Clock, BookOpen, Star, Share2, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function WorkDetail() {
     const navigate = useNavigate();
