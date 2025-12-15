@@ -4,7 +4,7 @@ import { cn } from '@/utils/cn';
 import styles from './Card.module.css';
 
 interface CardProps extends HTMLMotionProps<"div"> {
-    variant?: 'default' | 'glass';
+    variant?: 'default' | 'glass' | 'manga';
     hoverable?: boolean;
     children: React.ReactNode;
 }
@@ -17,6 +17,8 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
                 className={cn(
                     styles.card,
                     variant === 'glass' && styles.glass,
+                    variant === 'manga' && 'manga-panel',
+                    hoverable && styles.hoverable,
                     hoverable && styles.hoverable,
                     className
                 )}

@@ -5,7 +5,7 @@ import { XPBar } from '@/components/XPBar';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { useAuthStore } from '@/store/authStore';
 import { logout } from '@/firebase/auth';
-import { Settings, LogOut, Award, Zap } from 'lucide-react';
+import { Settings, LogOut, Award, Zap, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -22,119 +22,139 @@ export default function Profile() {
 
     return (
         <Layout>
-            <div className="container" style={{ paddingBottom: '4rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                    <h1 className="text-gradient" style={{ fontSize: '2.5rem' }}>Profil</h1>
-                    <Button variant="outline" size="icon"><Settings size={20} /></Button>
-                </div>
+            <div className="bg-halftone" style={{ minHeight: 'calc(100vh - 80px)' }}>
+                <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 2fr', gap: '2rem' }}>
-                    {/* Identity Card */}
-                    <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
-                        <Card variant="glass" style={{ textAlign: 'center', padding: '2rem' }}>
-                            <div style={{ position: 'relative', display: 'inline-block', marginBottom: '1.5rem' }}>
-                                <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: '#333', overflow: 'hidden', border: '4px solid var(--color-primary)' }}>
-                                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                        <h1 className="text-outline" style={{ fontSize: '3rem', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', color: '#fff', textShadow: '3px 3px 0 #000' }}>
+                            Fiche de Chasseur
+                        </h1>
+                        <Button variant="manga" size="icon"><Settings size={20} /></Button>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(320px, 1fr) 2fr', gap: '2rem' }}>
+                        {/* ID Card / Hunter License Style */}
+                        <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
+                            <div className="manga-panel" style={{ padding: '0', overflow: 'hidden', background: '#fff', color: '#000' }}>
+                                {/* Header Strip */}
+                                <div style={{ background: '#000', color: '#fff', padding: '0.5rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontWeight: 900, letterSpacing: '2px' }}>HUNTER LICENSE</span>
+                                    <Shield size={16} />
                                 </div>
-                                <div style={{ position: 'absolute', bottom: 0, right: 0, background: 'var(--color-primary)', color: '#fff', width: '30px', height: '30px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
-                                    {level}
-                                </div>
-                            </div>
 
-                            <h2 style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>{user?.displayName || 'Chasseur de Manga'}</h2>
-                            <p style={{ color: 'var(--color-text-dim)', marginBottom: '1.5rem' }}>Membre depuis 2023</p>
-
-                            <div style={{ marginBottom: '2rem' }}>
-                                <XPBar current={xp} max={xpToNextLevel} level={level} />
-                            </div>
-
-                            <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '2rem' }}>
-                                <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{streak}</div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-dim)' }}>Streak Jours</div>
-                                </div>
-                                <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{badges.length}</div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-dim)' }}>Badges</div>
-                                </div>
-                            </div>
-
-                            <Button variant="outline" style={{ width: '100%' }} icon={<LogOut size={16} />} onClick={handleLogout}>Déconnexion</Button>
-                        </Card>
-                    </motion.div>
-
-                    {/* Content & Stats */}
-                    <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
-                            <Card style={{ background: 'linear-gradient(135deg, rgba(255, 46, 99, 0.1), rgba(0,0,0,0))' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                                    <div style={{ padding: '0.75rem', background: 'rgba(255, 46, 99, 0.2)', borderRadius: '8px', color: 'var(--color-primary)' }}>
-                                        <Zap size={24} />
+                                <div style={{ padding: '2rem', textAlign: 'center' }}>
+                                    <div style={{ position: 'relative', display: 'inline-block', marginBottom: '1.5rem' }}>
+                                        <div style={{ width: '140px', height: '140px', borderRadius: '4px', border: '3px solid #000', overflow: 'hidden', background: '#333', boxShadow: '4px 4px 0 rgba(0,0,0,0.2)' }}>
+                                            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" />
+                                        </div>
+                                        <div className="manga-title" style={{ position: 'absolute', bottom: -10, right: -10, fontSize: '1.5rem', transform: 'rotate(-5deg)', color: '#fff', background: 'var(--color-primary)' }}>
+                                            LVL {level}
+                                        </div>
                                     </div>
-                                    <h3 style={{ fontSize: '1.1rem' }}>Activité</h3>
-                                </div>
-                                <div style={{ fontSize: '2rem', fontWeight: 700 }}>1,240</div>
-                                <p style={{ color: 'var(--color-text-dim)' }}>XP gagnés cette semaine</p>
-                            </Card>
 
-                            <Card style={{ background: 'linear-gradient(135deg, rgba(255, 159, 67, 0.1), rgba(0,0,0,0))' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                                    <div style={{ padding: '0.75rem', background: 'rgba(255, 159, 67, 0.2)', borderRadius: '8px', color: 'var(--color-secondary)' }}>
-                                        <Award size={24} />
+                                    <h2 style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900, textTransform: 'uppercase', marginBottom: '0.2rem' }}>{user?.displayName || 'Chasseur'}</h2>
+                                    <p style={{ fontFamily: 'monospace', fontSize: '1rem', opacity: 0.7, marginBottom: '2rem' }}>ID: 8094-1290-BING</p>
+
+                                    <div style={{ marginBottom: '2rem', textAlign: 'left' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontWeight: 700 }}>
+                                            <span>EXPÉRIENCE</span>
+                                            <span>{xp} / {xpToNextLevel}</span>
+                                        </div>
+                                        <div style={{ height: '12px', background: '#eee', border: '2px solid #000' }}>
+                                            <div style={{ height: '100%', width: `${(xp / xpToNextLevel) * 100}%`, background: 'var(--color-primary)' }} />
+                                        </div>
                                     </div>
-                                    <h3 style={{ fontSize: '1.1rem' }}>Rareté</h3>
-                                </div>
-                                <div style={{ fontSize: '2rem', fontWeight: 700 }}>Top 5%</div>
-                                <p style={{ color: 'var(--color-text-dim)' }}>Classement global</p>
-                            </Card>
-                        </div>
 
-                        <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>Badges Récents</h3>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '1.5rem' }}>
-                            {badges.map((badge) => (
-                                <motion.div
-                                    key={badge.id}
-                                    whileHover={{ scale: 1.05 }}
-                                    style={{ textAlign: 'center' }}
-                                >
-                                    <div style={{
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
+                                        <div style={{ border: '2px solid #000', padding: '0.5rem' }}>
+                                            <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{streak}</div>
+                                            <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 700 }}>Jours Streak</div>
+                                        </div>
+                                        <div style={{ border: '2px solid #000', padding: '0.5rem' }}>
+                                            <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{badges.length}</div>
+                                            <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 700 }}>Badges</div>
+                                        </div>
+                                    </div>
+
+                                    <Button variant="outline" style={{ width: '100%', border: '2px solid var(--color-primary)', borderRadius: 0, fontWeight: 900 }} icon={<LogOut size={16} />} onClick={handleLogout}>DECONNEXION</Button>
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        {/* Content & Stats */}
+                        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
+                                <div className="manga-panel" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem', background: '#fff', color: '#000' }}>
+                                    <div style={{ padding: '1rem', background: '#000', color: '#fff' }}>
+                                        <Zap size={32} />
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '2rem', fontWeight: 900 }}>1,240</div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.8rem', opacity: 0.6 }}>XP Gagnés (7j)</p>
+                                    </div>
+                                </div>
+
+                                <div className="manga-panel" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem', background: '#fff', color: '#000' }}>
+                                    <div style={{ padding: '1rem', background: '#000', color: '#fff' }}>
+                                        <Award size={32} />
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '2rem', fontWeight: 900 }}>TOP 5%</div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.8rem', opacity: 0.6 }}>Classement</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h3 className="manga-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem', background: 'var(--color-secondary)', color: '#000' }}>Badges Récents</h3>
+                            <div className="manga-panel" style={{ padding: '2rem', background: '#fff', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '2rem' }}>
+                                {badges.map((badge) => (
+                                    <motion.div
+                                        key={badge.id}
+                                        whileHover={{ scale: 1.1, rotate: 5 }}
+                                        style={{ textAlign: 'center' }}
+                                    >
+                                        <div style={{
+                                            width: '80px',
+                                            height: '80px',
+                                            margin: '0 auto 0.5rem',
+                                            background: badge.rarity === 'legendary' ? '#ffd700' : '#000',
+                                            color: badge.rarity === 'legendary' ? '#000' : '#fff',
+                                            borderRadius: '50%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontSize: '2.5rem',
+                                            border: '3px solid #000',
+                                            boxShadow: '4px 4px 0 rgba(0,0,0,0.2)'
+                                        }}>
+                                            {badge.icon}
+                                        </div>
+                                        <p style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', color: '#000' }}>{badge.name}</p>
+                                    </motion.div>
+                                ))}
+
+                                {/* Placeholder empty badges */}
+                                {[1, 2, 3, 4].map(i => (
+                                    <div key={i} style={{
                                         width: '80px',
                                         height: '80px',
-                                        margin: '0 auto 0.5rem',
-                                        background: 'var(--color-surface)',
-                                        borderRadius: '12px',
+                                        margin: '0 auto',
+                                        background: '#eee',
+                                        borderRadius: '50%',
+                                        border: '3px dashed #ccc',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        fontSize: '2.5rem',
-                                        border: badge.rarity === 'legendary' ? '2px solid #ffd700' : '1px solid var(--glass-border)',
-                                        boxShadow: badge.rarity === 'legendary' ? '0 0 15px rgba(255, 215, 0, 0.3)' : 'none'
+                                        color: '#ccc',
+                                        fontWeight: 900,
+                                        fontSize: '1.5rem'
                                     }}>
-                                        {badge.icon}
+                                        ?
                                     </div>
-                                    <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>{badge.name}</p>
-                                </motion.div>
-                            ))}
-
-                            {/* Placeholder empty badges */}
-                            {[1, 2, 3, 4].map(i => (
-                                <div key={i} style={{
-                                    width: '80px',
-                                    height: '80px',
-                                    margin: '0 auto',
-                                    background: 'rgba(255,255,255,0.03)',
-                                    borderRadius: '12px',
-                                    border: '1px dashed var(--color-text-dim)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    opacity: 0.5
-                                }}>
-                                    ?
-                                </div>
-                            ))}
-                        </div>
-                    </motion.div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    </div>
                 </div>
             </div>
         </Layout>

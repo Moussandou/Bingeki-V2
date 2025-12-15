@@ -1,5 +1,6 @@
 @import './tokens.css';
 @import './animations.css';
+@import './manga-theme.css';
 
 * {
     box-sizing: border-box;
