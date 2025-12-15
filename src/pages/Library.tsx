@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { Search, Plus, Filter, Grid, List } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -13,7 +13,7 @@ export default function Library() {
 
     return (
         <Layout>
-            <div className="bg-halftone" style={{ minHeight: 'calc(100vh - 80px)' }}>
+            <div style={{ minHeight: 'calc(100vh - 80px)' }}>
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
 
                     {/* Header Panel */}

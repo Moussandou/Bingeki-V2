@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { XPBar } from '@/components/XPBar';
 import { StreakCounter } from '@/components/StreakCounter';
-import { Play, Plus, ChevronRight, User } from 'lucide-react';
+import { Play, Plus, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
@@ -15,8 +15,7 @@ export default function Dashboard() {
 
     return (
         <Layout>
-            {/* Manga Background Texture */}
-            <div className="bg-halftone" style={{ minHeight: 'calc(100vh - 80px)' }}>
+            <div style={{ minHeight: 'calc(100vh - 80px)' }}>
 
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
 
