@@ -4,7 +4,7 @@ import { cn } from '@/utils/cn';
 import styles from './Button.module.css';
 
 interface ButtonProps extends HTMLMotionProps<"button"> {
-    variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+    variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'manga';
     size?: 'sm' | 'md' | 'lg' | 'icon';
     isLoading?: boolean;
     icon?: React.ReactNode;

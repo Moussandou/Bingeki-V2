@@ -13,101 +13,135 @@ export default function Library() {
 
     return (
         <Layout>
-            <div className="container" style={{ paddingBottom: '4rem' }}>
-                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                    <div>
-                        <h1 className="text-gradient" style={{ fontSize: '2.5rem' }}>Bibliothèque</h1>
-                        <p style={{ color: 'var(--color-text-dim)' }}>Vos aventures en cours et terminées</p>
-                    </div>
-                    <Button onClick={() => setIsAddModalOpen(true)} icon={<Plus size={18} />}>
-                        Ajouter
-                    </Button>
-                </header>
+            <div className="bg-halftone" style={{ minHeight: 'calc(100vh - 80px)' }}>
+                <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
 
-                {/* Filters & Search */}
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-                    <div style={{ flex: 1, minWidth: '250px' }}>
-                        <Input placeholder="Rechercher dans la bibliothèque..." icon={<Search size={18} />} />
-                    </div>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <Button variant="outline" icon={<Filter size={18} />}>Filtres</Button>
-                        <div style={{ background: 'var(--color-surface)', border: '1px solid var(--glass-border)', borderRadius: '4px', display: 'flex', padding: '0.25rem' }}>
-                            <button
-                                onClick={() => setViewMode('grid')}
-                                style={{ padding: '0.5rem', borderRadius: '2px', background: viewMode === 'grid' ? 'var(--color-surface-hover)' : 'transparent', color: viewMode === 'grid' ? '#fff' : 'var(--color-text-dim)' }}
-                            >
-                                <Grid size={18} />
-                            </button>
-                            <button
-                                onClick={() => setViewMode('list')}
-                                style={{ padding: '0.5rem', borderRadius: '2px', background: viewMode === 'list' ? 'var(--color-surface-hover)' : 'transparent', color: viewMode === 'list' ? '#fff' : 'var(--color-text-dim)' }}
-                            >
-                                <List size={18} />
-                            </button>
+                    {/* Header Panel */}
+                    <header className="manga-panel" style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '2rem',
+                        padding: '1.5rem',
+                        background: '#fff',
+                        color: '#000'
+                    }}>
+                        <div>
+                            <h1 className="text-outline" style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', lineHeight: 1, letterSpacing: '-1px', color: '#fff', textShadow: '2px 2px 0 #000' }}>Bibliothèque</h1>
+                            <p style={{ fontWeight: 600, opacity: 0.6 }}>Vos aventures en cours et terminées</p>
+                        </div>
+                        <Button variant="primary" onClick={() => setIsAddModalOpen(true)} icon={<Plus size={18} />} style={{ border: '2px solid #000', borderRadius: 0, boxShadow: '4px 4px 0 #000', color: '#fff' }}>
+                            AJOUTER
+                        </Button>
+                    </header>
+
+                    {/* Filters & Search Panel */}
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+                        <div style={{ flex: 1, minWidth: '250px' }}>
+                            <div className="manga-panel" style={{ padding: '0.5rem', display: 'flex', alignItems: 'center', background: '#fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.2)' }}>
+                                <Search size={20} style={{ margin: '0 0.5rem', color: '#000' }} />
+                                <input
+                                    placeholder="Rechercher une œuvre..."
+                                    style={{
+                                        border: 'none',
+                                        outline: 'none',
+                                        width: '100%',
+                                        fontFamily: 'var(--font-heading)',
+                                        fontSize: '1rem',
+                                        fontWeight: 600
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <Button variant="manga" icon={<Filter size={18} />}>FILTRES</Button>
+                            <div className="manga-panel" style={{ display: 'flex', padding: '0', background: '#fff', height: '100%', alignItems: 'center' }}>
+                                <button
+                                    onClick={() => setViewMode('grid')}
+                                    style={{
+                                        padding: '0 1rem',
+                                        height: '100%',
+                                        background: viewMode === 'grid' ? '#000' : 'transparent',
+                                        color: viewMode === 'grid' ? '#fff' : '#000',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        borderRight: '2px solid #000'
+                                    }}
+                                >
+                                    <Grid size={20} />
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('list')}
+                                    style={{
+                                        padding: '0 1rem',
+                                        height: '100%',
+                                        background: viewMode === 'list' ? '#000' : 'transparent',
+                                        color: viewMode === 'list' ? '#fff' : '#000',
+                                        border: 'none',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    <List size={20} />
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Library Grid / Wall */}
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                    gap: '2rem',
-                    perspective: '1000px' // For 3D tilt effect context
-                }}>
-                    {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <motion.div
-                            key={i}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.05 }}
-                            whileHover={{
-                                scale: 1.05,
-                                rotateY: 5,
-                                zIndex: 10,
-                                transition: { duration: 0.2 }
-                            }}
-                            style={{ position: 'relative', transformStyle: 'preserve-3d' }}
-                        >
-                            <Card style={{ padding: 0, overflow: 'hidden', height: '100%', border: 'none' }}>
-                                <div style={{ position: 'relative', aspectRatio: '2/3' }}>
-                                    <img
-                                        src={`https://picsum.photos/seed/${i + 100}/400/600`}
-                                        alt="Cover"
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                    />
-                                    <div style={{
-                                        position: 'absolute',
-                                        inset: 0,
-                                        background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 50%)'
-                                    }} />
+                    {/* Library Grid */}
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                        gap: '2rem',
+                    }}>
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: i * 0.05 }}
+                                whileHover={{ y: -5 }}
+                            >
+                                <Card variant="manga" style={{ padding: 0, overflow: 'hidden', height: '100%', border: '2px solid #000' }}>
+                                    <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid #000' }}>
+                                        <img
+                                            src={`https://picsum.photos/seed/${i + 100}/400/600`}
+                                            alt="Cover"
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'grayscale(20%) contrast(1.1)' }}
+                                        />
 
-                                    {/* Halftone overlay effect on hover (simulated with opacity) */}
-                                    <div className="halftone-overlay" style={{
-                                        position: 'absolute',
-                                        inset: 0,
-                                        background: 'radial-gradient(circle, #000 1px, transparent 1px)',
-                                        backgroundSize: '4px 4px',
-                                        opacity: 0,
-                                        transition: 'opacity 0.2s'
-                                    }} />
-
-                                    <div style={{ position: 'absolute', bottom: 0, padding: '1rem', width: '100%' }}>
-                                        <h3 style={{ fontSize: '1.1rem', marginBottom: '0.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                            Titre de l'œuvre {i}
-                                        </h3>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--color-text-dim)' }}>
-                                            <span>Chapitre {10 * i}</span>
-                                            <span>Manga</span>
+                                        {/* Tag */}
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '0.5rem',
+                                            left: '0.5rem',
+                                            background: '#000',
+                                            color: '#fff',
+                                            padding: '2px 8px',
+                                            fontWeight: 900,
+                                            fontSize: '0.75rem',
+                                            transform: 'skewX(-10deg)',
+                                            border: '1px solid #fff'
+                                        }}>
+                                            MANGA
                                         </div>
                                     </div>
-                                </div>
-                            </Card>
-                        </motion.div>
-                    ))}
-                </div>
 
-                <AddWorkModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
+                                    <div style={{ padding: '1rem', background: '#fff', color: '#000' }}>
+                                        <h3 style={{ fontSize: '1.2rem', fontFamily: 'var(--font-heading)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.5rem', lineHeight: 1.1 }}>
+                                            Titre de l'œuvre {i}
+                                        </h3>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600 }}>
+                                            <span>CH. {10 * i}</span>
+                                            <span style={{ opacity: 0.5 }}>ENC.</span>
+                                        </div>
+                                    </div>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </div>
+
+                    <AddWorkModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
+                </div>
             </div>
         </Layout>
     );
