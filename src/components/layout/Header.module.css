@@ -17,48 +17,129 @@
     font-weight: 900;
     letter-spacing: -0.05em;
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
-/* Desktop Navigation - Hidden on Mobile */
+.navLink {
+    color: var(--color-text-dim);
+    font-weight: 500;
+    text-decoration: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navLink:hover {
+    color: var(--color-text);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.activeLink {
+    color: var(--color-primary);
+    background: rgba(255, 46, 99, 0.1);
+}
+
+.statusPill {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.4rem 1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-dim);
+}
+
+.levelValue {
+    color: var(--color-secondary);
+}
+
+.streakContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    color: #ff9f43;
+    /* Orange for fire/streak */
+}
+
+.actionButton {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: var(--color-text-dim);
+    transition: all 0.2s;
+    background: transparent;
+    border: 1px solid transparent;
+}
+
+.actionButton:hover {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--glass-border);
+}
+
+.kbd {
+    font-size: 0.7rem;
+    background: var(--color-surface);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--glass-border);
+    margin-left: 0.5rem;
+    color: var(--color-text-dim);
+}
+
+/* Desktop Navigation */
 .desktopNav {
     display: flex;
-    gap: 2rem;
+    gap: 1rem;
     align-items: center;
 }
 
-/* Mobile Bottom Dock - Hidden on Desktop */
+/* Mobile Bottom Dock */
 .mobileNav {
     display: none;
     position: fixed;
     bottom: 1.5rem;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(15, 16, 20, 0.85);
-    padding: 0.5rem 1.5rem;
-    border-radius: 999px;
+    background: rgba(15, 16, 20, 0.9);
+    padding: 0.75rem 2rem;
+    border-radius: 20px;
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     z-index: 100;
-    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
-    gap: 1.5rem;
-    animation: floatUp 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    gap: 2rem;
 }
 
-@keyframes floatUp {
-    from {
-        opacity: 0;
-        transform: translate(-50%, 20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translate(-50%, 0);
-    }
+.profileDropdown {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 4px 8px 4px 4px;
+    border-radius: 50px;
+    transition: background 0.2s;
 }
 
-/* Responsive Breakpoint */
-@media (max-width: 768px) {
+.profileDropdown:hover {
+    background: var(--color-surface);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
     .desktopNav {
         display: none;
     }
@@ -66,9 +147,14 @@
     .mobileNav {
         display: flex;
     }
+
+    /* Hide specific desktop-only elements on tablet/mobile if needed */
+    .desktopOnly {
+        display: none;
+    }
 }
 
-@media (min-width: 769px) {
+@media (min-width: 1025px) {
     .mobileNav {
         display: none !important;
     }
