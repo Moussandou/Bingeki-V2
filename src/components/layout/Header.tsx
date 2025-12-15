@@ -1,16 +1,27 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
-import { Menu, User, Book, Home, Zap, Search, Globe, Moon, ChevronDown, Flame } from 'lucide-react';
+import { Menu, User, Book, Home, Zap, Search, Globe, Moon, ChevronDown, Flame, Sun } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
+import { useSettingsStore } from '@/store/settingsStore';
 import styles from './Header.module.css';
 
 export function Header() {
     const { user } = useAuthStore();
     const { level, xp, streak } = useGamificationStore();
+    const { theme, toggleTheme } = useSettingsStore();
     const location = useLocation();
+    const navigate = useNavigate();
 
     const isActive = (path: string) => location.pathname === path;
+
+    const handleSearch = () => {
+        navigate('/library');
+    };
+
+    const handleLanguage = () => {
+        alert("La traduction anglaise sera disponible prochainement !");
+    };
 
     return (
         <>
@@ -62,26 +73,27 @@ export function Header() {
                                     </div>
 
                                     {/* Level Pill */}
-                                    <div className={styles.statusPill}>
-                                        <span className={styles.levelValue}>Lvl {level}</span>
-                                        <span style={{ opacity: 0.3 }}>|</span>
-                                        <span>{xp} XP</span>
-                                    </div>
+                                    <Link to="/profile" style={{ textDecoration: 'none' }}>
+                                        <div className={styles.statusPill} style={{ cursor: 'pointer' }}>
+                                            <span className={styles.levelValue}>Lvl {level}</span>
+                                            <span style={{ opacity: 0.3 }}>|</span>
+                                            <span>{xp} XP</span>
+                                        </div>
+                                    </Link>
                                 </div>
 
                                 {/* Actions */}
                                 <div className="desktopOnly" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <button className={styles.actionButton}>
+                                    <button className={styles.actionButton} onClick={handleSearch} title="Rechercher">
                                         <Search size={20} />
-                                        {/* <span className={styles.kbd}>⌘K</span> - Optional hint */}
                                     </button>
-                                    <button className={styles.actionButton}>
+                                    <button className={styles.actionButton} onClick={handleLanguage} title="Langue">
                                         <Globe size={20} />
                                         <span style={{ fontSize: '0.75rem', fontWeight: 700, marginLeft: 4 }}>FR</span>
                                     </button>
-                                    <Link to="/settings" className={styles.actionButton}>
-                                        <Moon size={20} />
-                                    </Link>
+                                    <button className={styles.actionButton} onClick={toggleTheme} title="Changer le thème">
+                                        {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
+                                    </button>
                                 </div>
 
                                 {/* Profile Dropdown */}
