@@ -1,6 +1,9 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
+import { useAuthStore } from '@/store/authStore';
+import { auth } from '@/firebase/config';
+import { onAuthStateChanged } from 'firebase/auth';
 
 // Lazy load pages
 const Opening = lazy(() => import('@/pages/Opening'));
@@ -12,6 +15,17 @@ const Profile = lazy(() => import('@/pages/Profile'));
 const Settings = lazy(() => import('@/pages/Settings'));
 
 function App() {
+  const { setUser, setLoading } = useAuthStore();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [setUser, setLoading]);
+
   return (
     <BrowserRouter>
       <Suspense fallback={<LoadingScreen />}>
