@@ -3,6 +3,7 @@ import Opening from '@/pages/Opening';
 import Auth from '@/pages/Auth';
 import Dashboard from '@/pages/Dashboard';
 import Library from '@/pages/Library';
+import WorkDetail from '@/pages/WorkDetail';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/auth" element={<Auth />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/library" element={<Library />} />
+        <Route path="/work/:id" element={<WorkDetail />} />
       </Routes>
     </BrowserRouter>
   )
