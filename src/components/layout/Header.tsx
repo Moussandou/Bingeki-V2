@@ -1,67 +1,116 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
-import { Menu, User, Book, Home, Zap } from 'lucide-react';
+import { Menu, User, Book, Home, Zap, Search, Globe, Moon, ChevronDown, Flame } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import { useGamificationStore } from '@/store/gamificationStore';
 import styles from './Header.module.css';
 
 export function Header() {
     const { user } = useAuthStore();
+    const { level, xp, streak } = useGamificationStore();
     const location = useLocation();
 
-    // Helper to check active state
     const isActive = (path: string) => location.pathname === path;
 
     return (
         <>
-            {/* Top Header (Global) */}
+            {/* Top Header */}
             <header className={styles.header}>
                 <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 
-                    {/* Logo Section */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                        <Link to="/" className={`${styles.logo} text-gradient`}>
-                            BINGEKI
-                        </Link>
+                    {/* Left: Logo */}
+                    <Link to="/" className={`${styles.logo} text-gradient`}>
+                        {/* Using a box icon as in the reference image */}
+                        <div style={{ width: 32, height: 32, background: 'var(--gradient-primary)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                            <Zap size={20} fill="currentColor" />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+                            <span>Bingeki</span>
+                            <span style={{ fontSize: '0.7rem', fontWeight: 500, opacity: 0.7, color: 'var(--color-text)' }}>Anime Tracker</span>
+                        </div>
+                    </Link>
 
-                        {/* Desktop Navigation Links (Inline) */}
-                        {user && (
-                            <nav className={styles.desktopNav}>
-                                <Link to="/dashboard" className="hover-scale" style={{ color: isActive('/dashboard') ? 'var(--color-primary)' : 'var(--color-text-dim)', fontWeight: 500 }}>
-                                    Q.G.
-                                </Link>
-                                <Link to="/library" className="hover-scale" style={{ color: isActive('/library') ? 'var(--color-primary)' : 'var(--color-text-dim)', fontWeight: 500 }}>
-                                    Bibliothèque
-                                </Link>
-                            </nav>
-                        )}
-                    </div>
+                    {/* Center: Navigation (Desktop) */}
+                    {user && (
+                        <nav className={styles.desktopNav}>
+                            <Link to="/dashboard" className={`${styles.navLink} ${isActive('/dashboard') ? styles.activeLink : ''}`}>
+                                <Home size={18} />
+                                <span>Q.G.</span>
+                            </Link>
+                            <Link to="/library" className={`${styles.navLink} ${isActive('/library') ? styles.activeLink : ''}`}>
+                                <Book size={18} />
+                                <span>Bibliothèque</span>
+                            </Link>
+                            <Link to="/profile" className={`${styles.navLink} ${isActive('/profile') ? styles.activeLink : ''}`}>
+                                <User size={18} />
+                                <span>Tableau de bord</span>
+                            </Link>
+                        </nav>
+                    )}
 
-                    {/* Right Actions */}
-                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    {/* Right: Stats & Actions */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+
                         {user ? (
                             <>
-                                <Link to="/profile" className="hidden-mobile">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '4px 12px', background: 'var(--color-surface)', borderRadius: '20px', border: '1px solid var(--glass-border)' }}>
-                                        <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#333', overflow: 'hidden' }}>
-                                            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" />
-                                        </div>
-                                        <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{user.displayName || 'Héros'}</span>
+                                {/* Stats (Desktop only mainly) */}
+                                <div className="desktopOnly" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                                    {/* Streak */}
+                                    <div className={styles.streakContainer}>
+                                        <Flame size={20} fill="currentColor" />
+                                        <span>{streak}</span>
                                     </div>
+
+                                    {/* Level Pill */}
+                                    <div className={styles.statusPill}>
+                                        <span className={styles.levelValue}>Lvl {level}</span>
+                                        <span style={{ opacity: 0.3 }}>|</span>
+                                        <span>{xp} XP</span>
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="desktopOnly" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <button className={styles.actionButton}>
+                                        <Search size={20} />
+                                        {/* <span className={styles.kbd}>⌘K</span> - Optional hint */}
+                                    </button>
+                                    <button className={styles.actionButton}>
+                                        <Globe size={20} />
+                                        <span style={{ fontSize: '0.75rem', fontWeight: 700, marginLeft: 4 }}>FR</span>
+                                    </button>
+                                    <Link to="/settings" className={styles.actionButton}>
+                                        <Moon size={20} />
+                                    </Link>
+                                </div>
+
+                                {/* Profile Dropdown */}
+                                <Link to="/profile" className={styles.profileDropdown}>
+                                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#333', overflow: 'hidden', border: '2px solid var(--color-surface)' }}>
+                                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%' }} />
+                                    </div>
+                                    <span className="hidden-mobile" style={{ fontSize: '0.9rem', fontWeight: 600 }}>{user.displayName || 'Héros'}</span>
+                                    <ChevronDown size={16} className="hidden-mobile" style={{ opacity: 0.5 }} />
                                 </Link>
-                                <Button variant="ghost" size="icon">
-                                    <Menu size={20} />
-                                </Button>
                             </>
                         ) : (
                             <Link to="/auth">
                                 <Button size="sm">Connexion</Button>
                             </Link>
                         )}
+
+                        {/* Mobile Menu Toggle (if needed, but using dock) */}
+                        <div className="mobileOnly" style={{ display: 'none' }}> {/* Keeping consistent with new design - using Dock */}
+                            <Button variant="ghost" size="icon">
+                                <Menu size={20} />
+                            </Button>
+                        </div>
+
                     </div>
                 </div>
             </header>
 
-            {/* Mobile Bottom Dock (Floating) */}
+            {/* Mobile Bottom Dock */}
             {user && (
                 <nav className={styles.mobileNav}>
                     <Link to="/dashboard">
