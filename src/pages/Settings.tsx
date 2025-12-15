@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/Card';
 import { Switch } from '@/components/ui/Switch';
 import { useSettingsStore } from '@/store/settingsStore';
 import { motion } from 'framer-motion';
-import { Volume2, Monitor, Bell, Eye } from 'lucide-react';
+import { Volume2, Monitor, Eye } from 'lucide-react';
 
 export default function Settings() {
     const {
