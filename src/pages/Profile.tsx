@@ -4,12 +4,21 @@ import { Button } from '@/components/ui/Button';
 import { XPBar } from '@/components/XPBar';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { useAuthStore } from '@/store/authStore';
+import { logout } from '@/firebase/auth';
 import { Settings, LogOut, Award, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
-    const { user } = useAuthStore();
+    const { user, setUser } = useAuthStore();
     const { level, xp, xpToNextLevel, streak, badges } = useGamificationStore();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        await logout();
+        setUser(null);
+        navigate('/');
+    };
 
     return (
         <Layout>
@@ -50,7 +59,7 @@ export default function Profile() {
                                 </div>
                             </div>
 
-                            <Button variant="outline" style={{ width: '100%' }} icon={<LogOut size={16} />}>Déconnexion</Button>
+                            <Button variant="outline" style={{ width: '100%' }} icon={<LogOut size={16} />} onClick={handleLogout}>Déconnexion</Button>
                         </Card>
                     </motion.div>
 
