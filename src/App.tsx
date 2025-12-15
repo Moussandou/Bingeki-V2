@@ -5,6 +5,7 @@ import Dashboard from '@/pages/Dashboard';
 import Library from '@/pages/Library';
 import WorkDetail from '@/pages/WorkDetail';
 import Profile from '@/pages/Profile';
+import Settings from '@/pages/Settings';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/library" element={<Library />} />
         <Route path="/work/:id" element={<WorkDetail />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </BrowserRouter>
   )
