@@ -1,0 +1,109 @@
+/* Keyframes */
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 0 5px var(--color-primary-glow);
+    }
+
+    50% {
+        box-shadow: 0 0 20px var(--color-primary-glow), 0 0 10px var(--color-primary);
+    }
+
+    100% {
+        box-shadow: 0 0 5px var(--color-primary-glow);
+    }
+}
+
+@keyframes glitch {
+    0% {
+        transform: translate(0);
+    }
+
+    20% {
+        transform: translate(-2px, 2px);
+    }
+
+    40% {
+        transform: translate(-2px, -2px);
+    }
+
+    60% {
+        transform: translate(2px, 2px);
+    }
+
+    80% {
+        transform: translate(2px, -2px);
+    }
+
+    100% {
+        transform: translate(0);
+    }
+}
+
+@keyframes scanline {
+    0% {
+        transform: translateY(-100%);
+    }
+
+    100% {
+        transform: translateY(100%);
+    }
+}
+
+/* Animation Utilities */
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse {
+    animation: pulse-glow 2s infinite;
+}
+
+.animate-glitch:hover {
+    animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+}
+
+.hover-scale {
+    transition: transform var(--duration-fast) var(--ease-expo);
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+/* Screen Transitions */
+.page-transition-enter {
+    opacity: 0;
+    transform: scale(0.98);
+}
+
+.page-transition-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.page-transition-exit-active {
+    opacity: 0;
+    transform: scale(0.98);
+    transition: opacity 300ms, transform 300ms;
+}
