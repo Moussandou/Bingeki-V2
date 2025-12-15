@@ -3,10 +3,16 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { XPBar } from '@/components/XPBar';
 import { StreakCounter } from '@/components/StreakCounter';
-import { Play, Plus, ChevronRight } from 'lucide-react';
+import { Play, Plus, ChevronRight, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuthStore } from '@/store/authStore';
+import { useGamificationStore } from '@/store/gamificationStore';
+import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
+    const { user } = useAuthStore();
+    const { level, xp, xpToNextLevel, streak } = useGamificationStore();
+
     return (
         <Layout>
             <div className="container" style={{ paddingBottom: '4rem' }}>
@@ -33,7 +39,7 @@ export default function Dashboard() {
                             boxShadow: '0 0 20px var(--color-primary-glow)'
                         }}
                     >
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Avatar" style={{ width: '100%', height: '100%' }} />
+                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%' }} />
                     </motion.div>
 
                     <div style={{ flex: 1, minWidth: '300px' }}>
@@ -43,21 +49,25 @@ export default function Dashboard() {
                                 animate={{ x: 0, opacity: 1 }}
                                 style={{ fontSize: '2.5rem', lineHeight: 1 }}
                             >
-                                Bonjour, <span className="text-gradient">Héros</span>
+                                Bonjour, <span className="text-gradient">{user?.displayName || 'Héros'}</span>
                             </motion.h2>
-                            <StreakCounter count={14} />
+                            <StreakCounter count={streak} />
                         </div>
 
                         <div style={{ marginTop: '1.5rem', maxWidth: '500px' }}>
-                            <XPBar current={2450} max={3000} level={12} />
+                            <XPBar current={xp} max={xpToNextLevel} level={level} />
                         </div>
                     </div>
                 </section>
 
                 {/* Quick Actions */}
                 <section style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem' }}>
-                    <Button variant="outline" icon={<Plus size={16} />}>Ajouter une œuvre</Button>
-                    <Button variant="ghost">Voir mon profil</Button>
+                    <Link to="/library">
+                        <Button variant="outline" icon={<Plus size={16} />}>Ajouter une œuvre</Button>
+                    </Link>
+                    <Link to="/profile">
+                        <Button variant="ghost" icon={<User size={16} />}>Voir mon profil</Button>
+                    </Link>
                 </section>
 
                 {/* Continue Reading */}
@@ -70,7 +80,9 @@ export default function Dashboard() {
                         }}>
                             EN COURS
                         </h3>
-                        <Button variant="ghost" size="sm">Tout voir <ChevronRight size={16} /></Button>
+                        <Link to="/library">
+                            <Button variant="ghost" size="sm">Tout voir <ChevronRight size={16} /></Button>
+                        </Link>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
@@ -95,9 +107,11 @@ export default function Dashboard() {
                                             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-dim)' }}>Il y a 2h</span>
                                         </div>
                                         <div style={{ marginTop: '1rem' }}>
-                                            <Button size="sm" style={{ width: '100%' }}>
-                                                <Play size={14} /> Continuer
-                                            </Button>
+                                            <Link to="/work/1">
+                                                <Button size="sm" style={{ width: '100%' }}>
+                                                    <Play size={14} /> Continuer
+                                                </Button>
+                                            </Link>
                                         </div>
                                     </div>
                                 </Card>
