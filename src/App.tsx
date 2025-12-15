@@ -4,6 +4,7 @@ import Auth from '@/pages/Auth';
 import Dashboard from '@/pages/Dashboard';
 import Library from '@/pages/Library';
 import WorkDetail from '@/pages/WorkDetail';
+import Profile from '@/pages/Profile';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/library" element={<Library />} />
         <Route path="/work/:id" element={<WorkDetail />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   )
