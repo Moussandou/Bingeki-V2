@@ -4,18 +4,33 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { Mail, Lock, User, Github } from 'lucide-react';
+import { loginWithGoogle } from '@/firebase/auth';
+import { useAuthStore } from '@/store/authStore';
+import { useNavigate } from 'react-router-dom';
 
 export default function Auth() {
     const [isLogin, setIsLogin] = useState(true);
     const [loading, setLoading] = useState(false);
+    const { setUser } = useAuthStore();
+    const navigate = useNavigate();
 
     const toggleMode = () => setIsLogin(!isLogin);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        // Simulate auth
+        // Simulate email auth for now (implement later if needed)
         setTimeout(() => setLoading(false), 2000);
+    };
+
+    const handleGoogleLogin = async () => {
+        setLoading(true);
+        const user = await loginWithGoogle();
+        if (user) {
+            setUser(user);
+            navigate('/dashboard');
+        }
+        setLoading(false);
     };
 
     return (
@@ -95,7 +110,7 @@ export default function Auth() {
                                 <div style={{ flex: 1, height: '1px', background: 'var(--glass-border)' }} />
                             </div>
 
-                            <Button type="button" variant="outline">
+                            <Button type="button" variant="outline" onClick={handleGoogleLogin} disabled={loading}>
                                 <Github size={18} /> Continuer avec Google
                             </Button>
                         </form>
