@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
-import { Menu, User, Grid, Book, Home } from 'lucide-react';
+import { Menu, User, Book, Home, Zap } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import styles from './Header.module.css';
 
 export function Header() {
     const { user } = useAuthStore();
@@ -11,50 +12,75 @@ export function Header() {
     const isActive = (path: string) => location.pathname === path;
 
     return (
-        <header className="glass-panel" style={{ position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 50, padding: '0.75rem 0' }}>
-            <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Link to="/" style={{ fontSize: '1.5rem', fontWeight: 900, letterSpacing: '-0.05em' }} className="text-gradient">
-                    BINGEKI
-                </Link>
+        <>
+            {/* Top Header (Global) */}
+            <header className={styles.header}>
+                <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 
-                {/* Main Navigation - Visible if logged in */}
-                {user && (
-                    <nav style={{ display: 'flex', gap: '0.5rem', position: 'fixed', bottom: '1rem', left: '50%', transform: 'translateX(-50%)', background: 'rgba(20,20,30,0.9)', padding: '0.5rem 1.5rem', borderRadius: '50px', border: '1px solid var(--glass-border)', backdropFilter: 'blur(10px)', zIndex: 100 }}>
-                        <Link to="/dashboard">
-                            <Button variant={isActive('/dashboard') ? 'primary' : 'ghost'} size="icon">
-                                <Home size={20} />
-                            </Button>
+                    {/* Logo Section */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                        <Link to="/" className={`${styles.logo} text-gradient`}>
+                            BINGEKI
                         </Link>
-                        <Link to="/library">
-                            <Button variant={isActive('/library') ? 'primary' : 'ghost'} size="icon">
-                                <Book size={20} />
-                            </Button>
-                        </Link>
-                        <Link to="/profile">
-                            <Button variant={isActive('/profile') ? 'primary' : 'ghost'} size="icon">
-                                <User size={20} />
-                            </Button>
-                        </Link>
-                    </nav>
-                )}
 
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    {user ? (
-                        <Link to="/profile">
-                            <Button variant="ghost" size="icon" className="hidden-mobile">
-                                <User size={20} />
-                            </Button>
-                        </Link>
-                    ) : (
-                        <Link to="/auth">
-                            <Button size="sm">Connexion</Button>
-                        </Link>
-                    )}
-                    <Button variant="ghost" size="icon">
-                        <Menu size={20} />
-                    </Button>
+                        {/* Desktop Navigation Links (Inline) */}
+                        {user && (
+                            <nav className={styles.desktopNav}>
+                                <Link to="/dashboard" className="hover-scale" style={{ color: isActive('/dashboard') ? 'var(--color-primary)' : 'var(--color-text-dim)', fontWeight: 500 }}>
+                                    Q.G.
+                                </Link>
+                                <Link to="/library" className="hover-scale" style={{ color: isActive('/library') ? 'var(--color-primary)' : 'var(--color-text-dim)', fontWeight: 500 }}>
+                                    Bibliothèque
+                                </Link>
+                            </nav>
+                        )}
+                    </div>
+
+                    {/* Right Actions */}
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        {user ? (
+                            <>
+                                <Link to="/profile" className="hidden-mobile">
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '4px 12px', background: 'var(--color-surface)', borderRadius: '20px', border: '1px solid var(--glass-border)' }}>
+                                        <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#333', overflow: 'hidden' }}>
+                                            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" />
+                                        </div>
+                                        <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{user.displayName || 'Héros'}</span>
+                                    </div>
+                                </Link>
+                                <Button variant="ghost" size="icon">
+                                    <Menu size={20} />
+                                </Button>
+                            </>
+                        ) : (
+                            <Link to="/auth">
+                                <Button size="sm">Connexion</Button>
+                            </Link>
+                        )}
+                    </div>
                 </div>
-            </div>
-        </header>
+            </header>
+
+            {/* Mobile Bottom Dock (Floating) */}
+            {user && (
+                <nav className={styles.mobileNav}>
+                    <Link to="/dashboard">
+                        <Button variant={isActive('/dashboard') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                            <Home size={22} />
+                        </Button>
+                    </Link>
+                    <Link to="/library">
+                        <Button variant={isActive('/library') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                            <Book size={22} />
+                        </Button>
+                    </Link>
+                    <Link to="/profile">
+                        <Button variant={isActive('/profile') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                            <User size={22} />
+                        </Button>
+                    </Link>
+                </nav>
+            )}
+        </>
     );
 }
