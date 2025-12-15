@@ -1,7 +1,42 @@
 /* Global Manga Theme Utilities */
 
 /* Patterns */
+.manga-bg-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background-color: var(--color-background);
+    /* Uses global theme bg */
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.manga-halftone {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.08;
+    /* Adaptive halftone color based on theme via CSS variable or default */
+    background-image: radial-gradient(var(--color-text) 2px, transparent 2.5px);
+    background-size: 20px 20px;
+}
+
+.manga-speedlines {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.03;
+    background: repeating-conic-gradient(from 0deg,
+            transparent 0deg 10deg,
+            var(--color-text) 10deg 12deg);
+}
+
+/* Utilities for Containers */
 .bg-halftone {
+    /* Legacy/Specific container usage if needed */
     position: relative;
     overflow: hidden;
 }
@@ -12,25 +47,8 @@
     inset: 0;
     z-index: 0;
     opacity: 0.05;
-    background-image: radial-gradient(#fff 2px, transparent 2.5px);
+    background-image: radial-gradient(var(--color-text) 2px, transparent 2.5px);
     background-size: 20px 20px;
-    pointer-events: none;
-}
-
-/* For dark mode specific halftone */
-[data-theme='dark'] .bg-halftone::before {
-    background-image: radial-gradient(rgba(255, 255, 255, 0.15) 2px, transparent 2.5px);
-}
-
-.bg-speedlines::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    opacity: 0.03;
-    background: repeating-conic-gradient(from 0deg,
-            transparent 0deg 10deg,
-            var(--color-text) 10deg 12deg);
     pointer-events: none;
 }
 

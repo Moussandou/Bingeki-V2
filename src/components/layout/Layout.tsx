@@ -10,6 +10,10 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
     return (
         <>
+            <div className="manga-bg-container">
+                <div className="manga-halftone" />
+                <div className="manga-speedlines" />
+            </div>
             <Header />
             <motion.main
                 initial={{ opacity: 0, y: 20 }}

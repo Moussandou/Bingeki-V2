@@ -1,7 +1,7 @@
 import { Layout } from '@/components/layout/Layout';
-import { Card } from '@/components/ui/Card';
+
 import { Button } from '@/components/ui/Button';
-import { XPBar } from '@/components/XPBar';
+
 import { useGamificationStore } from '@/store/gamificationStore';
 import { useAuthStore } from '@/store/authStore';
 import { logout } from '@/firebase/auth';
@@ -22,7 +22,7 @@ export default function Profile() {
 
     return (
         <Layout>
-            <div className="bg-halftone" style={{ minHeight: 'calc(100vh - 80px)' }}>
+            <div style={{ minHeight: 'calc(100vh - 80px)' }}>
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
