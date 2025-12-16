@@ -6,6 +6,7 @@ import { searchWorks, type JikanResult } from '@/services/animeApi';
 import { PenTool, Globe, Loader2, Plus, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLibraryStore, type Work } from '@/store/libraryStore';
+import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
 
 interface AddWorkModalProps {
     isOpen: boolean;
@@ -19,6 +20,7 @@ export function AddWorkModal({ isOpen, onClose }: AddWorkModalProps) {
     const [loading, setLoading] = useState(false);
     const [type, setType] = useState<'manga' | 'anime'>('manga');
     const { addWork, works } = useLibraryStore();
+    const { addXp, recordActivity, incrementStat } = useGamificationStore();
 
     // Live Search with Debounce
     useEffect(() => {
@@ -52,8 +54,10 @@ export function AddWorkModal({ isOpen, onClose }: AddWorkModalProps) {
             status: 'reading',
         };
         addWork(newWork);
-        // Optional: show a small toast or feedback, but for now we keep the modal open or close it?
-        // User might want to add multiple. Let's keep it open but show feedback.
+        // Award XP for adding a work
+        addXp(XP_REWARDS.ADD_WORK);
+        recordActivity();
+        incrementStat('works');
     };
 
     const isAdded = (id: number) => works.some(w => w.id === id);

@@ -26,7 +26,7 @@ export default function Profile() {
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                        <h1 className="text-outline" style={{ fontSize: '3rem', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', color: '#fff', textShadow: '3px 3px 0 #000' }}>
+                        <h1 className="text-outline" style={{ fontSize: '3rem', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', color: '#000', textShadow: '2px 2px 0 rgba(0,0,0,0.1)' }}>
                             Fiche de Chasseur
                         </h1>
                         <Button variant="manga" size="icon"><Settings size={20} /></Button>

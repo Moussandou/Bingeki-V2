@@ -5,11 +5,13 @@ import { Button } from '@/components/ui/Button';
 import { ArrowLeft, BookOpen, Check, Trophy } from 'lucide-react';
 import { useState } from 'react';
 import { statusToFrench } from '@/utils/statusTranslation';
+import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
 
 export default function WorkDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { getWork, updateProgress, updateStatus } = useLibraryStore();
+    const { addXp, recordActivity, incrementStat } = useGamificationStore();
     const work = getWork(Number(id));
     const [isEditing, setIsEditing] = useState(false);
     const [progress, setProgress] = useState(work?.currentChapter || 0);
@@ -26,7 +28,26 @@ export default function WorkDetails() {
     }
 
     const handleSave = () => {
+        const oldProgress = work?.currentChapter || 0;
         updateProgress(work.id, progress);
+
+        // Award XP if progress increased
+        if (progress > oldProgress) {
+            const chaptersRead = progress - oldProgress;
+            for (let i = 0; i < chaptersRead; i++) {
+                incrementStat('chapters');
+            }
+            addXp(XP_REWARDS.UPDATE_PROGRESS * chaptersRead);
+            recordActivity();
+
+            // Bonus XP if work is completed
+            if (work.totalChapters && progress >= work.totalChapters) {
+                addXp(XP_REWARDS.COMPLETE_WORK);
+                updateStatus(work.id, 'completed');
+                incrementStat('completed');
+            }
+        }
+
         setIsEditing(false);
     };
 
