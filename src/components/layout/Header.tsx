@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
-import { Menu, User, Book, Home, Zap, ChevronDown, Flame, Search } from 'lucide-react';
+import { Menu, User, Book, Home, Zap, ChevronDown, Flame, Search, Trophy } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 import styles from './Header.module.css';
@@ -117,6 +117,11 @@ export function Header() {
                     <Link to="/discover">
                         <Button variant={isActive('/discover') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
                             <Search size={22} />
+                        </Button>
+                    </Link>
+                    <Link to="/social">
+                        <Button variant={isActive('/social') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                            <Trophy size={22} />
                         </Button>
                     </Link>
                     <Link to="/profile">
