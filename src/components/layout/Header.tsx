@@ -41,6 +41,10 @@ export function Header() {
                                 <Book size={18} />
                                 <span>Bibliothèque</span>
                             </Link>
+                            <Link to="/discover" className={`${styles.navLink} ${isActive('/discover') ? styles.activeLink : ''}`}>
+                                <Search size={18} />
+                                <span>Découvrir</span>
+                            </Link>
                             <Link to="/profile" className={`${styles.navLink} ${isActive('/profile') ? styles.activeLink : ''}`}>
                                 <User size={18} />
                                 <span>Tableau de bord</span>
@@ -108,6 +112,11 @@ export function Header() {
                     <Link to="/library">
                         <Button variant={isActive('/library') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
                             <Book size={22} />
+                        </Button>
+                    </Link>
+                    <Link to="/discover">
+                        <Button variant={isActive('/discover') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                            <Search size={22} />
                         </Button>
                     </Link>
                     <Link to="/profile">

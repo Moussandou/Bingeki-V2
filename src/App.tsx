@@ -23,6 +23,7 @@ const Library = lazy(() => import('@/pages/Library'));
 const WorkDetails = lazy(() => import('@/pages/WorkDetails'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const Settings = lazy(() => import('@/pages/Settings'));
+const Discover = lazy(() => import('@/pages/Discover'));
 
 function App() {
   const { setUser, setLoading, user } = useAuthStore();
@@ -106,6 +107,7 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/library" element={<Library />} />
+          <Route path="/discover" element={<Discover />} />
           <Route path="/work/:id" element={<WorkDetails />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
