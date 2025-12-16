@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
-import { Menu, User, Book, Home, Zap, ChevronDown, Flame } from 'lucide-react';
+import { Menu, User, Book, Home, Zap, ChevronDown, Flame, Search } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 import styles from './Header.module.css';
