@@ -10,7 +10,7 @@ const Opening = lazy(() => import('@/pages/Opening'));
 const Auth = lazy(() => import('@/pages/Auth'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const Library = lazy(() => import('@/pages/Library'));
-const WorkDetail = lazy(() => import('@/pages/WorkDetail'));
+const WorkDetails = lazy(() => import('@/pages/WorkDetails'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const Settings = lazy(() => import('@/pages/Settings'));
 
@@ -34,7 +34,7 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/library" element={<Library />} />
-          <Route path="/work/:id" element={<WorkDetail />} />
+          <Route path="/work/:id" element={<WorkDetails />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
