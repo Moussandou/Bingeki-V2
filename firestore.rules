@@ -1,8 +1,43 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+
+    // Helper: User is authenticated and is the owner of the document path
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // Helper: User is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    match /users/{userId} {
+      // Public Read: Allows Search and Leaderboard
+      allow read: if isAuthenticated();
+      
+      // Write: Only owner can modify their root profile (XP, Level, Email, etc.)
+      allow write: if isOwner(userId);
+
+      // --- Subcollection: Data (Library & Gamification) ---
+      // Private Data. Only the owner can read/write their library and details.
+      match /data/{document=**} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // --- Subcollection: Friends ---
+      match /friends/{friendId} {
+        // 1. Owner Access: The user can see their own friends list, remove friends, etc.
+        allow read, write: if isOwner(userId);
+
+        // 2. Cross-User Access (Social Graph):
+        // Allow ANOTHER user (friendId) to write into THIS user's (userId) friend list
+        // IF the document ID matches their own UID.
+        // This covers:
+        // - Sending Request: User A writes to /users/B/friends/A
+        // - Accepting Request: User A updates /users/B/friends/A
+        allow create, update: if request.auth != null && request.auth.uid == friendId;
+      }
     }
   }
 }
