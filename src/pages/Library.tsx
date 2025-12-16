@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal'; // Import Modal
 
 import { AddWorkModal } from '@/components/AddWorkModal';
-import { useLibraryStore } from '@/store/libraryStore';
-import { Search, Plus, Filter, Grid, List, Trash2 } from 'lucide-react';
+import { useLibraryStore, type Work } from '@/store/libraryStore'; // Import Work type
+import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle } from 'lucide-react'; // Add AlertTriangle
 import { motion } from 'framer-motion';
 
 import { useNavigate } from 'react-router-dom';
@@ -14,12 +15,13 @@ import { statusToFrench } from '@/utils/statusTranslation';
 export default function Library() {
     const navigate = useNavigate();
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [workToDelete, setWorkToDelete] = useState<Work | null>(null); // State for delete confirmation
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [searchQuery, setSearchQuery] = useState('');
     const [filterOpen, setFilterOpen] = useState(false);
     const [filterType, setFilterType] = useState<'all' | 'manga' | 'anime'>('all');
     const [filterStatus, setFilterStatus] = useState<'all' | 'reading' | 'completed' | 'plan_to_read'>('all');
-    const { works } = useLibraryStore();
+    const { works, removeWork } = useLibraryStore(); // Destructure removeWork
 
     const filteredWorks = works.filter(work => {
         const matchesSearch = work.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -27,6 +29,13 @@ export default function Library() {
         const matchesStatus = filterStatus === 'all' || work.status === filterStatus;
         return matchesSearch && matchesType && matchesStatus;
     });
+
+    const confirmDelete = () => {
+        if (workToDelete) {
+            removeWork(workToDelete.id);
+            setWorkToDelete(null);
+        }
+    };
 
     return (
         <Layout>
@@ -234,9 +243,7 @@ export default function Library() {
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        if (window.confirm(`Supprimer "${work.title}" ?`)) {
-                                                            useLibraryStore.getState().removeWork(work.id);
-                                                        }
+                                                        setWorkToDelete(work);
                                                     }}
                                                     style={{
                                                         position: 'absolute',
@@ -326,9 +333,7 @@ export default function Library() {
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                if (window.confirm(`Supprimer "${work.title}" ?`)) {
-                                                    useLibraryStore.getState().removeWork(work.id);
-                                                }
+                                                setWorkToDelete(work);
                                             }}
                                             style={{
                                                 background: '#ff0000',
@@ -351,6 +356,36 @@ export default function Library() {
                     )}
 
                     <AddWorkModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
+
+                    {/* Delete Confirmation Modal */}
+                    <Modal isOpen={!!workToDelete} onClose={() => setWorkToDelete(null)} title="SUPPRESSION">
+                        <div style={{ textAlign: 'center', padding: '1rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                                <div style={{ background: '#fee2e2', padding: '1rem', borderRadius: '50%', color: '#dc2626' }}>
+                                    <AlertTriangle size={32} />
+                                </div>
+                            </div>
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem', color: '#000' }}>
+                                Supprimer "{workToDelete?.title}" ?
+                            </h3>
+                            <p style={{ marginBottom: '2rem', opacity: 0.7 }}>
+                                Cette action est irréversible. Votre progression et vos notes seront perdues.
+                            </p>
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                                <Button variant="ghost" onClick={() => setWorkToDelete(null)}>
+                                    ANNULER
+                                </Button>
+                                <Button
+                                    variant="primary"
+                                    onClick={confirmDelete}
+                                    style={{ background: '#dc2626', borderColor: '#b91c1c' }}
+                                >
+                                    SUPPRIMER
+                                </Button>
+                            </div>
+                        </div>
+                    </Modal>
+
                 </div>
             </div>
         </Layout >

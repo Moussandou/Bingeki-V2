@@ -10,6 +10,7 @@ import { useGamificationStore } from '@/store/gamificationStore';
 import { useLibraryStore } from '@/store/libraryStore';
 import { Link } from 'react-router-dom';
 import { statusToFrench } from '@/utils/statusTranslation';
+import { calculateRank, getRankColor } from '@/utils/rankUtils';
 
 export default function Dashboard() {
     const { user } = useAuthStore();
@@ -63,7 +64,9 @@ export default function Dashboard() {
                                 }}>
                                     {user?.displayName || 'Héros'}
                                 </h1>
-                                <span className="manga-title" style={{ fontSize: '0.9rem' }}>RANK F</span>
+                                <span className="manga-title" style={{ fontSize: '0.9rem', color: getRankColor(calculateRank(level)) }}>
+                                    RANK {calculateRank(level)}
+                                </span>
                             </div>
 
                             <div style={{ display: 'flex', gap: '2rem', marginTop: '1rem', alignItems: 'center' }}>
