@@ -8,7 +8,8 @@
     width: 100vw;
     height: 100vh;
     z-index: -1;
-    background-color: var(--color-background);
+    background-color: #ffffff;
+    color: #000000;
     /* Uses global theme bg */
     pointer-events: none;
     overflow: hidden;
