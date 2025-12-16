@@ -1,4 +1,4 @@
-import { Shield, PenTool, LogOut, Star } from 'lucide-react';
+import { Shield, LogOut, Star } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { type UserProfile } from '@/firebase/firestore';
 import { BADGE_ICONS } from '@/utils/badges';
@@ -13,13 +13,12 @@ interface HunterLicenseCardProps {
         badgeCount: number;
     };
     isOwnProfile?: boolean;
-    onEdit?: () => void;
     onLogout?: () => void;
     featuredBadgeData?: { icon: string, rarity: string, name: string } | null; // Pass full badge data if needed
     favoriteMangaData?: { title: string, image: string } | null;
 }
 
-export function HunterLicenseCard({ user, stats, isOwnProfile, onEdit, onLogout, featuredBadgeData, favoriteMangaData }: HunterLicenseCardProps) {
+export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, featuredBadgeData, favoriteMangaData }: HunterLicenseCardProps) {
     const borderColor = user.borderColor || '#000';
     const accentColor = user.themeColor || 'var(--color-primary)';
     const bgColor = user.cardBgColor || '#fff';
