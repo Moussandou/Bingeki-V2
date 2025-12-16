@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Mail, Lock, User, Zap } from 'lucide-react';
+import { Mail, Lock, User } from 'lucide-react';
 import { loginWithGoogle } from '@/firebase/auth';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate, Link } from 'react-router-dom';
@@ -52,9 +52,7 @@ export default function Auth() {
                 >
                     {/* Logo */}
                     <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
-                        <div style={{ width: 48, height: 48, background: 'var(--gradient-primary)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '4px 4px 0 #000' }}>
-                            <Zap size={28} fill="currentColor" />
-                        </div>
+                        <img src="/logo.png" alt="Bingeki Logo" style={{ width: 100, height: 100, objectFit: 'contain' }} />
                         <span style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>BINGEKI</span>
                     </Link>
 

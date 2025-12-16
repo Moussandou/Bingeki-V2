@@ -1,14 +1,17 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { Menu, User, Book, Home, Zap, ChevronDown, Flame, Search, Trophy } from 'lucide-react';
+import { Menu, User, Book, Home, ChevronDown, Flame, Search, Trophy, Settings, LogOut } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
+import { auth } from '@/firebase/config';
 import styles from './Header.module.css';
 
 export function Header() {
     const { user } = useAuthStore();
     const { level, xp, streak } = useGamificationStore();
     const location = useLocation();
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const isActive = (path: string) => location.pathname === path;
 
@@ -16,17 +19,14 @@ export function Header() {
         <>
             {/* Top Header */}
             <header className={styles.header}>
-                <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '2rem' }}>
 
                     {/* Left: Logo */}
                     <Link to="/" className={`${styles.logo} text-gradient`}>
-                        {/* Using a box icon as in the reference image */}
-                        <div style={{ width: 32, height: 32, background: 'var(--gradient-primary)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                            <Zap size={20} fill="currentColor" />
-                        </div>
+                        {/* Using the new logo image */}
+                        <img src="/logo.png" alt="Bingeki Logo" style={{ width: 60, height: 60, objectFit: 'contain' }} />
                         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
-                            <span>Bingeki</span>
-                            <span style={{ fontSize: '0.7rem', fontWeight: 500, opacity: 0.7, color: 'var(--color-text)' }}>Anime Tracker</span>
+                            <span style={{ fontSize: '1.2rem', fontFamily: 'var(--font-heading)', letterSpacing: '-1px' }}>BINGEKI</span>
                         </div>
                     </Link>
 
@@ -44,6 +44,10 @@ export function Header() {
                             <Link to="/discover" className={`${styles.navLink} ${isActive('/discover') ? styles.activeLink : ''}`}>
                                 <Search size={18} />
                                 <span>Découvrir</span>
+                            </Link>
+                            <Link to="/social" className={`${styles.navLink} ${isActive('/social') ? styles.activeLink : ''}`}>
+                                <Trophy size={18} />
+                                <span>Social</span>
                             </Link>
                             <Link to="/profile" className={`${styles.navLink} ${isActive('/profile') ? styles.activeLink : ''}`}>
                                 <User size={18} />
@@ -76,13 +80,65 @@ export function Header() {
                                 </div>
 
                                 {/* Profile Dropdown */}
-                                <Link to="/profile" className={styles.profileDropdown}>
-                                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#333', overflow: 'hidden', border: '2px solid #000' }}>
-                                        <img src={user?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    </div>
-                                    <span className="hidden-mobile" style={{ fontSize: '0.9rem', fontWeight: 700, color: '#000' }}>{user.displayName || 'Héros'}</span>
-                                    <ChevronDown size={16} className="hidden-mobile" style={{ opacity: 0.7, color: '#000' }} />
-                                </Link>
+                                <div style={{ position: 'relative' }}>
+                                    <button
+                                        className={styles.profileDropdown}
+                                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', padding: '4px', border: '2px solid #000', background: '#fff' }}
+                                    >
+                                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#333', overflow: 'hidden', border: '2px solid #000' }}>
+                                            <img src={user?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        </div>
+                                        <span className="hidden-mobile" style={{ fontSize: '0.9rem', fontWeight: 700, color: '#000' }}>{user.displayName || 'Héros'}</span>
+                                        <ChevronDown size={16} className="hidden-mobile" style={{ opacity: 0.7, color: '#000', transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+                                    </button>
+
+                                    {/* Dropdown Menu */}
+                                    {isDropdownOpen && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '120%',
+                                            right: 0,
+                                            width: '200px',
+                                            background: '#fff',
+                                            border: '3px solid #000',
+                                            boxShadow: '4px 4px 0 rgba(0,0,0,1)',
+                                            padding: '0.5rem',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '0.5rem',
+                                            zIndex: 100
+                                        }}>
+                                            <Link
+                                                to="/profile"
+                                                onClick={() => setIsDropdownOpen(false)}
+                                                style={{ padding: '0.75rem', fontWeight: 700, color: '#000', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid transparent' }}
+                                                className={styles.dropdownItem}
+                                            >
+                                                <User size={18} /> Mon Profil
+                                            </Link>
+                                            <Link
+                                                to="/settings"
+                                                onClick={() => setIsDropdownOpen(false)}
+                                                style={{ padding: '0.75rem', fontWeight: 700, color: '#000', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid transparent' }}
+                                                className={styles.dropdownItem}
+                                            >
+                                                <Settings size={18} /> Paramètres
+                                            </Link>
+                                            <div style={{ height: '1px', background: '#eee', margin: '0.25rem 0' }}></div>
+                                            <button
+                                                onClick={() => {
+                                                    auth.signOut();
+                                                    setIsDropdownOpen(false);
+                                                }}
+                                                style={{ padding: '0.75rem', fontWeight: 700, color: 'red', background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', width: '100%', textAlign: 'left' }}
+                                                className={styles.dropdownItem}
+                                            >
+                                                <LogOut size={18} /> Déconnexion
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </>
                         ) : (
                             <Link to="/auth">

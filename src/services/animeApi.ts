@@ -47,9 +47,26 @@ export const searchWorks = async (
     }
 };
 
-export const getTopWorks = async (type: 'anime' | 'manga' = 'manga', filter: 'airing' | 'upcoming' | 'bypopularity' | 'favorite' = 'bypopularity') => {
+export const getTopWorks = async (
+    type: 'anime' | 'manga' = 'manga',
+    filter: 'airing' | 'upcoming' | 'bypopularity' | 'favorite' = 'bypopularity',
+    limit: number = 24
+) => {
     try {
-        const response = await fetch(`${BASE_URL}/top/${type}?filter=${filter}&limit=24`);
+        const response = await fetch(`${BASE_URL}/top/${type}?filter=${filter}&limit=${limit}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        return data.data as JikanResult[];
+    } catch (error) {
+        console.error('API Error:', error);
+        return [];
+    }
+};
+
+export const getSeasonalAnime = async (limit: number = 24) => {
+    try {
+        // Fetches current season's anime
+        const response = await fetch(`${BASE_URL}/seasons/now?limit=${limit}&sfw=true`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanResult[];

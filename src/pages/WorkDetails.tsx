@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { useLibraryStore } from '@/store/libraryStore';
 import { Button } from '@/components/ui/Button';
-import { ArrowLeft, BookOpen, Check, Trophy, Star } from 'lucide-react';
+import { ArrowLeft, BookOpen, Check, Trophy, Star, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { statusToFrench } from '@/utils/statusTranslation';
 import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
@@ -205,6 +205,7 @@ export default function WorkDetails() {
                             </div>
                         </div>
 
+
                         {/* Notes Section */}
                         <div style={{ marginBottom: '2rem' }}>
                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>MES NOTES</h3>
@@ -220,9 +221,33 @@ export default function WorkDetails() {
                                     fontFamily: 'inherit',
                                     fontSize: '1rem',
                                     resize: 'vertical',
-                                    background: '#f9f9f9'
+                                    background: '#f9f9f9',
+                                    marginBottom: '2rem'
                                 }}
                             />
+                        </div>
+
+                        {/* Danger Zone */}
+                        <div style={{ borderTop: '2px dashed #000', paddingTop: '2rem' }}>
+                            <Button
+                                onClick={() => {
+                                    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette œuvre de votre bibliothèque ?\nCette action est irréversible.')) {
+                                        const { removeWork } = useLibraryStore.getState();
+                                        removeWork(work.id);
+                                        navigate('/library');
+                                    }
+                                }}
+                                style={{
+                                    background: '#ff0000',
+                                    color: '#fff',
+                                    width: '100%',
+                                    fontWeight: 900,
+                                    textTransform: 'uppercase'
+                                }}
+                                icon={<Trash2 size={20} />}
+                            >
+                                Supprimer de la bibliothèque
+                            </Button>
                         </div>
 
                     </div>

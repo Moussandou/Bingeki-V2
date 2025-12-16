@@ -150,8 +150,9 @@
 }
 
 .profileDropdown:hover {
-    background: #000;
-    color: #fff;
+    box-shadow: 2px 2px 0 var(--color-primary);
+    transform: translateY(-2px);
+    border-color: #000;
 }
 
 /* Responsive */

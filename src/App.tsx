@@ -24,6 +24,7 @@ const WorkDetails = lazy(() => import('@/pages/WorkDetails'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const Discover = lazy(() => import('@/pages/Discover'));
+const Social = lazy(() => import('@/pages/Social'));
 
 function App() {
   const { setUser, setLoading, user } = useAuthStore();
