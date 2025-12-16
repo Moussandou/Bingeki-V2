@@ -20,6 +20,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { loadGamificationFromFirestore } from '@/firebase/firestore';
+import { BADGE_ICONS } from '@/utils/badges';
+import type { Badge } from '@/types/badge';
 
 export default function Profile() {
     const { user, setUser } = useAuthStore();
@@ -210,10 +212,10 @@ export default function Profile() {
                                     ...extendedProfile
                                 }}
                                 stats={displayStats}
-                                isOwnProfile={isOwnProfile}
+                                isOwnProfile={!!isOwnProfile}
                                 onEdit={() => setIsEditModalOpen(true)}
                                 onLogout={handleLogout}
-                                featuredBadgeData={extendedProfile.featuredBadge ? displayBadges.find(b => b.id === extendedProfile.featuredBadge) : null}
+                                featuredBadgeData={extendedProfile.featuredBadge ? displayBadges.find((b: Badge) => b.id === extendedProfile.featuredBadge) : null}
                                 favoriteMangaData={extendedProfile.favoriteManga ? (() => {
                                     // If own profile, we can search in local store
                                     // If visited profile, we might not have the full work details unless we fetch them or store basic info in profile
@@ -301,7 +303,7 @@ export default function Profile() {
 
                             <h3 className="manga-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem', background: 'var(--color-secondary)', color: '#000' }}>Badges Récents</h3>
                             <div className="manga-panel" style={{ padding: '2rem', background: '#fff', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '2rem' }}>
-                                {displayBadges.map((badge) => (
+                                {displayBadges.map((badge: Badge) => (
                                     <motion.div
                                         key={badge.id}
                                         whileHover={{ scale: 1.1, rotate: 5 }}
