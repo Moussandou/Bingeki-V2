@@ -31,7 +31,7 @@ export default function Profile() {
                         <h1 className="text-outline" style={{ fontSize: '3rem', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', color: '#000', textShadow: '2px 2px 0 rgba(0,0,0,0.1)' }}>
                             Fiche de Chasseur
                         </h1>
-                        <Button variant="manga" size="icon"><Settings size={20} /></Button>
+                        <Button variant="manga" size="icon" onClick={() => navigate('/settings')}><Settings size={20} /></Button>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'minmax(320px, 1fr) 2fr', gap: '2rem' }}>
