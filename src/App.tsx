@@ -26,6 +26,7 @@ const Profile = lazy(() => import('@/pages/Profile'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const Discover = lazy(() => import('@/pages/Discover'));
 const Social = lazy(() => import('@/pages/Social'));
+const Legal = lazy(() => import('@/pages/Legal'));
 
 function App() {
   const { setUser, setLoading, user } = useAuthStore();
@@ -115,6 +116,7 @@ function App() {
             <Route path="/work/:id" element={<WorkDetails />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/legal" element={<Legal />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

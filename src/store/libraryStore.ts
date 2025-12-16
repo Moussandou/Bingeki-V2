@@ -10,6 +10,7 @@ export interface Work {
     currentChapter?: number;
     status: 'reading' | 'completed' | 'on_hold' | 'dropped' | 'plan_to_read';
     score?: number;
+    synopsis?: string; // Add synopsis field
     rating?: number; // User personal rating (0-10)
     notes?: string;  // User personal notes
 }

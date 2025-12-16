@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy, limit, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy, limit, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from './config';
 import type { Work } from '@/store/libraryStore';
 import type { Badge } from '@/types/badge';
@@ -271,6 +271,22 @@ export async function acceptFriendRequest(currentUserId: string, friendUid: stri
         console.log('[Firestore] Friend request accepted');
     } catch (error) {
         console.error('[Firestore] Error accepting friend request:', error);
+        throw error;
+    }
+}
+
+// Reject/Remove Friend Request
+export async function rejectFriendRequest(currentUserId: string, friendUid: string): Promise<void> {
+    try {
+        // Remove from my list
+        await deleteDoc(doc(db, 'users', currentUserId, 'friends', friendUid));
+
+        // Remove from their list
+        await deleteDoc(doc(db, 'users', friendUid, 'friends', currentUserId));
+
+        console.log('[Firestore] Friend request rejected/removed');
+    } catch (error) {
+        console.error('[Firestore] Error rejecting friend request:', error);
         throw error;
     }
 }

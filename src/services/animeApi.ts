@@ -75,3 +75,66 @@ export const getSeasonalAnime = async (limit: number = 24) => {
         return [];
     }
 };
+
+export interface JikanEpisode {
+    mal_id: number;
+    url: string;
+    title: string;
+    title_japanese: string | null;
+    title_romanji: string | null;
+    aired: string | null;
+    score: number | null;
+    filler: boolean;
+    recap: boolean;
+    forum_url: string | null;
+}
+
+export const getAnimeEpisodes = async (id: number, page: number = 1) => {
+    try {
+        const response = await fetch(`${BASE_URL}/anime/${id}/episodes?page=${page}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        return {
+            data: data.data as JikanEpisode[],
+            pagination: data.pagination
+        };
+    } catch (error) {
+        console.error('API Error:', error);
+        return { data: [], pagination: { has_next_page: false } };
+    }
+};
+
+export const getAnimeEpisodeDetails = async (id: number, episodeId: number) => {
+    try {
+        const response = await fetch(`${BASE_URL}/anime/${id}/episodes/${episodeId}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        return data.data as { synopsis: string; duration: number; };
+    } catch (error) {
+        console.error('API Error:', error);
+        return null;
+    }
+};
+
+export const getWorkDetails = async (id: number, type: 'anime' | 'manga'): Promise<JikanResult> => {
+    try {
+        // Simple delay to help with rate limiting if called in a loop client-side
+        await new Promise(resolve => setTimeout(resolve, 350)); // ~3 requests/sec limit
+
+        const response = await fetch(`${BASE_URL}/${type}/${id}`);
+        if (!response.ok) {
+            // Handle 429 Too Many Requests specifically if needed, but for now generic error
+            if (response.status === 429) {
+                console.warn(`Rate limit hit for ${type} ${id}, waiting longer...`);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                return getWorkDetails(id, type); // Retry once
+            }
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        return data.data as JikanResult;
+    } catch (error) {
+        console.error(`API Error fetching ${type} ${id}:`, error);
+        throw error;
+    }
+};
