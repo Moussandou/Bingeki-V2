@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Menu, User, Book, Home, ChevronDown, Flame, Search, Trophy, Settings, LogOut } from 'lucide-react';
@@ -11,6 +11,7 @@ export function Header() {
     const { user } = useAuthStore();
     const { level, xp, streak } = useGamificationStore();
     const location = useLocation();
+    const navigate = useNavigate(); // Initialize hook
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const isActive = (path: string) => location.pathname === path;
@@ -123,9 +124,10 @@ export function Header() {
                                             </Link>
                                             <div style={{ height: '1px', background: '#eee', margin: '0.25rem 0' }}></div>
                                             <button
-                                                onClick={() => {
-                                                    auth.signOut();
+                                                onClick={async () => {
+                                                    await auth.signOut();
                                                     setIsDropdownOpen(false);
+                                                    navigate('/'); // Redirect to home
                                                 }}
                                                 style={{ padding: '0.75rem', fontWeight: 700, color: 'red', background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', width: '100%', textAlign: 'left' }}
                                                 className={styles.dropdownItem}

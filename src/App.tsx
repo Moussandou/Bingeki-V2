@@ -14,6 +14,7 @@ import {
   saveGamificationToFirestore,
   saveUserProfileToFirestore
 } from '@/firebase/firestore';
+import { ToastProvider } from '@/context/ToastContext';
 
 // Lazy load pages
 const Opening = lazy(() => import('@/pages/Opening'));
@@ -101,21 +102,23 @@ function App() {
   }, [gamificationState, user]);
 
   return (
-    <BrowserRouter>
-      <Suspense fallback={<LoadingScreen />}>
-        <Routes>
-          <Route path="/" element={<Opening />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/library" element={<Library />} />
-          <Route path="/discover" element={<Discover />} />
-          <Route path="/social" element={<Social />} />
-          <Route path="/work/:id" element={<WorkDetails />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/settings" element={<Settings />} />
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+    <ToastProvider>
+      <BrowserRouter>
+        <Suspense fallback={<LoadingScreen />}>
+          <Routes>
+            <Route path="/" element={<Opening />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/library" element={<Library />} />
+            <Route path="/discover" element={<Discover />} />
+            <Route path="/social" element={<Social />} />
+            <Route path="/work/:id" element={<WorkDetails />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </ToastProvider>
   )
 }
 
