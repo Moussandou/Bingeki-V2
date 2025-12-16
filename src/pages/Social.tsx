@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
-import { Trophy, Users, Search, UserPlus, Check, Clock, User } from 'lucide-react';
+import { Trophy, Users, Search, UserPlus, Check, User } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import {
     getLeaderboard,
     getFriends,
     searchUserByEmail,
+    searchUserByName,
     sendFriendRequest,
     acceptFriendRequest,
     type Friend,
@@ -29,14 +30,15 @@ export default function Social() {
 
     const loadData = async () => {
         setLoading(true);
+        // Always load friends to check status even in ranking
+        if (user) {
+            const friendsData = await getFriends(user.uid);
+            setFriends(friendsData);
+        }
+
         if (activeTab === 'ranking') {
             const data = await getLeaderboard(20);
             setLeaderboard(data);
-        } else {
-            if (user) {
-                const data = await getFriends(user.uid);
-                setFriends(data);
-            }
         }
         setLoading(false);
     };
@@ -46,10 +48,44 @@ export default function Social() {
         setLoading(true);
         setSearchResult(null);
         setRequestSent(false);
-        const result = await searchUserByEmail(searchEmail);
-        setSearchResult(result); // Can be null if not found
+
+        // Try exact email match first
+        let result = await searchUserByEmail(searchEmail);
+
+        // If not found, try by display name
+        if (!result) {
+            result = await searchUserByName(searchEmail);
+        }
+
+        setSearchResult(result);
         setLoading(false);
     };
+
+    const handleQuickAdd = async (targetUser: UserProfile) => {
+        if (!user) return;
+        try {
+            await sendFriendRequest(
+                user.uid,
+                { displayName: user.displayName || 'Héros', photoURL: user.photoURL || '' },
+                targetUser
+            );
+            // Refresh to update UI
+            loadData();
+            alert(`Demande envoyée à ${targetUser.displayName} !`);
+        } catch (error) {
+            console.error("Failed to add friend", error);
+        }
+    };
+
+    const getFriendStatus = (uid: string) => {
+        const friend = friends.find(f => f.uid === uid);
+        if (!friend) return 'none';
+        return friend.status; // 'pending' or 'accepted'
+    };
+
+    // ... inside return ...
+    // Update Ranking View to include buttons
+
 
     const handleSendRequest = async () => {
         if (!user || !searchResult) return;
@@ -122,8 +158,25 @@ export default function Social() {
                                     <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{player.displayName || 'Anonyme'}</div>
                                     <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>Lvl {player.level || 1}</div>
                                 </div>
-                                <div style={{ fontWeight: 900, fontSize: '1.2rem' }}>
-                                    {player.xp || 0} XP
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div style={{ fontWeight: 900, fontSize: '1.2rem' }}>
+                                        {player.xp || 0} XP
+                                    </div>
+                                    {player.uid !== user?.uid && (
+                                        <>
+                                            {getFriendStatus(player.uid) === 'none' && (
+                                                <Button size="sm" variant="ghost" onClick={() => handleQuickAdd(player)}>
+                                                    <UserPlus size={18} />
+                                                </Button>
+                                            )}
+                                            {getFriendStatus(player.uid) === 'pending' && (
+                                                <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>En attente</span>
+                                            )}
+                                            {getFriendStatus(player.uid) === 'accepted' && (
+                                                <User size={18} style={{ opacity: 0.3 }} />
+                                            )}
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -141,7 +194,7 @@ export default function Social() {
                                     <Search size={20} style={{ marginRight: '0.5rem', opacity: 0.5 }} />
                                     <input
                                         type="email"
-                                        placeholder="Email exact de l'ami..."
+                                        placeholder="Pseudo ou Email exact..."
                                         value={searchEmail}
                                         onChange={(e) => setSearchEmail(e.target.value)}
                                         style={{ border: 'none', outline: 'none', width: '100%', fontSize: '1rem', fontFamily: 'inherit' }}

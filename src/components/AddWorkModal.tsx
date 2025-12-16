@@ -11,9 +11,10 @@ import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
 interface AddWorkModalProps {
     isOpen: boolean;
     onClose: () => void;
+    initialWork?: JikanResult;
 }
 
-export function AddWorkModal({ isOpen, onClose }: AddWorkModalProps) {
+export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps) {
     const [mode, setMode] = useState<'api' | 'manual'>('api');
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<JikanResult[]>([]);
@@ -22,8 +23,24 @@ export function AddWorkModal({ isOpen, onClose }: AddWorkModalProps) {
     const { addWork, works } = useLibraryStore();
     const { addXp, recordActivity, incrementStat } = useGamificationStore();
 
+    // Handle initial work if provided
+    useEffect(() => {
+        if (isOpen && initialWork) {
+            setQuery(initialWork.title);
+            setResults([initialWork]);
+            setType(initialWork.type === 'Manga' ? 'manga' : 'anime' as any); // Simple heuristic
+        } else if (isOpen && !initialWork) {
+            // Reset if opening fresh
+            setQuery('');
+            setResults([]);
+        }
+    }, [isOpen, initialWork]);
+
     // Live Search with Debounce
     useEffect(() => {
+        // Skip search if we are just viewing the initial work (query matches initial work title)
+        if (initialWork && query === initialWork.title) return;
+
         const timer = setTimeout(async () => {
             if (query.trim().length > 2 && mode === 'api') {
                 setLoading(true);
@@ -41,7 +58,7 @@ export function AddWorkModal({ isOpen, onClose }: AddWorkModalProps) {
         }, 500); // 500ms debounce
 
         return () => clearTimeout(timer);
-    }, [query, type, mode]);
+    }, [query, type, mode, initialWork]);
 
     const handleAdd = (work: JikanResult) => {
         const newWork: Work = {

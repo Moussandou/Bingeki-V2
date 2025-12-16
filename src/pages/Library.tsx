@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { useLibraryStore } from '@/store/libraryStore';
-import { Search, Plus, Filter, Grid, List } from 'lucide-react';
+import { Search, Plus, Filter, Grid, List, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import { useNavigate } from 'react-router-dom';
@@ -229,6 +229,33 @@ export default function Library() {
                                                 }}>
                                                     {work.type}
                                                 </div>
+
+                                                {/* Delete Button */}
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (window.confirm(`Supprimer "${work.title}" ?`)) {
+                                                            useLibraryStore.getState().removeWork(work.id);
+                                                        }
+                                                    }}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '0.5rem',
+                                                        right: '0.5rem',
+                                                        background: '#ff0000',
+                                                        color: '#fff',
+                                                        border: '1px solid #fff',
+                                                        borderRadius: '4px',
+                                                        padding: '4px',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        boxShadow: '2px 2px 0 #000'
+                                                    }}
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
                                             </div>
 
                                             <div style={{ padding: '1rem', background: '#fff', color: '#000' }}>
@@ -296,6 +323,27 @@ export default function Library() {
                                         <div style={{ paddingRight: '1rem', fontSize: '1.5rem', fontWeight: 900, fontFamily: 'var(--font-heading)', color: '#000' }}>
                                             {work.currentChapter} <span style={{ fontSize: '1rem', opacity: 0.6, color: '#000' }}>/ {work.totalChapters || '?'}</span>
                                         </div>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (window.confirm(`Supprimer "${work.title}" ?`)) {
+                                                    useLibraryStore.getState().removeWork(work.id);
+                                                }
+                                            }}
+                                            style={{
+                                                background: '#ff0000',
+                                                color: '#fff',
+                                                border: '2px solid #000',
+                                                padding: '0.5rem',
+                                                marginLeft: '0.5rem',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}
+                                        >
+                                            <Trash2 size={20} />
+                                        </button>
                                     </motion.div>
                                 ))}
                             </div>
@@ -305,6 +353,6 @@ export default function Library() {
                     <AddWorkModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
                 </div>
             </div>
-        </Layout>
+        </Layout >
     );
 }

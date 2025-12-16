@@ -1,196 +1,201 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Layout } from '@/components/layout/Layout';
-import { searchWorks, getTopWorks, type JikanResult } from '@/services/animeApi';
+import { Input } from '@/components/ui/Input';
+import { Card } from '@/components/ui/Card';
+import { Carousel } from '@/components/ui/Carousel';
+import { searchWorks, getTopWorks, getSeasonalAnime, type JikanResult } from '@/services/animeApi';
 import { useLibraryStore } from '@/store/libraryStore';
-import { Button } from '@/components/ui/Button';
-import { Search, Plus, Check, Filter } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Search, Check, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { AddWorkModal } from '@/components/AddWorkModal';
 
 export default function Discover() {
-    const [query, setQuery] = useState('');
-    const [results, setResults] = useState<JikanResult[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<JikanResult[]>([]);
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState<'manga' | 'anime'>('manga');
-    const [view, setView] = useState<'search' | 'top'>('top');
-    const { addWork, works } = useLibraryStore();
-    const navigate = useNavigate();
 
-    // Initial load of top content
-    useEffect(() => {
-        if (view === 'top' && !query) {
-            loadTopContent();
-        }
-    }, [activeTab, view]);
+    // Carousel Data States
+    const [seasonalAnime, setSeasonalAnime] = useState<JikanResult[]>([]);
+    const [topAnime, setTopAnime] = useState<JikanResult[]>([]);
+    const [popularManga, setPopularManga] = useState<JikanResult[]>([]);
+    const [topManga, setTopManga] = useState<JikanResult[]>([]);
 
-    // Search effect
+
+    const [selectedWork, setSelectedWork] = useState<JikanResult | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const { works } = useLibraryStore();
+    const libraryIds = new Set(works.map(w => w.id));
+
+    const dataFetched = useRef(false);
+
+    // Fetch Home Data
     useEffect(() => {
-        const timer = setTimeout(() => {
-            if (query) {
-                handleSearch();
+        if (dataFetched.current) return;
+        dataFetched.current = true;
+
+        const fetchHomeData = async () => {
+            // No global loading - progressive loading handles UI
+            try {
+                // Stagger requests to avoid 429 Rate Limit (Jikan is strict)
+                const season = await getSeasonalAnime(15);
+                if (season.length > 0) setSeasonalAnime(season);
+                await new Promise(r => setTimeout(r, 600));
+
+                const topA = await getTopWorks('anime', 'favorite', 15);
+                if (topA.length > 0) setTopAnime(topA);
+                await new Promise(r => setTimeout(r, 600));
+
+                const popM = await getTopWorks('manga', 'bypopularity', 15);
+                if (popM.length > 0) setPopularManga(popM);
+                await new Promise(r => setTimeout(r, 600));
+
+                const topM = await getTopWorks('manga', 'favorite', 15);
+                if (topM.length > 0) setTopManga(topM);
+
+            } catch (error) {
+                console.error("Failed to load discovery data", error);
+            }
+        };
+        fetchHomeData();
+    }, []);
+
+    // Search Logic
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(async () => {
+            if (searchQuery.length > 2) {
+                setLoading(true);
+                const results = await searchWorks(searchQuery);
+                setSearchResults(results);
+                setLoading(false);
+            } else {
+                setSearchResults([]);
             }
         }, 500);
-        return () => clearTimeout(timer);
-    }, [query, activeTab]);
 
-    const loadTopContent = async () => {
-        setLoading(true);
-        const data = await getTopWorks(activeTab, 'bypopularity');
-        setResults(data);
-        setLoading(false);
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchQuery]);
+
+    const handleWorkClick = (work: JikanResult) => {
+        setSelectedWork(work);
+        setIsModalOpen(true);
     };
 
-    const handleSearch = async () => {
-        if (!query) return;
-        setLoading(true);
-        setView('search');
-        const data = await searchWorks(query, activeTab);
-        setResults(data);
-        setLoading(false);
-    };
-
-    const isInLibrary = (mal_id: number) => {
-        return works.some(w => w.id === mal_id);
-    };
-
-    const handleAdd = (item: JikanResult) => {
-        addWork({
-            id: item.mal_id,
-            title: item.title,
-            image: item.images.jpg.image_url,
-            type: activeTab,
-            totalChapters: activeTab === 'manga' ? item.chapters : item.episodes,
-            currentChapter: 0,
-            status: 'plan_to_read'
-        });
+    const handleQuickAdd = (work: JikanResult) => {
+        setSelectedWork(work);
+        setIsModalOpen(true);
     };
 
     return (
         <Layout>
-            <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
+            <div style={{ minHeight: 'calc(100vh - 80px)', paddingBottom: '6rem', paddingTop: '2rem' }} className="container">
 
-                {/* Header Section */}
-                <div style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', textTransform: 'uppercase' }}>
-                        DÉCOUVRIR
+                {/* Header & Search */}
+                <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
+                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '3rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '1rem', color: '#000' }}>
+                        Découvrir
                     </h1>
-
-                    {/* Search Bar */}
-                    <div className="manga-panel" style={{ padding: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#fff' }}>
-                        <Search size={24} style={{ marginLeft: '0.5rem' }} />
-                        <input
-                            type="text"
-                            placeholder={`Rechercher un ${activeTab}...`}
-                            value={query}
-                            onChange={(e) => {
-                                setQuery(e.target.value);
-                                if (!e.target.value) setView('top');
-                            }}
-                            style={{
-                                border: 'none',
-                                outline: 'none',
-                                width: '100%',
-                                fontSize: '1.2rem',
-                                padding: '0.5rem',
-                                fontFamily: 'inherit',
-                                fontWeight: 600
-                            }}
+                    <div className="manga-panel" style={{ maxWidth: '600px', margin: '0 auto', background: '#fff', padding: '0.5rem' }}>
+                        <Input
+                            placeholder="Rechercher un anime ou manga..."
+                            icon={<Search size={20} />}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{ fontSize: '1.2rem', padding: '1rem', paddingLeft: '3rem' }}
                         />
-                    </div>
-
-                    {/* Filters / Tabs */}
-                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <Button
-                                variant={activeTab === 'manga' ? 'primary' : 'ghost'}
-                                onClick={() => setActiveTab('manga')}
-                            >
-                                MANGA
-                            </Button>
-                            <Button
-                                variant={activeTab === 'anime' ? 'primary' : 'ghost'}
-                                onClick={() => setActiveTab('anime')}
-                            >
-                                ANIME
-                            </Button>
-                        </div>
                     </div>
                 </div>
 
-                {/* Results Grid */}
-                {loading ? (
-                    <div style={{ textAlign: 'center', padding: '4rem' }}>Chargement...</div>
-                ) : (
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-                        gap: '1.5rem'
-                    }}>
-                        {results.map((item) => (
-                            <div key={item.mal_id} className="manga-panel" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%' }}>
-                                <div style={{ position: 'relative', paddingTop: '140%' }}>
-                                    <img
-                                        src={item.images.jpg.image_url}
-                                        alt={item.title}
-                                        style={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'cover'
-                                        }}
-                                    />
-                                    {item.score && (
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: 5,
-                                            right: 5,
-                                            background: '#000',
-                                            color: '#fff',
-                                            padding: '2px 6px',
-                                            fontSize: '0.8rem',
-                                            fontWeight: 900
-                                        }}>
-                                            ★ {item.score}
-                                        </div>
-                                    )}
-                                </div>
-                                <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                                    <h3 style={{
-                                        fontSize: '0.9rem',
-                                        fontWeight: 700,
-                                        marginBottom: '0.5rem',
-                                        display: '-webkit-box',
-                                        WebkitLineClamp: 2,
-                                        WebkitBoxOrient: 'vertical',
-                                        overflow: 'hidden'
-                                    }}>
-                                        {item.title}
-                                    </h3>
-                                    <div style={{ marginTop: 'auto', paddingTop: '0.5rem' }}>
-                                        {isInLibrary(item.mal_id) ? (
-                                            <Button
-                                                variant="ghost"
-                                                style={{ width: '100%', opacity: 0.7, cursor: 'default' }}
-                                                icon={<Check size={16} />}
-                                            >
-                                                DÉJÀ AJOUTÉ
-                                            </Button>
-                                        ) : (
-                                            <Button
-                                                variant="manga"
-                                                style={{ width: '100%' }}
-                                                onClick={() => handleAdd(item)}
-                                                icon={<Plus size={16} />}
-                                            >
-                                                AJOUTER
-                                            </Button>
-                                        )}
-                                    </div>
-                                </div>
+                {/* Content Area */}
+                {searchQuery.length > 2 ? (
+                    /* Search Results Grid */
+                    <div>
+                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '2rem', color: '#000' }}>
+                            Résultats pour "{searchQuery}"
+                        </h2>
+                        {loading ? (
+                            <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
+                                <Loader2 className="spin" size={48} />
                             </div>
-                        ))}
+                        ) : (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '2rem' }}>
+                                {searchResults.map((work) => {
+                                    const isOwned = libraryIds.has(work.mal_id);
+                                    return (
+                                        <motion.div key={work.mal_id} whileHover={{ y: -5 }}>
+                                            <Card
+                                                variant="manga"
+                                                style={{ padding: 0, overflow: 'hidden', height: '100%', border: '2px solid #000', cursor: 'pointer' }}
+                                                onClick={() => handleWorkClick(work)}
+                                            >
+                                                <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid #000' }}>
+                                                    <img src={work.images.jpg.image_url} alt={work.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    {isOwned && (
+                                                        <div style={{ position: 'absolute', top: 5, right: 5, background: '#000', color: '#fff', padding: '4px', borderRadius: '50%' }}>
+                                                            <Check size={14} strokeWidth={3} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div style={{ padding: '1rem', background: '#fff' }}>
+                                                    <h3 style={{ fontSize: '1rem', fontWeight: 800, fontFamily: 'var(--font-heading)', lineHeight: 1.2 }}>{work.title}</h3>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', fontSize: '0.8rem', opacity: 0.7 }}>
+                                                        <span>{work.type}</span>
+                                                        <span>{work.status}</span>
+                                                    </div>
+                                                </div>
+                                            </Card>
+                                        </motion.div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
+                ) : (
+                    /* Home Carousels */
+                    <div>
+                        <>
+                            <Carousel
+                                title="🔥 Anime de la Saison"
+                                items={seasonalAnime}
+                                onItemClick={handleWorkClick}
+                                libraryIds={libraryIds}
+                                onAdd={handleQuickAdd}
+                                loading={seasonalAnime.length === 0}
+                            />
+                            <Carousel
+                                title="✨ Top 10 Animes (All Time)"
+                                items={topAnime}
+                                onItemClick={handleWorkClick}
+                                libraryIds={libraryIds}
+                                onAdd={handleQuickAdd}
+                                loading={topAnime.length === 0}
+                            />
+                            <Carousel
+                                title="📚 Mangas Populaires"
+                                items={popularManga}
+                                onItemClick={handleWorkClick}
+                                libraryIds={libraryIds}
+                                onAdd={handleQuickAdd}
+                                loading={popularManga.length === 0}
+                            />
+                            <Carousel
+                                title="🌟 Top 10 Mangas (All Time)"
+                                items={topManga}
+                                onItemClick={handleWorkClick}
+                                libraryIds={libraryIds}
+                                onAdd={handleQuickAdd}
+                                loading={topManga.length === 0}
+                            />
+                        </>
+                    </div>
+                )}
+
+                {/* Modals */}
+                {selectedWork && (
+                    <AddWorkModal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        initialWork={selectedWork}
+                    />
                 )}
             </div>
         </Layout>

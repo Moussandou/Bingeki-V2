@@ -22,7 +22,7 @@ interface GamificationData {
     lastUpdated: number;
 }
 
-interface UserProfile {
+export interface UserProfile {
     uid: string;
     email: string | null;
     displayName: string | null;
@@ -174,6 +174,21 @@ export async function searchUserByEmail(email: string): Promise<UserProfile | nu
         return null;
     } catch (error) {
         console.error('[Firestore] Error searching user:', error);
+        return null;
+    }
+}
+
+// Search user by exact display name
+export async function searchUserByName(name: string): Promise<UserProfile | null> {
+    try {
+        const q = query(collection(db, 'users'), where('displayName', '==', name), limit(1));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+            return querySnapshot.docs[0].data() as UserProfile;
+        }
+        return null;
+    } catch (error) {
+        console.error('[Firestore] Error searching user by name:', error);
         return null;
     }
 }
