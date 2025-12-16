@@ -6,7 +6,6 @@ import { useAuthStore } from '@/store/authStore';
 import {
     getLeaderboard,
     getFriends,
-    getUserProfile,
     searchUserByEmail,
     searchUserByName,
     sendFriendRequest,

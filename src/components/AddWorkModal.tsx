@@ -131,7 +131,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
             title: work.title,
             image: work.images.jpg.image_url,
             type: type,
-            totalChapters: type === 'manga' ? work.chapters : work.episodes,
+            totalChapters: (type === 'manga' ? work.chapters : work.episodes) || 0, // Fallback to 0 if null
             currentChapter: 0,
             status: 'reading',
             score: work.score, // Save score
