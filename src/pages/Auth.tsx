@@ -2,11 +2,10 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Card } from '@/components/ui/Card';
-import { Mail, Lock, User, Github } from 'lucide-react';
+import { Mail, Lock, User, Zap } from 'lucide-react';
 import { loginWithGoogle } from '@/firebase/auth';
 import { useAuthStore } from '@/store/authStore';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function Auth() {
     const [isLogin, setIsLogin] = useState(true);
@@ -19,7 +18,6 @@ export default function Auth() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        // Simulate email auth for now (implement later if needed)
         setTimeout(() => setLoading(false), 2000);
     };
 
@@ -39,32 +37,40 @@ export default function Auth() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'radial-gradient(circle at center, #1a1a2e 0%, #000 100%)',
-            padding: '1rem'
+            background: '#f5f5f5',
+            padding: '2rem'
         }}>
-            <div className="container" style={{ maxWidth: '1000px', display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) minmax(300px, 400px)', gap: '2rem', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="container" style={{ maxWidth: '1000px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }}>
 
-                {/* Visual Side - Hidden on small screens */}
+                {/* Visual Side */}
                 <motion.div
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8 }}
+                    transition={{ duration: 0.6 }}
                     className="hidden-mobile"
-                    style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
                 >
-                    <h1 className="text-gradient" style={{ fontSize: '4rem', lineHeight: 1 }}>
+                    {/* Logo */}
+                    <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
+                        <div style={{ width: 48, height: 48, background: 'var(--gradient-primary)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '4px 4px 0 #000' }}>
+                            <Zap size={28} fill="currentColor" />
+                        </div>
+                        <span style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>BINGEKI</span>
+                    </Link>
+
+                    <h1 style={{ fontSize: '3.5rem', lineHeight: 1.1, fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000', textTransform: 'uppercase' }}>
                         VOTRE<br />AVENTURE<br />COMMENCE
                     </h1>
-                    <p style={{ fontSize: '1.25rem', color: 'var(--color-text-dim)', maxWidth: '400px' }}>
+                    <p style={{ fontSize: '1.1rem', color: '#666', maxWidth: '400px', lineHeight: 1.6 }}>
                         Rejoignez Bingeki pour transformer votre passion manga en une véritable quête RPG.
                     </p>
 
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                        <div className="animate-float" style={{ padding: '1rem', background: 'rgba(255,46,99,0.1)', borderRadius: '8px', border: '1px solid var(--color-primary)' }}>
-                            <h3 style={{ color: 'var(--color-primary)' }}>Suivi RPG</h3>
+                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                        <div style={{ padding: '0.75rem 1.5rem', background: '#fff', border: '3px solid #000', fontWeight: 900, fontSize: '0.9rem', textTransform: 'uppercase', boxShadow: '4px 4px 0 var(--color-primary)' }}>
+                            🎮 Suivi RPG
                         </div>
-                        <div className="animate-float" style={{ animationDelay: '1s', padding: '1rem', background: 'rgba(8,217,214,0.1)', borderRadius: '8px', border: '1px solid var(--color-secondary)' }}>
-                            <h3 style={{ color: 'var(--color-secondary)' }}>Progression</h3>
+                        <div style={{ padding: '0.75rem 1.5rem', background: '#fff', border: '3px solid #000', fontWeight: 900, fontSize: '0.9rem', textTransform: 'uppercase', boxShadow: '4px 4px 0 var(--color-secondary)' }}>
+                            📈 Progression
                         </div>
                     </div>
                 </motion.div>
@@ -73,57 +79,81 @@ export default function Auth() {
                 <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
                 >
-                    <Card variant="glass" style={{ padding: '3rem 2rem' }}>
+                    <div className="manga-panel" style={{ padding: '2.5rem', background: '#fff', boxShadow: '8px 8px 0 rgba(0,0,0,0.1)' }}>
                         <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-                            <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
-                                {isLogin ? 'Bon retour' : 'Créer un compte'}
+                            <h2 style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000', marginBottom: '0.5rem' }}>
+                                {isLogin ? 'BON RETOUR !' : 'CRÉER UN COMPTE'}
                             </h2>
-                            <p style={{ color: 'var(--color-text-dim)' }}>
+                            <p style={{ color: '#666' }}>
                                 {isLogin ? 'Reprenez votre progression' : 'Commencez votre légende'}
                             </p>
                         </div>
 
-                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                             {!isLogin && (
-                                <div className="input-group">
+                                <div>
                                     <Input placeholder="Pseudo" icon={<User size={18} />} />
                                 </div>
                             )}
 
-                            <div className="input-group">
+                            <div>
                                 <Input type="email" placeholder="Email" icon={<Mail size={18} />} />
                             </div>
 
-                            <div className="input-group">
+                            <div>
                                 <Input type="password" placeholder="Mot de passe" icon={<Lock size={18} />} />
                             </div>
 
-                            <Button type="submit" isLoading={loading} size="lg" style={{ marginTop: '1rem' }}>
+                            <Button type="submit" variant="manga" isLoading={loading} style={{ marginTop: '0.5rem', padding: '1rem', fontSize: '1rem' }}>
                                 {isLogin ? 'SE CONNECTER' : "S'INSCRIRE"}
                             </Button>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '1rem 0' }}>
-                                <div style={{ flex: 1, height: '1px', background: 'var(--glass-border)' }} />
-                                <span style={{ color: 'var(--color-text-dim)', fontSize: '0.875rem' }}>OU</span>
-                                <div style={{ flex: 1, height: '1px', background: 'var(--glass-border)' }} />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '0.5rem 0' }}>
+                                <div style={{ flex: 1, height: '2px', background: '#000' }} />
+                                <span style={{ color: '#000', fontWeight: 700, fontSize: '0.875rem' }}>OU</span>
+                                <div style={{ flex: 1, height: '2px', background: '#000' }} />
                             </div>
 
-                            <Button type="button" variant="outline" onClick={handleGoogleLogin} disabled={loading}>
-                                <Github size={18} /> Continuer avec Google
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleGoogleLogin}
+                                disabled={loading}
+                                style={{
+                                    border: '3px solid #000',
+                                    color: '#000',
+                                    fontWeight: 900,
+                                    background: '#fff',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.5rem'
+                                }}
+                            >
+                                <img src="https://www.google.com/favicon.ico" alt="Google" style={{ width: 18, height: 18 }} />
+                                CONTINUER AVEC GOOGLE
                             </Button>
                         </form>
 
                         <div style={{ marginTop: '2rem', textAlign: 'center' }}>
                             <button
                                 onClick={toggleMode}
-                                style={{ color: 'var(--color-text-dim)', fontSize: '0.875rem', textDecoration: 'underline' }}
+                                style={{
+                                    color: '#000',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 600,
+                                    textDecoration: 'underline',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer'
+                                }}
                             >
                                 {isLogin ? "Pas encore de compte ? S'inscrire" : 'Déjà un compte ? Se connecter'}
                             </button>
                         </div>
-                    </Card>
+                    </div>
                 </motion.div>
             </div>
         </div>
