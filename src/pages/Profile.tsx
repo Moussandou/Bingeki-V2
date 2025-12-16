@@ -17,22 +17,102 @@ import { HunterLicenseCard } from '@/components/HunterLicenseCard';
 import { getUserProfile, saveUserProfileToFirestore, type UserProfile } from '@/firebase/firestore';
 import { Input } from '@/components/ui/Input';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-
-import { BADGE_ICONS } from '@/utils/badges';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { loadGamificationFromFirestore } from '@/firebase/firestore';
 
 export default function Profile() {
     const { user, setUser } = useAuthStore();
+    // Default (local) stats
     const { level, xp, xpToNextLevel, streak, badges, totalChaptersRead, totalWorksAdded, totalWorksCompleted } = useGamificationStore();
     const { works } = useLibraryStore();
+
+    // Router
     const navigate = useNavigate();
+    const { uid } = useParams<{ uid: string }>(); // Get uid from URL if present
+
+    // Local UI State
     const [showGuide, setShowGuide] = useState(false);
     const [hoveredBadgeId, setHoveredBadgeId] = useState<string | null>(null);
+    const [loadingProfile, setLoadingProfile] = useState(false);
 
-    // Extended Profile State
+    // Extended Profile State (for current or visited user)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [extendedProfile, setExtendedProfile] = useState<Partial<UserProfile>>({});
+
+    // Visited Profile Stats (if viewing someone else)
+    const [visitedStats, setVisitedStats] = useState<any>(null);
+
+    // Determine if we are viewing our own profile
+    const isOwnProfile = !uid || (user && user.uid === uid);
+
+    // Load Profile Data logic
+    useEffect(() => {
+        const targetUid = uid || user?.uid;
+        if (!targetUid) return;
+
+        setLoadingProfile(true);
+
+        // 1. Load User Profile (Banner, Bio, etc.)
+        getUserProfile(targetUid).then(profile => {
+            if (profile) {
+                setExtendedProfile(profile);
+            }
+        });
+
+        // 2. Load Stats (if not own profile, we need to fetch them manually)
+        if (!isOwnProfile) {
+            loadGamificationFromFirestore(targetUid).then(stats => {
+                if (stats) {
+                    setVisitedStats(stats);
+                }
+                setLoadingProfile(false);
+            });
+        } else {
+            // If own profile, we use the store data automatically, but we ensure loading is done
+            // The extended profile is already fetched above
+            // Sync form with loaded profile
+            if (user?.uid) { // Re-fetch own profile to ensure sync
+                getUserProfile(user.uid).then(p => {
+                    if (p) {
+                        setExtendedProfile(p);
+                        setEditForm({
+                            banner: p.banner || '',
+                            bio: p.bio || '',
+                            themeColor: p.themeColor || '#000000',
+                            cardBgColor: p.cardBgColor || '#ffffff',
+                            borderColor: p.borderColor || '#000000',
+                            favoriteManga: p.favoriteManga || '',
+                            featuredBadge: p.featuredBadge || ''
+                        });
+                    }
+                });
+            }
+            setLoadingProfile(false);
+        }
+
+    }, [uid, user?.uid, isOwnProfile]);
+
+    // Computed Stats to display
+    const displayStats = isOwnProfile ? {
+        level, xp, xpToNextLevel, streak, badgeCount: badges.length
+    } : (visitedStats ? {
+        level: visitedStats.level || 1,
+        xp: visitedStats.xp || 0,
+        xpToNextLevel: visitedStats.xpToNextLevel || 100,
+        streak: visitedStats.streak || 0,
+        badgeCount: visitedStats.badges?.length || 0
+    } : {
+        level: 1, xp: 0, xpToNextLevel: 100, streak: 0, badgeCount: 0
+    });
+
+    const displayBadges = isOwnProfile ? badges : (visitedStats?.badges || []);
+
+    // Extended stats for display
+    const displayTotalChapters = isOwnProfile ? totalChaptersRead : (visitedStats?.totalChaptersRead || 0);
+    const displayTotalWorks = isOwnProfile ? totalWorksAdded : (visitedStats?.totalWorksAdded || 0);
+    const displayWorksCompleted = isOwnProfile ? totalWorksCompleted : (visitedStats?.totalWorksCompleted || 0);
+
 
     // Edit Form State
     const [isDragging, setIsDragging] = useState(false);
@@ -44,26 +124,6 @@ export default function Profile() {
         borderColor: '#000000',
         favoriteManga: '',
         featuredBadge: ''
-    });
-
-    // Load extended profile data
-    useState(() => {
-        if (user?.uid) {
-            getUserProfile(user.uid).then(profile => {
-                if (profile) {
-                    setExtendedProfile(profile);
-                    setEditForm({
-                        banner: profile.banner || '',
-                        bio: profile.bio || '',
-                        themeColor: profile.themeColor || '#000000',
-                        cardBgColor: profile.cardBgColor || '#ffffff',
-                        borderColor: profile.borderColor || '#000000',
-                        favoriteManga: profile.favoriteManga || '',
-                        featuredBadge: profile.featuredBadge || ''
-                    });
-                }
-            });
-        }
     });
 
     // --- Drag & Drop Handlers ---
@@ -114,6 +174,8 @@ export default function Profile() {
         navigate('/');
     };
 
+    if (loadingProfile && !user) return <div style={{ padding: '2rem' }}>Chargement du profil...</div>;
+
     return (
         <Layout>
             <div style={{ minHeight: 'calc(100vh - 80px)' }}>
@@ -124,9 +186,16 @@ export default function Profile() {
                             Fiche de Chasseur
                         </h1>
                         <div style={{ display: 'flex', gap: '1rem' }}>
-                            <Button variant="primary" onClick={() => setIsEditModalOpen(true)} icon={<PenTool size={20} />}>EDITER</Button>
-                            <Button variant="ghost" onClick={() => setShowGuide(true)} icon={<Info size={20} />}>GUIDE</Button>
-                            <Button variant="manga" size="icon" onClick={() => navigate('/settings')}><Settings size={20} /></Button>
+                            {isOwnProfile && (
+                                <>
+                                    <Button variant="primary" onClick={() => setIsEditModalOpen(true)} icon={<PenTool size={20} />}>EDITER</Button>
+                                    <Button variant="ghost" onClick={() => setShowGuide(true)} icon={<Info size={20} />}>GUIDE</Button>
+                                    <Button variant="manga" size="icon" onClick={() => navigate('/settings')}><Settings size={20} /></Button>
+                                </>
+                            )}
+                            {!isOwnProfile && (
+                                <Button variant="ghost" onClick={() => navigate(-1)}>RETOUR</Button>
+                            )}
                         </div>
                     </div>
 
@@ -134,13 +203,26 @@ export default function Profile() {
                         {/* ID Card / Hunter License Style */}
                         <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
                             <HunterLicenseCard
-                                user={{ ...user, uid: user?.uid || '', ...extendedProfile }}
-                                stats={{ level, xp, xpToNextLevel, streak, badgeCount: badges.length }}
-                                isOwnProfile={true}
+                                user={{
+                                    uid: uid || user?.uid || '',
+                                    displayName: extendedProfile.displayName || (isOwnProfile ? user?.displayName : 'Héros'),
+                                    photoURL: extendedProfile.photoURL || (isOwnProfile ? user?.photoURL : ''),
+                                    ...extendedProfile
+                                }}
+                                stats={displayStats}
+                                isOwnProfile={isOwnProfile}
                                 onEdit={() => setIsEditModalOpen(true)}
                                 onLogout={handleLogout}
-                                featuredBadgeData={extendedProfile.featuredBadge ? badges.find(b => b.id === extendedProfile.featuredBadge) : null}
+                                featuredBadgeData={extendedProfile.featuredBadge ? displayBadges.find(b => b.id === extendedProfile.featuredBadge) : null}
                                 favoriteMangaData={extendedProfile.favoriteManga ? (() => {
+                                    // If own profile, we can search in local store
+                                    // If visited profile, we might not have the full work details unless we fetch them or store basic info in profile
+                                    // For now, let's try to match ID if it's a number, but without the full work object available for visitors, 
+                                    // this might be limited. 
+                                    // Only show if we can find it. For visitors, 'works' store is empty/irrelevant.
+                                    // TODO: Fetch favorite work details for visitors. For now, works only for self if works loaded.
+                                    if (!isOwnProfile) return null;
+
                                     const w = works.find(w => w.id === Number(extendedProfile.favoriteManga) || w.title === extendedProfile.favoriteManga);
                                     return w ? { title: w.title, image: w.image } : null;
                                 })() : null}
@@ -156,7 +238,7 @@ export default function Profile() {
                                         <BookOpen size={24} />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{totalChaptersRead}</div>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayTotalChapters}</div>
                                         <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>Chapitres lus</p>
                                     </div>
                                 </div>
@@ -167,7 +249,7 @@ export default function Profile() {
                                         <Flame size={24} />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{works.filter(w => w.status === 'reading').length}</div>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{isOwnProfile ? works.filter(w => w.status === 'reading').length : '-'}</div>
                                         <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>En cours</p>
                                     </div>
                                 </div>
@@ -178,7 +260,7 @@ export default function Profile() {
                                         <CheckCircle size={24} />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{totalWorksCompleted}</div>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayWorksCompleted}</div>
                                         <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>Terminées</p>
                                     </div>
                                 </div>
@@ -189,7 +271,7 @@ export default function Profile() {
                                         <Library size={24} />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{totalWorksAdded}</div>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayTotalWorks}</div>
                                         <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>Collection</p>
                                     </div>
                                 </div>
@@ -200,7 +282,7 @@ export default function Profile() {
                                         <Award size={24} />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{badges.length} / 16</div>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayStats.badgeCount} / 16</div>
                                         <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>Badges</p>
                                     </div>
                                 </div>
@@ -211,7 +293,7 @@ export default function Profile() {
                                         <Trophy size={24} />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{xp + (level - 1) * 100}</div>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayStats.xp}</div>
                                         <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>XP Total</p>
                                     </div>
                                 </div>
@@ -219,7 +301,7 @@ export default function Profile() {
 
                             <h3 className="manga-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem', background: 'var(--color-secondary)', color: '#000' }}>Badges Récents</h3>
                             <div className="manga-panel" style={{ padding: '2rem', background: '#fff', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '2rem' }}>
-                                {badges.map((badge) => (
+                                {displayBadges.map((badge) => (
                                     <motion.div
                                         key={badge.id}
                                         whileHover={{ scale: 1.1, rotate: 5 }}
