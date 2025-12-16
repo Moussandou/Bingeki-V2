@@ -1,5 +1,5 @@
 :root {
-  /* Colors */
+  /* Colors - Default (Dark) */
   --color-primary: #FF2E63;
   --color-primary-glow: rgba(255, 46, 99, 0.5);
   --color-secondary: #08D9D6;
@@ -10,12 +10,12 @@
   --color-surface-hover: #2a2d35;
   --color-text: #EAEAEA;
   --color-text-dim: #8b9bb4;
-  
+
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, #FF2E63 0%, #FF0844 100%);
   --gradient-secondary: linear-gradient(135deg, #08D9D6 0%, #252A34 100%);
   --gradient-dark: linear-gradient(180deg, rgba(15, 16, 20, 0) 0%, #0f1014 100%);
-  
+
   /* Glassmorphism */
   --glass-bg: rgba(30, 32, 37, 0.7);
   --glass-border: rgba(255, 255, 255, 0.1);
@@ -41,15 +41,42 @@
   --duration-fast: 0.2s;
   --duration-normal: 0.4s;
   --duration-slow: 0.8s;
-  
+
   /* Manga / Comic specific */
   --manga-panel-border: 2px solid #fff;
   --manga-halftone-opacity: 0.1;
 }
 
-/* Dark theme is default */
+/* Light Theme */
+body.theme-light {
+  --color-background: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-surface-hover: #e8e8e8;
+  --color-text: #1a1a1a;
+  --color-text-dim: #666666;
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  --manga-panel-border: 2px solid #000;
+}
+
+/* AMOLED Theme */
+body.theme-amoled {
+  --color-background: #000000;
+  --color-surface: #0a0a0a;
+  --color-surface-hover: #1a1a1a;
+  --color-text: #ffffff;
+  --color-text-dim: #888888;
+  --glass-bg: rgba(10, 10, 10, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+  --manga-panel-border: 2px solid #fff;
+}
+
+/* Default dark theme body */
 body {
   background-color: var(--color-background);
   color: var(--color-text);
   font-family: var(--font-body);
+  transition: background-color 0.3s, color 0.3s;
 }
