@@ -27,8 +27,8 @@ export default function Library() {
                         color: '#000'
                     }}>
                         <div>
-                            <h1 className="text-outline" style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', lineHeight: 1, letterSpacing: '-1px', color: '#fff', textShadow: '2px 2px 0 #000' }}>Bibliothèque</h1>
-                            <p style={{ fontWeight: 600, opacity: 0.6 }}>Vos aventures en cours et terminées</p>
+                            <h1 className="text-outline" style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', lineHeight: 1, letterSpacing: '-1px', color: '#000', textShadow: '2px 2px 0 #fff' }}>Bibliothèque</h1>
+                            <p style={{ fontWeight: 600, opacity: 0.6, color: '#000' }}>Vos aventures en cours et terminées</p>
                         </div>
                         <Button variant="primary" onClick={() => setIsAddModalOpen(true)} icon={<Plus size={18} />} style={{ border: '2px solid #000', borderRadius: 0, boxShadow: '4px 4px 0 #000', color: '#fff' }}>
                             AJOUTER
