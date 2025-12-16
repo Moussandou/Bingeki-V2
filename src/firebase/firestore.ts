@@ -22,6 +22,31 @@ interface GamificationData {
     lastUpdated: number;
 }
 
+interface UserProfile {
+    uid: string;
+    email: string | null;
+    displayName: string | null;
+    photoURL: string | null;
+    lastLogin: number;
+}
+
+// Save user profile to Firestore
+export async function saveUserProfileToFirestore(user: { uid: string; email: string | null; displayName: string | null; photoURL: string | null }): Promise<void> {
+    try {
+        const docRef = doc(db, 'users', user.uid);
+        await setDoc(docRef, {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            lastLogin: Date.now()
+        }, { merge: true }); // Merge to avoid overwriting existing fields like settings if any
+        console.log('[Firestore] User profile saved');
+    } catch (error) {
+        console.error('[Firestore] Error saving user profile:', error);
+    }
+}
+
 // Save library data to Firestore
 export async function saveLibraryToFirestore(userId: string, works: Work[]): Promise<void> {
     try {

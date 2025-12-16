@@ -11,7 +11,8 @@ import {
   loadLibraryFromFirestore,
   loadGamificationFromFirestore,
   saveLibraryToFirestore,
-  saveGamificationToFirestore
+  saveGamificationToFirestore,
+  saveUserProfileToFirestore
 } from '@/firebase/firestore';
 
 // Lazy load pages
@@ -44,6 +45,9 @@ function App() {
       setUser(firebaseUser);
 
       if (firebaseUser) {
+        // Sync user profile (email, name, photo)
+        await saveUserProfileToFirestore(firebaseUser);
+
         // User logged in - sync with Firestore
         const cloudLibrary = await loadLibraryFromFirestore(firebaseUser.uid);
         const cloudGamification = await loadGamificationFromFirestore(firebaseUser.uid);
