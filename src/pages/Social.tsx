@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
-import { Trophy, Users, Search, UserPlus, Check, User } from 'lucide-react';
+import { Trophy, Users, Search, UserPlus, Check, User, X } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import {
     getLeaderboard,
@@ -11,6 +11,7 @@ import {
     searchUserByName,
     sendFriendRequest,
     acceptFriendRequest,
+    rejectFriendRequest,
     type Friend,
     type UserProfile
 } from '@/firebase/firestore';
@@ -124,6 +125,16 @@ export default function Social() {
             loadData(); // Refresh to show accepted status
         } catch (error) {
             console.error("Failed to accept", error);
+        }
+    };
+
+    const handleReject = async (friendUid: string) => {
+        if (!user) return;
+        try {
+            await rejectFriendRequest(user.uid, friendUid);
+            loadData(); // Refresh to remove from list
+        } catch (error) {
+            console.error("Failed to reject", error);
         }
     };
 
@@ -254,7 +265,17 @@ export default function Social() {
                                                 </div>
                                                 <div style={{ fontWeight: 700 }}>{friend.displayName}</div>
                                             </div>
-                                            <Button variant="primary" onClick={() => handleAccept(friend.uid)}>ACCEPTER</Button>
+                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                <Button
+                                                    variant="ghost"
+                                                    onClick={() => handleReject(friend.uid)}
+                                                    style={{ color: '#ef4444' }}
+                                                    title="Refuser"
+                                                >
+                                                    <X size={20} />
+                                                </Button>
+                                                <Button variant="primary" onClick={() => handleAccept(friend.uid)}>ACCEPTER</Button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

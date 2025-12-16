@@ -8,12 +8,14 @@ interface SettingsState {
     reducedMotion: boolean;
     soundEnabled: boolean;
     notifications: boolean;
+    streamingUrlPattern: string;
 
     setTheme: (theme: Theme) => void;
     toggleTheme: () => void;
     toggleReducedMotion: () => void;
     toggleSound: () => void;
     toggleNotifications: () => void;
+    setStreamingUrlPattern: (pattern: string) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -23,6 +25,9 @@ export const useSettingsStore = create<SettingsState>()(
             reducedMotion: false,
             soundEnabled: true,
             notifications: true,
+
+            streamingUrlPattern: 'https://www.google.com/search?q={title}+episode+{number}+streaming', // Default
+            setStreamingUrlPattern: (pattern) => set({ streamingUrlPattern: pattern }),
 
             setTheme: (theme) => set({ theme }),
             toggleTheme: () => set((state) => {

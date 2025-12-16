@@ -3,9 +3,91 @@ import { Button } from '@/components/ui/Button';
 import { Switch } from '@/components/ui/Switch';
 import { useSettingsStore } from '@/store/settingsStore';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Eye, Volume2, Trash2, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Eye, Volume2, Trash2, RotateCcw, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useLibraryStore } from '@/store/libraryStore';
+import { getWorkDetails } from '@/services/animeApi';
+import { RefreshCw } from 'lucide-react';
+import { useToast } from '@/context/ToastContext';
+
+function SyncButton() {
+    const { works, updateWorkDetails } = useLibraryStore();
+    const { addToast } = useToast();
+    const [isSyncing, setIsSyncing] = useState(false);
+    const [progress, setProgress] = useState(0);
+
+    const handleSync = async () => {
+        if (works.length === 0) {
+            addToast('Aucune œuvre à synchroniser', 'info');
+            return;
+        }
+
+        setIsSyncing(true);
+        setProgress(0);
+        let updatedCount = 0;
+        let errorCount = 0;
+
+        try {
+            for (let i = 0; i < works.length; i++) {
+                const work = works[i];
+                // Only sync if ID is a number (Jikan ID), skip manual ones with timestamp IDs (usually large numbers but let's assume manual ones might fail gracefully or we check type)
+                // Actually Jikan IDs are numbers. timestamp IDs are also numbers.
+                // We'll try to fetch all. Manual ones (timestamp IDs) will likely fail 404 or 400, so we count errors but continue.
+
+                try {
+                    const details = await getWorkDetails(Number(work.id), work.type);
+                    if (details) {
+                        updateWorkDetails(work.id, {
+                            score: details.score || undefined,
+                            synopsis: details.synopsis || undefined,
+                            image: details.images.jpg.image_url, // Update image just in case
+                            totalChapters: work.type === 'manga' ? details.chapters : details.episodes,
+                        });
+                        updatedCount++;
+                    }
+                } catch (e) {
+                    // Ignore errors for individual works (e.g. manual items)
+                    errorCount++;
+                }
+
+                setProgress(Math.round(((i + 1) / works.length) * 100));
+            }
+
+            addToast(`Synchronisation terminée : ${updatedCount} mis à jour`, 'success');
+        } catch (error) {
+            addToast('Erreur lors de la synchronisation', 'error');
+            console.error(error);
+        } finally {
+            setIsSyncing(false);
+            setProgress(0);
+        }
+    };
+
+    return (
+        <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSync}
+            disabled={isSyncing}
+            style={{
+                borderColor: '#000',
+                color: '#000',
+                minWidth: '130px'
+            }}
+        >
+            {isSyncing ? (
+                <>
+                    <RefreshCw size={16} className="animate-spin" /> {progress}%
+                </>
+            ) : (
+                <>
+                    <RefreshCw size={16} /> Synchroniser
+                </>
+            )}
+        </Button>
+    );
+}
 
 export default function Settings() {
     const navigate = useNavigate();
@@ -100,6 +182,18 @@ export default function Settings() {
                             </h2>
                             <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+                                    {/* Synchronization */}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div>
+                                            <p style={{ fontWeight: 700 }}>Synchroniser la bibliothèque</p>
+                                            <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>Met à jour les synopsis, scores et statuts depuis l'API</p>
+                                        </div>
+                                        <SyncButton />
+                                    </div>
+
+                                    <div style={{ height: '1px', background: '#eee' }} />
+
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
                                             <p style={{ fontWeight: 700 }}>Réinitialiser la progression</p>

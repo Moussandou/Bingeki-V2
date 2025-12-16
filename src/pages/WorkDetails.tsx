@@ -3,11 +3,15 @@ import { Layout } from '@/components/layout/Layout';
 import { useLibraryStore } from '@/store/libraryStore';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal'; // Import Modal
-import { ArrowLeft, BookOpen, Check, Trophy, Star, Trash2, AlertTriangle } from 'lucide-react'; // Import AlertTriangle
-import { useState } from 'react';
+import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { statusToFrench } from '@/utils/statusTranslation';
 import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
-import { useToast } from '@/context/ToastContext'; // Import useToast
+import { useToast } from '@/context/ToastContext';
+import { ContentList, type ContentItem } from '@/components/ContentList';
+import { getAnimeEpisodes, getAnimeEpisodeDetails } from '@/services/animeApi';
+import logoCrunchyroll from '@/assets/logo_crunchyroll.png';
+import logoADN from '@/assets/logo_adn.png';
 
 export default function WorkDetails() {
     const { id } = useParams();
@@ -18,7 +22,15 @@ export default function WorkDetails() {
     const work = getWork(Number(id));
     const [isEditing, setIsEditing] = useState(false);
     const [progress, setProgress] = useState(work?.currentChapter || 0);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isSynopsisExpanded, setIsSynopsisExpanded] = useState(false);
+
+    // Tab & Episodes State
+    const [activeTab, setActiveTab] = useState<'info' | 'episodes'>('info');
+    const [episodes, setEpisodes] = useState<ContentItem[]>([]);
+    const [episodesPage, setEpisodesPage] = useState(1);
+    const [hasMoreEpisodes, setHasMoreEpisodes] = useState(false);
+    const [isLoadingEpisodes, setIsLoadingEpisodes] = useState(false);
 
     if (!work) {
         return (
@@ -57,8 +69,93 @@ export default function WorkDetails() {
 
     const handleDelete = () => {
         removeWork(work.id);
-        addToast(`"${work.title}" a été supprimé`, 'error'); // Add Toast
+        addToast(`"${work.title}" a été supprimé`, 'error');
         navigate('/library');
+    };
+
+    // Fetch episodes or generate chapters when tab updates
+    useEffect(() => {
+        if (activeTab === 'episodes') {
+            setIsLoadingEpisodes(true);
+
+            if (work?.type === 'anime') {
+                getAnimeEpisodes(Number(work.id), episodesPage).then(res => {
+                    const mapped = res.data.map((ep: any) => ({
+                        id: ep.mal_id,
+                        title: ep.title,
+                        number: ep.mal_id,
+                        date: ep.aired,
+                        isFiller: ep.filler,
+                        synopsis: null // Initialize with null
+                    }));
+                    setEpisodes(mapped);
+                    setHasMoreEpisodes(res.pagination.has_next_page);
+                    setIsLoadingEpisodes(false);
+                });
+            } else if (work?.type === 'manga' && work.totalChapters) {
+                // Generate chapters locally with simulated pagination (100 per page to be manageable)
+                const itemsPerPage = 50; // Use 50 as default chunk size for chapters
+                const total = work.totalChapters;
+                const start = (episodesPage - 1) * itemsPerPage + 1;
+                const end = Math.min(start + itemsPerPage - 1, total);
+
+                const generated: ContentItem[] = [];
+                for (let i = start; i <= end; i++) {
+                    generated.push({
+                        id: i,
+                        title: `Chapitre ${i}`,
+                        number: i,
+                        date: null,
+                        isFiller: false
+                    });
+                }
+
+                // Simulate network delay for feeling
+                setTimeout(() => {
+                    setEpisodes(generated);
+                    setHasMoreEpisodes(end < total);
+                    setIsLoadingEpisodes(false);
+                }, 300);
+            } else {
+                setEpisodes([]);
+                setIsLoadingEpisodes(false);
+            }
+        }
+    }, [work?.id, work?.type, work?.totalChapters, activeTab, episodesPage]);
+
+    const handleEpisodeSelect = (number: number) => {
+        if (work) {
+            updateProgress(work.id, number);
+            setProgress(number);
+
+            const oldProgress = work.currentChapter || 0;
+            if (number > oldProgress) {
+                const diff = number - oldProgress;
+                addXp(XP_REWARDS.UPDATE_PROGRESS * diff);
+                incrementStat('chapters');
+                recordActivity();
+            }
+            addToast(`Progression mise à jour: Épisode ${number}`, 'success');
+        }
+    };
+
+    const handleExpandEpisode = async (episodeNumber: number) => {
+        if (work.type !== 'anime') return;
+
+        console.log(`Fetching details for anime ${work.id} episode ${episodeNumber}`);
+        try {
+            const details = await getAnimeEpisodeDetails(Number(work.id), episodeNumber);
+            console.log("Details received:", details);
+            if (details) {
+                setEpisodes(prev => prev.map(ep =>
+                    ep.number === episodeNumber ? { ...ep, synopsis: details.synopsis } : ep
+                ));
+            } else {
+                console.warn("No details returned from API");
+            }
+        } catch (error) {
+            console.error("Failed to fetch episode details", error);
+        }
     };
 
     return (
@@ -102,158 +199,346 @@ export default function WorkDetails() {
 
                     {/* Info */}
                     <div style={{ flex: 1 }}>
-                        <h1 style={{
-                            fontFamily: 'var(--font-heading)',
-                            fontSize: '3rem',
-                            lineHeight: 1,
-                            marginBottom: '1rem',
-                            textTransform: 'uppercase',
-                            textShadow: '3px 3px 0 rgba(0,0,0,0.1)',
-                            color: '#000'
-                        }}>
-                            {work.title}
-                        </h1>
-
-                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', color: '#000' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, border: '2px solid #000', padding: '0.5rem 1rem' }}>
-                                <Trophy size={20} />
-                                <span>Score: {work.score || '?'}</span>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, border: '2px solid #000', padding: '0.5rem 1rem' }}>
-                                <BookOpen size={20} />
-                                <span>{work.totalChapters || '?'} Chaps</span>
-                            </div>
+                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '2px solid #EEE' }}>
+                            <button
+                                onClick={() => setActiveTab('info')}
+                                style={{
+                                    padding: '0.5rem 1rem',
+                                    fontWeight: 900,
+                                    fontSize: '1rem',
+                                    background: activeTab === 'info' ? '#000' : 'transparent',
+                                    color: activeTab === 'info' ? '#fff' : '#000',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    borderBottom: activeTab === 'info' ? '4px solid #000' : 'none',
+                                    marginBottom: '-2px'
+                                }}
+                            >
+                                GÉNÉRAL
+                            </button>
+                            {(work.type === 'anime' || work.type === 'manga') && (
+                                <button
+                                    onClick={() => setActiveTab('episodes')}
+                                    style={{
+                                        padding: '0.5rem 1rem',
+                                        fontWeight: 900,
+                                        fontSize: '1rem',
+                                        background: activeTab === 'episodes' ? '#000' : 'transparent',
+                                        color: activeTab === 'episodes' ? '#fff' : '#000',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        borderBottom: activeTab === 'episodes' ? '4px solid #000' : 'none',
+                                        marginBottom: '-2px'
+                                    }}
+                                >
+                                    {work.type === 'manga' ? 'LISTE DES CHAPITRES' : 'LISTE DES ÉPISODES'}
+                                </button>
+                            )}
                         </div>
 
-                        <div style={{ marginBottom: '2rem' }}>
-                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>PROGRESSION</h3>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#000' }}>
-                                {isEditing ? (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <input
-                                            type="number"
-                                            value={progress}
-                                            onChange={(e) => setProgress(Number(e.target.value))}
-                                            style={{
-                                                fontSize: '2rem',
-                                                fontWeight: 900,
-                                                width: '100px',
-                                                border: '2px solid #000',
-                                                padding: '0.5rem',
-                                                textAlign: 'center',
-                                                color: '#000',
-                                                background: '#fff'
-                                            }}
-                                        />
-                                        <span style={{ fontSize: '1.5rem', fontWeight: 900 }}>/ {work.totalChapters || '?'}</span>
-                                        <Button onClick={handleSave} variant="primary" icon={<Check size={20} />}>OK</Button>
+                        {activeTab === 'episodes' ? (
+                            work.type === 'manga' && (!work.totalChapters || work.totalChapters === 0) ? (
+                                <div style={{ textAlign: 'center', padding: '3rem', border: '2px dashed #000' }}>
+                                    <h3 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>NOMBRE DE CHAPITRES INCONNU</h3>
+                                    <p style={{ marginBottom: '1rem' }}>Veuillez définir le nombre total de chapitres dans l'onglet "Général" pour générer la liste.</p>
+                                    <Button
+                                        onClick={() => {
+                                            const newTotal = prompt("Entrez le nombre total de chapitres :", "0");
+                                            if (newTotal && !isNaN(Number(newTotal))) {
+                                                updateWorkDetails(work.id, { totalChapters: Number(newTotal) });
+                                            }
+                                        }}
+                                        variant="manga"
+                                    >
+                                        Définir le nombre de chapitres
+                                    </Button>
+                                </div>
+                            ) : (
+                                <ContentList
+                                    items={episodes}
+                                    currentProgress={work.currentChapter || 0}
+                                    onSelect={handleEpisodeSelect}
+                                    onExpand={handleExpandEpisode}
+                                    isLoading={isLoadingEpisodes}
+                                    page={episodesPage}
+                                    hasNextPage={hasMoreEpisodes}
+                                    hasPrevPage={episodesPage > 1}
+                                    onNextPage={() => setEpisodesPage(p => p + 1)}
+                                    onPrevPage={() => setEpisodesPage(p => p - 1)}
+                                    workTitle={work.title}
+                                    workType={work.type}
+                                />
+                            )
+                        ) : (
+                            <>
+                                <h1 style={{
+                                    fontFamily: 'var(--font-heading)',
+                                    fontSize: '3rem',
+                                    lineHeight: 1,
+                                    marginBottom: '1rem',
+                                    textTransform: 'uppercase',
+                                    textShadow: '3px 3px 0 rgba(0,0,0,0.1)',
+                                    color: '#000'
+                                }}>
+                                    {work.title}
+                                </h1>
+
+                                <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', color: '#000', flexWrap: 'wrap', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, border: '2px solid #000', padding: '0.5rem 1rem' }}>
+                                        <Trophy size={20} />
+                                        <span>Score: {work.score || '?'}</span>
                                     </div>
-                                ) : (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <span style={{ fontSize: '3rem', fontWeight: 900, lineHeight: 1 }}>
-                                            {work.currentChapter} <span style={{ fontSize: '1.5rem', opacity: 0.5 }}>/ {work.totalChapters || '?'}</span>
-                                        </span>
-                                        <Button onClick={() => setIsEditing(true)} variant="manga">Mettre à jour</Button>
+                                    <div
+                                        onClick={() => {
+                                            const newTotal = prompt("Entrez le nombre total:", work.totalChapters?.toString() || "");
+                                            if (newTotal && !isNaN(Number(newTotal))) {
+                                                updateWorkDetails(Number(work.id), { totalChapters: Number(newTotal) });
+                                            }
+                                        }}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem',
+                                            fontWeight: 600,
+                                            border: '2px solid #000',
+                                            padding: '0.5rem 1rem',
+                                            cursor: 'pointer',
+                                            background: '#fff',
+                                            transition: 'background 0.2s'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.background = '#f0f0f0'}
+                                        onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
+                                        title="Cliquez pour modifier le total"
+                                    >
+                                        <BookOpen size={20} />
+                                        <span>{work.totalChapters || '?'} Chaps</span>
+                                    </div>
+
+                                    {/* Minimalist Streaming Buttons */}
+                                    {work.type === 'anime' ? (
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            {/* Crunchyroll */}
+                                            <button
+                                                onClick={() => window.open(`https://www.google.com/search?q=site:crunchyroll.com/fr/watch ${encodeURIComponent(work.title)}`, '_blank')}
+                                                style={{ border: '2px solid #ea580c', padding: '0.5rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center' }}
+                                                title="Crunchyroll"
+                                            >
+                                                <img src={logoCrunchyroll} alt="CR" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
+                                            </button>
+
+                                            {/* ADN */}
+                                            <button
+                                                onClick={() => window.open(`https://www.google.com/search?q=site:animationdigitalnetwork.fr ${encodeURIComponent(work.title)}`, '_blank')}
+                                                style={{ border: '2px solid #0099ff', padding: '0.5rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center' }}
+                                                title="ADN"
+                                            >
+                                                <img src={logoADN} alt="ADN" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
+                                            </button>
+
+                                            {/* Generic Streaming */}
+                                            <button
+                                                onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} streaming vostfr`, '_blank')}
+                                                style={{ border: '2px solid #000', padding: '0.5rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center' }}
+                                                title="Recherche Streaming Générale"
+                                            >
+                                                <Tv size={20} />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} manga scan fr`, '_blank')}
+                                            style={{ border: '2px solid #22c55e', color: '#22c55e', padding: '0.5rem 1rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700 }}
+                                            title="Lire les scans"
+                                        >
+                                            <FileText size={20} />
+                                            <span>LIRE</span>
+                                        </button>
+                                    )}
+                                </div>
+
+                                {work.synopsis && (
+                                    <div style={{ marginBottom: '2rem' }}>
+                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '0.5rem', color: '#000' }}>SYNOPSIS</h3>
+                                        <div
+                                            onClick={() => setIsSynopsisExpanded(!isSynopsisExpanded)}
+                                            style={{ cursor: 'pointer', position: 'relative' }}
+                                        >
+                                            <p style={{
+                                                fontSize: '1rem',
+                                                lineHeight: '1.6',
+                                                opacity: 0.8,
+                                                color: '#000',
+                                                maxHeight: isSynopsisExpanded ? 'none' : '100px',
+                                                overflow: 'hidden',
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: isSynopsisExpanded ? 'none' : 4,
+                                                WebkitBoxOrient: 'vertical',
+                                                transition: 'max-height 0.3s ease'
+                                            }}>
+                                                {work.synopsis}
+                                            </p>
+                                            {!isSynopsisExpanded && (
+                                                <div style={{
+                                                    position: 'absolute',
+                                                    bottom: 0,
+                                                    left: 0,
+                                                    right: 0,
+                                                    height: '40px',
+                                                    background: 'linear-gradient(transparent, #fff)',
+                                                    pointerEvents: 'none'
+                                                }} />
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={() => setIsSynopsisExpanded(!isSynopsisExpanded)}
+                                            style={{
+                                                background: 'none',
+                                                border: 'none',
+                                                fontWeight: 900,
+                                                fontSize: '0.9rem',
+                                                marginTop: '0.5rem',
+                                                cursor: 'pointer',
+                                                textDecoration: 'underline',
+                                                padding: 0
+                                            }}
+                                        >
+                                            {isSynopsisExpanded ? 'Moins' : 'Lire la suite'}
+                                        </button>
                                     </div>
                                 )}
-                            </div>
-                        </div>
 
-                        <div style={{ marginBottom: '2rem' }}>
-                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>STATUT</h3>
-                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                {['reading', 'completed', 'plan_to_read', 'dropped'].map((s) => (
-                                    <button
-                                        key={s}
-                                        onClick={() => updateStatus(work.id, s as any)}
+                                <div style={{ marginBottom: '2rem' }}>
+                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>PROGRESSION</h3>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#000' }}>
+                                        {isEditing ? (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                <input
+                                                    type="number"
+                                                    value={progress}
+                                                    onChange={(e) => setProgress(Number(e.target.value))}
+                                                    style={{
+                                                        fontSize: '2rem',
+                                                        fontWeight: 900,
+                                                        width: '100px',
+                                                        border: '2px solid #000',
+                                                        padding: '0.5rem',
+                                                        textAlign: 'center',
+                                                        color: '#000',
+                                                        background: '#fff'
+                                                    }}
+                                                />
+                                                <span style={{ fontSize: '1.5rem', fontWeight: 900 }}>/ {work.totalChapters || '?'}</span>
+                                                <Button onClick={handleSave} variant="primary" icon={<Check size={20} />}>OK</Button>
+                                            </div>
+                                        ) : (
+                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem', marginTop: '1.5rem' }}>
+                                                <div className="manga-panel" style={{ padding: '1rem', background: '#fff' }}>
+                                                    <span style={{ fontSize: '3rem', fontWeight: 900, lineHeight: 1 }}>
+                                                        {work.currentChapter} <span style={{ fontSize: '1.5rem', opacity: 0.5 }}>/ {work.totalChapters || '?'}</span>
+                                                    </span>
+                                                    <Button onClick={() => setIsEditing(true)} variant="manga">Mettre à jour</Button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div style={{ marginBottom: '2rem' }}>
+                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>STATUT</h3>
+                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                        {['reading', 'completed', 'plan_to_read', 'dropped'].map((s) => (
+                                            <button
+                                                key={s}
+                                                onClick={() => updateStatus(work.id, s as any)}
+                                                style={{
+                                                    padding: '0.5rem 1rem',
+                                                    border: '2px solid #000',
+                                                    background: work.status === s ? '#000' : '#fff',
+                                                    color: work.status === s ? '#fff' : '#000',
+                                                    fontWeight: 900,
+                                                    textTransform: 'uppercase',
+                                                    cursor: 'pointer',
+                                                    transform: work.status === s ? 'translateY(-2px)' : 'none',
+                                                    boxShadow: work.status === s ? '4px 4px 0 rgba(0,0,0,0.2)' : 'none',
+                                                    transition: 'all 0.2s'
+                                                }}
+                                            >
+                                                {statusToFrench(s)}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Rating Section */}
+                                <div style={{ marginBottom: '2rem' }}>
+                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>MA NOTE</h3>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
+                                            <button
+                                                key={star}
+                                                onClick={() => updateWorkDetails(work.id, { rating: star })}
+                                                style={{
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    padding: 0,
+                                                    transition: 'transform 0.1s'
+                                                }}
+                                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+                                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                            >
+                                                <Star
+                                                    size={32}
+                                                    fill={(work.rating || 0) >= star ? '#000' : 'none'}
+                                                    color="#000"
+                                                    strokeWidth={2}
+                                                />
+                                            </button>
+                                        ))}
+                                        <span style={{ marginLeft: '1rem', fontSize: '1.5rem', fontWeight: 900 }}>{work.rating ? `${work.rating}/10` : '-/10'}</span>
+                                    </div>
+                                </div>
+
+
+                                {/* Notes Section */}
+                                <div style={{ marginBottom: '2rem' }}>
+                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>MES NOTES</h3>
+                                    <textarea
+                                        value={work.notes || ''}
+                                        onChange={(e) => updateWorkDetails(work.id, { notes: e.target.value })}
+                                        placeholder="Écrivez vos pensées ici..."
                                         style={{
-                                            padding: '0.5rem 1rem',
+                                            width: '100%',
+                                            minHeight: '150px',
                                             border: '2px solid #000',
-                                            background: work.status === s ? '#000' : '#fff',
-                                            color: work.status === s ? '#fff' : '#000',
-                                            fontWeight: 900,
-                                            textTransform: 'uppercase',
-                                            cursor: 'pointer',
-                                            transform: work.status === s ? 'translateY(-2px)' : 'none',
-                                            boxShadow: work.status === s ? '4px 4px 0 rgba(0,0,0,0.2)' : 'none',
-                                            transition: 'all 0.2s'
+                                            padding: '1rem',
+                                            fontFamily: 'inherit',
+                                            fontSize: '1rem',
+                                            resize: 'vertical',
+                                            background: '#f9f9f9',
+                                            marginBottom: '2rem'
                                         }}
-                                    >
-                                        {statusToFrench(s)}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                                    />
+                                </div>
 
-                        {/* Rating Section */}
-                        <div style={{ marginBottom: '2rem' }}>
-                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>MA NOTE</h3>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
-                                    <button
-                                        key={star}
-                                        onClick={() => updateWorkDetails(work.id, { rating: star })}
+                                {/* Danger Zone */}
+                                <div style={{ borderTop: '2px dashed #000', paddingTop: '2rem' }}>
+                                    <Button
+                                        onClick={() => setIsDeleteModalOpen(true)}
                                         style={{
-                                            background: 'none',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            padding: 0,
-                                            transition: 'transform 0.1s'
+                                            background: '#ff0000',
+                                            color: '#fff',
+                                            width: '100%',
+                                            fontWeight: 900,
+                                            textTransform: 'uppercase'
                                         }}
-                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                        icon={<Trash2 size={20} />}
                                     >
-                                        <Star
-                                            size={32}
-                                            fill={(work.rating || 0) >= star ? '#000' : 'none'}
-                                            color="#000"
-                                            strokeWidth={2}
-                                        />
-                                    </button>
-                                ))}
-                                <span style={{ marginLeft: '1rem', fontSize: '1.5rem', fontWeight: 900 }}>{work.rating ? `${work.rating}/10` : '-/10'}</span>
-                            </div>
-                        </div>
-
-
-                        {/* Notes Section */}
-                        <div style={{ marginBottom: '2rem' }}>
-                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>MES NOTES</h3>
-                            <textarea
-                                value={work.notes || ''}
-                                onChange={(e) => updateWorkDetails(work.id, { notes: e.target.value })}
-                                placeholder="Écrivez vos pensées ici..."
-                                style={{
-                                    width: '100%',
-                                    minHeight: '150px',
-                                    border: '2px solid #000',
-                                    padding: '1rem',
-                                    fontFamily: 'inherit',
-                                    fontSize: '1rem',
-                                    resize: 'vertical',
-                                    background: '#f9f9f9',
-                                    marginBottom: '2rem'
-                                }}
-                            />
-                        </div>
-
-                        {/* Danger Zone */}
-                        <div style={{ borderTop: '2px dashed #000', paddingTop: '2rem' }}>
-                            <Button
-                                onClick={() => setIsDeleteModalOpen(true)}
-                                style={{
-                                    background: '#ff0000',
-                                    color: '#fff',
-                                    width: '100%',
-                                    fontWeight: 900,
-                                    textTransform: 'uppercase'
-                                }}
-                                icon={<Trash2 size={20} />}
-                            >
-                                Supprimer de la bibliothèque
-                            </Button>
-                        </div>
-
+                                        Supprimer de la bibliothèque
+                                    </Button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
 
