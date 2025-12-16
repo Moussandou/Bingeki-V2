@@ -4,6 +4,7 @@ import { useLibraryStore } from '@/store/libraryStore';
 import { Button } from '@/components/ui/Button';
 import { ArrowLeft, BookOpen, Check, Trophy } from 'lucide-react';
 import { useState } from 'react';
+import { statusToFrench } from '@/utils/statusTranslation';
 
 export default function WorkDetails() {
     const { id } = useParams();
@@ -147,7 +148,7 @@ export default function WorkDetails() {
                                             transition: 'all 0.2s'
                                         }}
                                     >
-                                        {s.replace('_', ' ')}
+                                        {statusToFrench(s)}
                                     </button>
                                 ))}
                             </div>
