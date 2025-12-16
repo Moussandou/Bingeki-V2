@@ -30,19 +30,37 @@ export interface UserProfile {
     lastLogin: number;
     xp?: number;   // Added for leaderboard
     level?: number; // Added for leaderboard
+    banner?: string;      // Custom profile banner
+    bio?: string;         // Custom bio
+    themeColor?: string;  // Custom theme color (accent)
+    cardBgColor?: string; // Custom card background color
+    borderColor?: string; // Custom border color
+    favoriteManga?: string; // Optional: showcase a favorite work ID
+    featuredBadge?: string; // Optional: badge ID to showcase
 }
 
 // Save user profile to Firestore
-export async function saveUserProfileToFirestore(user: Pick<UserProfile, 'uid' | 'email' | 'displayName' | 'photoURL'>): Promise<void> {
+export async function saveUserProfileToFirestore(user: Partial<UserProfile>): Promise<void> {
     try {
-        const docRef = doc(db, 'users', user.uid);
-        await setDoc(docRef, {
+        const docRef = doc(db, 'users', user.uid!);
+        // Create a data object with only defined values to avoid overwriting with undefined
+        const dataToSave: any = {
             uid: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
             lastLogin: Date.now()
-        }, { merge: true }); // Merge to avoid overwriting existing fields like settings if any
+        };
+
+        if (user.email) dataToSave.email = user.email;
+        if (user.displayName) dataToSave.displayName = user.displayName;
+        if (user.photoURL) dataToSave.photoURL = user.photoURL;
+        if (user.banner) dataToSave.banner = user.banner;
+        if (user.bio) dataToSave.bio = user.bio;
+        if (user.themeColor) dataToSave.themeColor = user.themeColor;
+        if (user.cardBgColor) dataToSave.cardBgColor = user.cardBgColor;
+        if (user.borderColor) dataToSave.borderColor = user.borderColor;
+        if (user.favoriteManga) dataToSave.favoriteManga = user.favoriteManga;
+        if (user.featuredBadge) dataToSave.featuredBadge = user.featuredBadge;
+
+        await setDoc(docRef, dataToSave, { merge: true });
         console.log('[Firestore] User profile saved');
     } catch (error) {
         console.error('[Firestore] Error saving user profile:', error);
@@ -189,6 +207,21 @@ export async function searchUserByName(name: string): Promise<UserProfile | null
         return null;
     } catch (error) {
         console.error('[Firestore] Error searching user by name:', error);
+        return null;
+    }
+}
+
+// Get User Profile by UID
+export async function getUserProfile(uid: string): Promise<UserProfile | null> {
+    try {
+        const docRef = doc(db, 'users', uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data() as UserProfile;
+        }
+        return null;
+    } catch (error) {
+        console.error('[Firestore] Error getting user profile:', error);
         return null;
     }
 }

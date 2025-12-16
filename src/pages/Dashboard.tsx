@@ -64,7 +64,13 @@ export default function Dashboard() {
                                 }}>
                                     {user?.displayName || 'Héros'}
                                 </h1>
-                                <span className="manga-title" style={{ fontSize: '0.9rem', color: getRankColor(calculateRank(level)) }}>
+                                <span className="manga-title" style={{
+                                    fontSize: '0.9rem',
+                                    background: '#fff',
+                                    color: getRankColor(calculateRank(level)),
+                                    border: '2px solid #000',
+                                    boxShadow: '2px 2px 0 #000'
+                                }}>
                                     RANK {calculateRank(level)}
                                 </span>
                             </div>

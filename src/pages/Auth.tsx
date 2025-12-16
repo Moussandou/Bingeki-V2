@@ -37,9 +37,14 @@ export default function Auth() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: '#f5f5f5',
-            padding: '1rem'
+            position: 'relative',
+            padding: '1rem',
+            overflow: 'hidden'
         }}>
+            <div className="manga-bg-container">
+                <div className="manga-halftone"></div>
+                <div className="manga-speedlines"></div>
+            </div>
             <div className="container mobile-stack" style={{ maxWidth: '1000px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', alignItems: 'center' }}>
 
                 {/* Visual Side */}
@@ -65,10 +70,10 @@ export default function Auth() {
 
                     <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                         <div style={{ padding: '0.75rem 1.5rem', background: '#fff', border: '3px solid #000', fontWeight: 900, fontSize: '0.9rem', textTransform: 'uppercase', boxShadow: '4px 4px 0 var(--color-primary)' }}>
-                            🎮 Suivi RPG
+                            Suivi RPG
                         </div>
                         <div style={{ padding: '0.75rem 1.5rem', background: '#fff', border: '3px solid #000', fontWeight: 900, fontSize: '0.9rem', textTransform: 'uppercase', boxShadow: '4px 4px 0 var(--color-secondary)' }}>
-                            📈 Progression
+                            Progression
                         </div>
                     </div>
                 </motion.div>
@@ -116,18 +121,15 @@ export default function Auth() {
 
                             <Button
                                 type="button"
-                                variant="outline"
+                                variant="manga"
                                 onClick={handleGoogleLogin}
                                 disabled={loading}
                                 style={{
-                                    border: '3px solid #000',
-                                    color: '#000',
-                                    fontWeight: 900,
-                                    background: '#fff',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    gap: '0.5rem'
+                                    gap: '0.5rem',
+                                    width: '100%'
                                 }}
                             >
                                 <img src="https://www.google.com/favicon.ico" alt="Google" style={{ width: 18, height: 18 }} />
