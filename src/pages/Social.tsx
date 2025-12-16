@@ -118,11 +118,18 @@ export default function Social() {
 
     const handleReject = async (friendUid: string) => {
         if (!user) return;
+
+        // Optimistic update: Remove immediately from UI
+        setFriends(prev => prev.filter(f => f.uid !== friendUid));
+
         try {
             await rejectFriendRequest(user.uid, friendUid);
-            loadData(); // Refresh to remove from list
+            // loadData(); // No need to reload entire data if we updated locally, but maybe good for consistency
+            console.log("Friend request rejected successfully");
         } catch (error) {
             console.error("Failed to reject", error);
+            alert("Erreur lors du refus de la demande. Veuillez réessayer.");
+            loadData(); // Revert state on error handling
         }
     };
 
