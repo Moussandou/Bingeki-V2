@@ -8,8 +8,8 @@
     width: 100vw;
     height: 100vh;
     z-index: -1;
-    background-color: #ffffff;
-    color: #000000;
+    background-color: #f4f4f4;
+    color: #0f0f0f;
     /* Uses global theme bg */
     pointer-events: none;
     overflow: hidden;
@@ -19,7 +19,7 @@
     position: absolute;
     inset: 0;
     z-index: 0;
-    opacity: 0.08;
+    opacity: 0.1;
     /* Force black dots for visibility on white background */
     background-image: radial-gradient(#000 2px, transparent 2.5px);
     background-size: 20px 20px;
@@ -29,7 +29,7 @@
     position: absolute;
     inset: 0;
     z-index: 0;
-    opacity: 0.03;
+    opacity: 0.05;
     background: repeating-conic-gradient(from 0deg,
             transparent 0deg 10deg,
             #000 10deg 12deg);
