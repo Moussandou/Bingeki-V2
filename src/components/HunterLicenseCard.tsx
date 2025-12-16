@@ -41,11 +41,7 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onEdit, onLogout,
             <div style={{ background: borderColor, color: '#fff', padding: '0.5rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
                 <span style={{ fontWeight: 900, letterSpacing: '2px' }}>HUNTER LICENSE</span>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    {isOwnProfile && onEdit && (
-                        <Button size="md" variant="secondary" style={{ padding: '0.5rem 1rem', height: 'auto', color: '#000', fontWeight: 'bold' }} onClick={onEdit}>
-                            <PenTool size={16} style={{ marginRight: '0.5rem' }} /> EDITER
-                        </Button>
-                    )}
+
                     <Shield size={16} />
                 </div>
             </div>
