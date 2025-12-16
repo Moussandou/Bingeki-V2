@@ -1,24 +1,16 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
-import { Menu, User, Book, Home, Zap, Command, Moon, ChevronDown, Flame, Sun } from 'lucide-react';
+import { Menu, User, Book, Home, Zap, ChevronDown, Flame } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
-import { useSettingsStore } from '@/store/settingsStore';
 import styles from './Header.module.css';
 
 export function Header() {
     const { user } = useAuthStore();
     const { level, xp, streak } = useGamificationStore();
-    const { theme, toggleTheme } = useSettingsStore();
     const location = useLocation();
-    const navigate = useNavigate();
 
     const isActive = (path: string) => location.pathname === path;
-
-    const handleSearch = () => {
-        // TODO: Open command palette
-        navigate('/library');
-    };
 
     return (
         <>
@@ -77,17 +69,6 @@ export function Header() {
                                             <span>{xp} XP</span>
                                         </div>
                                     </Link>
-                                </div>
-
-                                {/* Actions */}
-                                <div className="desktopOnly" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <button className={styles.actionButton} onClick={handleSearch} title="Rechercher (Cmd+K)">
-                                        <Command size={18} />
-                                        <span className={styles.kbd}>K</span>
-                                    </button>
-                                    <button className={styles.actionButton} onClick={toggleTheme} title="Changer le thème">
-                                        {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
-                                    </button>
                                 </div>
 
                                 {/* Profile Dropdown */}
