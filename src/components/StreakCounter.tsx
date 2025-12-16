@@ -7,28 +7,25 @@ interface StreakCounterProps {
 export function StreakCounter({ count }: StreakCounterProps) {
     return (
         <div
-            className="glass-panel"
             style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.75rem',
+                gap: '0.5rem',
                 padding: '0.5rem 1rem',
-                borderRadius: '50px',
-                border: '1px solid rgba(255, 159, 67, 0.3)'
+                border: '2px solid #000',
+                background: '#fff',
+                boxShadow: '3px 3px 0 #000'
             }}
         >
             <div style={{ position: 'relative' }}>
-                <Flame size={20} color="#ff9f43" fill="#ff9f43" className="animate-pulse" />
-                <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: '#ff9f43',
-                    filter: 'blur(10px)',
-                    opacity: 0.5,
-                    zIndex: -1
-                }} />
+                <Flame size={22} color="#ff6b35" fill="#ff6b35" />
             </div>
-            <span style={{ fontSize: '1rem', fontWeight: 700, color: '#ff9f43' }}>
+            <span style={{
+                fontSize: '1.1rem',
+                fontWeight: 900,
+                color: '#000',
+                fontFamily: 'var(--font-heading)'
+            }}>
                 {count}
             </span>
         </div>

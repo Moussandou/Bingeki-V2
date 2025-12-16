@@ -12,14 +12,22 @@ export function XPBar({ current, max, level }: XPBarProps) {
     return (
         <div style={{ width: '100%' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--color-primary)' }}>NIV {level}</span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--color-text-dim)' }}>{current} / {max} XP</span>
+                <span style={{
+                    fontSize: '1rem',
+                    fontWeight: 900,
+                    color: '#000',
+                    fontFamily: 'var(--font-heading)',
+                    textTransform: 'uppercase'
+                }}>
+                    NIV {level}
+                </span>
+                <span style={{ fontSize: '0.85rem', color: '#000', fontWeight: 700 }}>{current} / {max} XP</span>
             </div>
 
             <div style={{
-                height: '6px',
-                background: 'rgba(255,255,255,0.1)',
-                borderRadius: '3px',
+                height: '10px',
+                background: '#eee',
+                border: '2px solid #000',
                 overflow: 'hidden',
                 position: 'relative'
             }}>
@@ -29,24 +37,9 @@ export function XPBar({ current, max, level }: XPBarProps) {
                     transition={{ duration: 1, ease: "circOut" }}
                     style={{
                         height: '100%',
-                        background: 'var(--gradient-primary)',
-                        borderRadius: '3px',
+                        background: 'var(--color-primary)',
                         position: 'relative',
                         zIndex: 2
-                    }}
-                />
-                {/* Glow effect */}
-                <motion.div
-                    animate={{ x: [-100, 200] }}
-                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '50%',
-                        height: '100%',
-                        background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
-                        zIndex: 3
                     }}
                 />
             </div>
