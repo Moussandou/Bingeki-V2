@@ -16,8 +16,14 @@ import {
 } from '@/firebase/firestore';
 
 
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/context/ToastContext';
+
 export default function Social() {
     const { user } = useAuthStore();
+    const navigate = useNavigate();
+    const { addToast } = useToast();
+
     const [activeTab, setActiveTab] = useState<'ranking' | 'friends'>('ranking');
     const [leaderboard, setLeaderboard] = useState<any[]>([]);
     const [friends, setFriends] = useState<Friend[]>([]);
@@ -75,9 +81,10 @@ export default function Social() {
             );
             // Refresh to update UI
             loadData();
-            alert(`Demande envoyée à ${targetUser.displayName} !`);
+            addToast(`Demande envoyée à ${targetUser.displayName} !`, 'success');
         } catch (error) {
             console.error("Failed to add friend", error);
+            addToast("Erreur lors de l'envoi de la demande.", 'error');
         }
     };
 
@@ -126,9 +133,10 @@ export default function Social() {
             await rejectFriendRequest(user.uid, friendUid);
             // loadData(); // No need to reload entire data if we updated locally, but maybe good for consistency
             console.log("Friend request rejected successfully");
+            addToast("Demande refusée et supprimée.", 'info');
         } catch (error) {
             console.error("Failed to reject", error);
-            alert("Erreur lors du refus de la demande. Veuillez réessayer.");
+            addToast("Erreur lors du refus de la demande. Veuillez réessayer.", 'error');
             loadData(); // Revert state on error handling
         }
     };
@@ -175,7 +183,7 @@ export default function Social() {
                                 <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', marginRight: '1rem', border: '2px solid #000' }}>
                                     <img src={player.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.displayName}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
-                                <div style={{ flex: 1, minWidth: 0, marginRight: '0.5rem' }}>
+                                <div style={{ flex: 1, minWidth: 0, marginRight: '0.5rem', cursor: 'pointer' }} onClick={() => navigate(`/profile/${player.uid}`)}>
                                     <div style={{ fontWeight: 700, fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{player.displayName || 'Anonyme'}</div>
                                     <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>Lvl {player.level || 1}</div>
                                 </div>
@@ -285,7 +293,7 @@ export default function Social() {
                                 </div>
                             ) : (
                                 friends.filter(f => f.status === 'accepted').map(friend => (
-                                    <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => navigate(`/profile/${friend.uid}`)}>
                                         <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
                                             <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         </div>

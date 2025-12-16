@@ -115,6 +115,7 @@ function App() {
             <Route path="/social" element={<Social />} />
             <Route path="/work/:id" element={<WorkDetails />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/:uid" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/legal" element={<Legal />} />
           </Routes>
