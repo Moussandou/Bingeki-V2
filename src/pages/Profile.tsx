@@ -9,33 +9,18 @@ import { useLibraryStore } from '@/store/libraryStore';
 import { useAuthStore } from '@/store/authStore';
 import { logout } from '@/firebase/auth';
 import {
-    Settings, LogOut, Award, BookOpen, CheckCircle, Library, Trophy, Flame, Shield, Info,
-    Flag, Book, Zap, Layers, Database, Timer, CalendarCheck, Crown, Target, Star, Medal
+    Settings, Award, BookOpen, CheckCircle, Library, Trophy, Flame, Info,
+
+    X, Upload, Star
 } from 'lucide-react';
+import { HunterLicenseCard } from '@/components/HunterLicenseCard';
+import { getUserProfile, saveUserProfileToFirestore, type UserProfile } from '@/firebase/firestore';
+import { Input } from '@/components/ui/Input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
-// Icon Mapping
-const BADGE_ICONS: Record<string, React.ReactNode> = {
-    'flag': <Flag size={32} />,
-    'book': <Book size={32} />,
-    'book-open': <BookOpen size={32} />,
-    'flame': <Flame size={32} />,
-    'zap': <Zap size={32} />,
-    'library': <Library size={32} />,
-    'layers': <Layers size={32} />,
-    'database': <Database size={32} />,
-    'timer': <Timer size={32} />,
-    'calendar-check': <CalendarCheck size={32} />,
-    'crown': <Crown size={32} />,
-    'check-circle': <CheckCircle size={32} />,
-    'target': <Target size={32} />,
-    'star': <Star size={32} />,
-    'medal': <Medal size={32} />,
-    'award': <Award size={32} />,
-    'trophy': <Trophy size={32} />,
-};
+import { BADGE_ICONS } from '@/utils/badges';
 
 export default function Profile() {
     const { user, setUser } = useAuthStore();
@@ -44,6 +29,84 @@ export default function Profile() {
     const navigate = useNavigate();
     const [showGuide, setShowGuide] = useState(false);
     const [hoveredBadgeId, setHoveredBadgeId] = useState<string | null>(null);
+
+    // Extended Profile State
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [extendedProfile, setExtendedProfile] = useState<Partial<UserProfile>>({});
+
+    // Edit Form State
+    const [isDragging, setIsDragging] = useState(false);
+    const [editForm, setEditForm] = useState({
+        banner: '',
+        bio: '',
+        themeColor: '#000000',
+        cardBgColor: '#ffffff',
+        borderColor: '#000000',
+        favoriteManga: '',
+        featuredBadge: ''
+    });
+
+    // Load extended profile data
+    useState(() => {
+        if (user?.uid) {
+            getUserProfile(user.uid).then(profile => {
+                if (profile) {
+                    setExtendedProfile(profile);
+                    setEditForm({
+                        banner: profile.banner || '',
+                        bio: profile.bio || '',
+                        themeColor: profile.themeColor || '#000000',
+                        cardBgColor: profile.cardBgColor || '#ffffff',
+                        borderColor: profile.borderColor || '#000000',
+                        favoriteManga: profile.favoriteManga || '',
+                        featuredBadge: profile.featuredBadge || ''
+                    });
+                }
+            });
+        }
+    });
+
+    // --- Drag & Drop Handlers ---
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
+        handleFileUpload(e);
+    };
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
+        let file: File | null = null;
+        if ('files' in e.target && e.target.files) file = e.target.files[0];
+        else if ('dataTransfer' in e && e.dataTransfer.files) file = e.dataTransfer.files[0];
+
+        if (file && (file.type.startsWith('image/') || file.type === 'image/gif')) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setEditForm(prev => ({ ...prev, banner: reader.result as string }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+    // ---------------------------
+
+    const handleSaveProfile = async () => {
+        if (!user) return;
+        await saveUserProfileToFirestore({
+            uid: user.uid,
+            ...editForm
+        });
+        setExtendedProfile({ ...extendedProfile, ...editForm });
+        setIsEditModalOpen(false);
+    };
 
     const handleLogout = async () => {
         await logout();
@@ -69,50 +132,18 @@ export default function Profile() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
                         {/* ID Card / Hunter License Style */}
                         <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
-                            <div className="manga-panel" style={{ padding: '0', overflow: 'hidden', background: '#fff', color: '#000' }}>
-                                {/* Header Strip */}
-                                <div style={{ background: '#000', color: '#fff', padding: '0.5rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <span style={{ fontWeight: 900, letterSpacing: '2px' }}>HUNTER LICENSE</span>
-                                    <Shield size={16} />
-                                </div>
-
-                                <div style={{ padding: '2rem', textAlign: 'center' }}>
-                                    <div style={{ position: 'relative', display: 'inline-block', marginBottom: '1.5rem' }}>
-                                        <div style={{ width: '140px', height: '140px', borderRadius: '4px', border: '3px solid #000', overflow: 'hidden', background: '#333', boxShadow: '4px 4px 0 rgba(0,0,0,0.2)' }}>
-                                            <img src={user?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                        </div>
-                                        <div className="manga-title" style={{ position: 'absolute', bottom: -10, right: -10, fontSize: '1.5rem', transform: 'rotate(-5deg)', color: '#fff', background: 'var(--color-primary)' }}>
-                                            LVL {level}
-                                        </div>
-                                    </div>
-
-                                    <h2 style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900, textTransform: 'uppercase', marginBottom: '0.2rem' }}>{user?.displayName || 'Chasseur'}</h2>
-                                    <p style={{ fontFamily: 'monospace', fontSize: '1rem', opacity: 0.7, marginBottom: '2rem' }}>ID: 8094-1290-BING</p>
-
-                                    <div style={{ marginBottom: '2rem', textAlign: 'left' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontWeight: 700 }}>
-                                            <span>EXPÉRIENCE</span>
-                                            <span>{xp} / {xpToNextLevel}</span>
-                                        </div>
-                                        <div style={{ height: '12px', background: '#eee', border: '2px solid #000' }}>
-                                            <div style={{ height: '100%', width: `${(xp / xpToNextLevel) * 100}%`, background: 'var(--color-primary)' }} />
-                                        </div>
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
-                                        <div style={{ border: '2px solid #000', padding: '0.5rem' }}>
-                                            <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{streak}</div>
-                                            <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 700 }}>Jours Streak</div>
-                                        </div>
-                                        <div style={{ border: '2px solid #000', padding: '0.5rem' }}>
-                                            <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{badges.length}</div>
-                                            <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 700 }}>Badges</div>
-                                        </div>
-                                    </div>
-
-                                    <Button variant="outline" style={{ width: '100%', border: '2px solid var(--color-primary)', borderRadius: 0, fontWeight: 900 }} icon={<LogOut size={16} />} onClick={handleLogout}>DECONNEXION</Button>
-                                </div>
-                            </div>
+                            <HunterLicenseCard
+                                user={{ ...user, uid: user?.uid || '', ...extendedProfile }}
+                                stats={{ level, xp, xpToNextLevel, streak, badgeCount: badges.length }}
+                                isOwnProfile={true}
+                                onEdit={() => setIsEditModalOpen(true)}
+                                onLogout={handleLogout}
+                                featuredBadgeData={extendedProfile.featuredBadge ? badges.find(b => b.id === extendedProfile.featuredBadge) : null}
+                                favoriteMangaData={extendedProfile.favoriteManga ? (() => {
+                                    const w = works.find(w => w.id === Number(extendedProfile.favoriteManga) || w.title === extendedProfile.favoriteManga);
+                                    return w ? { title: w.title, image: w.image } : null;
+                                })() : null}
+                            />
                         </motion.div>
 
                         {/* Content & Stats */}
@@ -208,7 +239,7 @@ export default function Profile() {
                                             border: '3px solid #000',
                                             boxShadow: '4px 4px 0 rgba(0,0,0,0.2)'
                                         }}>
-                                            {BADGE_ICONS[badge.icon as string] || <span>?</span>}
+                                            {BADGE_ICONS[badge.icon as string] || <Star size={32} />}
                                         </div>
                                         <p style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', color: '#000' }}>{badge.name}</p>
 
@@ -274,7 +305,134 @@ export default function Profile() {
                         </motion.div>
                     </div>
 
-                    {/* Guide Modal */}
+                    {/* Edit Profile Modal */}
+                    <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="EDITER LA LICENSE">
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxHeight: '70vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
+
+                            {/* BANNER UPLOAD */}
+                            <div>
+                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>BANNIÈRE / GIF</label>
+                                {!editForm.banner ? (
+                                    <div
+                                        onDragOver={handleDragOver}
+                                        onDragLeave={handleDragLeave}
+                                        onDrop={handleDrop}
+                                        style={{
+                                            border: `2px dashed ${isDragging ? 'var(--color-primary)' : '#000'}`,
+                                            background: isDragging ? 'rgba(0,0,0,0.05)' : '#fff',
+                                            padding: '1.5rem',
+                                            textAlign: 'center',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            gap: '0.5rem'
+                                        }}
+                                        onClick={() => document.getElementById('banner-upload')?.click()}
+                                    >
+                                        <input
+                                            type="file"
+                                            id="banner-upload"
+                                            accept="image/*"
+                                            onChange={handleFileUpload}
+                                            style={{ display: 'none' }}
+                                        />
+                                        <Upload size={24} style={{ opacity: 0.5 }} />
+                                        <div style={{ fontSize: '0.8rem', fontWeight: 700 }}>Glisser ou cliquer (JPG, GIF...)</div>
+                                    </div>
+                                ) : (
+                                    <div style={{ position: 'relative', width: '100%', height: '100px', border: '2px solid #000', overflow: 'hidden' }}>
+                                        <img src={editForm.banner} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <button
+                                            onClick={() => setEditForm(prev => ({ ...prev, banner: '' }))}
+                                            style={{ position: 'absolute', top: 5, right: 5, background: 'red', color: 'white', border: 'none', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                        >
+                                            <X size={12} />
+                                        </button>
+                                    </div>
+                                )}
+                                <Input
+                                    placeholder="Ou URL directe..."
+                                    value={editForm.banner}
+                                    onChange={(e) => setEditForm(prev => ({ ...prev, banner: e.target.value }))}
+                                    style={{ marginTop: '0.5rem' }}
+                                />
+                            </div>
+
+                            {/* COLORS */}
+                            <div>
+                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>COULEURS</label>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+                                    <div>
+                                        <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>ACCENT</span>
+                                        <input type="color" value={editForm.themeColor} onChange={(e) => setEditForm(prev => ({ ...prev, themeColor: e.target.value }))} style={{ width: '100%', height: '40px', border: '2px solid #000' }} />
+                                    </div>
+                                    <div>
+                                        <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>FOND</span>
+                                        <input type="color" value={editForm.cardBgColor} onChange={(e) => setEditForm(prev => ({ ...prev, cardBgColor: e.target.value }))} style={{ width: '100%', height: '40px', border: '2px solid #000' }} />
+                                    </div>
+                                    <div>
+                                        <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>BORDURE</span>
+                                        <input type="color" value={editForm.borderColor} onChange={(e) => setEditForm(prev => ({ ...prev, borderColor: e.target.value }))} style={{ width: '100%', height: '40px', border: '2px solid #000' }} />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* SELECTORS */}
+                            <div>
+                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>MANGA PRÉFÉRÉ</label>
+                                <select
+                                    value={editForm.favoriteManga}
+                                    onChange={(e) => setEditForm(prev => ({ ...prev, favoriteManga: e.target.value }))}
+                                    style={{ width: '100%', padding: '0.75rem', border: '2px solid #000', fontWeight: 'bold' }}
+                                >
+                                    <option value="">Aucun</option>
+                                    {works.map(w => (
+                                        <option key={w.id} value={w.id}>{w.title}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>BADGE EN VEDETTE</label>
+                                <select
+                                    value={editForm.featuredBadge}
+                                    onChange={(e) => setEditForm(prev => ({ ...prev, featuredBadge: e.target.value }))}
+                                    style={{ width: '100%', padding: '0.75rem', border: '2px solid #000', fontWeight: 'bold' }}
+                                >
+                                    <option value="">Aucun</option>
+                                    {badges.map(b => (
+                                        <option key={b.id} value={b.id}>{b.name} ({b.rarity})</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>BIO / CITATION</label>
+                                <textarea
+                                    className="manga-input" // Assuming existence or using raw style
+                                    placeholder="Une phrase qui vous définit..."
+                                    value={editForm.bio}
+                                    onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
+                                    rows={3}
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.75rem',
+                                        border: '2px solid #000',
+                                        fontFamily: 'inherit',
+                                        fontSize: '1rem',
+                                        resize: 'vertical'
+                                    }}
+                                />
+                            </div>
+
+                            <Button variant="primary" onClick={handleSaveProfile} style={{ marginTop: '1rem' }}>
+                                ENREGISTRER
+                            </Button>
+                        </div>
+                    </Modal>
+
+                    {/* Guide Modal (unchanged) */}
                     <Modal isOpen={showGuide} onClose={() => setShowGuide(false)} title="Guide du Chasseur">
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             <div style={{ display: 'flex', gap: '1rem' }}>
