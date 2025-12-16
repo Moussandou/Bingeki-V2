@@ -20,8 +20,8 @@
     inset: 0;
     z-index: 0;
     opacity: 0.08;
-    /* Adaptive halftone color based on theme via CSS variable or default */
-    background-image: radial-gradient(var(--color-text) 2px, transparent 2.5px);
+    /* Force black dots for visibility on white background */
+    background-image: radial-gradient(#000 2px, transparent 2.5px);
     background-size: 20px 20px;
 }
 
@@ -32,7 +32,7 @@
     opacity: 0.03;
     background: repeating-conic-gradient(from 0deg,
             transparent 0deg 10deg,
-            var(--color-text) 10deg 12deg);
+            #000 10deg 12deg);
 }
 
 /* Utilities for Containers */
