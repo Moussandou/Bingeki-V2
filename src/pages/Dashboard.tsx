@@ -7,11 +7,16 @@ import { Play, Plus, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
+import { useLibraryStore } from '@/store/libraryStore';
 import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
     const { user } = useAuthStore();
     const { level, xp, xpToNextLevel, streak } = useGamificationStore();
+    const { works } = useLibraryStore();
+
+    // Filter works that are currently being read
+    const inProgressWorks = works.filter(w => w.status === 'reading').slice(0, 6);
 
     return (
         <Layout>
@@ -94,62 +99,86 @@ export default function Dashboard() {
 
                     {/* Manga Cards Grid */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
-                        {/* Mock Data */}
-                        {[1, 2, 3].map((i) => (
-                            <motion.div key={i} whileHover={{ y: -5 }}>
-                                <Card variant="manga" hoverable style={{ padding: 0, overflow: 'hidden', minHeight: '380px', display: 'flex', flexDirection: 'column' }}>
-                                    {/* Image */}
-                                    <div style={{
-                                        height: '200px',
-                                        background: `url(https://picsum.photos/seed/${i + 20}/400/300) center/cover`,
-                                        borderBottom: '3px solid #000',
-                                        position: 'relative'
-                                    }}>
+                        {inProgressWorks.length === 0 ? (
+                            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem' }}>
+                                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>
+                                    AUCUNE LECTURE EN COURS
+                                </h3>
+                                <p style={{ marginBottom: '1.5rem', opacity: 0.7 }}>
+                                    Ajoutez des œuvres à votre bibliothèque pour commencer l'aventure !
+                                </p>
+                                <Link to="/library">
+                                    <Button variant="primary" icon={<Plus size={18} />}>
+                                        EXPLORER LA BIBLIOTHÈQUE
+                                    </Button>
+                                </Link>
+                            </div>
+                        ) : (
+                            inProgressWorks.map((work) => (
+                                <motion.div key={work.id} whileHover={{ y: -5 }}>
+                                    <Card variant="manga" hoverable style={{ padding: 0, overflow: 'hidden', minHeight: '380px', display: 'flex', flexDirection: 'column' }}>
+                                        {/* Image */}
                                         <div style={{
-                                            position: 'absolute',
-                                            top: '0.5rem',
-                                            left: '0.5rem',
-                                            background: '#000',
-                                            color: '#fff',
-                                            padding: '2px 8px',
-                                            fontWeight: 700,
-                                            fontSize: '0.75rem',
-                                            transform: 'skewX(-10deg)'
+                                            height: '200px',
+                                            background: `url(${work.image}) center/cover`,
+                                            borderBottom: '3px solid #000',
+                                            position: 'relative'
                                         }}>
-                                            MANGA
-                                        </div>
-                                    </div>
-
-                                    {/* Content */}
-                                    <div style={{ padding: '1.5rem', background: '#fff', color: '#000', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                        <h4 style={{
-                                            fontFamily: 'var(--font-heading)',
-                                            fontSize: '1.25rem',
-                                            fontWeight: 900,
-                                            textTransform: 'uppercase',
-                                            marginBottom: '0.5rem',
-                                            lineHeight: 1.2
-                                        }}>
-                                            Jujutsu Kaisen
-                                        </h4>
-
-                                        {/* Chapter info */}
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                            <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Chapitre {230 + i}</span>
-                                            <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>2h ago</span>
+                                            <div style={{
+                                                position: 'absolute',
+                                                top: '0.5rem',
+                                                left: '0.5rem',
+                                                background: '#000',
+                                                color: '#fff',
+                                                padding: '2px 8px',
+                                                fontWeight: 700,
+                                                fontSize: '0.75rem',
+                                                transform: 'skewX(-10deg)',
+                                                textTransform: 'uppercase'
+                                            }}>
+                                                {work.type}
+                                            </div>
                                         </div>
 
-                                        <div style={{ marginTop: 'auto' }}>
-                                            <Link to="/work/1">
-                                                <Button size="sm" variant="primary" style={{ width: '100%', borderRadius: 0, border: '2px solid #000', boxShadow: '4px 4px 0 #000' }}>
-                                                    <Play size={14} fill="currentColor" /> CONTINUER
-                                                </Button>
-                                            </Link>
+                                        {/* Content */}
+                                        <div style={{ padding: '1.5rem', background: '#fff', color: '#000', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                            <h4 style={{
+                                                fontFamily: 'var(--font-heading)',
+                                                fontSize: '1.25rem',
+                                                fontWeight: 900,
+                                                textTransform: 'uppercase',
+                                                marginBottom: '0.5rem',
+                                                lineHeight: 1.2,
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: 2,
+                                                WebkitBoxOrient: 'vertical',
+                                                overflow: 'hidden'
+                                            }}>
+                                                {work.title}
+                                            </h4>
+
+                                            {/* Chapter info */}
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                                <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>
+                                                    Chapitre {work.currentChapter} / {work.totalChapters || '?'}
+                                                </span>
+                                                <span style={{ fontSize: '0.75rem', opacity: 0.6, textTransform: 'uppercase' }}>
+                                                    {work.status}
+                                                </span>
+                                            </div>
+
+                                            <div style={{ marginTop: 'auto' }}>
+                                                <Link to={`/work/${work.id}`}>
+                                                    <Button size="sm" variant="primary" style={{ width: '100%', borderRadius: 0, border: '2px solid #000', boxShadow: '4px 4px 0 #000' }}>
+                                                        <Play size={14} fill="currentColor" /> CONTINUER
+                                                    </Button>
+                                                </Link>
+                                            </div>
                                         </div>
-                                    </div>
-                                </Card>
-                            </motion.div>
-                        ))}
+                                    </Card>
+                                </motion.div>
+                            ))
+                        )}
                     </div>
                 </div>
             </div>
