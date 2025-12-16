@@ -19,7 +19,6 @@ import { Input } from '@/components/ui/Input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { loadGamificationFromFirestore } from '@/firebase/firestore';
 import { BADGE_ICONS } from '@/utils/badges';
 import type { Badge } from '@/types/badge';
 
@@ -55,42 +54,43 @@ export default function Profile() {
 
         setLoadingProfile(true);
 
-        // 1. Load User Profile (Banner, Bio, etc.)
+        // Load User Profile (Banner, Bio, XP, Level, etc.) - main document has all data
         getUserProfile(targetUid).then(profile => {
             if (profile) {
                 setExtendedProfile(profile);
-            }
-        });
-
-        // 2. Load Stats (if not own profile, we need to fetch them manually)
-        if (!isOwnProfile) {
-            loadGamificationFromFirestore(targetUid).then(stats => {
-                if (stats) {
-                    setVisitedStats(stats);
+                // For visited profiles, set stats from the profile data
+                if (!isOwnProfile) {
+                    setVisitedStats({
+                        level: profile.level || 1,
+                        xp: profile.xp || 0,
+                        xpToNextLevel: 100, // Default
+                        streak: 0, // Not available in main profile, could be added later
+                        badges: [], // Could be fetched separately if needed
+                        totalChaptersRead: 0,
+                        totalWorksAdded: 0,
+                        totalWorksCompleted: 0
+                    });
                 }
-                setLoadingProfile(false);
-            });
-        } else {
-            // If own profile, we use the store data automatically, but we ensure loading is done
-            // The extended profile is already fetched above
-            // Sync form with loaded profile
-            if (user?.uid) { // Re-fetch own profile to ensure sync
-                getUserProfile(user.uid).then(p => {
-                    if (p) {
-                        setExtendedProfile(p);
-                        setEditForm({
-                            banner: p.banner || '',
-                            bio: p.bio || '',
-                            themeColor: p.themeColor || '#000000',
-                            cardBgColor: p.cardBgColor || '#ffffff',
-                            borderColor: p.borderColor || '#000000',
-                            favoriteManga: p.favoriteManga || '',
-                            featuredBadge: p.featuredBadge || ''
-                        });
-                    }
-                });
             }
             setLoadingProfile(false);
+        });
+
+        // If own profile, sync form with loaded profile
+        if (isOwnProfile && user?.uid) {
+            getUserProfile(user.uid).then(p => {
+                if (p) {
+                    setExtendedProfile(p);
+                    setEditForm({
+                        banner: p.banner || '',
+                        bio: p.bio || '',
+                        themeColor: p.themeColor || '#000000',
+                        cardBgColor: p.cardBgColor || '#ffffff',
+                        borderColor: p.borderColor || '#000000',
+                        favoriteManga: p.favoriteManga || '',
+                        featuredBadge: p.featuredBadge || ''
+                    });
+                }
+            });
         }
 
     }, [uid, user?.uid, isOwnProfile]);
