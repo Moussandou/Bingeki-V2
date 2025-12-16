@@ -4,6 +4,7 @@ import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { useAuthStore } from '@/store/authStore';
 import { useLibraryStore } from '@/store/libraryStore';
 import { useGamificationStore } from '@/store/gamificationStore';
+import { useShallow } from 'zustand/react/shallow';
 import { auth } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 import {
@@ -25,7 +26,7 @@ const Settings = lazy(() => import('@/pages/Settings'));
 function App() {
   const { setUser, setLoading, user } = useAuthStore();
   const libraryWorks = useLibraryStore((s) => s.works);
-  const gamificationState = useGamificationStore((s) => ({
+  const gamificationState = useGamificationStore(useShallow((s) => ({
     level: s.level,
     xp: s.xp,
     xpToNextLevel: s.xpToNextLevel,
@@ -35,7 +36,7 @@ function App() {
     totalChaptersRead: s.totalChaptersRead,
     totalWorksAdded: s.totalWorksAdded,
     totalWorksCompleted: s.totalWorksCompleted,
-  }));
+  })));
 
   // Auth state listener + Firestore sync
   useEffect(() => {
