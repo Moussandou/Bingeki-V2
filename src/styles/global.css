@@ -95,3 +95,62 @@ button {
     cursor: pointer;
     font-family: inherit;
 }
+
+/* ===================== */
+/* Mobile Responsive     */
+/* ===================== */
+
+/* Tablet and below */
+@media (max-width: 1024px) {
+    .container {
+        padding: 0 1rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .hidden-mobile {
+        display: none !important;
+    }
+
+    .desktopOnly {
+        display: none !important;
+    }
+
+    .mobileOnly {
+        display: block !important;
+    }
+
+    .container {
+        padding: 0 0.75rem;
+    }
+
+    h1 {
+        font-size: 1.75rem !important;
+    }
+
+    h2 {
+        font-size: 1.25rem !important;
+    }
+
+    /* Stack grids on mobile */
+    .mobile-stack {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Manga panels smaller padding */
+    .manga-panel {
+        padding: 1rem !important;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .container {
+        padding: 0 0.5rem;
+    }
+
+    h1 {
+        font-size: 1.5rem !important;
+    }
+}

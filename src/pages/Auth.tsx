@@ -38,9 +38,9 @@ export default function Auth() {
             alignItems: 'center',
             justifyContent: 'center',
             background: '#f5f5f5',
-            padding: '2rem'
+            padding: '1rem'
         }}>
-            <div className="container" style={{ maxWidth: '1000px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }}>
+            <div className="container mobile-stack" style={{ maxWidth: '1000px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', alignItems: 'center' }}>
 
                 {/* Visual Side */}
                 <motion.div
