@@ -108,6 +108,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/library" element={<Library />} />
           <Route path="/discover" element={<Discover />} />
+          <Route path="/social" element={<Social />} />
           <Route path="/work/:id" element={<WorkDetails />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
