@@ -31,7 +31,7 @@ interface UserProfile {
 }
 
 // Save user profile to Firestore
-export async function saveUserProfileToFirestore(user: { uid: string; email: string | null; displayName: string | null; photoURL: string | null }): Promise<void> {
+export async function saveUserProfileToFirestore(user: UserProfile): Promise<void> {
     try {
         const docRef = doc(db, 'users', user.uid);
         await setDoc(docRef, {
