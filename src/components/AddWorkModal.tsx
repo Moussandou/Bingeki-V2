@@ -134,8 +134,8 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
             totalChapters: (type === 'manga' ? work.chapters : work.episodes) || 0, // Fallback to 0 if null
             currentChapter: 0,
             status: 'reading',
-            score: work.score, // Save score
-            synopsis: work.synopsis, // Save synopsis
+            score: work.score || undefined, // Fallback to undefined if null
+            synopsis: work.synopsis || '', // Fallback to empty string if null
         };
         addWork(newWork);
         // Award XP for adding a work
