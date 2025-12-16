@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { Switch } from '@/components/ui/Switch';
 import { useSettingsStore } from '@/store/settingsStore';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Monitor, Eye, Volume2, Trash2, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Eye, Volume2, Trash2, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -12,11 +12,9 @@ export default function Settings() {
     const [showConfirmReset, setShowConfirmReset] = useState(false);
 
     const {
-        theme,
         reducedMotion,
         soundEnabled,
         notifications,
-        setTheme,
         toggleReducedMotion,
         toggleSound,
         toggleNotifications
@@ -57,38 +55,6 @@ export default function Settings() {
                     </div>
 
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-
-                        {/* Apparence */}
-                        <section>
-                            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>
-                                <Monitor size={20} /> APPARENCE
-                            </h2>
-                            <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
-                                <p style={{ marginBottom: '1rem', fontWeight: 600 }}>Thème</p>
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    {['dark', 'light', 'amoled'].map((t) => (
-                                        <button
-                                            key={t}
-                                            onClick={() => setTheme(t as any)}
-                                            style={{
-                                                padding: '0.75rem 1.5rem',
-                                                border: '2px solid #000',
-                                                background: theme === t ? '#000' : '#fff',
-                                                color: theme === t ? '#fff' : '#000',
-                                                fontWeight: 900,
-                                                textTransform: 'uppercase',
-                                                cursor: 'pointer',
-                                                boxShadow: theme === t ? '4px 4px 0 var(--color-primary)' : 'none',
-                                                transform: theme === t ? 'translate(-2px, -2px)' : 'none',
-                                                transition: 'all 0.2s'
-                                            }}
-                                        >
-                                            {t === 'dark' ? 'Sombre' : t === 'light' ? 'Clair' : 'AMOLED'}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </section>
 
                         {/* Accessibilité */}
                         <section>
