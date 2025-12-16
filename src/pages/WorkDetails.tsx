@@ -41,7 +41,7 @@ export default function WorkDetails() {
                     RETOUR
                 </Button>
 
-                <div className="manga-panel" style={{ background: '#fff', padding: '2rem', display: 'flex', gap: '2rem', flexDirection: 'row', alignItems: 'flex-start' }}>
+                <div className="manga-panel" style={{ background: '#fff', color: '#000', padding: '2rem', display: 'flex', gap: '2rem', flexDirection: 'row', alignItems: 'flex-start' }}>
 
                     {/* Cover Image */}
                     <div style={{ width: '250px', flexShrink: 0 }}>
@@ -76,12 +76,13 @@ export default function WorkDetails() {
                             lineHeight: 1,
                             marginBottom: '1rem',
                             textTransform: 'uppercase',
-                            textShadow: '3px 3px 0 rgba(0,0,0,0.1)'
+                            textShadow: '3px 3px 0 rgba(0,0,0,0.1)',
+                            color: '#000'
                         }}>
                             {work.title}
                         </h1>
 
-                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', color: '#000' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, border: '2px solid #000', padding: '0.5rem 1rem' }}>
                                 <Trophy size={20} />
                                 <span>Score: {work.score || '?'}</span>
@@ -93,8 +94,8 @@ export default function WorkDetails() {
                         </div>
 
                         <div style={{ marginBottom: '2rem' }}>
-                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem' }}>PROGRESSION</h3>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>PROGRESSION</h3>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#000' }}>
                                 {isEditing ? (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <input
@@ -107,7 +108,9 @@ export default function WorkDetails() {
                                                 width: '100px',
                                                 border: '2px solid #000',
                                                 padding: '0.5rem',
-                                                textAlign: 'center'
+                                                textAlign: 'center',
+                                                color: '#000',
+                                                background: '#fff'
                                             }}
                                         />
                                         <span style={{ fontSize: '1.5rem', fontWeight: 900 }}>/ {work.totalChapters || '?'}</span>
@@ -125,7 +128,7 @@ export default function WorkDetails() {
                         </div>
 
                         <div>
-                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem' }}>STATUT</h3>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>STATUT</h3>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 {['reading', 'completed', 'plan_to_read', 'dropped'].map((s) => (
                                     <button
