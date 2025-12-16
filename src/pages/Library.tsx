@@ -9,6 +9,7 @@ import { Search, Plus, Filter, Grid, List } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import { useNavigate } from 'react-router-dom';
+import { statusToFrench } from '@/utils/statusTranslation';
 
 export default function Library() {
     const navigate = useNavigate();
@@ -236,7 +237,7 @@ export default function Library() {
                                                 </h3>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600 }}>
                                                     <span>{work.currentChapter} / {work.totalChapters || '?'}</span>
-                                                    <span style={{ opacity: 0.5, textTransform: 'uppercase' }}>{work.status}</span>
+                                                    <span style={{ opacity: 0.5, textTransform: 'uppercase' }}>{statusToFrench(work.status)}</span>
                                                 </div>
                                             </div>
                                         </Card>
@@ -289,7 +290,7 @@ export default function Library() {
                                             </h3>
                                             <div style={{ display: 'flex', gap: '1rem', fontSize: '0.85rem', fontWeight: 600, color: '#000' }}>
                                                 <span style={{ textTransform: 'uppercase', background: '#000', color: '#fff', padding: '0 4px' }}>{work.type}</span>
-                                                <span style={{ color: '#000' }}>{work.status.replace(/_/g, ' ')}</span>
+                                                <span style={{ color: '#000' }}>{statusToFrench(work.status)}</span>
                                             </div>
                                         </div>
                                         <div style={{ paddingRight: '1rem', fontSize: '1.5rem', fontWeight: 900, fontFamily: 'var(--font-heading)', color: '#000' }}>

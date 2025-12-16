@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { useLibraryStore } from '@/store/libraryStore';
 import { Link } from 'react-router-dom';
+import { statusToFrench } from '@/utils/statusTranslation';
 
 export default function Dashboard() {
     const { user } = useAuthStore();
@@ -163,7 +164,7 @@ export default function Dashboard() {
                                                     Chapitre {work.currentChapter} / {work.totalChapters || '?'}
                                                 </span>
                                                 <span style={{ fontSize: '0.75rem', opacity: 0.6, textTransform: 'uppercase' }}>
-                                                    {work.status}
+                                                    {statusToFrench(work.status)}
                                                 </span>
                                             </div>
 
