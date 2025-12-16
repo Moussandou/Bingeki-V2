@@ -80,7 +80,7 @@ export default function Dashboard() {
                                 <Button variant="manga" size="sm" icon={<Plus size={16} />}>Ajouter</Button>
                             </Link>
                             <Link to="/profile">
-                                <Button variant="ghost" size="sm" style={{ color: '#000', border: '1px solid #000' }}>PROFIL</Button>
+                                <Button variant="manga" size="sm">PROFIL</Button>
                             </Link>
                         </div>
                     </motion.section>
