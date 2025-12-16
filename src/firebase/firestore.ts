@@ -31,8 +31,11 @@ export async function saveLibraryToFirestore(userId: string, works: Work[]): Pro
             lastUpdated: Date.now()
         } as LibraryData);
         console.log('[Firestore] Library saved');
-    } catch (error) {
+    } catch (error: any) {
         console.error('[Firestore] Error saving library:', error);
+        if (error.code === 'permission-denied') {
+            console.error('[Firestore] PERMISSION DENIED: Check your Firestore Security Rules in Firebase Console.');
+        }
     }
 }
 
@@ -66,8 +69,11 @@ export async function saveGamificationToFirestore(
             lastUpdated: Date.now()
         });
         console.log('[Firestore] Gamification saved');
-    } catch (error) {
+    } catch (error: any) {
         console.error('[Firestore] Error saving gamification:', error);
+        if (error.code === 'permission-denied') {
+            console.error('[Firestore] PERMISSION DENIED: Check your Firestore Security Rules in Firebase Console.');
+        }
     }
 }
 
