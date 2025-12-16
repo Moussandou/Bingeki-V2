@@ -10,7 +10,7 @@ import { useAuthStore } from '@/store/authStore';
 import { logout } from '@/firebase/auth';
 import {
     Settings, Award, BookOpen, CheckCircle, Library, Trophy, Flame, Info,
-
+    PenTool,
     X, Upload, Star
 } from 'lucide-react';
 import { HunterLicenseCard } from '@/components/HunterLicenseCard';
@@ -124,6 +124,7 @@ export default function Profile() {
                             Fiche de Chasseur
                         </h1>
                         <div style={{ display: 'flex', gap: '1rem' }}>
+                            <Button variant="primary" onClick={() => setIsEditModalOpen(true)} icon={<PenTool size={20} />}>EDITER</Button>
                             <Button variant="ghost" onClick={() => setShowGuide(true)} icon={<Info size={20} />}>GUIDE</Button>
                             <Button variant="manga" size="icon" onClick={() => navigate('/settings')}><Settings size={20} /></Button>
                         </div>
