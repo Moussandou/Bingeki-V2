@@ -3,15 +3,17 @@ import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 
 import { useGamificationStore } from '@/store/gamificationStore';
+import { useLibraryStore } from '@/store/libraryStore';
 import { useAuthStore } from '@/store/authStore';
 import { logout } from '@/firebase/auth';
-import { Settings, LogOut, Award, Zap, Shield } from 'lucide-react';
+import { Settings, LogOut, Award, BookOpen, CheckCircle, Library, Trophy, Flame, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
     const { user, setUser } = useAuthStore();
-    const { level, xp, xpToNextLevel, streak, badges } = useGamificationStore();
+    const { level, xp, xpToNextLevel, streak, badges, totalChaptersRead, totalWorksAdded, totalWorksCompleted } = useGamificationStore();
+    const { works } = useLibraryStore();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -83,24 +85,70 @@ export default function Profile() {
 
                         {/* Content & Stats */}
                         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
-                                <div className="manga-panel" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem', background: '#fff', color: '#000' }}>
-                                    <div style={{ padding: '1rem', background: '#000', color: '#fff' }}>
-                                        <Zap size={32} />
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '3rem' }}>
+                                {/* Chapitres lus */}
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
+                                    <div style={{ padding: '0.75rem', background: '#000', color: '#fff' }}>
+                                        <BookOpen size={24} />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: '2rem', fontWeight: 900 }}>1,240</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.8rem', opacity: 0.6 }}>XP Gagnés (7j)</p>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{totalChaptersRead}</div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>Chapitres lus</p>
                                     </div>
                                 </div>
 
-                                <div className="manga-panel" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem', background: '#fff', color: '#000' }}>
-                                    <div style={{ padding: '1rem', background: '#000', color: '#fff' }}>
-                                        <Award size={32} />
+                                {/* En cours */}
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
+                                    <div style={{ padding: '0.75rem', background: 'var(--color-primary)', color: '#fff' }}>
+                                        <Flame size={24} />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: '2rem', fontWeight: 900 }}>TOP 5%</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.8rem', opacity: 0.6 }}>Classement</p>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{works.filter(w => w.status === 'reading').length}</div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>En cours</p>
+                                    </div>
+                                </div>
+
+                                {/* Terminées */}
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
+                                    <div style={{ padding: '0.75rem', background: '#22c55e', color: '#fff' }}>
+                                        <CheckCircle size={24} />
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{totalWorksCompleted}</div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>Terminées</p>
+                                    </div>
+                                </div>
+
+                                {/* Collection */}
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
+                                    <div style={{ padding: '0.75rem', background: '#000', color: '#fff' }}>
+                                        <Library size={24} />
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{totalWorksAdded}</div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>Collection</p>
+                                    </div>
+                                </div>
+
+                                {/* Badges */}
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
+                                    <div style={{ padding: '0.75rem', background: '#fbbf24', color: '#000' }}>
+                                        <Award size={24} />
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{badges.length} / 16</div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>Badges</p>
+                                    </div>
+                                </div>
+
+                                {/* XP Total */}
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
+                                    <div style={{ padding: '0.75rem', background: '#8b5cf6', color: '#fff' }}>
+                                        <Trophy size={24} />
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{xp + (level - 1) * 100}</div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>XP Total</p>
                                     </div>
                                 </div>
                             </div>
