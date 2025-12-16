@@ -1,4 +1,4 @@
-import { Shield, LogOut, Star } from 'lucide-react';
+import { LogOut, Star } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { type UserProfile } from '@/firebase/firestore';
 import { BADGE_ICONS } from '@/utils/badges';
@@ -41,7 +41,7 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
                 <span style={{ fontWeight: 900, letterSpacing: '2px' }}>HUNTER LICENSE</span>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
 
-                    <Shield size={16} />
+
                 </div>
             </div>
 
