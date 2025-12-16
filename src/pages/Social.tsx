@@ -15,8 +15,7 @@ import {
     type Friend,
     type UserProfile
 } from '@/firebase/firestore';
-import { HunterLicenseCard } from '@/components/HunterLicenseCard';
-import { Modal } from '@/components/ui/Modal';
+
 
 export default function Social() {
     const { user } = useAuthStore();
@@ -28,17 +27,7 @@ export default function Social() {
     const [loading, setLoading] = useState(false);
     const [requestSent, setRequestSent] = useState(false);
 
-    // View Profile State
-    const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
-    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
-    const handleViewProfile = async (uid: string) => {
-        const profile = await getUserProfile(uid);
-        if (profile) {
-            setSelectedUser(profile);
-            setIsProfileModalOpen(true);
-        }
-    };
 
     useEffect(() => {
         loadData();
@@ -180,12 +169,12 @@ export default function Social() {
                                 <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', marginRight: '1rem', border: '2px solid #000' }}>
                                     <img src={player.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.displayName}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
-                                <div style={{ flex: 1, cursor: 'pointer' }} onClick={() => handleViewProfile(player.uid)}>
-                                    <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{player.displayName || 'Anonyme'}</div>
+                                <div style={{ flex: 1, minWidth: 0, marginRight: '0.5rem' }}>
+                                    <div style={{ fontWeight: 700, fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{player.displayName || 'Anonyme'}</div>
                                     <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>Lvl {player.level || 1}</div>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{ fontWeight: 900, fontSize: '1.2rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
+                                    <div style={{ fontWeight: 900, fontSize: '1.2rem', whiteSpace: 'nowrap' }}>
                                         {player.xp || 0} XP
                                     </div>
                                     {player.uid !== user?.uid && (
@@ -290,7 +279,7 @@ export default function Social() {
                                 </div>
                             ) : (
                                 friends.filter(f => f.status === 'accepted').map(friend => (
-                                    <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => handleViewProfile(friend.uid)}>
+                                    <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                         <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
                                             <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         </div>
