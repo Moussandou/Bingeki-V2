@@ -260,7 +260,8 @@ export default function Library() {
                                             border: '2px solid #000',
                                             cursor: 'pointer',
                                             gap: '1rem',
-                                            boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
+                                            boxShadow: '4px 4px 0 rgba(0,0,0,0.1)',
+                                            color: '#000'
                                         }}
                                         whileHover={{ x: 5 }}
                                     >
@@ -281,17 +282,18 @@ export default function Library() {
                                                 fontFamily: 'var(--font-heading)',
                                                 fontWeight: 800,
                                                 textTransform: 'uppercase',
-                                                marginBottom: '0.25rem'
+                                                marginBottom: '0.25rem',
+                                                color: '#000'
                                             }}>
                                                 {work.title}
                                             </h3>
-                                            <div style={{ display: 'flex', gap: '1rem', fontSize: '0.85rem', fontWeight: 600, color: '#666' }}>
+                                            <div style={{ display: 'flex', gap: '1rem', fontSize: '0.85rem', fontWeight: 600, color: '#000' }}>
                                                 <span style={{ textTransform: 'uppercase', background: '#000', color: '#fff', padding: '0 4px' }}>{work.type}</span>
-                                                <span>{work.status.replace(/_/g, ' ')}</span>
+                                                <span style={{ color: '#000' }}>{work.status.replace(/_/g, ' ')}</span>
                                             </div>
                                         </div>
-                                        <div style={{ paddingRight: '1rem', fontSize: '1.5rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>
-                                            {work.currentChapter} <span style={{ fontSize: '1rem', opacity: 0.4 }}>/ {work.totalChapters || '?'}</span>
+                                        <div style={{ paddingRight: '1rem', fontSize: '1.5rem', fontWeight: 900, fontFamily: 'var(--font-heading)', color: '#000' }}>
+                                            {work.currentChapter} <span style={{ fontSize: '1rem', opacity: 0.6, color: '#000' }}>/ {work.totalChapters || '?'}</span>
                                         </div>
                                     </motion.div>
                                 ))}
