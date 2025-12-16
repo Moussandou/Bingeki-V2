@@ -2,8 +2,16 @@ import { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { useAuthStore } from '@/store/authStore';
+import { useLibraryStore } from '@/store/libraryStore';
+import { useGamificationStore } from '@/store/gamificationStore';
 import { auth } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
+import {
+  loadLibraryFromFirestore,
+  loadGamificationFromFirestore,
+  saveLibraryToFirestore,
+  saveGamificationToFirestore
+} from '@/firebase/firestore';
 
 // Lazy load pages
 const Opening = lazy(() => import('@/pages/Opening'));
@@ -16,15 +24,76 @@ const Settings = lazy(() => import('@/pages/Settings'));
 
 function App() {
   const { setUser, setLoading } = useAuthStore();
+  const libraryWorks = useLibraryStore((s) => s.works);
+  const gamificationState = useGamificationStore((s) => ({
+    level: s.level,
+    xp: s.xp,
+    xpToNextLevel: s.xpToNextLevel,
+    streak: s.streak,
+    lastActivityDate: s.lastActivityDate,
+    badges: s.badges,
+    totalChaptersRead: s.totalChaptersRead,
+    totalWorksAdded: s.totalWorksAdded,
+    totalWorksCompleted: s.totalWorksCompleted,
+  }));
 
+  // Auth state listener + Firestore sync
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+
+      if (user) {
+        // User logged in - sync with Firestore
+        const cloudLibrary = await loadLibraryFromFirestore(user.uid);
+        const cloudGamification = await loadGamificationFromFirestore(user.uid);
+
+        if (cloudLibrary) {
+          // Cloud data exists - load it into Zustand
+          useLibraryStore.setState({ works: cloudLibrary });
+        } else if (libraryWorks.length > 0) {
+          // No cloud data but local data exists - upload to Firestore
+          await saveLibraryToFirestore(user.uid, libraryWorks);
+        }
+
+        if (cloudGamification) {
+          // Cloud data exists - load it
+          useGamificationStore.setState(cloudGamification);
+        } else if (gamificationState.level > 1 || gamificationState.totalWorksAdded > 0) {
+          // No cloud data but local progress exists - upload
+          await saveGamificationToFirestore(user.uid, gamificationState);
+        }
+      }
+
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, [setUser, setLoading]);
+
+  // Auto-save to Firestore when data changes (debounced via separate effect)
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    // Save library changes to Firestore
+    const timeout = setTimeout(() => {
+      saveLibraryToFirestore(user.uid, libraryWorks);
+    }, 2000); // Debounce 2 seconds
+
+    return () => clearTimeout(timeout);
+  }, [libraryWorks]);
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    // Save gamification changes to Firestore
+    const timeout = setTimeout(() => {
+      saveGamificationToFirestore(user.uid, gamificationState);
+    }, 2000); // Debounce 2 seconds
+
+    return () => clearTimeout(timeout);
+  }, [gamificationState.level, gamificationState.xp, gamificationState.totalWorksAdded]);
 
   return (
     <BrowserRouter>
