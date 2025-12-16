@@ -213,7 +213,6 @@ export default function Profile() {
                                 }}
                                 stats={displayStats}
                                 isOwnProfile={!!isOwnProfile}
-                                onEdit={() => setIsEditModalOpen(true)}
                                 onLogout={handleLogout}
                                 featuredBadgeData={extendedProfile.featuredBadge ? displayBadges.find((b: Badge) => b.id === extendedProfile.featuredBadge) : null}
                                 favoriteMangaData={extendedProfile.favoriteManga ? (() => {
