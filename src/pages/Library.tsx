@@ -11,7 +11,12 @@ import { motion } from 'framer-motion';
 export default function Library() {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const [searchQuery, setSearchQuery] = useState('');
     const { works } = useLibraryStore();
+
+    const filteredWorks = works.filter(work =>
+        work.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <Layout>
@@ -44,13 +49,17 @@ export default function Library() {
                                 <Search size={20} style={{ margin: '0 0.5rem', color: '#000' }} />
                                 <input
                                     placeholder="Rechercher une œuvre..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
                                     style={{
                                         border: 'none',
                                         outline: 'none',
                                         width: '100%',
                                         fontFamily: 'var(--font-heading)',
                                         fontSize: '1rem',
-                                        fontWeight: 600
+                                        fontWeight: 600,
+                                        background: 'transparent',
+                                        color: '#000'
                                     }}
                                 />
                             </div>
@@ -90,11 +99,15 @@ export default function Library() {
                     </div>
 
                     {/* Library Grid */}
-                    {works.length === 0 ? (
+                    {filteredWorks.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '4rem', gridColumn: '1 / -1' }}>
-                            <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>C'EST VIDE ICI...</h3>
-                            <p style={{ marginBottom: '2rem' }}>Votre collection attend ses premiers trésors.</p>
-                            <Button variant="primary" onClick={() => setIsAddModalOpen(true)}>COMMENCER L'AVENTURE</Button>
+                            <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>
+                                {searchQuery ? 'AUCUN RÉSULTAT...' : "C'EST VIDE ICI..."}
+                            </h3>
+                            <p style={{ marginBottom: '2rem' }}>
+                                {searchQuery ? "Essayez une autre recherche." : "Votre collection attend ses premiers trésors."}
+                            </p>
+                            {!searchQuery && <Button variant="primary" onClick={() => setIsAddModalOpen(true)}>COMMENCER L'AVENTURE</Button>}
                         </div>
                     ) : (
                         <div style={{
@@ -102,7 +115,7 @@ export default function Library() {
                             gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
                             gap: '2rem',
                         }}>
-                            {works.map((work) => (
+                            {filteredWorks.map((work) => (
                                 <motion.div
                                     key={work.id}
                                     initial={{ opacity: 0, y: 20 }}
