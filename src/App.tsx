@@ -23,7 +23,7 @@ const Profile = lazy(() => import('@/pages/Profile'));
 const Settings = lazy(() => import('@/pages/Settings'));
 
 function App() {
-  const { setUser, setLoading } = useAuthStore();
+  const { setUser, setLoading, user } = useAuthStore();
   const libraryWorks = useLibraryStore((s) => s.works);
   const gamificationState = useGamificationStore((s) => ({
     level: s.level,
@@ -39,20 +39,20 @@ function App() {
 
   // Auth state listener + Firestore sync
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setUser(firebaseUser);
 
-      if (user) {
+      if (firebaseUser) {
         // User logged in - sync with Firestore
-        const cloudLibrary = await loadLibraryFromFirestore(user.uid);
-        const cloudGamification = await loadGamificationFromFirestore(user.uid);
+        const cloudLibrary = await loadLibraryFromFirestore(firebaseUser.uid);
+        const cloudGamification = await loadGamificationFromFirestore(firebaseUser.uid);
 
         if (cloudLibrary) {
           // Cloud data exists - load it into Zustand
           useLibraryStore.setState({ works: cloudLibrary });
         } else if (libraryWorks.length > 0) {
           // No cloud data but local data exists - upload to Firestore
-          await saveLibraryToFirestore(user.uid, libraryWorks);
+          await saveLibraryToFirestore(firebaseUser.uid, libraryWorks);
         }
 
         if (cloudGamification) {
@@ -60,7 +60,7 @@ function App() {
           useGamificationStore.setState(cloudGamification);
         } else if (gamificationState.level > 1 || gamificationState.totalWorksAdded > 0) {
           // No cloud data but local progress exists - upload
-          await saveGamificationToFirestore(user.uid, gamificationState);
+          await saveGamificationToFirestore(firebaseUser.uid, gamificationState);
         }
       }
 
@@ -72,7 +72,6 @@ function App() {
 
   // Auto-save to Firestore when data changes (debounced via separate effect)
   useEffect(() => {
-    const user = auth.currentUser;
     if (!user) return;
 
     // Save library changes to Firestore
@@ -81,10 +80,9 @@ function App() {
     }, 2000); // Debounce 2 seconds
 
     return () => clearTimeout(timeout);
-  }, [libraryWorks]);
+  }, [libraryWorks, user]);
 
   useEffect(() => {
-    const user = auth.currentUser;
     if (!user) return;
 
     // Save gamification changes to Firestore
@@ -93,7 +91,7 @@ function App() {
     }, 2000); // Debounce 2 seconds
 
     return () => clearTimeout(timeout);
-  }, [gamificationState.level, gamificationState.xp, gamificationState.totalWorksAdded]);
+  }, [gamificationState, user]);
 
   return (
     <BrowserRouter>
