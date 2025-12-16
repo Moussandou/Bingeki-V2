@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { useLibraryStore } from '@/store/libraryStore';
 import { Button } from '@/components/ui/Button';
-import { ArrowLeft, BookOpen, Check, Trophy } from 'lucide-react';
+import { ArrowLeft, BookOpen, Check, Trophy, Star } from 'lucide-react';
 import { useState } from 'react';
 import { statusToFrench } from '@/utils/statusTranslation';
 import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
@@ -10,7 +10,7 @@ import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
 export default function WorkDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { getWork, updateProgress, updateStatus } = useLibraryStore();
+    const { getWork, updateProgress, updateStatus, updateWorkDetails } = useLibraryStore();
     const { addXp, recordActivity, incrementStat } = useGamificationStore();
     const work = getWork(Number(id));
     const [isEditing, setIsEditing] = useState(false);
@@ -149,9 +149,9 @@ export default function WorkDetails() {
                             </div>
                         </div>
 
-                        <div>
+                        <div style={{ marginBottom: '2rem' }}>
                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>STATUT</h3>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                 {['reading', 'completed', 'plan_to_read', 'dropped'].map((s) => (
                                     <button
                                         key={s}
@@ -173,6 +173,56 @@ export default function WorkDetails() {
                                     </button>
                                 ))}
                             </div>
+                        </div>
+
+                        {/* Rating Section */}
+                        <div style={{ marginBottom: '2rem' }}>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>MA NOTE</h3>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
+                                    <button
+                                        key={star}
+                                        onClick={() => updateWorkDetails(work.id, { rating: star })}
+                                        style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            padding: 0,
+                                            transition: 'transform 0.1s'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                    >
+                                        <Star
+                                            size={32}
+                                            fill={(work.rating || 0) >= star ? '#000' : 'none'}
+                                            color="#000"
+                                            strokeWidth={2}
+                                        />
+                                    </button>
+                                ))}
+                                <span style={{ marginLeft: '1rem', fontSize: '1.5rem', fontWeight: 900 }}>{work.rating ? `${work.rating}/10` : '-/10'}</span>
+                            </div>
+                        </div>
+
+                        {/* Notes Section */}
+                        <div style={{ marginBottom: '2rem' }}>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>MES NOTES</h3>
+                            <textarea
+                                value={work.notes || ''}
+                                onChange={(e) => updateWorkDetails(work.id, { notes: e.target.value })}
+                                placeholder="Écrivez vos pensées ici..."
+                                style={{
+                                    width: '100%',
+                                    minHeight: '150px',
+                                    border: '2px solid #000',
+                                    padding: '1rem',
+                                    fontFamily: 'inherit',
+                                    fontSize: '1rem',
+                                    resize: 'vertical',
+                                    background: '#f9f9f9'
+                                }}
+                            />
                         </div>
 
                     </div>

@@ -10,6 +10,8 @@ export interface Work {
     currentChapter?: number;
     status: 'reading' | 'completed' | 'on_hold' | 'dropped' | 'plan_to_read';
     score?: number;
+    rating?: number; // User personal rating (0-10)
+    notes?: string;  // User personal notes
 }
 
 interface LibraryState {
@@ -18,6 +20,7 @@ interface LibraryState {
     removeWork: (id: number | string) => void;
     updateProgress: (id: number | string, progress: number) => void;
     updateStatus: (id: number | string, status: Work['status']) => void;
+    updateWorkDetails: (id: number | string, details: Partial<Work>) => void;
     getWork: (id: number | string) => Work | undefined;
 }
 
@@ -40,6 +43,11 @@ export const useLibraryStore = create<LibraryState>()(
             updateStatus: (id, status) => set((state) => ({
                 works: state.works.map((w) =>
                     w.id === id ? { ...w, status } : w
+                ),
+            })),
+            updateWorkDetails: (id, details) => set((state) => ({
+                works: state.works.map((w) =>
+                    w.id === id ? { ...w, ...details } : w
                 ),
             })),
             getWork: (id) => get().works.find((w) => w.id === id),
