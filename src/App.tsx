@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { useAuthStore } from '@/store/authStore';
+import { useSettingsStore } from '@/store/settingsStore';
 import { auth } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -16,6 +17,18 @@ const Settings = lazy(() => import('@/pages/Settings'));
 
 function App() {
   const { setUser, setLoading } = useAuthStore();
+  const { theme } = useSettingsStore();
+
+  // Apply theme class to body
+  useEffect(() => {
+    document.body.classList.remove('theme-light', 'theme-dark', 'theme-amoled');
+    if (theme === 'light') {
+      document.body.classList.add('theme-light');
+    } else if (theme === 'amoled') {
+      document.body.classList.add('theme-amoled');
+    }
+    // dark is default, no class needed
+  }, [theme]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {

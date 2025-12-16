@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
-import { Menu, User, Book, Home, Zap, Search, Globe, Moon, ChevronDown, Flame, Sun } from 'lucide-react';
+import { Menu, User, Book, Home, Zap, Command, Moon, ChevronDown, Flame, Sun } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -16,11 +16,8 @@ export function Header() {
     const isActive = (path: string) => location.pathname === path;
 
     const handleSearch = () => {
+        // TODO: Open command palette
         navigate('/library');
-    };
-
-    const handleLanguage = () => {
-        alert("La traduction anglaise sera disponible prochainement !");
     };
 
     return (
@@ -84,12 +81,9 @@ export function Header() {
 
                                 {/* Actions */}
                                 <div className="desktopOnly" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <button className={styles.actionButton} onClick={handleSearch} title="Rechercher">
-                                        <Search size={20} />
-                                    </button>
-                                    <button className={styles.actionButton} onClick={handleLanguage} title="Langue">
-                                        <Globe size={20} />
-                                        <span style={{ fontSize: '0.75rem', fontWeight: 700, marginLeft: 4 }}>FR</span>
+                                    <button className={styles.actionButton} onClick={handleSearch} title="Rechercher (Cmd+K)">
+                                        <Command size={18} />
+                                        <span className={styles.kbd}>K</span>
                                     </button>
                                     <button className={styles.actionButton} onClick={toggleTheme} title="Changer le thème">
                                         {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
@@ -98,11 +92,11 @@ export function Header() {
 
                                 {/* Profile Dropdown */}
                                 <Link to="/profile" className={styles.profileDropdown}>
-                                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#333', overflow: 'hidden', border: '2px solid var(--color-surface)' }}>
-                                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%' }} />
+                                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#333', overflow: 'hidden', border: '2px solid #000' }}>
+                                        <img src={user?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     </div>
-                                    <span className="hidden-mobile" style={{ fontSize: '0.9rem', fontWeight: 600 }}>{user.displayName || 'Héros'}</span>
-                                    <ChevronDown size={16} className="hidden-mobile" style={{ opacity: 0.5 }} />
+                                    <span className="hidden-mobile" style={{ fontSize: '0.9rem', fontWeight: 700, color: '#000' }}>{user.displayName || 'Héros'}</span>
+                                    <ChevronDown size={16} className="hidden-mobile" style={{ opacity: 0.7, color: '#000' }} />
                                 </Link>
                             </>
                         ) : (
