@@ -2,7 +2,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { useLibraryStore } from '@/store/libraryStore';
 import { Button } from '@/components/ui/Button';
-import { ArrowLeft, BookOpen, Check, Trophy, Star, Trash2 } from 'lucide-react';
+import { Modal } from '@/components/ui/Modal'; // Import Modal
+import { ArrowLeft, BookOpen, Check, Trophy, Star, Trash2, AlertTriangle } from 'lucide-react'; // Import AlertTriangle
 import { useState } from 'react';
 import { statusToFrench } from '@/utils/statusTranslation';
 import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
@@ -10,11 +11,12 @@ import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
 export default function WorkDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { getWork, updateProgress, updateStatus, updateWorkDetails } = useLibraryStore();
+    const { getWork, updateProgress, updateStatus, updateWorkDetails, removeWork } = useLibraryStore(); // Add removeWork
     const { addXp, recordActivity, incrementStat } = useGamificationStore();
     const work = getWork(Number(id));
     const [isEditing, setIsEditing] = useState(false);
     const [progress, setProgress] = useState(work?.currentChapter || 0);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State
 
     if (!work) {
         return (
@@ -49,6 +51,11 @@ export default function WorkDetails() {
         }
 
         setIsEditing(false);
+    };
+
+    const handleDelete = () => {
+        removeWork(work.id);
+        navigate('/library');
     };
 
     return (
@@ -230,13 +237,7 @@ export default function WorkDetails() {
                         {/* Danger Zone */}
                         <div style={{ borderTop: '2px dashed #000', paddingTop: '2rem' }}>
                             <Button
-                                onClick={() => {
-                                    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette œuvre de votre bibliothèque ?\nCette action est irréversible.')) {
-                                        const { removeWork } = useLibraryStore.getState();
-                                        removeWork(work.id);
-                                        navigate('/library');
-                                    }
-                                }}
+                                onClick={() => setIsDeleteModalOpen(true)}
                                 style={{
                                     background: '#ff0000',
                                     color: '#fff',
@@ -252,6 +253,35 @@ export default function WorkDetails() {
 
                     </div>
                 </div>
+
+                {/* Delete Confirmation Modal */}
+                <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} title="SUPPRESSION">
+                    <div style={{ textAlign: 'center', padding: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                            <div style={{ background: '#fee2e2', padding: '1rem', borderRadius: '50%', color: '#dc2626' }}>
+                                <AlertTriangle size={32} />
+                            </div>
+                        </div>
+                        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem', color: '#000' }}>
+                            Supprimer "{work.title}" ?
+                        </h3>
+                        <p style={{ marginBottom: '2rem', opacity: 0.7 }}>
+                            Cette action est irréversible. Votre progression et vos notes seront perdues.
+                        </p>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                            <Button variant="ghost" onClick={() => setIsDeleteModalOpen(false)}>
+                                ANNULER
+                            </Button>
+                            <Button
+                                variant="primary"
+                                onClick={handleDelete}
+                                style={{ background: '#dc2626', borderColor: '#b91c1c' }}
+                            >
+                                SUPPRIMER
+                            </Button>
+                        </div>
+                    </div>
+                </Modal>
             </div>
         </Layout>
     );

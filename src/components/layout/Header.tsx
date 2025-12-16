@@ -49,10 +49,6 @@ export function Header() {
                                 <Trophy size={18} />
                                 <span>Social</span>
                             </Link>
-                            <Link to="/profile" className={`${styles.navLink} ${isActive('/profile') ? styles.activeLink : ''}`}>
-                                <User size={18} />
-                                <span>Tableau de bord</span>
-                            </Link>
                         </nav>
                     )}
 
