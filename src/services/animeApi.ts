@@ -14,6 +14,7 @@ export interface JikanResult {
     synopsis: string;
     type: string;
     status: string;
+    score?: number | null;
 }
 
 export const searchWorks = async (query: string, type: 'anime' | 'manga' = 'manga') => {

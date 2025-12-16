@@ -4,12 +4,14 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 
 import { AddWorkModal } from '@/components/AddWorkModal';
+import { useLibraryStore } from '@/store/libraryStore';
 import { Search, Plus, Filter, Grid, List } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Library() {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const { works } = useLibraryStore();
 
     return (
         <Layout>
@@ -88,57 +90,65 @@ export default function Library() {
                     </div>
 
                     {/* Library Grid */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-                        gap: '2rem',
-                    }}>
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: i * 0.05 }}
-                                whileHover={{ y: -5 }}
-                            >
-                                <Card variant="manga" style={{ padding: 0, overflow: 'hidden', height: '100%', border: '2px solid #000' }}>
-                                    <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid #000' }}>
-                                        <img
-                                            src={`https://picsum.photos/seed/${i + 100}/400/600`}
-                                            alt="Cover"
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'grayscale(20%) contrast(1.1)' }}
-                                        />
+                    {works.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '4rem', gridColumn: '1 / -1' }}>
+                            <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>C'EST VIDE ICI...</h3>
+                            <p style={{ marginBottom: '2rem' }}>Votre collection attend ses premiers trésors.</p>
+                            <Button variant="primary" onClick={() => setIsAddModalOpen(true)}>COMMENCER L'AVENTURE</Button>
+                        </div>
+                    ) : (
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                            gap: '2rem',
+                        }}>
+                            {works.map((work) => (
+                                <motion.div
+                                    key={work.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    whileHover={{ y: -5 }}
+                                >
+                                    <Card variant="manga" style={{ padding: 0, overflow: 'hidden', height: '100%', border: '2px solid #000' }}>
+                                        <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid #000' }}>
+                                            <img
+                                                src={work.image}
+                                                alt={work.title}
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'grayscale(0%) contrast(1.1)' }}
+                                            />
 
-                                        {/* Tag */}
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: '0.5rem',
-                                            left: '0.5rem',
-                                            background: '#000',
-                                            color: '#fff',
-                                            padding: '2px 8px',
-                                            fontWeight: 900,
-                                            fontSize: '0.75rem',
-                                            transform: 'skewX(-10deg)',
-                                            border: '1px solid #fff'
-                                        }}>
-                                            MANGA
+                                            {/* Tag */}
+                                            <div style={{
+                                                position: 'absolute',
+                                                top: '0.5rem',
+                                                left: '0.5rem',
+                                                background: '#000',
+                                                color: '#fff',
+                                                padding: '2px 8px',
+                                                fontWeight: 900,
+                                                fontSize: '0.75rem',
+                                                transform: 'skewX(-10deg)',
+                                                border: '1px solid #fff',
+                                                textTransform: 'uppercase'
+                                            }}>
+                                                {work.type}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div style={{ padding: '1rem', background: '#fff', color: '#000' }}>
-                                        <h3 style={{ fontSize: '1.2rem', fontFamily: 'var(--font-heading)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.5rem', lineHeight: 1.1 }}>
-                                            Titre de l'œuvre {i}
-                                        </h3>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600 }}>
-                                            <span>CH. {10 * i}</span>
-                                            <span style={{ opacity: 0.5 }}>ENC.</span>
+                                        <div style={{ padding: '1rem', background: '#fff', color: '#000' }}>
+                                            <h3 style={{ fontSize: '1.1rem', fontFamily: 'var(--font-heading)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.5rem', lineHeight: 1.1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                {work.title}
+                                            </h3>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600 }}>
+                                                <span>{work.currentChapter} / {work.totalChapters || '?'}</span>
+                                                <span style={{ opacity: 0.5, textTransform: 'uppercase' }}>{work.status}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                </Card>
-                            </motion.div>
-                        ))}
-                    </div>
+                                    </Card>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
 
                     <AddWorkModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
                 </div>
