@@ -7,10 +7,12 @@ import { ArrowLeft, BookOpen, Check, Trophy, Star, Trash2, AlertTriangle } from 
 import { useState } from 'react';
 import { statusToFrench } from '@/utils/statusTranslation';
 import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
+import { useToast } from '@/context/ToastContext'; // Import useToast
 
 export default function WorkDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { addToast } = useToast(); // Initialize hook
     const { getWork, updateProgress, updateStatus, updateWorkDetails, removeWork } = useLibraryStore(); // Add removeWork
     const { addXp, recordActivity, incrementStat } = useGamificationStore();
     const work = getWork(Number(id));
@@ -55,6 +57,7 @@ export default function WorkDetails() {
 
     const handleDelete = () => {
         removeWork(work.id);
+        addToast(`"${work.title}" a été supprimé`, 'error'); // Add Toast
         navigate('/library');
     };
 

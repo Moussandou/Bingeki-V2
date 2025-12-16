@@ -11,9 +11,11 @@ import { motion } from 'framer-motion';
 
 import { useNavigate } from 'react-router-dom';
 import { statusToFrench } from '@/utils/statusTranslation';
+import { useToast } from '@/context/ToastContext'; // Import useToast
 
 export default function Library() {
     const navigate = useNavigate();
+    const { addToast } = useToast(); // Initialize hook
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [workToDelete, setWorkToDelete] = useState<Work | null>(null); // State for delete confirmation
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -33,6 +35,7 @@ export default function Library() {
     const confirmDelete = () => {
         if (workToDelete) {
             removeWork(workToDelete.id);
+            addToast(`"${workToDelete.title}" a été supprimé`, 'error'); // Add Toast
             setWorkToDelete(null);
         }
     };
