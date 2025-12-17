@@ -39,5 +39,28 @@ service cloud.firestore {
         allow create, update: if request.auth != null && request.auth.uid == friendId;
       }
     }
-  }
-}
+    // ==================== FEATURES ====================
+
+    // FEEDBACK
+    match /feedback/{feedbackId} {
+      allow create: if true; // Guests can submit feedback
+      allow read: if isAuthenticated(); // For now, all logged-in users can see feedback (temporary admin)
+    }
+
+    // WATCH PARTIES
+    match /watchparties/{partyId} {
+      allow read, create: if isAuthenticated();
+      allow update: if isAuthenticated(); // Need checking participant vs host logic ideally, but keeping open for alpha
+    }
+
+    // ==================== USER DATA (Root Collections Strategy) ====================
+    // Since we moved to root collections for easier querying in some contexts:
+    
+    match /libraries/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    match /gamification/{userId} {
+      allow read: if isAuthenticated(); // Public for leaderboards
+      allow write: if isOwner(userId);
+    }
