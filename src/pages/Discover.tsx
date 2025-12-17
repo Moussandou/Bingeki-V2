@@ -29,6 +29,17 @@ export default function Discover() {
 
     const dataFetched = useRef(false);
 
+    const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
+
+    const GENRES = [
+        { id: 1, label: 'Action' },
+        { id: 2, label: 'Adventure' },
+        { id: 4, label: 'Comedy' },
+        { id: 8, label: 'Drama' },
+        { id: 10, label: 'Fantasy' },
+        { id: 24, label: 'Sci-Fi' }
+    ];
+
     // Fetch Home Data
     useEffect(() => {
         if (dataFetched.current) return;
@@ -65,7 +76,16 @@ export default function Discover() {
         const delayDebounceFn = setTimeout(async () => {
             if (searchQuery.length > 2) {
                 setLoading(true);
+                // Clear genre if searching by text
+                if (selectedGenre) setSelectedGenre(null);
                 const results = await searchWorks(searchQuery);
+                setSearchResults(results);
+                setLoading(false);
+            } else if (selectedGenre) {
+                setLoading(true);
+                setSearchResults([]); // Clear previous results immediately
+                // Search by genre (empty query, specific genre)
+                const results = await searchWorks('', 'manga', { genres: selectedGenre.toString() });
                 setSearchResults(results);
                 setLoading(false);
             } else {
@@ -74,7 +94,12 @@ export default function Discover() {
         }, 500);
 
         return () => clearTimeout(delayDebounceFn);
-    }, [searchQuery]);
+    }, [searchQuery, selectedGenre]);
+
+    const handleGenreClick = (id: number) => {
+        setSearchQuery('');
+        setSelectedGenre(id === selectedGenre ? null : id);
+    };
 
     const handleWorkClick = (work: JikanResult) => {
         setSelectedWork(work);
@@ -248,37 +273,44 @@ export default function Discover() {
                         {/* Quick Genres */}
                         {!searchQuery && (
                             <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                                {['Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Sci-Fi'].map(genre => (
-                                    <button
-                                        key={genre}
-                                        onClick={() => setSearchQuery(genre)}
-                                        style={{
-                                            padding: '0.5rem 1rem',
-                                            borderRadius: '2rem',
-                                            border: '2px solid #000',
-                                            background: '#fff',
-                                            fontWeight: 700,
-                                            fontSize: '0.9rem',
-                                            cursor: 'pointer',
-                                            transition: 'transform 0.1s',
-                                            boxShadow: '2px 2px 0 #000'
-                                        }}
-                                        onMouseDown={e => e.currentTarget.style.transform = 'translate(1px, 1px)'}
-                                        onMouseUp={e => e.currentTarget.style.transform = 'translate(0, 0)'}
-                                    >
-                                        {genre}
-                                    </button>
-                                ))}
+                                {GENRES.map(genre => {
+                                    const isActive = selectedGenre === genre.id;
+                                    return (
+                                        <button
+                                            key={genre.id}
+                                            onClick={() => handleGenreClick(genre.id)}
+                                            style={{
+                                                padding: '0.5rem 1rem',
+                                                borderRadius: '2rem',
+                                                border: isActive ? 'none' : '2px solid #000',
+                                                background: isActive ? 'var(--color-primary)' : '#fff',
+                                                color: isActive ? '#fff' : '#000',
+                                                fontWeight: 700,
+                                                fontSize: '0.9rem',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s',
+                                                boxShadow: isActive ? 'inset 2px 2px 5px rgba(0,0,0,0.2)' : '2px 2px 0 #000',
+                                                transform: isActive ? 'translate(1px, 1px)' : 'none'
+                                            }}
+                                        >
+                                            {genre.label}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
 
                     {/* Content Area */}
-                    {searchQuery.length > 2 ? (
+                    {searchQuery.length > 2 || selectedGenre ? (
                         /* Search Results */
                         <div>
                             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '2rem', color: '#000', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <Search size={32} /> Résultats pour "{searchQuery}"
+                                <Search size={32} />
+                                {selectedGenre
+                                    ? `Résultats pour le genre "${GENRES.find(g => g.id === selectedGenre)?.label}"`
+                                    : `Résultats pour "${searchQuery}"`
+                                }
                             </h2>
                             {loading ? (
                                 <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
