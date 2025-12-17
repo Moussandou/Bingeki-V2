@@ -320,11 +320,12 @@ export default function WorkDetails() {
                                             {/* Crunchyroll */}
                                             <button
                                                 onClick={() => {
-                                                    handleEpisodeSelect((work.currentChapter || 0) + 1);
-                                                    window.open(`https://www.google.com/search?q=site:crunchyroll.com/fr/watch ${encodeURIComponent(work.title)}`, '_blank');
+                                                    const nextEp = (work.currentChapter || 0) + 1;
+                                                    handleEpisodeSelect(nextEp);
+                                                    window.open(`https://www.google.com/search?q=site:crunchyroll.com/fr/watch ${encodeURIComponent(work.title)} episode ${nextEp}`, '_blank');
                                                 }}
                                                 style={{ border: '2px solid #ea580c', padding: '0.5rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center' }}
-                                                title="Crunchyroll (+1 épisode)"
+                                                title={`Crunchyroll - Épisode ${(work.currentChapter || 0) + 1}`}
                                             >
                                                 <img src={logoCrunchyroll} alt="CR" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
                                             </button>
@@ -332,11 +333,12 @@ export default function WorkDetails() {
                                             {/* ADN */}
                                             <button
                                                 onClick={() => {
-                                                    handleEpisodeSelect((work.currentChapter || 0) + 1);
-                                                    window.open(`https://www.google.com/search?q=site:animationdigitalnetwork.fr ${encodeURIComponent(work.title)}`, '_blank');
+                                                    const nextEp = (work.currentChapter || 0) + 1;
+                                                    handleEpisodeSelect(nextEp);
+                                                    window.open(`https://www.google.com/search?q=site:animationdigitalnetwork.fr ${encodeURIComponent(work.title)} episode ${nextEp}`, '_blank');
                                                 }}
                                                 style={{ border: '2px solid #0099ff', padding: '0.5rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center' }}
-                                                title="ADN (+1 épisode)"
+                                                title={`ADN - Épisode ${(work.currentChapter || 0) + 1}`}
                                             >
                                                 <img src={logoADN} alt="ADN" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
                                             </button>
@@ -344,11 +346,12 @@ export default function WorkDetails() {
                                             {/* Generic Streaming */}
                                             <button
                                                 onClick={() => {
-                                                    handleEpisodeSelect((work.currentChapter || 0) + 1);
-                                                    window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} streaming vostfr`, '_blank');
+                                                    const nextEp = (work.currentChapter || 0) + 1;
+                                                    handleEpisodeSelect(nextEp);
+                                                    window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} episode ${nextEp} streaming vostfr`, '_blank');
                                                 }}
                                                 style={{ border: '2px solid #000', padding: '0.5rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center' }}
-                                                title="Streaming (+1 épisode)"
+                                                title={`Streaming - Épisode ${(work.currentChapter || 0) + 1}`}
                                             >
                                                 <Tv size={20} />
                                             </button>
@@ -356,11 +359,12 @@ export default function WorkDetails() {
                                     ) : (
                                         <button
                                             onClick={() => {
-                                                handleEpisodeSelect((work.currentChapter || 0) + 1);
-                                                window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} manga scan fr`, '_blank');
+                                                const nextChap = (work.currentChapter || 0) + 1;
+                                                handleEpisodeSelect(nextChap);
+                                                window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} chapitre ${nextChap} scan fr`, '_blank');
                                             }}
                                             style={{ border: '2px solid #22c55e', color: '#22c55e', padding: '0.5rem 1rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700 }}
-                                            title="Lire (+1 chapitre)"
+                                            title={`Lire - Chapitre ${(work.currentChapter || 0) + 1}`}
                                         >
                                             <FileText size={20} />
                                             <span>LIRE</span>
