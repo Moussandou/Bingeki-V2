@@ -1,7 +1,10 @@
-import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy, limit, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy, limit, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
 import { db } from './config';
 import type { Work } from '@/store/libraryStore';
 import type { Badge } from '@/types/badge';
+import type { ActivityEvent } from '@/types/activity';
+import type { Comment } from '@/types/comment';
+import type { Challenge } from '@/types/challenge';
 
 // Types for Firestore data
 interface LibraryData {
@@ -334,5 +337,265 @@ export async function getLeaderboard(limitCount: number = 10): Promise<UserProfi
     } catch (error) {
         console.error('[Firestore] Error loading leaderboard:', error);
         return [];
+    }
+}
+
+// ==================== ACTIVITY FEED FUNCTIONS ====================
+
+// Log an activity event
+export async function logActivity(_userId: string, event: Omit<ActivityEvent, 'id' | 'timestamp'>): Promise<void> {
+    try {
+        const activityRef = doc(collection(db, 'activities'));
+        const activity: ActivityEvent = {
+            ...event,
+            id: activityRef.id,
+            timestamp: Date.now()
+        };
+        await setDoc(activityRef, activity);
+        console.log('[Firestore] Activity logged:', event.type);
+    } catch (error) {
+        console.error('[Firestore] Error logging activity:', error);
+    }
+}
+
+// Get activities from friends
+export async function getFriendsActivity(userId: string, limitCount: number = 20): Promise<ActivityEvent[]> {
+    try {
+        // First get friends list
+        const friends = await getFriends(userId);
+        const friendIds = friends.filter(f => f.status === 'accepted').map(f => f.uid);
+
+        if (friendIds.length === 0) return [];
+
+        // Get activities from friends (Firestore 'in' query limited to 10 items)
+        const batchedIds = friendIds.slice(0, 10); // Take first 10 friends
+        const q = query(
+            collection(db, 'activities'),
+            where('userId', 'in', batchedIds),
+            orderBy('timestamp', 'desc'),
+            limit(limitCount)
+        );
+
+        const querySnapshot = await getDocs(q);
+        const activities: ActivityEvent[] = [];
+        querySnapshot.forEach((doc) => {
+            activities.push(doc.data() as ActivityEvent);
+        });
+        return activities;
+    } catch (error) {
+        console.error('[Firestore] Error loading friends activity:', error);
+        return [];
+    }
+}
+
+// ==================== LIBRARY COMPARISON ====================
+
+// Get user's library (for comparison)
+export async function getUserLibrary(userId: string): Promise<Work[]> {
+    try {
+        const docRef = doc(db, 'users', userId, 'data', 'library');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return (docSnap.data() as LibraryData).works;
+        }
+        return [];
+    } catch (error) {
+        console.error('[Firestore] Error loading user library:', error);
+        return [];
+    }
+}
+
+// Compare two users' libraries
+export async function compareLibraries(userId1: string, userId2: string): Promise<{ common: Work[]; count: number }> {
+    try {
+        const [lib1, lib2] = await Promise.all([
+            getUserLibrary(userId1),
+            getUserLibrary(userId2)
+        ]);
+
+        const lib2Ids = new Set(lib2.map(w => w.id));
+        const common = lib1.filter(w => lib2Ids.has(w.id));
+
+        return { common, count: common.length };
+    } catch (error) {
+        console.error('[Firestore] Error comparing libraries:', error);
+        return { common: [], count: 0 };
+    }
+}
+
+// ==================== ENHANCED LEADERBOARD ====================
+
+export type LeaderboardPeriod = 'week' | 'month' | 'all';
+export type LeaderboardCategory = 'xp' | 'chapters' | 'streak';
+
+// Get filtered leaderboard
+export async function getFilteredLeaderboard(
+    category: LeaderboardCategory = 'xp',
+    _period: LeaderboardPeriod = 'all',
+    limitCount: number = 10
+): Promise<UserProfile[]> {
+    try {
+        // Map category to Firestore field
+        const fieldMap: Record<LeaderboardCategory, string> = {
+            'xp': 'xp',
+            'chapters': 'totalChaptersRead',
+            'streak': 'streak'
+        };
+
+        const field = fieldMap[category];
+
+        const q = query(
+            collection(db, 'users'),
+            orderBy(field, 'desc'),
+            limit(limitCount)
+        );
+
+        const querySnapshot = await getDocs(q);
+        const users: UserProfile[] = [];
+        querySnapshot.forEach((doc) => {
+            users.push(doc.data() as UserProfile);
+        });
+        return users;
+    } catch (error) {
+        console.error('[Firestore] Error loading filtered leaderboard:', error);
+        return [];
+    }
+}
+
+// ==================== COMMENTS SYSTEM ====================
+
+// Add a comment to a work
+export async function addComment(comment: Omit<Comment, 'id' | 'timestamp' | 'likes'>): Promise<string | null> {
+    try {
+        const commentRef = await addDoc(collection(db, 'comments'), {
+            ...comment,
+            timestamp: Date.now(),
+            likes: []
+        });
+        console.log('[Firestore] Comment added:', commentRef.id);
+        return commentRef.id;
+    } catch (error) {
+        console.error('[Firestore] Error adding comment:', error);
+        return null;
+    }
+}
+
+// Get comments for a work
+export async function getComments(workId: number, limitCount: number = 50): Promise<Comment[]> {
+    try {
+        const q = query(
+            collection(db, 'comments'),
+            where('workId', '==', workId),
+            orderBy('timestamp', 'desc'),
+            limit(limitCount)
+        );
+
+        const querySnapshot = await getDocs(q);
+        const comments: Comment[] = [];
+        querySnapshot.forEach((doc) => {
+            comments.push({ id: doc.id, ...doc.data() } as Comment);
+        });
+        return comments;
+    } catch (error) {
+        console.error('[Firestore] Error loading comments:', error);
+        return [];
+    }
+}
+
+// Like/unlike a comment
+export async function toggleCommentLike(commentId: string, userId: string): Promise<void> {
+    try {
+        const commentRef = doc(db, 'comments', commentId);
+        const commentSnap = await getDoc(commentRef);
+
+        if (commentSnap.exists()) {
+            const comment = commentSnap.data() as Comment;
+            const likes = comment.likes || [];
+
+            if (likes.includes(userId)) {
+                await updateDoc(commentRef, { likes: likes.filter(id => id !== userId) });
+            } else {
+                await updateDoc(commentRef, { likes: [...likes, userId] });
+            }
+        }
+    } catch (error) {
+        console.error('[Firestore] Error toggling comment like:', error);
+    }
+}
+
+// ==================== CHALLENGES SYSTEM ====================
+
+// Create a new challenge
+export async function createChallenge(challenge: Omit<Challenge, 'id'>): Promise<string | null> {
+    try {
+        const challengeRef = await addDoc(collection(db, 'challenges'), challenge);
+        console.log('[Firestore] Challenge created:', challengeRef.id);
+        return challengeRef.id;
+    } catch (error) {
+        console.error('[Firestore] Error creating challenge:', error);
+        return null;
+    }
+}
+
+// Get user's challenges
+export async function getUserChallenges(userId: string): Promise<Challenge[]> {
+    try {
+        const q = query(
+            collection(db, 'challenges'),
+            where('participants', 'array-contains', userId)
+        );
+
+        const querySnapshot = await getDocs(q);
+        const challenges: Challenge[] = [];
+        querySnapshot.forEach((doc) => {
+            challenges.push({ id: doc.id, ...doc.data() } as Challenge);
+        });
+        return challenges;
+    } catch (error) {
+        console.error('[Firestore] Error loading challenges:', error);
+        return [];
+    }
+}
+
+// Update challenge progress
+export async function updateChallengeProgress(challengeId: string, participantId: string, progress: number): Promise<void> {
+    try {
+        const challengeRef = doc(db, 'challenges', challengeId);
+        const challengeSnap = await getDoc(challengeRef);
+
+        if (challengeSnap.exists()) {
+            const challenge = challengeSnap.data() as Challenge;
+            const participants = challenge.participants.map(p =>
+                p.id === participantId ? { ...p, progress } : p
+            );
+            await updateDoc(challengeRef, { participants });
+        }
+    } catch (error) {
+        console.error('[Firestore] Error updating challenge progress:', error);
+    }
+}
+
+// ==================== FRIEND RECOMMENDATIONS ====================
+
+// Get how many friends are reading a specific work
+export async function getFriendsReadingWork(userId: string, workId: number): Promise<{ count: number; friends: UserProfile[] }> {
+    try {
+        const friends = await getFriends(userId);
+        const acceptedFriends = friends.filter(f => f.status === 'accepted');
+
+        const friendsReading: UserProfile[] = [];
+
+        for (const friend of acceptedFriends.slice(0, 10)) {
+            const library = await getUserLibrary(friend.uid);
+            if (library.some(w => w.id === workId)) {
+                const profile = await getUserProfile(friend.uid);
+                if (profile) friendsReading.push(profile);
+            }
+        }
+
+        return { count: friendsReading.length, friends: friendsReading };
+    } catch (error) {
+        console.error('[Firestore] Error getting friends reading work:', error);
+        return { count: 0, friends: [] };
     }
 }

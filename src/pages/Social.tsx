@@ -1,20 +1,24 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
-import { Trophy, Users, Search, UserPlus, Check, User, X } from 'lucide-react';
+import { Trophy, Users, Search, UserPlus, Check, User, X, Activity, BookOpen, Flame, Clock } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import {
-    getLeaderboard,
     getFriends,
     searchUserByEmail,
     searchUserByName,
     sendFriendRequest,
     acceptFriendRequest,
     rejectFriendRequest,
+    getFriendsActivity,
+    getFilteredLeaderboard,
     type Friend,
-    type UserProfile
+    type UserProfile,
+    type LeaderboardCategory,
+    type LeaderboardPeriod
 } from '@/firebase/firestore';
-
+import type { ActivityEvent } from '@/types/activity';
+import { ACTIVITY_EMOJIS, ACTIVITY_LABELS } from '@/types/activity';
 
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/context/ToastContext';
@@ -24,19 +28,22 @@ export default function Social() {
     const navigate = useNavigate();
     const { addToast } = useToast();
 
-    const [activeTab, setActiveTab] = useState<'ranking' | 'friends'>('ranking');
-    const [leaderboard, setLeaderboard] = useState<any[]>([]);
+    const [activeTab, setActiveTab] = useState<'ranking' | 'friends' | 'activity'>('ranking');
+    const [leaderboard, setLeaderboard] = useState<UserProfile[]>([]);
     const [friends, setFriends] = useState<Friend[]>([]);
+    const [activities, setActivities] = useState<ActivityEvent[]>([]);
     const [searchEmail, setSearchEmail] = useState('');
-    const [searchResult, setSearchResult] = useState<any | null>(null);
+    const [searchResult, setSearchResult] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(false);
     const [requestSent, setRequestSent] = useState(false);
 
-
+    // Leaderboard filters
+    const [leaderboardCategory, setLeaderboardCategory] = useState<LeaderboardCategory>('xp');
+    const [leaderboardPeriod, _setLeaderboardPeriod] = useState<LeaderboardPeriod>('all');
 
     useEffect(() => {
         loadData();
-    }, [activeTab]);
+    }, [activeTab, leaderboardCategory, leaderboardPeriod]);
 
     const loadData = async () => {
         setLoading(true);
@@ -47,11 +54,15 @@ export default function Social() {
         }
 
         if (activeTab === 'ranking') {
-            const data = await getLeaderboard(20);
+            const data = await getFilteredLeaderboard(leaderboardCategory, leaderboardPeriod, 20);
             setLeaderboard(data);
+        } else if (activeTab === 'activity' && user) {
+            const activityData = await getFriendsActivity(user.uid, 30);
+            setActivities(activityData);
         }
         setLoading(false);
     };
+
 
     const handleSearch = async () => {
         if (!searchEmail) return;
@@ -149,13 +160,20 @@ export default function Social() {
                 </h1>
 
                 {/* Tabs */}
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
                     <Button
                         variant={activeTab === 'ranking' ? 'primary' : 'ghost'}
                         onClick={() => setActiveTab('ranking')}
                         icon={<Trophy size={20} />}
                     >
                         CLASSEMENT
+                    </Button>
+                    <Button
+                        variant={activeTab === 'activity' ? 'primary' : 'ghost'}
+                        onClick={() => setActiveTab('activity')}
+                        icon={<Activity size={20} />}
+                    >
+                        ACTIVITÉ
                     </Button>
                     <Button
                         variant={activeTab === 'friends' ? 'primary' : 'ghost'}
@@ -166,50 +184,138 @@ export default function Social() {
                     </Button>
                 </div>
 
+                {/* ACTIVITY FEED */}
+                {activeTab === 'activity' && (
+                    <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff' }}>
+                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem' }}>
+                            🔥 Activité de tes amis
+                        </h2>
+                        {loading ? (
+                            <p style={{ textAlign: 'center', opacity: 0.6 }}>Chargement...</p>
+                        ) : activities.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.6 }}>
+                                <p>Aucune activité récente de tes amis.</p>
+                                <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Ajoute des amis pour voir leur activité !</p>
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                {activities.map((activity) => {
+                                    const timeDiff = Date.now() - activity.timestamp;
+                                    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+                                    const timeAgo = hours < 1 ? 'Il y a moins d\'une heure' :
+                                        hours < 24 ? `Il y a ${hours}h` :
+                                            `Il y a ${Math.floor(hours / 24)}j`;
+
+                                    return (
+                                        <div key={activity.id} style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '1rem',
+                                            padding: '1rem',
+                                            background: '#f8f8f8',
+                                            borderRadius: '8px',
+                                            border: '1px solid #eee'
+                                        }}>
+                                            <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000', flexShrink: 0 }}>
+                                                <img src={activity.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${activity.userName}`}
+                                                    alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <p style={{ fontWeight: 600 }}>
+                                                    {ACTIVITY_EMOJIS[activity.type]} <strong>{activity.userName}</strong> {ACTIVITY_LABELS[activity.type]}
+                                                    {activity.workTitle && <span style={{ color: 'var(--color-primary)' }}> {activity.workTitle}</span>}
+                                                    {activity.episodeNumber && <span> (Ep. {activity.episodeNumber})</span>}
+                                                    {activity.newLevel && <span style={{ color: 'var(--color-primary)' }}> {activity.newLevel}</span>}
+                                                    {activity.badgeName && <span style={{ color: 'var(--color-primary)' }}> {activity.badgeName}</span>}
+                                                </p>
+                                                <p style={{ fontSize: '0.75rem', opacity: 0.5, display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.25rem' }}>
+                                                    <Clock size={12} /> {timeAgo}
+                                                </p>
+                                            </div>
+                                            {activity.workImage && (
+                                                <div style={{ width: 50, height: 70, borderRadius: '4px', overflow: 'hidden', flexShrink: 0 }}>
+                                                    <img src={activity.workImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 {/* RANKING VIEW */}
                 {activeTab === 'ranking' && (
-                    <div className="manga-panel" style={{ padding: '0' }}>
-                        {leaderboard.map((player, index) => (
-                            <div key={player.uid} style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: '1rem',
-                                borderBottom: '1px solid #eee',
-                                background: player.uid === user?.uid ? '#f0f0f0' : '#fff'
-                            }}>
-                                <div style={{ width: '40px', fontSize: '1.5rem', fontWeight: 900, color: index < 3 ? '#ffce00' : '#000' }}>
-                                    #{index + 1}
-                                </div>
-                                <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', marginRight: '1rem', border: '2px solid #000' }}>
-                                    <img src={player.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.displayName}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0, marginRight: '0.5rem', cursor: 'pointer' }} onClick={() => navigate(`/profile/${player.uid}`)}>
-                                    <div style={{ fontWeight: 700, fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{player.displayName || 'Anonyme'}</div>
-                                    <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>Lvl {player.level || 1}</div>
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
-                                    <div style={{ fontWeight: 900, fontSize: '1.2rem', whiteSpace: 'nowrap' }}>
-                                        {player.xp || 0} XP
-                                    </div>
-                                    {player.uid !== user?.uid && (
-                                        <>
-                                            {getFriendStatus(player.uid) === 'none' && (
-                                                <Button size="sm" variant="ghost" onClick={() => handleQuickAdd(player)}>
-                                                    <UserPlus size={18} />
-                                                </Button>
-                                            )}
-                                            {getFriendStatus(player.uid) === 'pending' && (
-                                                <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>En attente</span>
-                                            )}
-                                            {getFriendStatus(player.uid) === 'accepted' && (
-                                                <User size={18} style={{ opacity: 0.3 }} />
-                                            )}
-                                        </>
-                                    )}
-                                </div>
+                    <>
+                        {/* Leaderboard Filters */}
+                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>Par :</span>
+                                <Button
+                                    variant={leaderboardCategory === 'xp' ? 'manga' : 'ghost'}
+                                    size="sm"
+                                    onClick={() => setLeaderboardCategory('xp')}
+                                    icon={<Trophy size={14} />}
+                                >XP</Button>
+                                <Button
+                                    variant={leaderboardCategory === 'chapters' ? 'manga' : 'ghost'}
+                                    size="sm"
+                                    onClick={() => setLeaderboardCategory('chapters')}
+                                    icon={<BookOpen size={14} />}
+                                >Chapitres</Button>
+                                <Button
+                                    variant={leaderboardCategory === 'streak' ? 'manga' : 'ghost'}
+                                    size="sm"
+                                    onClick={() => setLeaderboardCategory('streak')}
+                                    icon={<Flame size={14} />}
+                                >Streak</Button>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+
+                        <div className="manga-panel" style={{ padding: '0' }}>
+                            {leaderboard.map((player, index) => (
+                                <div key={player.uid} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    padding: '1rem',
+                                    borderBottom: '1px solid #eee',
+                                    background: player.uid === user?.uid ? '#f0f0f0' : '#fff'
+                                }}>
+                                    <div style={{ width: '40px', fontSize: '1.5rem', fontWeight: 900, color: index < 3 ? '#ffce00' : '#000' }}>
+                                        #{index + 1}
+                                    </div>
+                                    <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', marginRight: '1rem', border: '2px solid #000' }}>
+                                        <img src={player.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.displayName}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: 0, marginRight: '0.5rem', cursor: 'pointer' }} onClick={() => navigate(`/profile/${player.uid}`)}>
+                                        <div style={{ fontWeight: 700, fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{player.displayName || 'Anonyme'}</div>
+                                        <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>Lvl {player.level || 1}</div>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
+                                        <div style={{ fontWeight: 900, fontSize: '1.2rem', whiteSpace: 'nowrap' }}>
+                                            {player.xp || 0} XP
+                                        </div>
+                                        {player.uid !== user?.uid && (
+                                            <>
+                                                {getFriendStatus(player.uid) === 'none' && (
+                                                    <Button size="sm" variant="ghost" onClick={() => handleQuickAdd(player)}>
+                                                        <UserPlus size={18} />
+                                                    </Button>
+                                                )}
+                                                {getFriendStatus(player.uid) === 'pending' && (
+                                                    <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>En attente</span>
+                                                )}
+                                                {getFriendStatus(player.uid) === 'accepted' && (
+                                                    <User size={18} style={{ opacity: 0.3 }} />
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 )}
 
                 {/* FRIENDS VIEW */}
@@ -237,7 +343,7 @@ export default function Social() {
                                 <div style={{ marginTop: '1rem', padding: '1rem', border: '2px dashed #000', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                         <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
-                                            <img src={searchResult.photoURL} alt="Avatar" style={{ width: '100%', height: '100%' }} />
+                                            <img src={searchResult.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${searchResult.displayName}`} alt="Avatar" style={{ width: '100%', height: '100%' }} />
                                         </div>
                                         <div>
                                             <div style={{ fontWeight: 700 }}>{searchResult.displayName}</div>
