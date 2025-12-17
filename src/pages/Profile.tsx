@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/Input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { BADGE_ICONS } from '@/utils/badges';
+import { getBadgeIcon, getBadgeColors } from '@/utils/badges';
 import type { Badge } from '@/types/badge';
 
 export default function Profile() {
@@ -314,16 +314,16 @@ export default function Profile() {
                                             width: '80px',
                                             height: '80px',
                                             margin: '0 auto 0.5rem',
-                                            background: badge.rarity === 'legendary' ? '#ffd700' : '#000',
-                                            color: badge.rarity === 'legendary' ? '#000' : '#fff',
+                                            background: getBadgeColors(badge.rarity).bg,
+                                            color: getBadgeColors(badge.rarity).text,
                                             borderRadius: '50%',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            border: '3px solid #000',
-                                            boxShadow: '4px 4px 0 rgba(0,0,0,0.2)'
+                                            border: `3px solid ${getBadgeColors(badge.rarity).border}`,
+                                            boxShadow: badge.rarity === 'legendary' ? '0 0 20px rgba(255, 215, 0, 0.5)' : '4px 4px 0 rgba(0,0,0,0.2)'
                                         }}>
-                                            {BADGE_ICONS[badge.icon as string] || <Star size={32} />}
+                                            {getBadgeIcon(badge.icon)}
                                         </div>
                                         <p style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', color: '#000' }}>{badge.name}</p>
 
