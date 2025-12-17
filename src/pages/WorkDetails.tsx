@@ -21,6 +21,198 @@ import { getWorkDetails } from '@/services/animeApi';
 import { handleProgressUpdateWithXP } from '@/utils/progressUtils';
 import styles from './WorkDetails.module.css';
 
+// Helper Component for Recursive Comments
+function RecursiveComment({
+    comment,
+    user,
+    replyingTo,
+    setReplyingTo,
+    replyText,
+    setReplyText,
+    handleReply,
+    handleLike,
+    revealedSpoilers,
+    setRevealedSpoilers
+}: any) {
+    const isRevealed = revealedSpoilers.includes(comment.id);
+    const timeDiff = Date.now() - comment.timestamp;
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const timeAgo = hours < 1 ? 'À l\'instant' : hours < 24 ? `Il y a ${hours}h` : `Il y a ${Math.floor(hours / 24)}j`;
+    const isReplying = replyingTo === comment.id;
+
+    return (
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.5rem',
+            width: '100%'
+        }}>
+            {/* Comment Card */}
+            <div style={{
+                padding: '1rem',
+                background: '#fff',
+                border: '2px solid #000', // Brutalist border
+                boxShadow: '4px 4px 0 rgba(0,0,0,0.1)', // Subtle shadow
+                transition: 'transform 0.2s',
+            }}>
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                        <img src={comment.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.userName}`}
+                            alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                    <div>
+                        <p style={{ fontWeight: 800, fontSize: '0.9rem', textTransform: 'uppercase' }}>{comment.userName}</p>
+                        <p style={{ fontSize: '0.7rem', opacity: 0.6, fontWeight: 600 }}>{timeAgo}</p>
+                    </div>
+                </div>
+
+                {/* Content */}
+                {comment.spoiler && !isRevealed ? (
+                    <div
+                        onClick={() => setRevealedSpoilers((prev: any) => [...prev, comment.id])}
+                        style={{
+                            padding: '0.75rem',
+                            background: '#000',
+                            color: '#fff',
+                            cursor: 'pointer',
+                            textAlign: 'center',
+                            fontWeight: 700,
+                            fontSize: '0.85rem',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
+                        }}
+                    >
+                        <EyeOff size={14} /> SPOILER
+                    </div>
+                ) : (
+                    <p style={{ fontSize: '0.95rem', lineHeight: 1.5, fontWeight: 500 }}>{comment.text}</p>
+                )}
+
+                {/* Actions */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.75rem', borderTop: '1px solid #eee', paddingTop: '0.5rem' }}>
+                    <button
+                        onClick={() => handleLike(comment.id)}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                            color: user && comment.likes.includes(user.uid) ? '#ef4444' : '#000',
+                            fontWeight: 700,
+                            fontSize: '0.8rem'
+                        }}
+                    >
+                        <Heart size={16} fill={user && comment.likes.includes(user.uid) ? '#ef4444' : 'none'} />
+                        {comment.likes.length}
+                    </button>
+                    {user && (
+                        <button
+                            onClick={() => {
+                                if (isReplying) {
+                                    setReplyingTo(null);
+                                    setReplyText('');
+                                } else {
+                                    setReplyingTo(comment.id);
+                                    setReplyText(''); // Clear text when opening new reply
+                                }
+                            }}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.25rem',
+                                color: isReplying ? '#3b82f6' : '#000',
+                                fontWeight: 700,
+                                fontSize: '0.8rem',
+                                opacity: isReplying ? 1 : 0.6
+                            }}
+                        >
+                            <Reply size={16} />
+                            RÉPONDRE
+                        </button>
+                    )}
+                </div>
+
+                {/* Reply Form (Localized) */}
+                {isReplying && (
+                    <div style={{ marginTop: '1rem', animation: 'fadeIn 0.2s ease-out' }}>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <input
+                                type="text"
+                                value={replyText}
+                                onChange={(e: any) => setReplyText(e.target.value)}
+                                placeholder={`Répondre à ${comment.userName}...`}
+                                autoFocus
+                                style={{
+                                    flex: 1,
+                                    padding: '0.75rem',
+                                    border: '2px solid #000',
+                                    fontWeight: 600,
+                                    fontSize: '0.9rem',
+                                    outline: 'none',
+                                    background: '#f9f9f9'
+                                }}
+                                onKeyDown={(e: any) => e.key === 'Enter' && handleReply(comment.id)}
+                            />
+                            <button
+                                onClick={() => handleReply(comment.id)}
+                                style={{
+                                    background: '#000',
+                                    color: '#fff',
+                                    border: 'none',
+                                    padding: '0 1.25rem',
+                                    cursor: 'pointer',
+                                    fontWeight: 800,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'transform 0.1s'
+                                }}
+                                onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+                                onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            >
+                                <Send size={18} />
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Nested Replies (Staircase) */}
+            {comment.replies && comment.replies.length > 0 && (
+                <div style={{
+                    marginLeft: '2rem', // Staircase indent
+                    paddingLeft: '1rem',
+                    borderLeft: '2px solid #e5e5e5', // Guide line
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1rem'
+                }}>
+                    {comment.replies.map((reply: any) => (
+                        <RecursiveComment
+                            key={reply.id}
+                            comment={reply}
+                            user={user}
+                            replyingTo={replyingTo}
+                            setReplyingTo={setReplyingTo}
+                            replyText={replyText}
+                            setReplyText={setReplyText}
+                            handleReply={handleReply}
+                            handleLike={handleLike}
+                            revealedSpoilers={revealedSpoilers}
+                            setRevealedSpoilers={setRevealedSpoilers}
+                        />
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
 export default function WorkDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -892,3 +1084,5 @@ export default function WorkDetails() {
         </Layout >
     );
 }
+
+
