@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { Menu, User, Book, Home, ChevronDown, Flame, Search, Trophy, Settings, LogOut } from 'lucide-react';
+import { User, Book, Home, ChevronDown, Flame, Search, Trophy, Settings, LogOut } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { auth } from '@/firebase/config';

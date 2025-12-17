@@ -23,12 +23,14 @@ import { getBadgeIcon, getBadgeColors } from '@/utils/badges';
 import type { Badge } from '@/types/badge';
 import { storage } from '@/firebase/config';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { useToast } from '@/context/ToastContext';
 
 export default function Profile() {
     const { user, setUser } = useAuthStore();
     // Default (local) stats
     const { level, xp, xpToNextLevel, streak, badges, totalChaptersRead, totalWorksAdded, totalWorksCompleted } = useGamificationStore();
     const { works } = useLibraryStore();
+    const { addToast } = useToast();
 
     // Router
     const navigate = useNavigate();
@@ -184,8 +186,6 @@ export default function Profile() {
 
     // ---------------------------
 
-
-
     const handleSaveProfile = async () => {
         if (!user) return;
 
@@ -199,18 +199,24 @@ export default function Profile() {
                 bannerUrl = await getDownloadURL(storageRef);
             } catch (error) {
                 console.error("Error uploading banner:", error);
-                // Fallback: try saving as is (might fail if too big) or notify user
-                // For now, we proceed, but the Firestore save might fail.
+                addToast('Erreur lors de l\'upload de la bannière', 'error');
+                return; // Stop if upload fails is better?
             }
         }
 
-        await saveUserProfileToFirestore({
-            uid: user.uid,
-            ...editForm,
-            banner: bannerUrl
-        });
-        setExtendedProfile({ ...extendedProfile, ...editForm, banner: bannerUrl });
-        setIsEditModalOpen(false);
+        try {
+            await saveUserProfileToFirestore({
+                uid: user.uid,
+                ...editForm,
+                banner: bannerUrl
+            });
+            setExtendedProfile({ ...extendedProfile, ...editForm, banner: bannerUrl });
+            addToast('Profil mis à jour !', 'success');
+            setIsEditModalOpen(false);
+        } catch (error) {
+            console.error("Error saving profile:", error);
+            addToast('Erreur lors de la sauvegarde du profil', 'error');
+        }
     };
 
     const handleLogout = async () => {
@@ -688,3 +694,4 @@ export default function Profile() {
         </Layout>
     );
 }
+
