@@ -178,7 +178,7 @@ export default function Discover() {
                                                 padding: '0.75rem 1.5rem',
                                                 border: 'none',
                                                 boxShadow: '4px 4px 0 #000',
-                                                background: '#ef4444',
+                                                background: 'var(--color-primary)',
                                                 color: '#fff'
                                             }}
                                         >
@@ -222,8 +222,8 @@ export default function Discover() {
                                 boxShadow: '8px 8px 0 #000'
                             }}
                             whileHover={{
-                                borderColor: '#ef4444',
-                                boxShadow: '8px 8px 0 #ef4444'
+                                borderColor: 'var(--color-primary)',
+                                boxShadow: '8px 8px 0 var(--color-primary)'
                             }}
                             transition={{ duration: 0.2 }}
                         >
@@ -376,9 +376,9 @@ export default function Discover() {
                                             transition: 'all 0.2s'
                                         }}
                                         whileHover={{
-                                            borderColor: '#ef4444',
-                                            color: '#ef4444',
-                                            boxShadow: '4px 4px 0 #ef4444'
+                                            borderColor: 'var(--color-primary)',
+                                            color: 'var(--color-primary)',
+                                            boxShadow: '4px 4px 0 var(--color-primary)'
                                         }}
                                     >
                                         SURPRENDS-MOI
