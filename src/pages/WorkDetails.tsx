@@ -296,7 +296,7 @@ export default function WorkDetails() {
             const success = handleProgressUpdateWithXP(work.id, number, work.totalChapters);
             if (success) {
                 setProgress(number);
-                addToast(`Progression mise à jour: ${(work.type === 'anime' || work.type === 'tv') ? 'Épisode' : 'Chapitre'} ${number}`, 'success');
+                // addToast(`Progression mise à jour...`); // Removed to prevent spam on rapid clicks
             }
         }
     };
