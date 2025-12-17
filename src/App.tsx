@@ -67,6 +67,8 @@ function App() {
         if (cloudGamification) {
           // Cloud data exists - load it
           useGamificationStore.setState(cloudGamification);
+          // Force sync to main user doc (ensures new fields like badges, stats are on root doc)
+          await saveGamificationToFirestore(firebaseUser.uid, cloudGamification);
         } else if (gamificationState.level > 1 || gamificationState.totalWorksAdded > 0) {
           // No cloud data but local progress exists - upload
           await saveGamificationToFirestore(firebaseUser.uid, gamificationState);
