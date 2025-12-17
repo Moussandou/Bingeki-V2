@@ -832,3 +832,29 @@ export async function leaveWatchParty(partyId: string, participantId: string): P
         throw error;
     }
 }
+// ==================== FEEDBACK SYSTEM ====================
+
+export interface FeedbackData {
+    rating: number; // 1-10
+    category: 'bug' | 'feature' | 'general';
+    message: string;
+    userId?: string;
+    userName?: string; // Optional if guest
+    contactEmail?: string; // Optional for guests
+    timestamp: number;
+    userAgent: string;
+}
+
+export async function submitFeedback(feedback: Omit<FeedbackData, 'timestamp'>): Promise<boolean> {
+    try {
+        const feedbackRef = await addDoc(collection(db, 'feedback'), {
+            ...feedback,
+            timestamp: Date.now()
+        });
+        console.log('[Firestore] Feedback submitted:', feedbackRef.id);
+        return true;
+    } catch (error) {
+        console.error('[Firestore] Error submitting feedback:', error);
+        return false;
+    }
+}
