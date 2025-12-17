@@ -13,6 +13,9 @@ export interface Work {
     synopsis?: string; // Add synopsis field
     rating?: number; // User personal rating (0-10)
     notes?: string;  // User personal notes
+    lastUpdated?: number; // Timestamp of last progress update
+    dateAdded?: number; // Timestamp of creation
+    collections?: string[]; // E.g., "Favorites", "Must Read"
 }
 
 interface LibraryState {
@@ -31,14 +34,21 @@ export const useLibraryStore = create<LibraryState>()(
             works: [],
             addWork: (work) => set((state) => {
                 if (state.works.some((w) => w.id === work.id)) return state;
-                return { works: [...state.works, work] };
+                return {
+                    works: [...state.works, {
+                        ...work,
+                        dateAdded: Date.now(),
+                        lastUpdated: Date.now(),
+                        collections: []
+                    }]
+                };
             }),
             removeWork: (id) => set((state) => ({
                 works: state.works.filter((w) => w.id !== id),
             })),
             updateProgress: (id, progress) => set((state) => ({
                 works: state.works.map((w) =>
-                    w.id === id ? { ...w, currentChapter: progress } : w
+                    w.id === id ? { ...w, currentChapter: progress, lastUpdated: Date.now() } : w
                 ),
             })),
             updateStatus: (id, status) => set((state) => ({
