@@ -254,7 +254,7 @@ export default function Dashboard() {
                                 </Link>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
                                 {inProgressWorks.length === 0 ? (
                                     <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem' }}>
                                         <p style={{ marginBottom: '1rem', opacity: 0.7 }}>Aucune lecture en cours</p>
