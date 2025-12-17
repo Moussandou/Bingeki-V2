@@ -53,7 +53,7 @@ export const getTopWorks = async (
     limit: number = 24
 ) => {
     try {
-        const response = await fetch(`${BASE_URL}/top/${type}?filter=${filter}&limit=${limit}`);
+        const response = await fetch(`${BASE_URL}/top/${type}?filter=${filter}&limit=${limit}&sfw=true`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanResult[];
