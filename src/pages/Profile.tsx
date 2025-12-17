@@ -43,6 +43,7 @@ export default function Profile() {
 
     // Extended Profile State (for current or visited user)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const [extendedProfile, setExtendedProfile] = useState<Partial<UserProfile>>({});
 
     // Visited Profile Stats (if viewing someone else)
@@ -189,35 +190,41 @@ export default function Profile() {
     // ---------------------------
 
     const handleSaveProfile = async () => {
-        if (!user) return;
+        if (!user || isSaving) return;
 
+        setIsSaving(true);
         let bannerUrl = editForm.banner;
 
-        // If banner is a Data URL (new upload), upload to Storage
-        if (bannerUrl && bannerUrl.startsWith('data:')) {
-            try {
+        try {
+            // If banner is a Data URL (new upload), upload to Storage
+            if (bannerUrl && bannerUrl.startsWith('data:')) {
                 const storageRef = ref(storage, `banners/${user.uid}_${Date.now()}`);
                 await uploadString(storageRef, bannerUrl, 'data_url');
                 bannerUrl = await getDownloadURL(storageRef);
-            } catch (error) {
-                console.error("Error uploading banner:", error);
-                addToast('Erreur lors de l\'upload de la bannière', 'error');
-                return; // Stop if upload fails is better?
             }
-        }
 
-        try {
-            await saveUserProfileToFirestore({
+            // Ensure top3Favorites doesn't contain empty strings
+            const cleanTop3 = editForm.top3Favorites.filter(id => id && id.trim() !== '');
+
+            const profileData = {
                 uid: user.uid,
                 ...editForm,
-                banner: bannerUrl
-            });
-            setExtendedProfile({ ...extendedProfile, ...editForm, banner: bannerUrl });
-            addToast('Profil mis à jour !', 'success');
+                banner: bannerUrl,
+                top3Favorites: cleanTop3
+            };
+
+            await saveUserProfileToFirestore(profileData);
+
+            setExtendedProfile({ ...extendedProfile, ...profileData });
+            setEditForm(prev => ({ ...prev, banner: bannerUrl, top3Favorites: cleanTop3 }));
+
+            addToast('Profil mis à jour avec succès !', 'success');
             setIsEditModalOpen(false);
         } catch (error) {
             console.error("Error saving profile:", error);
-            addToast('Erreur lors de la sauvegarde du profil', 'error');
+            addToast('Erreur lors de la sauvegarde : ' + (error instanceof Error ? error.message : 'Inconnue'), 'error');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -251,6 +258,8 @@ export default function Profile() {
                             )}
                         </div>
                     </div>
+
+
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
                         {/* ID Card / Hunter License Style */}
