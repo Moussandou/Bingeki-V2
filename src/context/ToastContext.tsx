@@ -43,13 +43,28 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
     const [toasts, setToasts] = useState<Toast[]>([]);
 
     const addToast = useCallback((message: string, type: ToastType = 'info') => {
-        const id = Math.random().toString(36).substr(2, 9);
-        setToasts((prev) => [...prev, { id, message, type }]);
+        // Prevent duplicate toasts with same message (spam prevention)
+        setToasts((prev) => {
+            // Check if same message already exists
+            if (prev.some(t => t.message === message)) {
+                return prev; // Don't add duplicate
+            }
 
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-            setToasts((prev) => prev.filter((t) => t.id !== id));
-        }, 5000);
+            const id = Math.random().toString(36).substr(2, 9);
+            const newToast = { id, message, type };
+
+            // Auto remove after 3 seconds (faster)
+            setTimeout(() => {
+                setToasts((current) => current.filter((t) => t.id !== id));
+            }, 3000);
+
+            // Limit to max 3 toasts at a time
+            const updatedToasts = [...prev, newToast];
+            if (updatedToasts.length > 3) {
+                return updatedToasts.slice(-3);
+            }
+            return updatedToasts;
+        });
     }, []);
 
     const removeToast = useCallback((id: string) => {
