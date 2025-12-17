@@ -3,13 +3,16 @@ import { Layout } from '@/components/layout/Layout';
 import { useLibraryStore } from '@/store/libraryStore';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal'; // Import Modal
-import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { statusToFrench } from '@/utils/statusTranslation';
 import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
 import { useToast } from '@/context/ToastContext';
 import { ContentList, type ContentItem } from '@/components/ContentList';
 import { getAnimeEpisodes, getAnimeEpisodeDetails } from '@/services/animeApi';
+import { getComments, addComment, toggleCommentLike, getFriendsReadingWork, type UserProfile } from '@/firebase/firestore';
+import { useAuthStore } from '@/store/authStore';
+import type { Comment } from '@/types/comment';
 import logoCrunchyroll from '@/assets/logo_crunchyroll.png';
 import logoADN from '@/assets/logo_adn.png';
 
@@ -19,6 +22,7 @@ export default function WorkDetails() {
     const { addToast } = useToast(); // Initialize hook
     const { getWork, updateProgress, updateStatus, updateWorkDetails, removeWork } = useLibraryStore(); // Add removeWork
     const { addXp, recordActivity, incrementStat } = useGamificationStore();
+    const { user } = useAuthStore();
     const work = getWork(Number(id));
     const [isEditing, setIsEditing] = useState(false);
     const [progress, setProgress] = useState(work?.currentChapter || 0);
@@ -31,6 +35,16 @@ export default function WorkDetails() {
     const [episodesPage, setEpisodesPage] = useState(1);
     const [hasMoreEpisodes, setHasMoreEpisodes] = useState(false);
     const [isLoadingEpisodes, setIsLoadingEpisodes] = useState(false);
+
+    // Comments State
+    const [comments, setComments] = useState<Comment[]>([]);
+    const [newComment, setNewComment] = useState('');
+    const [isSpoiler, setIsSpoiler] = useState(false);
+    const [isLoadingComments, setIsLoadingComments] = useState(false);
+    const [revealedSpoilers, setRevealedSpoilers] = useState<string[]>([]);
+
+    // Friends reading this
+    const [friendsReading, setFriendsReading] = useState<{ count: number; friends: UserProfile[] }>({ count: 0, friends: [] });
 
     if (!work) {
         return (
@@ -122,6 +136,57 @@ export default function WorkDetails() {
             }
         }
     }, [work?.id, work?.type, work?.totalChapters, activeTab, episodesPage]);
+
+    // Load comments and friends reading when work changes
+    useEffect(() => {
+        if (work?.id) {
+            // Load comments
+            setIsLoadingComments(true);
+            getComments(Number(work.id)).then(data => {
+                setComments(data);
+                setIsLoadingComments(false);
+            });
+
+            // Load friends reading this work
+            if (user) {
+                getFriendsReadingWork(user.uid, Number(work.id)).then(data => {
+                    setFriendsReading(data);
+                });
+            }
+        }
+    }, [work?.id, user?.uid]);
+
+    const handleSubmitComment = async () => {
+        if (!newComment.trim() || !user || !work) return;
+
+        const commentData = {
+            userId: user.uid,
+            userName: user.displayName || 'Anonyme',
+            userPhoto: user.photoURL || '',
+            workId: Number(work.id),
+            text: newComment,
+            spoiler: isSpoiler
+        };
+
+        await addComment(commentData);
+        setNewComment('');
+        setIsSpoiler(false);
+        addToast('Commentaire ajouté !', 'success');
+
+        // Reload comments
+        const updated = await getComments(Number(work.id));
+        setComments(updated);
+    };
+
+    const handleLikeComment = async (commentId: string) => {
+        if (!user) return;
+        await toggleCommentLike(commentId, user.uid);
+        // Reload comments to reflect like change
+        if (work) {
+            const updated = await getComments(Number(work.id));
+            setComments(updated);
+        }
+    };
 
     const handleEpisodeSelect = (number: number) => {
         if (work) {
@@ -574,6 +639,154 @@ export default function WorkDetails() {
                                             marginBottom: '2rem'
                                         }}
                                     />
+                                </div>
+
+                                {/* Comments Section */}
+                                <div style={{ marginBottom: '2rem' }}>
+                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <MessageCircle size={24} /> COMMENTAIRES ({comments.length})
+                                    </h3>
+
+                                    {/* Friends reading indicator */}
+                                    {friendsReading.count > 0 && (
+                                        <div style={{
+                                            background: 'linear-gradient(135deg, #dbeafe, #ede9fe)',
+                                            padding: '1rem',
+                                            borderRadius: '8px',
+                                            marginBottom: '1rem',
+                                            border: '1px solid #c7d2fe'
+                                        }}>
+                                            <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                                                👥 <strong>{friendsReading.count} ami{friendsReading.count > 1 ? 's' : ''}</strong> {work.type === 'anime' ? 'regarde' : 'lit'} aussi cette œuvre
+                                            </p>
+                                            <div style={{ display: 'flex', gap: '-8px', marginTop: '0.5rem' }}>
+                                                {friendsReading.friends.slice(0, 5).map(f => (
+                                                    <div key={f.uid} style={{
+                                                        width: 28,
+                                                        height: 28,
+                                                        borderRadius: '50%',
+                                                        overflow: 'hidden',
+                                                        border: '2px solid #fff',
+                                                        marginLeft: '-8px'
+                                                    }}>
+                                                        <img src={f.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${f.displayName}`}
+                                                            alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* New comment form */}
+                                    {user ? (
+                                        <div style={{ marginBottom: '1.5rem', background: '#f9f9f9', padding: '1rem', border: '1px solid #eee', borderRadius: '8px' }}>
+                                            <textarea
+                                                value={newComment}
+                                                onChange={(e) => setNewComment(e.target.value)}
+                                                placeholder="Partagez votre avis..."
+                                                style={{
+                                                    width: '100%',
+                                                    minHeight: '80px',
+                                                    border: '1px solid #ccc',
+                                                    padding: '0.75rem',
+                                                    fontFamily: 'inherit',
+                                                    fontSize: '0.95rem',
+                                                    resize: 'vertical',
+                                                    borderRadius: '4px',
+                                                    marginBottom: '0.75rem'
+                                                }}
+                                            />
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem' }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isSpoiler}
+                                                        onChange={(e) => setIsSpoiler(e.target.checked)}
+                                                    />
+                                                    <EyeOff size={16} /> Contient des spoilers
+                                                </label>
+                                                <Button onClick={handleSubmitComment} variant="manga" size="sm" icon={<Send size={16} />}>
+                                                    Publier
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <p style={{ opacity: 0.6, fontStyle: 'italic', marginBottom: '1rem' }}>Connectez-vous pour commenter</p>
+                                    )}
+
+                                    {/* Comments list */}
+                                    {isLoadingComments ? (
+                                        <p style={{ textAlign: 'center', opacity: 0.6 }}>Chargement des commentaires...</p>
+                                    ) : comments.length === 0 ? (
+                                        <p style={{ textAlign: 'center', opacity: 0.6, padding: '2rem' }}>Aucun commentaire. Soyez le premier !</p>
+                                    ) : (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                            {comments.map(comment => {
+                                                const isRevealed = revealedSpoilers.includes(comment.id);
+                                                const timeDiff = Date.now() - comment.timestamp;
+                                                const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+                                                const timeAgo = hours < 1 ? 'À l\'instant' : hours < 24 ? `Il y a ${hours}h` : `Il y a ${Math.floor(hours / 24)}j`;
+
+                                                return (
+                                                    <div key={comment.id} style={{
+                                                        padding: '1rem',
+                                                        background: '#fff',
+                                                        border: '1px solid #eee',
+                                                        borderRadius: '8px'
+                                                    }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                                                            <div style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                                                <img src={comment.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.userName}`}
+                                                                    alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                            </div>
+                                                            <div>
+                                                                <p style={{ fontWeight: 700, fontSize: '0.95rem' }}>{comment.userName}</p>
+                                                                <p style={{ fontSize: '0.75rem', opacity: 0.5 }}>{timeAgo}</p>
+                                                            </div>
+                                                        </div>
+
+                                                        {comment.spoiler && !isRevealed ? (
+                                                            <div
+                                                                onClick={() => setRevealedSpoilers(prev => [...prev, comment.id])}
+                                                                style={{
+                                                                    padding: '1rem',
+                                                                    background: '#000',
+                                                                    color: '#fff',
+                                                                    cursor: 'pointer',
+                                                                    borderRadius: '4px',
+                                                                    textAlign: 'center',
+                                                                    fontSize: '0.9rem'
+                                                                }}
+                                                            >
+                                                                <EyeOff size={16} style={{ marginRight: '0.5rem' }} />
+                                                                ⚠️ Spoiler - Cliquez pour révéler
+                                                            </div>
+                                                        ) : (
+                                                            <p style={{ lineHeight: 1.5, fontSize: '0.95rem' }}>{comment.text}</p>
+                                                        )}
+
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem' }}>
+                                                            <button
+                                                                onClick={() => handleLikeComment(comment.id)}
+                                                                style={{
+                                                                    background: 'none',
+                                                                    border: 'none',
+                                                                    cursor: 'pointer',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '0.25rem',
+                                                                    color: user && comment.likes.includes(user.uid) ? '#ef4444' : '#666'
+                                                                }}
+                                                            >
+                                                                <Heart size={16} fill={user && comment.likes.includes(user.uid) ? '#ef4444' : 'none'} />
+                                                                <span style={{ fontSize: '0.85rem' }}>{comment.likes.length}</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Danger Zone */}
