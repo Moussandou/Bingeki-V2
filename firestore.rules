@@ -64,3 +64,5 @@ service cloud.firestore {
       allow read: if isAuthenticated(); // Public for leaderboards
       allow write: if isOwner(userId);
     }
+  }
+}
