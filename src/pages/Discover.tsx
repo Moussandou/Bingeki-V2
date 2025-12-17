@@ -176,7 +176,7 @@ export default function Discover() {
                                             style={{
                                                 fontSize: '1.1rem',
                                                 padding: '0.75rem 1.5rem',
-                                                border: '2px solid #000',
+                                                border: 'none',
                                                 boxShadow: '4px 4px 0 #000',
                                                 background: '#ef4444',
                                                 color: '#fff'
@@ -372,7 +372,13 @@ export default function Discover() {
                                             background: '#fff',
                                             border: '2px solid #000',
                                             color: '#000',
-                                            boxShadow: '4px 4px 0 #000'
+                                            boxShadow: '4px 4px 0 #000',
+                                            transition: 'all 0.2s'
+                                        }}
+                                        whileHover={{
+                                            borderColor: '#ef4444',
+                                            color: '#ef4444',
+                                            boxShadow: '4px 4px 0 #ef4444'
                                         }}
                                     >
                                         SURPRENDS-MOI
