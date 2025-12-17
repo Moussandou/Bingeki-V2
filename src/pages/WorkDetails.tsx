@@ -939,12 +939,36 @@ export default function WorkDetails() {
 
                                                                             return (
                                                                                 <div key={reply.id} style={{ marginBottom: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid #f0f0f0' }}>
-                                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                                                                        <div style={{ width: 24, height: 24, borderRadius: '50%', overflow: 'hidden', border: '1px solid #ccc' }}>
-                                                                                            <img src={reply.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${reply.userName}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                                                            <div style={{ width: 24, height: 24, borderRadius: '50%', overflow: 'hidden', border: '1px solid #ccc' }}>
+                                                                                                <img src={reply.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${reply.userName}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                                                            </div>
+                                                                                            <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{reply.userName}</span>
+                                                                                            <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>{replyTimeAgo}</span>
                                                                                         </div>
-                                                                                        <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{reply.userName}</span>
-                                                                                        <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>{replyTimeAgo}</span>
+                                                                                        {user && (
+                                                                                            <button
+                                                                                                onClick={() => {
+                                                                                                    setReplyingTo(comment.id);
+                                                                                                    setReplyText(`@${reply.userName} `);
+                                                                                                    // Ideally focus the input, but state update will reveal it
+                                                                                                }}
+                                                                                                style={{
+                                                                                                    background: 'none',
+                                                                                                    border: 'none',
+                                                                                                    cursor: 'pointer',
+                                                                                                    display: 'flex',
+                                                                                                    alignItems: 'center',
+                                                                                                    gap: '0.25rem',
+                                                                                                    color: '#666',
+                                                                                                    fontSize: '0.75rem',
+                                                                                                    opacity: 0.7
+                                                                                                }}
+                                                                                            >
+                                                                                                <Reply size={12} /> Répondre
+                                                                                            </button>
+                                                                                        )}
                                                                                     </div>
                                                                                     <p style={{ fontSize: '0.9rem', lineHeight: 1.4 }}>{reply.text}</p>
                                                                                 </div>
