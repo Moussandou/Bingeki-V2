@@ -188,7 +188,7 @@ export default function Dashboard() {
                                 </p>
                             ) : streak < 3 ? (
                                 <p style={{ fontSize: '0.8rem', color: 'var(--color-primary)', marginTop: '0.5rem' }}>
-                                    🔥 Continue comme ça !
+                                    Continue comme ça !
                                 </p>
                             ) : (
                                 <p style={{ fontSize: '0.8rem', color: 'var(--color-primary)', marginTop: '0.5rem' }}>
