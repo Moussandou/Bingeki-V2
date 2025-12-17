@@ -11,7 +11,7 @@ import { logout } from '@/firebase/auth';
 import {
     Settings, Award, BookOpen, CheckCircle, Library, Trophy, Flame, Info,
     PenTool,
-    X, Upload
+    X
 } from 'lucide-react';
 import { HunterLicenseCard } from '@/components/HunterLicenseCard';
 import { getUserProfile, saveUserProfileToFirestore, compareLibraries, type UserProfile } from '@/firebase/firestore';
@@ -143,7 +143,6 @@ export default function Profile() {
 
 
     // Edit Form State
-    const [isDragging, setIsDragging] = useState(false);
     const [editForm, setEditForm] = useState({
         banner: '',
         bio: '',
