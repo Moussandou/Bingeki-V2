@@ -1,0 +1,327 @@
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
+import { Play, Users, Plus, BookOpen, Tv } from 'lucide-react';
+import { useAuthStore } from '@/store/authStore';
+import { useLibraryStore } from '@/store/libraryStore';
+import {
+    getUserWatchParties,
+    createWatchParty,
+    updateWatchPartyProgress,
+    getFriends,
+    type Friend
+} from '@/firebase/firestore';
+import type { WatchParty, PartyParticipant } from '@/types/watchparty';
+import { PARTY_STATUS_LABELS } from '@/types/watchparty';
+import { useToast } from '@/context/ToastContext';
+import { useNavigate } from 'react-router-dom';
+
+export function WatchPartiesSection() {
+    const { user } = useAuthStore();
+    const { works } = useLibraryStore();
+    const { addToast } = useToast();
+    const navigate = useNavigate();
+
+    const [parties, setParties] = useState<WatchParty[]>([]);
+    const [friends, setFriends] = useState<Friend[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    // Form state
+    const [newParty, setNewParty] = useState({
+        workId: 0,
+        title: '',
+        selectedFriends: [] as string[]
+    });
+
+    useEffect(() => {
+        if (user) {
+            loadData();
+        }
+    }, [user]);
+
+    const loadData = async () => {
+        if (!user) return;
+        setIsLoading(true);
+
+        const [partyData, friendData] = await Promise.all([
+            getUserWatchParties(user.uid),
+            getFriends(user.uid)
+        ]);
+
+        setParties(partyData);
+        setFriends(friendData.filter(f => f.status === 'accepted'));
+        setIsLoading(false);
+    };
+
+    const handleCreateParty = async () => {
+        if (!user || !newParty.workId) {
+            addToast('Sélectionnez une œuvre', 'error');
+            return;
+        }
+
+        const selectedWork = works.find(w => w.id === newParty.workId);
+        if (!selectedWork) return;
+
+        const participants: PartyParticipant[] = [
+            {
+                id: user.uid,
+                name: user.displayName || 'Hôte',
+                photo: user.photoURL || '',
+                joinedAt: Date.now(),
+                isReady: true,
+                currentProgress: selectedWork.currentChapter || 0
+            },
+            ...newParty.selectedFriends.map(friendUid => {
+                const friend = friends.find(f => f.uid === friendUid);
+                return {
+                    id: friendUid,
+                    name: friend?.displayName || 'Ami',
+                    photo: friend?.photoURL || '',
+                    joinedAt: Date.now(),
+                    isReady: false,
+                    currentProgress: 0
+                };
+            })
+        ];
+
+        const party: Omit<WatchParty, 'id'> = {
+            title: newParty.title || `${selectedWork.type === 'anime' ? 'Watch' : 'Read'} Party - ${selectedWork.title}`,
+            workId: Number(selectedWork.id),
+            workTitle: selectedWork.title,
+            workImage: selectedWork.image,
+            workType: selectedWork.type,
+            hostId: user.uid,
+            hostName: user.displayName || 'Hôte',
+            participants,
+            currentEpisode: selectedWork.currentChapter || 1,
+            status: 'active',
+            createdAt: Date.now(),
+            lastActivity: Date.now()
+        };
+
+        await createWatchParty(party);
+        addToast('Party créée !', 'success');
+        setIsCreateModalOpen(false);
+        setNewParty({ workId: 0, title: '', selectedFriends: [] });
+        loadData();
+    };
+
+    const handleAdvanceEpisode = async (partyId: string, currentEp: number) => {
+        await updateWatchPartyProgress(partyId, currentEp + 1);
+        addToast('Épisode avancé !', 'success');
+        loadData();
+    };
+
+    const toggleFriendSelect = (uid: string) => {
+        setNewParty(prev => ({
+            ...prev,
+            selectedFriends: prev.selectedFriends.includes(uid)
+                ? prev.selectedFriends.filter(id => id !== uid)
+                : [...prev.selectedFriends, uid]
+        }));
+    };
+
+    if (!user) {
+        return (
+            <div className="manga-panel" style={{ padding: '2rem', textAlign: 'center', background: '#fff' }}>
+                <p style={{ opacity: 0.6 }}>Connectez-vous pour créer des Watch Parties</p>
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Tv size={24} /> WATCH PARTIES
+                </h2>
+                <Button onClick={() => setIsCreateModalOpen(true)} variant="manga" size="sm" icon={<Plus size={16} />}>
+                    NOUVELLE PARTY
+                </Button>
+            </div>
+
+            {isLoading ? (
+                <p style={{ textAlign: 'center', opacity: 0.6 }}>Chargement...</p>
+            ) : parties.length === 0 ? (
+                <div className="manga-panel" style={{ padding: '2rem', textAlign: 'center', background: '#fff' }}>
+                    <Tv size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
+                    <p style={{ fontWeight: 600 }}>Aucune party en cours</p>
+                    <p style={{ opacity: 0.6, fontSize: '0.9rem', marginTop: '0.5rem' }}>Crée une party et regarde/lis avec tes amis !</p>
+                </div>
+            ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {parties.map(party => (
+                        <div key={party.id} className="manga-panel" style={{ padding: '1.25rem', background: '#fff' }}>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                {/* Work image */}
+                                <div
+                                    style={{ width: 80, height: 110, borderRadius: '4px', overflow: 'hidden', border: '2px solid #000', cursor: 'pointer', flexShrink: 0 }}
+                                    onClick={() => navigate(`/work/${party.workId}`)}
+                                >
+                                    <img
+                                        src={party.workImage || `https://via.placeholder.com/80x110?text=${party.workType}`}
+                                        alt={party.workTitle}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
+                                </div>
+
+                                {/* Party info */}
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                                        <div>
+                                            <h3 style={{ fontWeight: 800, fontSize: '1.1rem' }}>{party.title}</h3>
+                                            <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>{party.workTitle}</p>
+                                        </div>
+                                        <span style={{
+                                            padding: '0.25rem 0.5rem',
+                                            background: party.status === 'active' ? '#22c55e' : party.status === 'paused' ? '#eab308' : '#6b7280',
+                                            color: '#fff',
+                                            borderRadius: '4px',
+                                            fontSize: '0.7rem',
+                                            fontWeight: 700
+                                        }}>
+                                            {PARTY_STATUS_LABELS[party.status]}
+                                        </span>
+                                    </div>
+
+                                    {/* Current progress */}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                                        {party.workType === 'anime' ? <Play size={16} /> : <BookOpen size={16} />}
+                                        <span style={{ fontWeight: 700 }}>
+                                            {party.workType === 'anime' ? 'Épisode' : 'Chapitre'} {party.currentEpisode}
+                                        </span>
+                                        {party.hostId === user.uid && party.status === 'active' && (
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                onClick={() => handleAdvanceEpisode(party.id, party.currentEpisode)}
+                                                style={{ marginLeft: 'auto' }}
+                                            >
+                                                +1
+                                            </Button>
+                                        )}
+                                    </div>
+
+                                    {/* Participants */}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <Users size={14} style={{ opacity: 0.6 }} />
+                                        <div style={{ display: 'flex', marginLeft: '-4px' }}>
+                                            {party.participants.slice(0, 5).map(p => (
+                                                <div key={p.id} style={{
+                                                    width: 24,
+                                                    height: 24,
+                                                    borderRadius: '50%',
+                                                    overflow: 'hidden',
+                                                    border: `2px solid ${p.isReady ? '#22c55e' : '#ccc'}`,
+                                                    marginLeft: '-4px'
+                                                }}>
+                                                    <img src={p.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.name}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{party.participants.length} participant{party.participants.length > 1 ? 's' : ''}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Create Party Modal */}
+            <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="NOUVELLE WATCH PARTY">
+                <div style={{ padding: '1rem' }}>
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>Choisir une œuvre</label>
+                        {works.filter(w => w.status === 'reading').length === 0 ? (
+                            <p style={{ opacity: 0.6, fontStyle: 'italic' }}>Ajoutez d'abord une œuvre à votre bibliothèque</p>
+                        ) : (
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', maxHeight: '200px', overflowY: 'auto' }}>
+                                {works.filter(w => w.status === 'reading').map(work => (
+                                    <div
+                                        key={work.id}
+                                        onClick={() => setNewParty(prev => ({ ...prev, workId: Number(work.id) }))}
+                                        style={{
+                                            width: 70,
+                                            cursor: 'pointer',
+                                            opacity: newParty.workId === work.id ? 1 : 0.6,
+                                            border: newParty.workId === work.id ? '2px solid #000' : '2px solid transparent',
+                                            borderRadius: '4px',
+                                            padding: '2px'
+                                        }}
+                                    >
+                                        <div style={{ width: '100%', aspectRatio: '2/3', borderRadius: '4px', overflow: 'hidden' }}>
+                                            <img src={work.image} alt={work.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        </div>
+                                        <p style={{ fontSize: '0.65rem', textAlign: 'center', marginTop: '0.25rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{work.title}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>Nom de la party (optionnel)</label>
+                        <input
+                            type="text"
+                            value={newParty.title}
+                            onChange={e => setNewParty(prev => ({ ...prev, title: e.target.value }))}
+                            placeholder="Ex: Marathon One Piece"
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                border: '2px solid #000',
+                                fontSize: '1rem',
+                                fontFamily: 'inherit'
+                            }}
+                        />
+                    </div>
+
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>
+                            <Users size={16} style={{ marginRight: '0.5rem' }} />
+                            Inviter des amis ({newParty.selectedFriends.length})
+                        </label>
+                        {friends.length === 0 ? (
+                            <p style={{ opacity: 0.6, fontStyle: 'italic' }}>Vous n'avez pas encore d'amis</p>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '150px', overflowY: 'auto' }}>
+                                {friends.map(friend => (
+                                    <div
+                                        key={friend.uid}
+                                        onClick={() => toggleFriendSelect(friend.uid)}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.75rem',
+                                            padding: '0.5rem',
+                                            border: newParty.selectedFriends.includes(friend.uid) ? '2px solid #000' : '1px solid #eee',
+                                            background: newParty.selectedFriends.includes(friend.uid) ? '#f0f0f0' : '#fff',
+                                            cursor: 'pointer',
+                                            borderRadius: '4px'
+                                        }}
+                                    >
+                                        <div style={{ width: 28, height: 28, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                            <img
+                                                src={friend.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${friend.displayName}`}
+                                                alt=""
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                            />
+                                        </div>
+                                        <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{friend.displayName}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                        <Button variant="ghost" onClick={() => setIsCreateModalOpen(false)}>Annuler</Button>
+                        <Button variant="manga" onClick={handleCreateParty}>Créer la party</Button>
+                    </div>
+                </div>
+            </Modal>
+        </div>
+    );
+}

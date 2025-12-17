@@ -8,6 +8,7 @@ import { useLibraryStore } from '@/store/libraryStore';
 import { Search, Check, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AddWorkModal } from '@/components/AddWorkModal';
+import { FriendRecommendations } from '@/components/FriendRecommendations';
 
 export default function Discover() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -173,8 +174,12 @@ export default function Discover() {
                         )}
                     </div>
                 ) : (
-                    /* Home Carousels */
+                    /* Home Content */
                     <div>
+                        {/* Friend Recommendations */}
+                        <FriendRecommendations />
+
+                        {/* Carousels */}
                         <>
                             <Carousel
                                 title="🔥 Anime de la Saison"

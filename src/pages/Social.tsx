@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
-import { Trophy, Users, Search, UserPlus, Check, User, X, Activity, BookOpen, Flame, Clock, Swords } from 'lucide-react';
+import { Trophy, Users, Search, UserPlus, Check, User, X, Activity, BookOpen, Flame, Clock, Swords, Tv } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import {
     getFriends,
@@ -20,6 +20,7 @@ import {
 import type { ActivityEvent } from '@/types/activity';
 import { ACTIVITY_EMOJIS, ACTIVITY_LABELS } from '@/types/activity';
 import { ChallengesSection } from '@/components/ChallengesSection';
+import { WatchPartiesSection } from '@/components/WatchPartiesSection';
 
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/context/ToastContext';
@@ -29,7 +30,7 @@ export default function Social() {
     const navigate = useNavigate();
     const { addToast } = useToast();
 
-    const [activeTab, setActiveTab] = useState<'ranking' | 'friends' | 'activity' | 'challenges'>('ranking');
+    const [activeTab, setActiveTab] = useState<'ranking' | 'friends' | 'activity' | 'challenges' | 'parties'>('ranking');
     const [leaderboard, setLeaderboard] = useState<UserProfile[]>([]);
     const [friends, setFriends] = useState<Friend[]>([]);
     const [activities, setActivities] = useState<ActivityEvent[]>([]);
@@ -184,6 +185,13 @@ export default function Social() {
                         DÉFIS
                     </Button>
                     <Button
+                        variant={activeTab === 'parties' ? 'primary' : 'ghost'}
+                        onClick={() => setActiveTab('parties')}
+                        icon={<Tv size={20} />}
+                    >
+                        PARTIES
+                    </Button>
+                    <Button
                         variant={activeTab === 'friends' ? 'primary' : 'ghost'}
                         onClick={() => setActiveTab('friends')}
                         icon={<Users size={20} />}
@@ -191,6 +199,11 @@ export default function Social() {
                         AMIS
                     </Button>
                 </div>
+
+                {/* PARTIES TAB */}
+                {activeTab === 'parties' && (
+                    <WatchPartiesSection />
+                )}
 
                 {/* CHALLENGES TAB */}
                 {activeTab === 'challenges' && (
