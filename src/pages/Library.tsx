@@ -6,6 +6,7 @@ import { Modal } from '@/components/ui/Modal';
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { useLibraryStore, type Work } from '@/store/libraryStore';
 import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle, BookOpen, CheckCircle, SortAsc, ChevronDown, Download, Upload, TrendingUp } from 'lucide-react';
+import styles from './Library.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { statusToFrench } from '@/utils/statusTranslation';
@@ -118,32 +119,23 @@ export default function Library() {
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
 
                     {/* Stats Header - Consolidated */}
-                    <div className="manga-panel" style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '0',
-                        marginBottom: '2rem',
-                        background: '#fff',
-                        overflow: 'hidden'
-                    }}>
-                        <div style={{ display: 'flex', flex: 1, minWidth: '300px' }}>
-                            <div style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRight: '2px solid #000' }}>
+                    <div className={`manga-panel ${styles.statsPanel}`}>
+                        <div className={styles.statsContainer}>
+                            <div className={styles.statItem}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.6, marginBottom: '0.5rem' }}>
                                     <BookOpen size={18} />
                                     <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>Total</span>
                                 </div>
                                 <span style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.total}</span>
                             </div>
-                            <div style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRight: '2px solid #000' }}>
+                            <div className={styles.statItem}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.6, marginBottom: '0.5rem' }}>
                                     <CheckCircle size={18} />
                                     <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>Terminées</span>
                                 </div>
                                 <span style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.completed}</span>
                             </div>
-                            <div style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                            <div className={styles.statItem} style={{ borderRight: 'none' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.6, marginBottom: '0.5rem' }}>
                                     <TrendingUp size={18} />
                                     <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>Progression</span>
@@ -152,11 +144,12 @@ export default function Library() {
                             </div>
                         </div>
 
-                        <div style={{ padding: '1.5rem', borderLeft: '2px solid #000', background: '#000' }}>
+                        <div className={styles.addWorkContainer}>
                             <Button
                                 variant="primary"
                                 onClick={() => setIsAddModalOpen(true)}
                                 icon={<Plus size={20} />}
+                                className={styles.addWorkButton}
                                 style={{
                                     height: 'auto',
                                     padding: '0.75rem 1.5rem',
@@ -171,237 +164,247 @@ export default function Library() {
                     </div>
 
                     {/* Controls Bar */}
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <div className={styles.controlsBar}>
 
                         {/* Search */}
-                        {/* Search */}
-                        <Card
-                            variant="manga"
-                            style={{
-                                flex: 1,
-                                minWidth: '300px',
-                                padding: '0.25rem 0.75rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.75rem',
-                                background: '#fff',
-                                borderWidth: '3px',
-                                borderStyle: 'solid',
-                                borderColor: '#000',
-                                boxShadow: '6px 6px 0 #000'
-                            }}
-                            whileHover={{
-                                borderColor: 'var(--color-primary)',
-                                boxShadow: '6px 6px 0 var(--color-primary)'
-                            }}
-                            transition={{ duration: 0.2 }}
-                        >
+                        <div className={styles.searchCard}>
                             <Search size={20} style={{ opacity: 0.4 }} />
                             <input
                                 placeholder="Rechercher..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                style={{
-                                    border: 'none',
-                                    outline: 'none',
-                                    width: '100%',
-                                    fontSize: '1rem',
-                                    background: 'transparent',
-                                    fontFamily: 'var(--font-heading)',
-                                    fontWeight: 700,
-                                    padding: '0.5rem 0'
-                                }}
+                                className={styles.searchInput}
                             />
-                        </Card>
+                        </div>
 
-                        {/* Filters Dropdown */}
-                        <div style={{ position: 'relative' }}>
-                            <Button
-                                variant="manga"
-                                icon={<Filter size={18} />}
-                                onClick={() => setFilterOpen(!filterOpen)}
-                                style={{
-                                    background: filterOpen ? '#000' : '#fff',
-                                    color: filterOpen ? '#fff' : '#000',
-                                    minWidth: '130px'
-                                }}
-                            >
-                                FILTRES
-                            </Button>
-                            {filterOpen && (
-                                <Card variant="manga" style={{
-                                    position: 'absolute',
-                                    top: '110%',
-                                    right: 0,
-                                    zIndex: 50,
-                                    background: '#fff',
-                                    padding: '1rem',
-                                    width: '280px',
-                                }}>
-                                    <div style={{ marginBottom: '1rem' }}>
-                                        <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.9rem', marginBottom: '0.5rem', opacity: 0.7 }}>TYPE</h4>
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            {['all', 'manga', 'anime'].map(t => (
+                        {/* Filter Group used for Mobile Grid Layout */}
+                        <div className={styles.filterGroup}>
+                            {/* Filters Dropdown */}
+                            <div style={{ position: 'relative', flex: 1 }}>
+                                <Button
+                                    variant="manga"
+                                    icon={<Filter size={18} />}
+                                    onClick={() => {
+                                        setFilterOpen(!filterOpen);
+                                        setSortOpen(false);
+                                    }}
+                                    style={{
+                                        background: filterOpen ? '#000' : '#fff',
+                                        color: filterOpen ? '#fff' : '#000',
+                                        width: '100%',
+                                        justifyContent: 'center',
+                                        border: '3px solid #000',
+                                        boxShadow: filterOpen ? 'none' : '6px 6px 0 #000',
+                                        transform: filterOpen ? 'translate(2px, 2px)' : 'none'
+                                    }}
+                                >
+                                    FILTRES
+                                </Button>
+                                {filterOpen && (
+                                    <Card variant="manga" style={{
+                                        position: 'absolute',
+                                        top: '110%',
+                                        left: 0,
+                                        zIndex: 50,
+                                        background: '#fff',
+                                        padding: '1rem',
+                                        width: '280px',
+                                        maxWidth: '90vw',
+                                        border: '3px solid #000',
+                                        boxShadow: '6px 6px 0 #000'
+                                    }}>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.9rem', marginBottom: '0.5rem', opacity: 0.7 }}>TYPE</h4>
+                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                {['all', 'manga', 'anime'].map(t => (
+                                                    <button
+                                                        key={t}
+                                                        onClick={() => setFilterType(t as any)}
+                                                        style={{
+                                                            padding: '0.5rem 1rem',
+                                                            border: '2px solid #000',
+                                                            background: filterType === t ? '#000' : '#fff',
+                                                            color: filterType === t ? '#fff' : '#000',
+                                                            fontWeight: 800,
+                                                            textTransform: 'uppercase',
+                                                            fontSize: '0.8rem',
+                                                            cursor: 'pointer',
+                                                            flex: 1,
+                                                            boxShadow: filterType === t ? 'none' : '2px 2px 0 #000',
+                                                            transform: filterType === t ? 'translate(2px, 2px)' : 'none',
+                                                            transition: 'all 0.1s'
+                                                        }}
+                                                    >
+                                                        {t === 'all' ? 'TOUS' : t}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.9rem', marginBottom: '0.5rem', opacity: 0.7 }}>STATUT</h4>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                                {['all', 'reading', 'completed', 'plan_to_read'].map(s => (
+                                                    <button
+                                                        key={s}
+                                                        onClick={() => setFilterStatus(s as any)}
+                                                        style={{
+                                                            padding: '0.4rem 0.8rem',
+                                                            border: '2px solid #000',
+                                                            background: filterStatus === s ? '#000' : '#fff',
+                                                            color: filterStatus === s ? '#fff' : '#000',
+                                                            fontWeight: 700,
+                                                            textTransform: 'uppercase',
+                                                            fontSize: '0.75rem',
+                                                            cursor: 'pointer',
+                                                            boxShadow: filterStatus === s ? 'none' : '2px 2px 0 #000',
+                                                            transform: filterStatus === s ? 'translate(2px, 2px)' : 'none',
+                                                            transition: 'all 0.1s'
+                                                        }}
+                                                    >
+                                                        {s === 'all' ? 'TOUS' : s.replace(/_/g, ' ')}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </Card>
+                                )}
+                            </div>
+
+                            {/* Sort Dropdown */}
+                            <div style={{ position: 'relative', flex: 1 }}>
+                                <Button
+                                    variant="manga"
+                                    icon={<SortAsc size={18} />}
+                                    onClick={() => {
+                                        setSortOpen(!sortOpen);
+                                        setFilterOpen(false);
+                                    }}
+                                    style={{
+                                        background: sortOpen ? '#000' : '#fff',
+                                        color: sortOpen ? '#fff' : '#000',
+                                        width: '100%',
+                                        justifyContent: 'space-between',
+                                        border: '3px solid #000',
+                                        boxShadow: sortOpen ? 'none' : '6px 6px 0 #000',
+                                        transform: sortOpen ? 'translate(2px, 2px)' : 'none'
+                                    }}
+                                >
+                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        {sortOptions.find(o => o.value === sortBy)?.label}
+                                    </span>
+                                    <ChevronDown size={16} />
+                                </Button>
+                                {sortOpen && (
+                                    <Card variant="manga" style={{
+                                        position: 'absolute',
+                                        top: '110%',
+                                        right: 0,
+                                        zIndex: 50,
+                                        background: '#fff',
+                                        padding: '0.5rem',
+                                        width: '200px',
+                                        border: '3px solid #000',
+                                        boxShadow: '6px 6px 0 #000'
+                                    }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                            {sortOptions.map(option => (
                                                 <button
-                                                    key={t}
-                                                    onClick={() => setFilterType(t as any)}
+                                                    key={option.value}
+                                                    onClick={() => {
+                                                        setSortBy(option.value as any);
+                                                        setSortOpen(false);
+                                                    }}
                                                     style={{
-                                                        padding: '0.5rem 1rem',
+                                                        padding: '0.75rem 1rem',
                                                         border: '2px solid #000',
-                                                        background: filterType === t ? '#000' : '#fff',
-                                                        color: filterType === t ? '#fff' : '#000',
+                                                        background: sortBy === option.value ? '#000' : '#fff',
+                                                        color: sortBy === option.value ? '#fff' : '#000',
                                                         fontWeight: 800,
                                                         textTransform: 'uppercase',
-                                                        fontSize: '0.8rem',
+                                                        fontSize: '0.9rem',
                                                         cursor: 'pointer',
-                                                        flex: 1,
-                                                        boxShadow: filterType === t ? 'none' : '2px 2px 0 #000',
-                                                        transform: filterType === t ? 'translate(2px, 2px)' : 'none',
+                                                        textAlign: 'left',
+                                                        boxShadow: sortBy === option.value ? 'none' : '2px 2px 0 #000',
+                                                        transform: sortBy === option.value ? 'translate(2px, 2px)' : 'none',
                                                         transition: 'all 0.1s'
                                                     }}
                                                 >
-                                                    {t === 'all' ? 'TOUS' : t}
+                                                    {option.label}
                                                 </button>
                                             ))}
                                         </div>
-                                    </div>
-                                    <div>
-                                        <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.9rem', marginBottom: '0.5rem', opacity: 0.7 }}>STATUT</h4>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                                            {['all', 'reading', 'completed', 'plan_to_read'].map(s => (
-                                                <button
-                                                    key={s}
-                                                    onClick={() => setFilterStatus(s as any)}
-                                                    style={{
-                                                        padding: '0.4rem 0.8rem',
-                                                        border: '2px solid #000',
-                                                        background: filterStatus === s ? '#000' : '#fff',
-                                                        color: filterStatus === s ? '#fff' : '#000',
-                                                        fontWeight: 700,
-                                                        textTransform: 'uppercase',
-                                                        fontSize: '0.75rem',
-                                                        cursor: 'pointer',
-                                                        boxShadow: filterStatus === s ? 'none' : '2px 2px 0 #000',
-                                                        transform: filterStatus === s ? 'translate(2px, 2px)' : 'none',
-                                                        transition: 'all 0.1s'
-                                                    }}
-                                                >
-                                                    {s === 'all' ? 'TOUS' : s.replace(/_/g, ' ')}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </Card>
-                            )}
+                                    </Card>
+                                )}
+                            </div>
+
+                            {/* View & Actions Toggle */}
+                            <Card variant="manga" className={styles.viewControlsCard}>
+                                <button
+                                    onClick={() => setViewMode('grid')}
+                                    className={`${styles.controlButton} ${viewMode === 'grid' ? styles.controlButtonActive : ''}`}
+                                    title="Vue Grille"
+                                >
+                                    <Grid size={20} />
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('list')}
+                                    className={`${styles.controlButton} ${viewMode === 'list' ? styles.controlButtonActive : ''}`}
+                                    title="Vue Liste"
+                                >
+                                    <List size={20} />
+                                </button>
+                                <button
+                                    onClick={exportData}
+                                    className={styles.controlButton}
+                                    title="Exporter"
+                                >
+                                    <Download size={20} />
+                                </button>
+                                <div style={{ position: 'relative', display: 'flex' }}>
+                                    <input
+                                        type="file"
+                                        accept=".json"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                importData(file).then(() => {
+                                                    addToast('Données importées !', 'success');
+                                                }).catch(() => addToast('Erreur', 'error'));
+                                            }
+                                        }}
+                                        style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', zIndex: 10 }}
+                                    />
+                                    <button
+                                        className={styles.controlButton}
+                                        title="Importer"
+                                    >
+                                        <Upload size={20} />
+                                    </button>
+                                </div>
+                            </Card>
+
+                            {/* Selection Mode Toggle */}
+                            <div style={{ flex: '1 0 100%', display: 'flex' }}>
+                                <Button
+                                    variant={isSelectionMode ? 'primary' : 'manga'}
+                                    onClick={() => {
+                                        setIsSelectionMode(!isSelectionMode);
+                                        setSelectedWorks(new Set());
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        justifyContent: 'center',
+                                        background: isSelectionMode ? 'var(--color-primary)' : '#fff',
+                                        color: isSelectionMode ? '#fff' : '#000',
+                                        borderColor: isSelectionMode ? 'var(--color-primary)' : '#000'
+                                    }}
+                                >
+                                    {isSelectionMode ? 'ANNULER' : 'SÉLECTIONNER'}
+                                </Button>
+                            </div>
                         </div>
 
-                        {/* Sort Dropdown */}
-                        <div style={{ position: 'relative' }}>
-                            <Button
-                                variant="manga"
-                                icon={<SortAsc size={18} />}
-                                onClick={() => setSortOpen(!sortOpen)}
-                                style={{
-                                    background: sortOpen ? '#000' : '#fff',
-                                    color: sortOpen ? '#fff' : '#000',
-                                    minWidth: '160px',
-                                    justifyContent: 'space-between'
-                                }}
-                            >
-                                {sortOptions.find(o => o.value === sortBy)?.label}
-                                <ChevronDown size={16} />
-                            </Button>
-                            {sortOpen && (
-                                <Card variant="manga" style={{
-                                    position: 'absolute',
-                                    top: '110%',
-                                    right: 0,
-                                    zIndex: 50,
-                                    background: '#fff',
-                                    padding: '0.5rem',
-                                    width: '200px',
-                                }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                        {sortOptions.map(option => (
-                                            <button
-                                                key={option.value}
-                                                onClick={() => {
-                                                    setSortBy(option.value as any);
-                                                    setSortOpen(false);
-                                                }}
-                                                style={{
-                                                    padding: '0.75rem 1rem',
-                                                    border: '2px solid #000',
-                                                    background: sortBy === option.value ? '#000' : '#fff',
-                                                    color: sortBy === option.value ? '#fff' : '#000',
-                                                    fontWeight: 800,
-                                                    textTransform: 'uppercase',
-                                                    fontSize: '0.9rem',
-                                                    cursor: 'pointer',
-                                                    textAlign: 'left',
-                                                    boxShadow: sortBy === option.value ? 'none' : '2px 2px 0 #000',
-                                                    transform: sortBy === option.value ? 'translate(2px, 2px)' : 'none',
-                                                    transition: 'all 0.1s'
-                                                }}
-                                            >
-                                                {option.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </Card>
-                            )}
-                        </div>
-
-                        {/* View Toggle */}
-                        <Card variant="manga" style={{ display: 'flex', padding: 0, overflow: 'hidden', gap: 0, background: '#fff' }}>
-                            <button
-                                onClick={() => setViewMode('grid')}
-                                style={{
-                                    padding: '0.75rem',
-                                    background: viewMode === 'grid' ? '#000' : '#fff',
-                                    color: viewMode === 'grid' ? '#fff' : '#000',
-                                    cursor: 'pointer',
-                                    border: 'none',
-                                    borderRight: '2px solid #000',
-                                    display: 'flex',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <Grid size={20} />
-                            </button>
-                            <button
-                                onClick={() => setViewMode('list')}
-                                style={{
-                                    padding: '0.75rem',
-                                    background: viewMode === 'list' ? '#000' : '#fff',
-                                    color: viewMode === 'list' ? '#fff' : '#000',
-                                    cursor: 'pointer',
-                                    border: 'none',
-                                    display: 'flex',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <List size={20} />
-                            </button>
-                        </Card>
-
-                        {/* Selection Mode Toggle */}
-                        <Button
-                            variant={isSelectionMode ? 'primary' : 'manga'}
-                            onClick={() => {
-                                setIsSelectionMode(!isSelectionMode);
-                                setSelectedWorks(new Set());
-                            }}
-                            style={{
-                                minWidth: '140px',
-                                background: isSelectionMode ? 'var(--color-primary)' : '#fff',
-                                color: isSelectionMode ? '#fff' : '#000',
-                                borderColor: isSelectionMode ? 'var(--color-primary)' : '#000'
-                            }}
-                        >
-                            {isSelectionMode ? 'ANNULER' : 'SÉLECTIONNER'}
-                        </Button>
-
+                        {/* Bulk Actions (outside grid) */}
                         {isSelectionMode && selectedWorks.size > 0 && (
                             <Button
                                 variant="primary"
@@ -410,45 +413,15 @@ export default function Library() {
                                     background: '#ef4444',
                                     borderColor: '#000',
                                     boxShadow: '4px 4px 0 #000',
-                                    color: '#fff'
+                                    color: '#fff',
+                                    width: '100%',
+                                    justifyContent: 'center'
                                 }}
                                 icon={<Trash2 size={16} />}
                             >
                                 SUPPRIMER ({selectedWorks.size})
                             </Button>
                         )}
-
-                        {/* Import/Export */}
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <Button
-                                variant="manga"
-                                icon={<Download size={18} />}
-                                onClick={exportData}
-                                title="Exporter la bibliothèque"
-                                style={{ minWidth: '40px', padding: '0.5rem' }}
-                            />
-                            <div style={{ position: 'relative' }}>
-                                <input
-                                    type="file"
-                                    accept=".json"
-                                    onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                            importData(file).then(() => {
-                                                addToast('Données importées !', 'success');
-                                            }).catch(() => addToast('Erreur', 'error'));
-                                        }
-                                    }}
-                                    style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', zIndex: 10 }}
-                                />
-                                <Button
-                                    variant="manga"
-                                    icon={<Upload size={18} />}
-                                    title="Importer la bibliothèque"
-                                    style={{ minWidth: '40px', padding: '0.5rem' }}
-                                />
-                            </div>
-                        </div>
 
                     </div>
 
@@ -459,12 +432,7 @@ export default function Library() {
                             <h3>Aucune œuvre trouvée</h3>
                         </div>
                     ) : (
-                        <div style={{
-                            display: viewMode === 'grid' ? 'grid' : 'flex',
-                            flexDirection: 'column',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-                            gap: '1.5rem'
-                        }}>
+                        <div className={viewMode === 'grid' ? styles.worksGrid : styles.worksList}>
                             <AnimatePresence>
                                 {filteredWorks.map(work => (
                                     <motion.div
@@ -508,14 +476,19 @@ export default function Library() {
                                             )}
 
                                             {/* Image */}
-                                            <div style={{
-                                                height: viewMode === 'grid' ? '280px' : '150px',
-                                                width: viewMode === 'list' ? '120px' : '100%',
-                                                background: `url(${work.image}) center/cover`,
-                                                flexShrink: 0,
-                                                borderRight: viewMode === 'list' ? '2px solid #000' : 'none',
-                                                borderBottom: viewMode === 'grid' ? '2px solid #000' : 'none'
-                                            }} />
+                                            <div
+                                                className={viewMode === 'grid' ? styles.workCover : undefined}
+                                                style={{
+                                                    height: viewMode === 'list' ? '150px' : undefined, // Handled by class in grid
+                                                    width: viewMode === 'list' ? '120px' : undefined,
+                                                    backgroundImage: `url(${work.image})`,
+                                                    backgroundPosition: 'center',
+                                                    backgroundSize: viewMode === 'list' ? 'cover' : undefined, // Class handles grid
+                                                    flexShrink: 0,
+                                                    borderRight: viewMode === 'list' ? '2px solid #000' : 'none',
+                                                    borderBottom: viewMode === 'grid' ? '2px solid #000' : 'none'
+                                                }}
+                                            />
 
                                             {/* Info */}
                                             <div style={{ padding: '1.25rem', flex: 1, background: '#fff' }}>

@@ -245,7 +245,7 @@ export default function Opening() {
                         <div className={styles.sectionDescription}>
                             <p>Organisez votre vidéothèque comme un stratège.</p>
                             <p style={{ marginTop: '1rem' }}>Séparez vos lectures en cours, vos pauses, et vos archives. Ne perdez plus jamais le fil de vos intrigues favorites.</p>
-                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', fontWeight: 900 }}>
+                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', fontWeight: 900, flexWrap: 'wrap', justifyContent: 'center' }}>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Check size={20} /> CHAPITRES</span>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Check size={20} /> ÉPISODES</span>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Check size={20} /> TOMES</span>
@@ -297,7 +297,7 @@ export default function Opening() {
                     </div>
 
                     <div className={`${styles.visualContent} ${styles.progressionVisual}`}>
-                        <div className={styles.mockupContainer} style={{ width: '80%' }}>
+                        <div className={`${styles.mockupContainer} ${styles.mockupWrapper}`}>
                             <HunterLicenseCard
                                 user={mockUser as any}
                                 stats={{
@@ -409,7 +409,7 @@ export default function Opening() {
                             <p>Vous n'êtes pas seul dans ce monde.</p>
                             <p style={{ marginTop: '1rem' }}>Suivez l'activité de vos amis. Partagez vos avis sans spoil. Comparez vos collections et vos badges.</p>
                         </div>
-                        <div style={{ marginTop: '2rem', display: 'flex', gap: '2rem' }}>
+                        <div style={{ marginTop: '2rem', display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <Users size={32} style={{ marginBottom: '0.5rem' }} />
                                 <span style={{ fontWeight: 800 }}>AMIS</span>

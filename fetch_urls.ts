@@ -9,19 +9,19 @@ const genres = {
 };
 
 const run = async () => {
-  const results = {};
+  const results: Record<string, any> = {};
   for (const [name, id] of Object.entries(genres)) {
     const data = await searchWorks('', 'manga', {
-        genres: id,
-        order_by: 'members',
-        sort: 'desc',
-        min_score: 7
+      genres: id,
+      order_by: 'popularity',
+      sort: 'desc',
+      min_score: 7
     });
     results[name] = data.slice(0, 3).map(m => ({
-        title: m.title,
-        type: 'Manga',
-        score: m.score,
-        image: m.images.jpg.large_image_url || m.images.jpg.image_url
+      title: m.title,
+      type: 'Manga',
+      score: m.score,
+      image: m.images.jpg.large_image_url || m.images.jpg.image_url
     }));
     await new Promise(r => setTimeout(r, 1000));
   }

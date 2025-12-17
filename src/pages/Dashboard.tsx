@@ -17,8 +17,10 @@ import { ACTIVITY_EMOJIS, ACTIVITY_LABELS } from '@/types/activity';
 import { getTopWorks } from '@/services/animeApi';
 import type { JikanResult } from '@/services/animeApi';
 import { Star } from 'lucide-react';
+
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { Card } from '@/components/ui/Card';
+import styles from './Dashboard.module.css';
 
 export default function Dashboard() {
     const { user } = useAuthStore();
@@ -85,29 +87,13 @@ export default function Dashboard() {
                     <motion.section
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="manga-panel"
-                        style={{
-                            padding: '2rem',
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            gap: '2rem',
-                            alignItems: 'center',
-                            marginBottom: '2rem',
-                            background: '#fff',
-                            color: '#000'
-                        }}
+                        className={`manga-panel ${styles.heroPanel}`}
                     >
-                        <div style={{
-                            width: '100px',
-                            height: '100px',
-                            border: '3px solid #000',
-                            overflow: 'hidden',
-                            boxShadow: '4px 4px 0px var(--color-primary)'
-                        }}>
+                        <div className={styles.avatarContainer}>
                             <img src={user?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </div>
 
-                        <div style={{ flex: 1 }}>
+                        <div className={styles.heroInfo}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
                                 <h1 style={{
                                     fontFamily: 'var(--font-heading)',
@@ -149,17 +135,9 @@ export default function Dashboard() {
                     </motion.section>
 
                     {/* Stats HUD (Bar Style) */}
-                    <div className="manga-panel" style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(3, 1fr)',
-                        gap: '2px', // For dividers
-                        background: '#000',
-                        overflow: 'hidden',
-                        marginBottom: '3rem',
-                        padding: 0 // Remove padding to let children fill
-                    }}>
+                    <div className={`manga-panel ${styles.statsHud}`}>
                         {/* Daily Goal */}
-                        <div style={{ background: '#fff', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                        <div className={styles.statItem}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', opacity: 0.7 }}>
                                 <Target size={20} />
                                 <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>Objectif</span>
@@ -173,7 +151,7 @@ export default function Dashboard() {
                         </div>
 
                         {/* Weekly Stats */}
-                        <div style={{ background: '#fff', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', borderLeft: '2px solid #000' }}>
+                        <div className={styles.statItem}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', opacity: 0.7 }}>
                                 <TrendingUp size={20} />
                                 <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>Hebdo</span>
@@ -185,7 +163,7 @@ export default function Dashboard() {
                         </div>
 
                         {/* Streak */}
-                        <div style={{ background: streak > 0 ? '#fff' : '#fef2f2', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', borderLeft: '2px solid #000' }}>
+                        <div className={styles.statItem} style={{ background: streak > 0 ? '#fff' : '#fef2f2' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', opacity: 0.7 }}>
                                 <Flame size={20} color={streak > 0 ? 'var(--color-primary)' : 'currentColor'} />
                                 <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>Série</span>
@@ -198,7 +176,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* Two Column Layout */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem' }}>
+                    <div className={styles.dashboardGrid}>
 
                         {/* Left Column - Continue Reading */}
                         <div>
@@ -288,7 +266,7 @@ export default function Dashboard() {
                                 </Link>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1.5rem' }}>
+                            <div className={styles.progressGrid}>
                                 {inProgressWorks.length === 0 ? (
                                     <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem' }}>
                                         <p style={{ marginBottom: '1rem', opacity: 0.7 }}>Aucune lecture en cours</p>
@@ -408,11 +386,7 @@ export default function Dashboard() {
                                 <span style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase' }}>À DÉCOUVRIR</span>
                             </div>
 
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-                                gap: '1rem'
-                            }}>
+                            <div className={styles.recGrid}>
                                 {recommendations.length > 0 ? (
                                     <>
                                         {recommendations.map(manga => (

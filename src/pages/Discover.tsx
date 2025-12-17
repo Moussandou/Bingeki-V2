@@ -11,6 +11,7 @@ import { Search, Check, Loader2, Flame, Sparkles, Star, Dice5, TrendingUp, Plus 
 import { motion } from 'framer-motion';
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { FriendRecommendations } from '@/components/FriendRecommendations';
+import styles from './Discover.module.css';
 
 export default function Discover() {
     const navigate = useNavigate();
@@ -107,12 +108,7 @@ export default function Discover() {
     };
 
     const handleWorkClick = (work: JikanResult) => {
-        if (!user) {
-            navigate('/auth');
-            return;
-        }
-        setSelectedWork(work);
-        setIsModalOpen(true);
+        navigate(`/work/${work.mal_id}?type=${work.type?.toLowerCase() || 'anime'}`);
     };
 
     const handleQuickAdd = (work: JikanResult) => {
@@ -175,41 +171,33 @@ export default function Discover() {
                     </div>
                 )}
 
+
                 {/* Hero Section */}
                 {heroWork && !searchQuery && (
-                    <div style={{ position: 'relative', height: '60vh', minHeight: '500px', overflow: 'hidden', borderBottom: '4px solid #000' }}>
+                    <div className={styles.heroSection}>
                         {/* Background */}
-                        <div style={{
-                            position: 'absolute',
-                            inset: 0,
-                            backgroundImage: `url(${heroWork.images.jpg.large_image_url})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            filter: 'blur(20px) brightness(0.5)',
-                            transform: 'scale(1.1)'
-                        }} />
+                        <div
+                            className={styles.heroBackground}
+                            style={{ backgroundImage: `url(${heroWork.images.jpg.large_image_url})` }}
+                        />
 
-                        <div className="container" style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center', gap: '3rem', paddingTop: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <div className={`container ${styles.heroContainer}`}>
                             {/* Hero Image */}
                             <motion.div
                                 initial={{ opacity: 0, y: 50 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5 }}
-                                style={{
-                                    height: '400px',
-                                    aspectRatio: '2/3',
-                                    borderRadius: '0',
-                                    border: '4px solid #fff',
-                                    boxShadow: '10px 10px 0 #000',
-                                    flexShrink: 0
-                                }}
-                                className="hidden md:block"
+                                className={styles.heroImageContainer}
                             >
-                                <img src={heroWork.images.jpg.large_image_url} alt={heroWork.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <img
+                                    src={heroWork.images.jpg.large_image_url}
+                                    alt={heroWork.title}
+                                    className={styles.heroImage}
+                                />
                             </motion.div>
 
                             {/* Hero Content */}
-                            <div style={{ color: '#fff', maxWidth: '800px' }}>
+                            <div className={styles.heroContent}>
                                 <motion.div
                                     initial={{ opacity: 0, x: -50 }}
                                     animate={{ opacity: 1, x: 0 }}
@@ -218,21 +206,14 @@ export default function Discover() {
                                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-primary)', color: '#fff', padding: '0.5rem 1rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '1rem', boxShadow: '4px 4px 0 #000' }}>
                                         <Flame size={18} fill="#fff" /> A LA UNE
                                     </div>
-                                    <h1 style={{
-                                        fontFamily: 'var(--font-heading)',
-                                        fontSize: 'min(4rem, 10vw)',
-                                        fontWeight: 900,
-                                        lineHeight: 0.9,
-                                        marginBottom: '1rem',
-                                        textShadow: '4px 4px 0 #000'
-                                    }}>
+                                    <h1 className={styles.heroTitle}>
                                         {heroWork.title}
                                     </h1>
-                                    <p style={{ fontSize: '1.1rem', lineHeight: 1.6, opacity: 0.9, marginBottom: '2rem', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', maxWidth: '600px', textShadow: '1px 1px 2px #000' }}>
+                                    <p className={styles.heroSynopsis}>
                                         {heroWork.synopsis}
                                     </p>
 
-                                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                                    <div className={styles.heroActions}>
                                         <Button
                                             variant="primary"
                                             size="lg"
@@ -252,7 +233,7 @@ export default function Discover() {
                                         <Button
                                             variant="manga"
                                             size="lg"
-                                            onClick={() => handleWorkClick(heroWork)}
+                                            onClick={() => navigate(`/work/${heroWork.mal_id}?type=${heroWork.type?.toLowerCase() || 'anime'}`)}
                                             style={{
                                                 fontSize: '1.1rem',
                                                 padding: '0.75rem 1.5rem',

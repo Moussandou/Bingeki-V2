@@ -1,0 +1,120 @@
+.dashboardGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+}
+
+.statsHud {
+    display: grid;
+    grid-template-columns: 1fr;
+    /* Stack on mobile */
+    margin-bottom: 3rem;
+    border: none !important;
+    /* Remove outline on mobile */
+    box-shadow: none !important;
+    background: transparent;
+    /* Let items stand alone */
+    gap: 1rem;
+    /* Add spacing between separated items */
+}
+
+.statItem {
+    background: #fff;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    text-align: center;
+    /* Borders are handled by gap on grid container, but need to reset for stack */
+    border: 3px solid #000;
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
+}
+
+.statItem:last-child {
+    border-bottom: none;
+}
+
+.recGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.progressGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* 2 columns on mobile */
+    gap: 1rem;
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+    .dashboardGrid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .statsHud {
+        grid-template-columns: repeat(3, 1fr);
+        border: none;
+        /* Reset container border if wanted, or keep it */
+    }
+
+    .statItem {
+        border-bottom: none;
+        border-left: 2px solid #000;
+    }
+
+    .statItem:first-child {
+        border-left: none;
+    }
+
+    .progressGrid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+}
+
+.heroPanel {
+    padding: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 2rem;
+    background: #fff;
+    color: #000;
+}
+
+.avatarContainer {
+    width: 100px;
+    height: 100px;
+    border: 3px solid #000;
+    overflow: hidden;
+    box-shadow: 4px 4px 0px var(--color-primary);
+    margin: 0 auto;
+    /* Center on mobile if wrapped */
+}
+
+.heroInfo {
+    flex: 1;
+}
+
+@media (max-width: 480px) {
+    .heroPanel {
+        justify-content: center;
+        text-align: center;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .avatarContainer {
+        margin: 0 auto;
+    }
+
+    .heroInfo {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+    }
+}

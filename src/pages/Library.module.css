@@ -1,0 +1,240 @@
+/* Library.module.css */
+
+.statsPanel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+    margin-bottom: 2rem;
+    background: #fff;
+    overflow: hidden;
+}
+
+.statsContainer {
+    display: flex;
+    flex: 1;
+    min-width: 300px;
+}
+
+.statItem {
+    flex: 1;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-right: 2px solid #000;
+}
+
+.statItem:last-child {
+    border-right: none;
+}
+
+.addWorkContainer {
+    padding: 1.5rem;
+    border-left: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Controls Section */
+.controlsBar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.searchCard {
+    flex: 1;
+    min-width: 300px;
+    padding: 0.25rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #fff;
+    border: 3px solid #000;
+    box-shadow: 6px 6px 0 #000;
+    transition: all 0.2s;
+}
+
+.searchCard:focus-within {
+    box-shadow: 6px 6px 0 var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.searchInput {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 1rem;
+    background: transparent;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    padding: 0.5rem 0;
+}
+
+.filterGroup {
+    display: contents;
+}
+
+.viewControlsCard {
+    display: flex;
+    padding: 0;
+    overflow: hidden;
+    gap: 0;
+    background: #fff;
+    flex: 0 0 auto;
+    border: 3px solid #000;
+    box-shadow: 6px 6px 0 #000;
+}
+
+.controlButton {
+    padding: 0.75rem;
+    cursor: pointer;
+    border: none;
+    border-right: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    color: #000;
+    transition: all 0.2s;
+}
+
+.controlButton:last-child {
+    border-right: none;
+}
+
+.controlButtonActive {
+    background: #000;
+    color: #fff;
+}
+
+/* Content Grid & List */
+.worksGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.worksList {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Image Cover Logic */
+.workCover {
+    height: 280px;
+    width: 100%;
+    background-position: center;
+    background-size: contain;
+    /* Show FULL image on desktop too */
+    background-repeat: no-repeat;
+    background-color: #f4f4f5;
+    flex-shrink: 0;
+    transition: background-size 0.3s;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .statsPanel {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .statsContainer {
+        min-width: 100%;
+        border-bottom: 2px solid #000;
+        flex-direction: column;
+        /* Stack stats vertically */
+    }
+
+    .statItem {
+        padding: 0.75rem 1rem;
+        flex-direction: row;
+        /* Horizontal layout for stacked items: Label ... Value */
+        justify-content: space-between;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #eee;
+        /* Light separator */
+    }
+
+    .statItem:last-child {
+        border-bottom: none;
+    }
+
+    .statItem span:first-child {
+        /* Icon + Label */
+        font-size: 0.8rem !important;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .statItem span:last-child {
+        /* Value */
+        font-size: 1.2rem !important;
+    }
+
+    .addWorkContainer {
+        border-left: none;
+        padding: 1rem;
+        width: 100%;
+    }
+
+    .addWorkButton {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .controlsBar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .searchCard {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .filterGroup {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    .filterButton {
+        width: 100%;
+    }
+
+    .controlButton {
+        flex: 1;
+        padding: 0.6rem;
+    }
+
+    /* Mobile Grid Overrides */
+    .worksGrid {
+        grid-template-columns: repeat(2, 1fr);
+        /* Force 2 columns */
+        gap: 0.5rem;
+        /* Tighter gap */
+    }
+
+    /* Mobile Cover Overrides */
+    .workCover {
+        height: 220px;
+        /* Smaller height on mobile */
+        background-size: contain;
+        /* Show FULL image */
+        background-repeat: no-repeat;
+        background-color: #f4f4f5;
+        /* Light grey background for padding */
+    }
+}

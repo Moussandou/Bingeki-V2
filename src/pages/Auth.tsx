@@ -124,6 +124,20 @@ export default function Auth() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
                 >
+                    {/* Mobile Only Header */}
+                    <div className="mobileOnly" style={{ display: 'none', textAlign: 'center', marginBottom: '2rem' }}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                            <img src="/logo.png" alt="Bingeki" style={{ width: 60, height: 60, objectFit: 'contain' }} />
+                            <span style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900 }}>BINGEKI</span>
+                        </div>
+                        <h1 style={{ fontSize: '2rem', lineHeight: 1.1, textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                            VOTRE AVENTURE
+                        </h1>
+                        <p style={{ fontSize: '0.9rem', opacity: 0.7, maxWidth: '280px', margin: '0 auto' }}>
+                            Suivez vos mangas, gagnez de l'XP et défiez vos amis.
+                        </p>
+                    </div>
+
                     <div className="manga-panel" style={{ padding: '2.5rem', background: '#fff', boxShadow: '8px 8px 0 rgba(0,0,0,0.1)' }}>
                         <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
                             <h2 style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000', marginBottom: '0.5rem' }}>
