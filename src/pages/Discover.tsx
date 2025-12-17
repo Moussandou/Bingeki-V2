@@ -119,16 +119,15 @@ export default function Discover() {
                             </div>
                         ) : (
                             <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                                display: 'flex',
+                                flexWrap: 'wrap',
                                 gap: '1rem',
-                                alignItems: 'stretch',
-                                width: '100%'
+                                justifyContent: 'flex-start'
                             }}>
                                 {searchResults.map((work) => {
                                     const isOwned = libraryIds.has(work.mal_id);
                                     return (
-                                        <motion.div key={work.mal_id} whileHover={{ y: -5 }} style={{ height: '100%' }}>
+                                        <motion.div key={work.mal_id} whileHover={{ y: -5 }} style={{ width: 'calc(20% - 0.8rem)', minWidth: '140px', maxWidth: '180px' }}>
                                             <Card
                                                 variant="manga"
                                                 style={{
