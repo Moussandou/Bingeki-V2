@@ -1,4 +1,5 @@
 export const calculateRank = (level: number): string => {
+    if (level >= 100) return '臭';
     if (level >= 75) return 'S';
     if (level >= 50) return 'A';
     if (level >= 30) return 'B';
@@ -10,6 +11,7 @@ export const calculateRank = (level: number): string => {
 
 export const getRankColor = (rank: string): string => {
     switch (rank) {
+        case '臭': return '#000000'; // Special Black
         case 'S': return '#D4AF37'; // Metalic Gold (darker than yellow)
         case 'A': return '#FF4500'; // Red-Orange (Good)
         case 'B': return '#8A2BE2'; // BlueViolet (darker purple)
