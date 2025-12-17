@@ -370,7 +370,7 @@ export default function Discover() {
                                             fontSize: '1.2rem',
                                             padding: '1rem 2rem',
                                             background: '#fff',
-                                            border: '2px solid #000',
+                                            border: 'none',
                                             color: '#000',
                                             boxShadow: '4px 4px 0 #000',
                                             transition: 'all 0.2s'
