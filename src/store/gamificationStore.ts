@@ -54,7 +54,7 @@ export const useGamificationStore = create<GamificationState>()(
 
             addXp: (amount) => {
                 const { xp, xpToNextLevel, level } = get();
-                let newXp = xp + amount;
+                let newXp = Math.max(0, xp + amount);
                 let newLevel = level;
                 let newXpToNext = xpToNextLevel;
 
