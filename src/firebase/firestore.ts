@@ -3,7 +3,7 @@ import { db } from './config';
 import type { Work } from '@/store/libraryStore';
 import type { Badge } from '@/types/badge';
 import type { ActivityEvent } from '@/types/activity';
-import type { Comment } from '@/types/comment';
+import type { Comment, CommentWithReplies } from '@/types/comment';
 import type { Challenge } from '@/types/challenge';
 
 // Types for Firestore data
@@ -500,6 +500,23 @@ export async function getComments(workId: number, limitCount: number = 50): Prom
         console.error('[Firestore] Error loading comments:', error);
         return [];
     }
+}
+
+// Get comments organized with replies
+export async function getCommentsWithReplies(workId: number): Promise<CommentWithReplies[]> {
+    const allComments = await getComments(workId, 100);
+
+    // Separate top-level comments and replies
+    const topLevel = allComments.filter(c => !c.replyTo);
+    const replies = allComments.filter(c => c.replyTo);
+
+    // Attach replies to their parent comments
+    const withReplies: CommentWithReplies[] = topLevel.map(comment => ({
+        ...comment,
+        replies: replies.filter(r => r.replyTo === comment.id).sort((a, b) => a.timestamp - b.timestamp)
+    }));
+
+    return withReplies;
 }
 
 // Like/unlike a comment

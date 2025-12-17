@@ -3,16 +3,16 @@ import { Layout } from '@/components/layout/Layout';
 import { useLibraryStore } from '@/store/libraryStore';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal'; // Import Modal
-import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff } from 'lucide-react';
+import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff, Reply } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { statusToFrench } from '@/utils/statusTranslation';
 import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
 import { useToast } from '@/context/ToastContext';
 import { ContentList, type ContentItem } from '@/components/ContentList';
 import { getAnimeEpisodes, getAnimeEpisodeDetails } from '@/services/animeApi';
-import { getComments, addComment, toggleCommentLike, getFriendsReadingWork, type UserProfile } from '@/firebase/firestore';
+import { getCommentsWithReplies, addComment, toggleCommentLike, getFriendsReadingWork, type UserProfile } from '@/firebase/firestore';
 import { useAuthStore } from '@/store/authStore';
-import type { Comment } from '@/types/comment';
+import type { CommentWithReplies } from '@/types/comment';
 import logoCrunchyroll from '@/assets/logo_crunchyroll.png';
 import logoADN from '@/assets/logo_adn.png';
 
@@ -37,11 +37,13 @@ export default function WorkDetails() {
     const [isLoadingEpisodes, setIsLoadingEpisodes] = useState(false);
 
     // Comments State
-    const [comments, setComments] = useState<Comment[]>([]);
+    const [comments, setComments] = useState<CommentWithReplies[]>([]);
     const [newComment, setNewComment] = useState('');
     const [isSpoiler, setIsSpoiler] = useState(false);
     const [isLoadingComments, setIsLoadingComments] = useState(false);
     const [revealedSpoilers, setRevealedSpoilers] = useState<string[]>([]);
+    const [replyingTo, setReplyingTo] = useState<string | null>(null);
+    const [replyText, setReplyText] = useState('');
 
     // Friends reading this
     const [friendsReading, setFriendsReading] = useState<{ count: number; friends: UserProfile[] }>({ count: 0, friends: [] });
@@ -142,7 +144,7 @@ export default function WorkDetails() {
         if (work?.id) {
             // Load comments
             setIsLoadingComments(true);
-            getComments(Number(work.id)).then(data => {
+            getCommentsWithReplies(Number(work.id)).then(data => {
                 setComments(data);
                 setIsLoadingComments(false);
             });
@@ -182,7 +184,7 @@ export default function WorkDetails() {
                 addToast('Commentaire ajouté !', 'success');
 
                 // Reload comments
-                const updated = await getComments(Number(work.id));
+                const updated = await getCommentsWithReplies(Number(work.id));
                 console.log('[Comments] Reloaded comments:', updated.length);
                 setComments(updated);
             } else {
@@ -199,8 +201,36 @@ export default function WorkDetails() {
         await toggleCommentLike(commentId, user.uid);
         // Reload comments to reflect like change
         if (work) {
-            const updated = await getComments(Number(work.id));
+            const updated = await getCommentsWithReplies(Number(work.id));
             setComments(updated);
+        }
+    };
+
+    const handleReply = async (parentId: string) => {
+        if (!replyText.trim() || !user || !work) return;
+
+        try {
+            const replyData = {
+                userId: user.uid,
+                userName: user.displayName || 'Anonyme',
+                userPhoto: user.photoURL || '',
+                workId: Number(work.id),
+                text: replyText,
+                spoiler: false,
+                replyTo: parentId
+            };
+
+            const result = await addComment(replyData);
+            if (result) {
+                setReplyText('');
+                setReplyingTo(null);
+                addToast('Réponse ajoutée !', 'success');
+                const updated = await getCommentsWithReplies(Number(work.id));
+                setComments(updated);
+            }
+        } catch (error) {
+            console.error('[Comments] Reply error:', error);
+            addToast('Erreur lors de la réponse', 'error');
         }
     };
 
@@ -797,7 +827,82 @@ export default function WorkDetails() {
                                                                 <Heart size={16} fill={user && comment.likes.includes(user.uid) ? '#ef4444' : 'none'} />
                                                                 <span style={{ fontSize: '0.85rem' }}>{comment.likes.length}</span>
                                                             </button>
+                                                            {user && (
+                                                                <button
+                                                                    onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+                                                                    style={{
+                                                                        background: 'none',
+                                                                        border: 'none',
+                                                                        cursor: 'pointer',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        gap: '0.25rem',
+                                                                        color: replyingTo === comment.id ? '#3b82f6' : '#666'
+                                                                    }}
+                                                                >
+                                                                    <Reply size={16} />
+                                                                    <span style={{ fontSize: '0.85rem' }}>Répondre</span>
+                                                                </button>
+                                                            )}
                                                         </div>
+
+                                                        {/* Inline reply form */}
+                                                        {replyingTo === comment.id && (
+                                                            <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
+                                                                <input
+                                                                    type="text"
+                                                                    value={replyText}
+                                                                    onChange={(e) => setReplyText(e.target.value)}
+                                                                    placeholder="Votre réponse..."
+                                                                    style={{
+                                                                        flex: 1,
+                                                                        padding: '0.5rem 0.75rem',
+                                                                        border: '1px solid #ccc',
+                                                                        borderRadius: '4px',
+                                                                        fontSize: '0.9rem'
+                                                                    }}
+                                                                    onKeyDown={(e) => e.key === 'Enter' && handleReply(comment.id)}
+                                                                />
+                                                                <button
+                                                                    onClick={() => handleReply(comment.id)}
+                                                                    style={{
+                                                                        background: '#000',
+                                                                        color: '#fff',
+                                                                        border: 'none',
+                                                                        borderRadius: '4px',
+                                                                        padding: '0.5rem 1rem',
+                                                                        cursor: 'pointer',
+                                                                        fontWeight: 600
+                                                                    }}
+                                                                >
+                                                                    <Send size={16} />
+                                                                </button>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Nested replies */}
+                                                        {comment.replies && comment.replies.length > 0 && (
+                                                            <div style={{ marginTop: '1rem', marginLeft: '1.5rem', borderLeft: '2px solid #eee', paddingLeft: '1rem' }}>
+                                                                {comment.replies.map(reply => {
+                                                                    const replyTimeDiff = Date.now() - reply.timestamp;
+                                                                    const replyHours = Math.floor(replyTimeDiff / (1000 * 60 * 60));
+                                                                    const replyTimeAgo = replyHours < 1 ? 'À l\'instant' : replyHours < 24 ? `Il y a ${replyHours}h` : `Il y a ${Math.floor(replyHours / 24)}j`;
+
+                                                                    return (
+                                                                        <div key={reply.id} style={{ marginBottom: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid #f0f0f0' }}>
+                                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                                                                <div style={{ width: 24, height: 24, borderRadius: '50%', overflow: 'hidden', border: '1px solid #ccc' }}>
+                                                                                    <img src={reply.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${reply.userName}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                                                </div>
+                                                                                <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{reply.userName}</span>
+                                                                                <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>{replyTimeAgo}</span>
+                                                                            </div>
+                                                                            <p style={{ fontSize: '0.9rem', lineHeight: 1.4 }}>{reply.text}</p>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 );
                                             })}
