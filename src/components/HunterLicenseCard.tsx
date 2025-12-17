@@ -2,6 +2,7 @@ import { LogOut, Star } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { type UserProfile } from '@/firebase/firestore';
 import { BADGE_ICONS } from '@/utils/badges';
+import { NenChart } from './profile/NenChart';
 
 interface HunterLicenseCardProps {
     user: Partial<UserProfile> & { uid: string, photoURL?: string | null, displayName?: string | null };
@@ -11,22 +12,27 @@ interface HunterLicenseCardProps {
         xpToNextLevel: number;
         streak: number;
         badgeCount: number;
+        totalChaptersRead?: number;
+        totalWorksAdded?: number;
+        totalWorksCompleted?: number;
     };
     isOwnProfile?: boolean;
     onLogout?: () => void;
-    featuredBadgeData?: { icon: string, rarity: string, name: string } | null; // Pass full badge data if needed
+    featuredBadgeData?: { icon: string, rarity: string, name: string } | null;
     favoriteMangaData?: { title: string, image: string } | null;
+    top3FavoritesData?: { id: string, title: string, image: string }[];
 }
 
-export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, featuredBadgeData, favoriteMangaData }: HunterLicenseCardProps) {
+export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, featuredBadgeData, favoriteMangaData, top3FavoritesData }: HunterLicenseCardProps) {
     const borderColor = user.borderColor || '#000';
     const accentColor = user.themeColor || 'var(--color-primary)';
     const bgColor = user.cardBgColor || '#fff';
-    const textColor = bgColor === '#000000' || bgColor === '#000' ? '#fff' : '#000'; // Simple contrast check
+    const textColor = bgColor === '#000000' || bgColor === '#000' ? '#fff' : '#000';
 
     return (
         <div className="manga-panel" style={{ padding: '0', overflow: 'hidden', background: bgColor, color: textColor, position: 'relative', border: `3px solid ${borderColor} ` }}>
             {/* Banner */}
+            {/* ... banner code same ... */}
             <div style={{
                 height: '120px',
                 background: user.banner ? `url(${user.banner}) center / cover` : accentColor,
@@ -40,8 +46,7 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
             <div style={{ background: borderColor, color: '#fff', padding: '0.5rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
                 <span style={{ fontWeight: 900, letterSpacing: '2px' }}>HUNTER LICENSE</span>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-
-
+                    {/* Stars or Rank could go here */}
                 </div>
             </div>
 
@@ -57,23 +62,55 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
                 </div >
 
                 {/* Name & ID */}
-                < h2 style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900, textTransform: 'uppercase', marginBottom: '0.2rem', color: textColor }}> {user.displayName || 'Chasseur'}</h2 >
+                <h2 style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900, textTransform: 'uppercase', marginBottom: '0.2rem', color: textColor }}> {user.displayName || 'Chasseur'}</h2>
                 <p style={{ fontFamily: 'monospace', fontSize: '1rem', opacity: 0.7, marginBottom: '1rem' }}>ID: {user.uid.slice(0, 8).toUpperCase()}</p>
 
                 {/* Bio */}
-                {
-                    user.bio && (
-                        <p style={{ fontStyle: 'italic', marginBottom: '2rem', maxWidth: '300px', margin: '0 auto 2rem', borderLeft: `2px solid ${accentColor}`, paddingLeft: '1rem' }}>
-                            "{user.bio}"
-                        </p>
-                    )
-                }
+                {user.bio && (
+                    <p style={{ fontStyle: 'italic', marginBottom: '2rem', maxWidth: '300px', margin: '0 auto 2rem', borderLeft: `2px solid ${accentColor}`, paddingLeft: '1rem' }}>
+                        "{user.bio}"
+                    </p>
+                )}
 
-                {/* Featured Section (Flexible Grid) */}
-                {
-                    (favoriteMangaData || featuredBadgeData) && (
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                            {favoriteMangaData && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem', alignItems: 'start' }}>
+
+                    {/* Left Col: Favorites & Badge */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+                        {/* Featured Badge */}
+                        {featuredBadgeData && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', border: `1px solid ${borderColor}`, padding: '0.5rem', borderRadius: '4px', background: 'rgba(255,255,255,0.1)' }}>
+                                <div className={featuredBadgeData.rarity === 'legendary' ? 'holo-badge' : ''} style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: featuredBadgeData.rarity === 'legendary' ? '#ffd700' : textColor, border: `2px solid ${borderColor}`, borderRadius: '50%', background: '#fff' }}>
+                                    {BADGE_ICONS[featuredBadgeData.icon] || <Star size={20} />}
+                                </div>
+                                <div style={{ textAlign: 'left' }}>
+                                    <div style={{ fontSize: '0.6rem', opacity: 0.7, textTransform: 'uppercase' }}>BADGE</div>
+                                    <div style={{ fontWeight: 900, fontSize: '0.8rem' }}>{featuredBadgeData.name}</div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Top 3 Favorites */}
+                        {(top3FavoritesData && top3FavoritesData.length > 0) ? (
+                            <div style={{ textAlign: 'left' }}>
+                                <div style={{ fontSize: '0.7rem', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', opacity: 0.8 }}>Top 3 Favoris</div>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    {top3FavoritesData.map(fav => (
+                                        <div key={fav.id} style={{ width: '50px', position: 'relative' }}>
+                                            <div style={{ height: '70px', border: `1px solid ${borderColor}`, borderRadius: '2px', overflow: 'hidden' }}>
+                                                <img src={fav.image} alt={fav.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {/* Fill empty slots if less than 3 */}
+                                    {[...Array(3 - top3FavoritesData.length)].map((_, i) => (
+                                        <div key={`empty-${i}`} style={{ width: '50px', height: '70px', border: `1px dashed ${borderColor}`, borderRadius: '2px', opacity: 0.3 }} />
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            /* Fallback to single favorite if no top 3 set yet */
+                            favoriteMangaData && (
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', border: `1px solid ${borderColor}`, padding: '0.5rem', borderRadius: '4px', background: 'rgba(255,255,255,0.1)' }}>
                                     <img src={favoriteMangaData.image} alt="Fav" style={{ width: '30px', height: '40px', objectFit: 'cover' }} />
                                     <div style={{ textAlign: 'left' }}>
@@ -81,22 +118,23 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
                                         <div style={{ fontWeight: 900, fontSize: '0.8rem', maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{favoriteMangaData.title}</div>
                                     </div>
                                 </div>
-                            )}
-                            {featuredBadgeData && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', border: `1px solid ${borderColor}`, padding: '0.5rem', borderRadius: '4px', background: 'rgba(255,255,255,0.1)' }}>
-                                    <div style={{ width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: featuredBadgeData.rarity === 'legendary' ? '#ffd700' : textColor }}>
-                                        {/* Clone element to force size if needed, or just render */}
-                                        {BADGE_ICONS[featuredBadgeData.icon] || <Star size={20} />}
-                                    </div>
-                                    <div style={{ textAlign: 'left' }}>
-                                        <div style={{ fontSize: '0.6rem', opacity: 0.7, textTransform: 'uppercase' }}>BADGE</div>
-                                        <div style={{ fontWeight: 900, fontSize: '0.8rem' }}>{featuredBadgeData.name}</div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )
-                }
+                            )
+                        )}
+                    </div>
+
+                    {/* Right Col: Nen Chart */}
+                    <div style={{ height: '200px', marginTop: '-2rem' }}>
+                        <NenChart stats={{
+                            level: stats.level,
+                            xp: stats.xp,
+                            streak: stats.streak,
+                            totalChaptersRead: stats.totalChaptersRead || 0,
+                            totalWorksAdded: stats.totalWorksAdded || 0,
+                            totalWorksCompleted: stats.totalWorksCompleted || 0
+                        }} themeColor={accentColor} />
+                    </div>
+
+                </div>
 
                 {/* XP Bar */}
                 <div style={{ marginBottom: '2rem', textAlign: 'left' }}>
@@ -121,11 +159,9 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
                     </div>
                 </div>
 
-                {
-                    isOwnProfile && onLogout && (
-                        <Button variant="outline" style={{ width: '100%', borderRadius: 0, fontWeight: 900, borderColor: borderColor, color: textColor === '#fff' ? borderColor : undefined }} icon={<LogOut size={16} />} onClick={onLogout}>DECONNEXION</Button>
-                    )
-                }
+                {isOwnProfile && onLogout && (
+                    <Button variant="outline" style={{ width: '100%', borderRadius: 0, fontWeight: 900, borderColor: borderColor, color: textColor === '#fff' ? borderColor : undefined }} icon={<LogOut size={16} />} onClick={onLogout}>DECONNEXION</Button>
+                )}
             </div >
         </div >
     );
