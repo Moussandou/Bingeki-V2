@@ -124,8 +124,8 @@ export default function Library() {
                         marginBottom: '2rem'
                     }}>
                         <Card variant="manga" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff' }}>
-                            <div style={{ padding: '0.75rem', background: '#f4f4f5', borderRadius: '50%', border: '2px solid #000' }}>
-                                <BookOpen size={24} color="#000" />
+                            <div style={{ padding: '0.75rem', background: 'rgba(255, 46, 99, 0.1)', borderRadius: '50%', border: '2px solid var(--color-primary)' }}>
+                                <BookOpen size={24} color="var(--color-primary)" />
                             </div>
                             <div>
                                 <span style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.total}</span>
@@ -133,8 +133,8 @@ export default function Library() {
                             </div>
                         </Card>
                         <Card variant="manga" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff' }}>
-                            <div style={{ padding: '0.75rem', background: '#f4f4f5', borderRadius: '50%', border: '2px solid #000' }}>
-                                <CheckCircle size={24} color="#22c55e" />
+                            <div style={{ padding: '0.75rem', background: 'rgba(255, 46, 99, 0.1)', borderRadius: '50%', border: '2px solid var(--color-primary)' }}>
+                                <CheckCircle size={24} color="var(--color-primary)" />
                             </div>
                             <div>
                                 <span style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.completed}</span>
@@ -142,7 +142,7 @@ export default function Library() {
                             </div>
                         </Card>
                         <Card variant="manga" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff' }}>
-                            <div style={{ padding: '0.75rem', background: '#f4f4f5', borderRadius: '50%', border: '2px solid #000' }}>
+                            <div style={{ padding: '0.75rem', background: 'rgba(255, 46, 99, 0.1)', borderRadius: '50%', border: '2px solid var(--color-primary)' }}>
                                 <Users size={24} color="var(--color-primary)" />
                             </div>
                             <div>
