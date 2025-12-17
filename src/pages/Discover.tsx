@@ -120,9 +120,10 @@ export default function Discover() {
                         ) : (
                             <div style={{
                                 display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-                                gap: '1.5rem',
-                                alignItems: 'start'
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                                gap: '1rem',
+                                alignItems: 'stretch',
+                                width: '100%'
                             }}>
                                 {searchResults.map((work) => {
                                     const isOwned = libraryIds.has(work.mal_id);
