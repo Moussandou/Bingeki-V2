@@ -117,17 +117,30 @@ export default function Discover() {
                                 <Loader2 className="spin" size={48} />
                             </div>
                         ) : (
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '2rem' }}>
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+                                gap: '1.5rem',
+                                alignItems: 'start'
+                            }}>
                                 {searchResults.map((work) => {
                                     const isOwned = libraryIds.has(work.mal_id);
                                     return (
-                                        <motion.div key={work.mal_id} whileHover={{ y: -5 }}>
+                                        <motion.div key={work.mal_id} whileHover={{ y: -5 }} style={{ height: '100%' }}>
                                             <Card
                                                 variant="manga"
-                                                style={{ padding: 0, overflow: 'hidden', height: '100%', border: '2px solid #000', cursor: 'pointer' }}
+                                                style={{
+                                                    padding: 0,
+                                                    overflow: 'hidden',
+                                                    height: '100%',
+                                                    border: '2px solid #000',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    flexDirection: 'column'
+                                                }}
                                                 onClick={() => handleWorkClick(work)}
                                             >
-                                                <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid #000' }}>
+                                                <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid #000', flexShrink: 0 }}>
                                                     <img src={work.images.jpg.image_url} alt={work.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                     {isOwned && (
                                                         <div style={{ position: 'absolute', top: 5, right: 5, background: '#000', color: '#fff', padding: '4px', borderRadius: '50%' }}>
@@ -135,9 +148,19 @@ export default function Discover() {
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div style={{ padding: '1rem', background: '#fff' }}>
-                                                    <h3 style={{ fontSize: '1rem', fontWeight: 800, fontFamily: 'var(--font-heading)', lineHeight: 1.2 }}>{work.title}</h3>
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', fontSize: '0.8rem', opacity: 0.7 }}>
+                                                <div style={{ padding: '0.75rem', background: '#fff', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                                    <h3 style={{
+                                                        fontSize: '0.9rem',
+                                                        fontWeight: 800,
+                                                        fontFamily: 'var(--font-heading)',
+                                                        lineHeight: 1.2,
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        display: '-webkit-box',
+                                                        WebkitLineClamp: 2,
+                                                        WebkitBoxOrient: 'vertical'
+                                                    }}>{work.title}</h3>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', fontSize: '0.75rem', opacity: 0.7 }}>
                                                         <span>{work.type}</span>
                                                         <span>{work.status}</span>
                                                     </div>
