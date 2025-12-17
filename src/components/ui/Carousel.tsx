@@ -12,9 +12,10 @@ interface CarouselProps {
     libraryIds: Set<string | number>; // For checking if owned
     onAdd: (work: JikanResult) => void;
     loading?: boolean;
+    showRank?: boolean;
 }
 
-export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading }: CarouselProps) {
+export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading, showRank }: CarouselProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const scroll = (direction: 'left' | 'right') => {
@@ -30,20 +31,24 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
     return (
         <div style={{ marginBottom: '3rem' }}>
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 0.5rem' }}>
-                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', fontWeight: 900, textTransform: 'uppercase', color: '#000' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', padding: '0 0.5rem' }}>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', fontWeight: 900, textTransform: 'uppercase', color: '#000', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     {title}
                 </h2>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button
                         onClick={() => scroll('left')}
-                        style={{ border: '2px solid #000', background: '#fff', cursor: 'pointer', padding: '0.5rem', boxShadow: '2px 2px 0 #000' }}
+                        style={{ border: '2px solid #000', background: '#fff', cursor: 'pointer', padding: '0.75rem', boxShadow: '4px 4px 0 #000', transition: 'transform 0.1s' }}
+                        onMouseDown={e => e.currentTarget.style.transform = 'translate(2px, 2px)'}
+                        onMouseUp={e => e.currentTarget.style.transform = 'translate(0, 0)'}
                     >
                         <ChevronLeft size={20} />
                     </button>
                     <button
                         onClick={() => scroll('right')}
-                        style={{ border: '2px solid #000', background: '#fff', cursor: 'pointer', padding: '0.5rem', boxShadow: '2px 2px 0 #000' }}
+                        style={{ border: '2px solid #000', background: '#fff', cursor: 'pointer', padding: '0.75rem', boxShadow: '4px 4px 0 #000', transition: 'transform 0.1s' }}
+                        onMouseDown={e => e.currentTarget.style.transform = 'translate(2px, 2px)'}
+                        onMouseUp={e => e.currentTarget.style.transform = 'translate(0, 0)'}
                     >
                         <ChevronRight size={20} />
                     </button>
@@ -55,9 +60,9 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
                 ref={scrollRef}
                 style={{
                     display: 'flex',
-                    gap: '1.5rem',
+                    gap: '2rem',
                     overflowX: 'auto',
-                    padding: '1rem 0.5rem',
+                    padding: '1rem 0.5rem 2rem 0.5rem', // Extra bottom padding for shadows
                     scrollSnapType: 'x mandatory',
                     scrollbarWidth: 'none', // Firefox
                     msOverflowStyle: 'none' // IE/Edge
@@ -66,7 +71,7 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
             >
                 {loading
                     ? Array.from({ length: 6 }).map((_, i) => (
-                        <div key={i} style={{ flex: '0 0 200px', scrollSnapAlign: 'start' }}>
+                        <div key={i} style={{ flex: '0 0 220px', scrollSnapAlign: 'start' }}>
                             <Card variant="manga" style={{ padding: 0, overflow: 'hidden', height: '100%', border: '2px solid #000' }}>
                                 <div style={{ aspectRatio: '2/3', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '4px solid #ddd', borderTopColor: '#000', animation: 'spin 1s linear infinite' }} />
@@ -78,21 +83,23 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
                             </Card>
                         </div>
                     ))
-                    : items.map((work) => {
+                    : items.map((work, index) => {
                         const isOwned = libraryIds.has(work.mal_id);
                         return (
                             <motion.div
                                 key={work.mal_id}
-                                whileHover={{ y: -5 }}
+                                whileHover={{ y: -10 }}
+                                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                                 style={{
-                                    flex: '0 0 200px', // Fixed width cards
+                                    flex: '0 0 220px', // Fixed width cards
                                     scrollSnapAlign: 'start',
                                     position: 'relative'
                                 }}
                             >
                                 <Card
                                     variant="manga"
-                                    style={{ padding: 0, overflow: 'hidden', height: '100%', border: '2px solid #000', cursor: 'pointer' }}
+                                    hoverable
+                                    style={{ padding: 0, overflow: 'hidden', height: '100%', border: '2px solid #000', cursor: 'pointer', background: '#fff' }}
                                     onClick={() => onItemClick(work)}
                                 >
                                     <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid #000' }}>
@@ -101,30 +108,82 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
                                             alt={work.title}
                                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                         />
-                                        {isOwned && (
-                                            <div style={{ position: 'absolute', top: 5, right: 5, background: '#000', color: '#fff', padding: '4px', borderRadius: '50%' }}>
-                                                <Check size={14} strokeWidth={3} />
+
+                                        {/* Rank Badge */}
+                                        {showRank && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                background: index < 3 ? 'var(--color-primary)' : '#000',
+                                                color: '#fff',
+                                                width: '40px',
+                                                height: '40px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '1.2rem',
+                                                fontWeight: 900,
+                                                fontFamily: 'var(--font-heading)',
+                                                borderRight: '2px solid #000',
+                                                borderBottom: '2px solid #000',
+                                                zIndex: 10
+                                            }}>
+                                                #{index + 1}
                                             </div>
                                         )}
-                                    </div>
-                                    <div style={{ padding: '0.75rem', background: '#fff' }}>
-                                        <h3 style={{ fontSize: '0.9rem', fontWeight: 800, fontFamily: 'var(--font-heading)', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', height: '2.4em' }}>
-                                            {work.title}
-                                        </h3>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
-                                            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#666' }}>{work.type}</span>
-                                            {!isOwned && (
+
+                                        {isOwned && (
+                                            <div style={{ position: 'absolute', top: 5, right: 5, background: '#000', color: '#fff', padding: '4px', borderRadius: '50%', border: '2px solid #fff', zIndex: 10 }}>
+                                                <Check size={16} strokeWidth={4} />
+                                            </div>
+                                        )}
+
+                                        {/* Overlay Add Button on Hover (group needed in framer motion or CSS, simpler to put absolute bottom right) */}
+                                        {!isOwned && (
+                                            <div
+                                                style={{
+                                                    position: 'absolute',
+                                                    bottom: 10,
+                                                    right: 10,
+                                                    zIndex: 20
+                                                }}
+                                            >
                                                 <Button
                                                     size="sm"
-                                                    variant="ghost"
+                                                    variant="primary"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         onAdd(work);
                                                     }}
-                                                    style={{ padding: '4px 8px', height: 'auto', border: '1px solid #000' }}
+                                                    style={{ padding: '0.5rem', height: 'auto', borderRadius: '50%', aspectRatio: '1/1', boxShadow: '4px 4px 0 #000' }}
                                                 >
-                                                    <Plus size={14} />
+                                                    <Plus size={20} />
                                                 </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div style={{ padding: '1rem', background: '#fff' }}>
+                                        <h3 style={{
+                                            fontSize: '1rem',
+                                            fontWeight: 900,
+                                            fontFamily: 'var(--font-heading)',
+                                            lineHeight: 1.1,
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 2,
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden',
+                                            height: '2.2em',
+                                            marginBottom: '0.5rem'
+                                        }}>
+                                            {work.title}
+                                        </h3>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', padding: '2px 6px', background: '#000', color: '#fff' }}>{work.type}</span>
+                                            {work.score && (
+                                                <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#000', display: 'flex', alignItems: 'center', gap: '2px' }}>
+                                                    ★ {work.score}
+                                                </span>
                                             )}
                                         </div>
                                     </div>
