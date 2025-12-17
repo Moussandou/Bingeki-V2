@@ -2,7 +2,7 @@
 
 ![Build & Deploy](https://github.com/Moussandou/Bingeki-V2/actions/workflows/deploy.yml/badge.svg)
 
-**Bingeki** est une application web PWA de suivi de mangas et d'animes, transformant votre consommation de médias en une véritable aventure RPG inspirée de Hunter x Hunter.
+**Bingeki** est une application web PWA de suivi de mangas et d'animes, transformant votre consommation de médias en une véritable aventure RPG.
 
 ## ✨ Fonctionnalités
 
