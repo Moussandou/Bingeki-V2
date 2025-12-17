@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/Card';
 import { Carousel } from '@/components/ui/Carousel';
 import { searchWorks, getTopWorks, getSeasonalAnime, type JikanResult } from '@/services/animeApi';
 import { useLibraryStore } from '@/store/libraryStore';
-import { Search, Check, Loader2 } from 'lucide-react';
+import { Search, Check, Loader2, Flame, Sparkles, BookOpen, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { FriendRecommendations } from '@/components/FriendRecommendations';
@@ -182,7 +182,7 @@ export default function Discover() {
                         {/* Carousels */}
                         <>
                             <Carousel
-                                title="🔥 Anime de la Saison"
+                                title={<><Flame size={20} color="#ef4444" style={{ marginRight: '0.5rem' }} /> Anime de la Saison</>}
                                 items={seasonalAnime}
                                 onItemClick={handleWorkClick}
                                 libraryIds={libraryIds}
@@ -190,7 +190,7 @@ export default function Discover() {
                                 loading={seasonalAnime.length === 0}
                             />
                             <Carousel
-                                title="✨ Top 10 Animes (All Time)"
+                                title={<><Sparkles size={20} color="#eab308" style={{ marginRight: '0.5rem' }} /> Top 10 Animes (All Time)</>}
                                 items={topAnime}
                                 onItemClick={handleWorkClick}
                                 libraryIds={libraryIds}
@@ -198,7 +198,7 @@ export default function Discover() {
                                 loading={topAnime.length === 0}
                             />
                             <Carousel
-                                title="📚 Mangas Populaires"
+                                title={<><BookOpen size={20} color="#3b82f6" style={{ marginRight: '0.5rem' }} /> Mangas Populaires</>}
                                 items={popularManga}
                                 onItemClick={handleWorkClick}
                                 libraryIds={libraryIds}
@@ -206,7 +206,7 @@ export default function Discover() {
                                 loading={popularManga.length === 0}
                             />
                             <Carousel
-                                title="🌟 Top 10 Mangas (All Time)"
+                                title={<><Star size={20} color="#f59e0b" style={{ marginRight: '0.5rem' }} /> Top 10 Mangas (All Time)</>}
                                 items={topManga}
                                 onItemClick={handleWorkClick}
                                 libraryIds={libraryIds}

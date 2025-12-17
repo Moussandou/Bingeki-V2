@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Plus, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 interface CarouselProps {
-    title: string;
+    title: React.ReactNode;
     items: JikanResult[];
     onItemClick: (work: JikanResult) => void;
     libraryIds: Set<string | number>; // For checking if owned
