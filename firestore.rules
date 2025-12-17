@@ -43,25 +43,47 @@ service cloud.firestore {
 
     // FEEDBACK
     match /feedback/{feedbackId} {
-      allow create: if true; // Guests can submit feedback
-      allow read: if request.auth.token.email == 'moussandou.m@gmail.com'; // ONLY Admin (You)
+      allow create: if true;
+      allow read: if request.auth.token.email == 'moussandou.m@gmail.com';
     }
 
     // WATCH PARTIES
     match /watchparties/{partyId} {
       allow read, create: if isAuthenticated();
-      allow update: if isAuthenticated(); // Need checking participant vs host logic ideally, but keeping open for alpha
+      allow update: if isAuthenticated();
+    }
+
+    // ACTIVITY FEED
+    match /activities/{activityId} {
+      allow create: if isAuthenticated(); // Users log their own activity
+      allow read: if isAuthenticated();  // Friends read activities
+    }
+
+    // COMMENTS
+    match /comments/{commentId} {
+      allow create: if isAuthenticated();
+      allow read: if isAuthenticated();
+    }
+
+    // CHALLENGES
+    match /challenges/{challengeId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated(); // Should be admin only ideally, but keeping open for alpha
     }
 
     // ==================== USER DATA (Root Collections Strategy) ====================
-    // Since we moved to root collections for easier querying in some contexts:
+    // Rules for when data is accessed via root collections (if any) AND explicit subcollection overrides
+    
+    // Explicitly handle the 'data' subcollection for libraries and gamification
+    // inside the /users/{userId} path is handled by the wildcard match /data/{document=**},
+    // but we can make it explicit to be safe.
     
     match /libraries/{userId} {
       allow read, write: if isOwner(userId);
     }
 
     match /gamification/{userId} {
-      allow read: if isAuthenticated(); // Public for leaderboards
+      allow read: if isAuthenticated();
       allow write: if isOwner(userId);
     }
   }
