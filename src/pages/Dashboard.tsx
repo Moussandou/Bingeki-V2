@@ -199,7 +199,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* Two Column Layout */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
 
                         {/* Left Column - Continue Reading */}
                         <div>
