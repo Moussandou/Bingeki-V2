@@ -14,5 +14,5 @@ export interface Comment {
 }
 
 export interface CommentWithReplies extends Comment {
-    replies: Comment[];
+    replies: CommentWithReplies[];
 }
