@@ -178,7 +178,7 @@ export default function Discover() {
                                                 padding: '0.75rem 1.5rem',
                                                 border: '2px solid #000',
                                                 boxShadow: '4px 4px 0 #000',
-                                                background: '#000',
+                                                background: '#ef4444',
                                                 color: '#fff'
                                             }}
                                         >
@@ -208,7 +208,25 @@ export default function Discover() {
                 <div className="container" style={{ marginTop: '3rem' }}>
                     {/* Search Section */}
                     <div style={{ margin: '0 auto 4rem', maxWidth: '800px' }}>
-                        <Card variant="manga" style={{ padding: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', border: '3px solid #000', boxShadow: '8px 8px 0 #000' }}>
+                        <Card
+                            variant="manga"
+                            style={{
+                                padding: '0.5rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '1rem',
+                                background: '#fff',
+                                borderWidth: '3px',
+                                borderStyle: 'solid',
+                                borderColor: '#000',
+                                boxShadow: '8px 8px 0 #000'
+                            }}
+                            whileHover={{
+                                borderColor: '#ef4444',
+                                boxShadow: '8px 8px 0 #ef4444'
+                            }}
+                            transition={{ duration: 0.2 }}
+                        >
                             <Search size={28} style={{ marginLeft: '1rem', opacity: 0.4 }} />
                             <input
                                 placeholder="Rechercher un anime, un manga..."
