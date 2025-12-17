@@ -49,30 +49,36 @@ export interface UserProfile {
 }
 
 // Save user profile to Firestore
+// Save user profile to Firestore
 export async function saveUserProfileToFirestore(user: Partial<UserProfile>): Promise<void> {
     try {
-        const docRef = doc(db, 'users', user.uid!);
-        // Create a data object with only defined values to avoid overwriting with undefined
+        if (!user.uid) return;
+
+        const docRef = doc(db, 'users', user.uid);
+
+        // Prepare data to save - filter out undefined but Keep null/empty strings to allow clearing
         const dataToSave: any = {
-            uid: user.uid,
             lastLogin: Date.now()
         };
 
-        if (user.email) dataToSave.email = user.email;
-        if (user.displayName) dataToSave.displayName = user.displayName;
-        if (user.photoURL) dataToSave.photoURL = user.photoURL;
-        if (user.banner) dataToSave.banner = user.banner;
-        if (user.bio) dataToSave.bio = user.bio;
-        if (user.themeColor) dataToSave.themeColor = user.themeColor;
-        if (user.cardBgColor) dataToSave.cardBgColor = user.cardBgColor;
-        if (user.borderColor) dataToSave.borderColor = user.borderColor;
-        if (user.favoriteManga) dataToSave.favoriteManga = user.favoriteManga;
-        if (user.featuredBadge) dataToSave.featuredBadge = user.featuredBadge;
+        // List of allowed fields to sync
+        const allowedFields: (keyof UserProfile)[] = [
+            'email', 'displayName', 'photoURL', 'banner', 'bio',
+            'themeColor', 'cardBgColor', 'borderColor',
+            'favoriteManga', 'top3Favorites', 'featuredBadge'
+        ];
+
+        allowedFields.forEach(field => {
+            if (user[field] !== undefined) {
+                dataToSave[field] = user[field];
+            }
+        });
 
         await setDoc(docRef, dataToSave, { merge: true });
-        console.log('[Firestore] User profile saved');
+        console.log('[Firestore] User profile saved:', dataToSave);
     } catch (error) {
         console.error('[Firestore] Error saving user profile:', error);
+        throw error; // Re-throw to let UI know
     }
 }
 
