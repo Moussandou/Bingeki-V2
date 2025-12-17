@@ -430,59 +430,52 @@ export default function WorkDetails() {
                                                 <span style={{ fontSize: '1.5rem', fontWeight: 900 }}>/ {work.totalChapters || '?'}</span>
                                                 <Button onClick={handleSave} variant="primary" icon={<Check size={20} />}>OK</Button>
                                             </div>
-                                        ) : (
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-                                                {/* Left: Decrement buttons */}
-                                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 5))}
-                                                        style={{ fontWeight: 700, border: '1px solid #ccc' }}
-                                                    >-5</Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 3))}
-                                                        style={{ fontWeight: 700, border: '1px solid #ccc' }}
-                                                    >-3</Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 1))}
-                                                        style={{ fontWeight: 700, border: '1px solid #ccc' }}
-                                                    >-1</Button>
-                                                </div>
-
-                                                {/* Center: Progress display */}
-                                                <div style={{ textAlign: 'center' }}>
-                                                    <span style={{ fontSize: '3rem', fontWeight: 900, lineHeight: 1 }}>
-                                                        {work.currentChapter} <span style={{ fontSize: '1.5rem', opacity: 0.5 }}>/ {work.totalChapters || '?'}</span>
-                                                    </span>
-                                                </div>
-
-                                                {/* Right: Increment buttons + Edit */}
-                                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 1)}
-                                                        style={{ fontWeight: 700, border: '1px solid #ccc' }}
-                                                    >+1</Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 3)}
-                                                        style={{ fontWeight: 700, border: '1px solid #ccc' }}
-                                                    >+3</Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 5)}
-                                                        style={{ fontWeight: 700, border: '1px solid #ccc' }}
-                                                    >+5</Button>
-                                                    <Button onClick={() => setIsEditing(true)} variant="manga" size="sm">Éditer</Button>
-                                                </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                                {/* Decrement buttons */}
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="sm"
+                                                    onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 5))}
+                                                    style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                >-5</Button>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="sm"
+                                                    onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 3))}
+                                                    style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                >-3</Button>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="sm"
+                                                    onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 1))}
+                                                    style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                >-1</Button>
+                                                
+                                                {/* Progress display */}
+                                                <span style={{ fontSize: '2.5rem', fontWeight: 900, lineHeight: 1, margin: '0 0.5rem' }}>
+                                                    {work.currentChapter} <span style={{ fontSize: '1.25rem', opacity: 0.5 }}>/ {work.totalChapters || '?'}</span>
+                                                </span>
+                                                
+                                                {/* Increment buttons */}
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="sm"
+                                                    onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 1)}
+                                                    style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                >+1</Button>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="sm"
+                                                    onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 3)}
+                                                    style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                >+3</Button>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="sm"
+                                                    onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 5)}
+                                                    style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                >+5</Button>
+                                                <Button onClick={() => setIsEditing(true)} variant="manga" size="sm">Éditer</Button>
                                             </div>
                                         )}
                                     </div>
