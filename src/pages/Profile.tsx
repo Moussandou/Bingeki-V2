@@ -156,35 +156,14 @@ export default function Profile() {
     });
 
     // --- Drag & Drop Handlers ---
-    const handleDragOver = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(true);
-    };
-
-    const handleDragLeave = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
-    };
-
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
-        handleFileUpload(e);
-    };
-
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
-        let file: File | null = null;
-        if ('files' in e.target && e.target.files) file = e.target.files[0];
-        else if ('dataTransfer' in e && e.dataTransfer.files) file = e.dataTransfer.files[0];
-
-        if (file && (file.type.startsWith('image/') || file.type === 'image/gif')) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setEditForm(prev => ({ ...prev, banner: reader.result as string }));
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+    // --- Drag & Drop Handlers REMOVED (Simpler URL-only approach) ---
+    /* 
+    const handleDragOver = ...
+    const handleDragLeave = ...
+    const handleDrop = ...
+    const handleFileUpload = ... 
+    */
+    // ---------------------------
     // ---------------------------
 
     // ---------------------------
@@ -519,54 +498,33 @@ export default function Profile() {
                     <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="EDITER LA LICENSE">
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxHeight: '70vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
 
-                            {/* BANNER UPLOAD */}
+                            {/* BANNER URL */}
                             <div>
-                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>BANNIÈRE / GIF</label>
-                                {!editForm.banner ? (
-                                    <div
-                                        onDragOver={handleDragOver}
-                                        onDragLeave={handleDragLeave}
-                                        onDrop={handleDrop}
-                                        style={{
-                                            border: `2px dashed ${isDragging ? 'var(--color-primary)' : '#000'}`,
-                                            background: isDragging ? 'rgba(0,0,0,0.05)' : '#fff',
-                                            padding: '1.5rem',
-                                            textAlign: 'center',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            gap: '0.5rem'
-                                        }}
-                                        onClick={() => document.getElementById('banner-upload')?.click()}
-                                    >
-                                        <input
-                                            type="file"
-                                            id="banner-upload"
-                                            accept="image/*"
-                                            onChange={handleFileUpload}
-                                            style={{ display: 'none' }}
+                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>BANNIÈRE / GIF (Lien URL)</label>
+                                <div style={{ marginBottom: '0.5rem', fontSize: '0.8rem', color: '#666' }}>
+                                    Copiez l&apos;adresse d&apos;une image (clic droit &gt; Copier l&apos;adresse de l&apos;image) et collez-la ici.
+                                </div>
+                                <Input
+                                    placeholder="https://exemple.com/image.jpg"
+                                    value={editForm.banner}
+                                    onChange={(e) => setEditForm(prev => ({ ...prev, banner: e.target.value }))}
+                                />
+                                {editForm.banner && (
+                                    <div style={{ marginTop: '1rem', width: '100%', height: '100px', border: '2px solid #000', overflow: 'hidden', position: 'relative' }}>
+                                        <img
+                                            src={editForm.banner}
+                                            alt="Aperçu"
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                            onError={(e) => (e.currentTarget.style.display = 'none')}
                                         />
-                                        <Upload size={24} style={{ opacity: 0.5 }} />
-                                        <div style={{ fontSize: '0.8rem', fontWeight: 700 }}>Glisser ou cliquer (JPG, GIF...)</div>
-                                    </div>
-                                ) : (
-                                    <div style={{ position: 'relative', width: '100%', height: '100px', border: '2px solid #000', overflow: 'hidden' }}>
-                                        <img src={editForm.banner} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         <button
                                             onClick={() => setEditForm(prev => ({ ...prev, banner: '' }))}
-                                            style={{ position: 'absolute', top: 5, right: 5, background: 'red', color: 'white', border: 'none', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                            style={{ position: 'absolute', top: 5, right: 5, background: 'rgba(0,0,0,0.7)', color: 'white', border: 'none', borderRadius: '50%', width: 24, height: 24, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                         >
-                                            <X size={12} />
+                                            <X size={14} />
                                         </button>
                                     </div>
                                 )}
-                                <Input
-                                    placeholder="Ou URL directe..."
-                                    value={editForm.banner}
-                                    onChange={(e) => setEditForm(prev => ({ ...prev, banner: e.target.value }))}
-                                    style={{ marginTop: '0.5rem' }}
-                                />
                             </div>
 
                             {/* COLORS */}
