@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { useLibraryStore, type Work } from '@/store/libraryStore';
-import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle, Users, BookOpen, CheckCircle, SortAsc } from 'lucide-react';
+import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle, Users, BookOpen, CheckCircle, SortAsc, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { statusToFrench } from '@/utils/statusTranslation';
@@ -29,6 +29,14 @@ export default function Library() {
     const [filterType, setFilterType] = useState<'all' | 'manga' | 'anime'>('all');
     const [filterStatus, setFilterStatus] = useState<'all' | 'reading' | 'completed' | 'plan_to_read'>('all');
     const [sortBy, setSortBy] = useState<'updated' | 'added' | 'alphabetical' | 'progress'>('updated');
+    const [sortOpen, setSortOpen] = useState(false);
+
+    const sortOptions = [
+        { value: 'updated', label: 'Récents' },
+        { value: 'added', label: 'Ajoutés' },
+        { value: 'alphabetical', label: 'A-Z' },
+        { value: 'progress', label: 'Progression' }
+    ];
 
     // Bulk Actions State
     const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -146,7 +154,7 @@ export default function Library() {
                             variant="primary"
                             onClick={() => setIsAddModalOpen(true)}
                             icon={<Plus size={18} />}
-                            style={{ height: 'auto', minHeight: '100%', fontSize: '1.1rem' }}
+                            style={{ height: 'auto', alignSelf: 'stretch' }}
                         >
                             AJOUTER
                         </Button>
@@ -254,31 +262,62 @@ export default function Library() {
                             )}
                         </div>
 
-                        {/* Sort Select */}
-                        <Card variant="manga" style={{ padding: 0, background: '#fff', border: '2px solid #000', boxShadow: '4px 4px 0 #000', display: 'flex', alignItems: 'center' }}>
-                            <SortAsc size={18} style={{ marginLeft: '1rem' }} />
-                            <select
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value as any)}
+                        {/* Sort Dropdown */}
+                        <div style={{ position: 'relative' }}>
+                            <Button
+                                variant="manga"
+                                icon={<SortAsc size={18} />}
+                                onClick={() => setSortOpen(!sortOpen)}
                                 style={{
-                                    padding: '0.75rem 1rem 0.75rem 0.5rem',
-                                    borderRadius: 0,
-                                    border: 'none',
-                                    fontWeight: 700,
-                                    cursor: 'pointer',
-                                    background: 'transparent',
-                                    outline: 'none',
-                                    fontSize: '0.9rem',
-                                    fontFamily: 'inherit',
-                                    textTransform: 'uppercase'
+                                    background: sortOpen ? '#000' : '#fff',
+                                    color: sortOpen ? '#fff' : '#000',
+                                    minWidth: '160px',
+                                    justifyContent: 'space-between'
                                 }}
                             >
-                                <option value="updated">Récents</option>
-                                <option value="added">Ajoutés</option>
-                                <option value="alphabetical">A-Z</option>
-                                <option value="progress">Progression</option>
-                            </select>
-                        </Card>
+                                {sortOptions.find(o => o.value === sortBy)?.label}
+                                <ChevronDown size={16} />
+                            </Button>
+                            {sortOpen && (
+                                <Card variant="manga" style={{
+                                    position: 'absolute',
+                                    top: '110%',
+                                    right: 0,
+                                    zIndex: 50,
+                                    background: '#fff',
+                                    padding: '0.5rem',
+                                    width: '200px',
+                                }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                        {sortOptions.map(option => (
+                                            <button
+                                                key={option.value}
+                                                onClick={() => {
+                                                    setSortBy(option.value as any);
+                                                    setSortOpen(false);
+                                                }}
+                                                style={{
+                                                    padding: '0.75rem 1rem',
+                                                    border: '2px solid #000',
+                                                    background: sortBy === option.value ? '#000' : '#fff',
+                                                    color: sortBy === option.value ? '#fff' : '#000',
+                                                    fontWeight: 800,
+                                                    textTransform: 'uppercase',
+                                                    fontSize: '0.9rem',
+                                                    cursor: 'pointer',
+                                                    textAlign: 'left',
+                                                    boxShadow: sortBy === option.value ? 'none' : '2px 2px 0 #000',
+                                                    transform: sortBy === option.value ? 'translate(2px, 2px)' : 'none',
+                                                    transition: 'all 0.1s'
+                                                }}
+                                            >
+                                                {option.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </Card>
+                            )}
+                        </div>
 
                         {/* View Toggle */}
                         <Card variant="manga" style={{ display: 'flex', padding: 0, overflow: 'hidden', gap: 0, background: '#fff' }}>
@@ -323,7 +362,8 @@ export default function Library() {
                             style={{
                                 border: isSelectionMode ? '2px solid var(--color-primary)' : '2px solid #000',
                                 color: isSelectionMode ? 'var(--color-primary)' : '#000',
-                                boxShadow: isSelectionMode ? '4px 4px 0 var(--color-primary-glow)' : '4px 4px 0 #000'
+                                boxShadow: isSelectionMode ? 'none' : '4px 4px 0 #000',
+                                transform: isSelectionMode ? 'translate(2px, 2px)' : 'none'
                             }}
                         >
                             {isSelectionMode ? 'ANNULER' : 'SÉLECTIONNER'}
@@ -346,8 +386,8 @@ export default function Library() {
                         <div style={{
                             display: viewMode === 'grid' ? 'grid' : 'flex',
                             flexDirection: 'column',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                            gap: '1.5rem'
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                            gap: '2rem'
                         }}>
                             <AnimatePresence>
                                 {filteredWorks.map(work => (
@@ -358,6 +398,7 @@ export default function Library() {
                                         animate={{ opacity: 1, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.9 }}
                                         transition={{ duration: 0.2 }}
+                                        whileHover={{ y: -8, transition: { duration: 0.2 } }}
                                         style={{ position: 'relative' }}
                                     >
                                         <Card
@@ -392,8 +433,8 @@ export default function Library() {
 
                                             {/* Image */}
                                             <div style={{
-                                                height: viewMode === 'grid' ? '240px' : '120px',
-                                                width: viewMode === 'list' ? '100px' : '100%',
+                                                height: viewMode === 'grid' ? '320px' : '150px',
+                                                width: viewMode === 'list' ? '120px' : '100%',
                                                 background: `url(${work.image}) center/cover`,
                                                 flexShrink: 0,
                                                 borderRight: viewMode === 'list' ? '2px solid #000' : 'none',
@@ -401,13 +442,13 @@ export default function Library() {
                                             }} />
 
                                             {/* Info */}
-                                            <div style={{ padding: '1rem', flex: 1, background: '#fff' }}>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.5rem' }}>
+                                            <div style={{ padding: '1.25rem', flex: 1, background: '#fff' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
                                                     <h3 style={{
                                                         fontFamily: 'var(--font-heading)',
-                                                        fontSize: viewMode === 'list' ? '1.2rem' : '1rem',
+                                                        fontSize: viewMode === 'list' ? '1.5rem' : '1.2rem',
                                                         fontWeight: 900,
-                                                        lineHeight: 1.2,
+                                                        lineHeight: 1.1,
                                                         marginBottom: '0.25rem',
                                                         textTransform: 'uppercase'
                                                     }}>
@@ -415,10 +456,10 @@ export default function Library() {
                                                     </h3>
                                                 </div>
 
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                                                     <span style={{
-                                                        fontSize: '0.7rem',
-                                                        padding: '2px 6px',
+                                                        fontSize: '0.75rem',
+                                                        padding: '4px 8px',
                                                         background: '#000',
                                                         color: '#fff',
                                                         fontWeight: 800,
@@ -426,20 +467,22 @@ export default function Library() {
                                                     }}>
                                                         {work.type}
                                                     </span>
-                                                    <span style={{ fontSize: '0.75rem', fontWeight: 700, opacity: 0.7, textTransform: 'uppercase' }}>{statusToFrench(work.status)}</span>
+                                                    <span style={{ fontSize: '0.85rem', fontWeight: 700, opacity: 0.7, textTransform: 'uppercase' }}>{statusToFrench(work.status)}</span>
                                                 </div>
 
                                                 {/* Progress Bar */}
-                                                <div style={{ height: '8px', background: '#f4f4f5', borderRadius: '4px', overflow: 'hidden', marginTop: 'auto', border: '1px solid #000' }}>
+                                                <div style={{ height: '10px', background: '#f4f4f5', borderRadius: '5px', overflow: 'hidden', marginTop: 'auto', border: '1px solid #000' }}>
                                                     <div style={{
                                                         height: '100%',
                                                         width: `${((work.currentChapter || 0) / (work.totalChapters || 1)) * 100}%`,
                                                         background: 'var(--color-primary)'
                                                     }} />
                                                 </div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
-                                                    <span style={{ fontSize: '0.75rem', fontWeight: 800 }}>Ch. {work.currentChapter} / {work.totalChapters || '?'}</span>
-                                                    {work.rating && <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#fbbf24' }}>★ {work.rating}</span>}
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.75rem' }}>
+                                                    <span style={{ fontSize: '0.9rem', fontWeight: 800 }}>
+                                                        {work.type === 'anime' ? 'Ep.' : 'Ch.'} {work.currentChapter} / {work.totalChapters || '?'}
+                                                    </span>
+                                                    {work.rating && <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fbbf24' }}>★ {work.rating}</span>}
                                                 </div>
                                             </div>
                                         </Card>
