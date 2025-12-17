@@ -157,25 +157,41 @@ export default function WorkDetails() {
     }, [work?.id, user?.uid]);
 
     const handleSubmitComment = async () => {
-        if (!newComment.trim() || !user || !work) return;
+        if (!newComment.trim() || !user || !work) {
+            console.log('[Comments] Submit blocked - missing data:', { hasComment: !!newComment.trim(), hasUser: !!user, hasWork: !!work });
+            return;
+        }
 
-        const commentData = {
-            userId: user.uid,
-            userName: user.displayName || 'Anonyme',
-            userPhoto: user.photoURL || '',
-            workId: Number(work.id),
-            text: newComment,
-            spoiler: isSpoiler
-        };
+        try {
+            const commentData = {
+                userId: user.uid,
+                userName: user.displayName || 'Anonyme',
+                userPhoto: user.photoURL || '',
+                workId: Number(work.id),
+                text: newComment,
+                spoiler: isSpoiler
+            };
 
-        await addComment(commentData);
-        setNewComment('');
-        setIsSpoiler(false);
-        addToast('Commentaire ajouté !', 'success');
+            console.log('[Comments] Submitting comment:', commentData);
+            const result = await addComment(commentData);
+            console.log('[Comments] Add result:', result);
 
-        // Reload comments
-        const updated = await getComments(Number(work.id));
-        setComments(updated);
+            if (result) {
+                setNewComment('');
+                setIsSpoiler(false);
+                addToast('Commentaire ajouté !', 'success');
+
+                // Reload comments
+                const updated = await getComments(Number(work.id));
+                console.log('[Comments] Reloaded comments:', updated.length);
+                setComments(updated);
+            } else {
+                addToast('Erreur lors de l\'ajout du commentaire', 'error');
+            }
+        } catch (error) {
+            console.error('[Comments] Submit error:', error);
+            addToast('Erreur lors de l\'ajout du commentaire', 'error');
+        }
     };
 
     const handleLikeComment = async (commentId: string) => {
