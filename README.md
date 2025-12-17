@@ -27,6 +27,14 @@
 - **Animations** : Framer Motion pour des transitions fluides et cinématiques.
 - **Thèmes** : Support complet du mode sombre et personnalisation (Settings).
 
+### 🤝 Fonctionnalités Sociales
+- **Système d'amis** : Ajoutez des amis et voyez leur activité.
+- **Défis** : Lancez des challenges contre vos amis (Course à la fin, Plus de chapitres, Battle de Streak).
+- **Watch Parties** : Regardez/lisez ensemble avec synchronisation de progression.
+- **Œuvres en commun** : Découvrez les mangas/animes partagés avec vos amis.
+- **Invitations** : Système d'invitation avec acceptation/refus pour les défis.
+- **Classement** : Leaderboard par XP, chapitres lus ou streak.
+
 ## 🚀 Installation & Démarrage
 
 ### Prérequis
