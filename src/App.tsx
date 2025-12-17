@@ -30,6 +30,7 @@ const Social = lazy(() => import('@/pages/Social'));
 const Legal = lazy(() => import('@/pages/Legal'));
 const Challenges = lazy(() => import('@/pages/Challenges'));
 const Feedback = lazy(() => import('@/pages/Feedback'));
+const FeedbackList = lazy(() => import('@/pages/FeedbackList'));
 
 function App() {
   const { setUser, setLoading, user } = useAuthStore();
@@ -140,6 +141,11 @@ function App() {
             <Route path="/feedback" element={
               <Suspense fallback={<LoadingScreen />}>
                 <Feedback />
+              </Suspense>
+            } />
+            <Route path="/feedback-admin" element={
+              <Suspense fallback={<LoadingScreen />}>
+                <FeedbackList />
               </Suspense>
             } />
             <Route path="/auth" element={<Auth />} />
