@@ -8,7 +8,10 @@ interface SettingsState {
     reducedMotion: boolean;
     soundEnabled: boolean;
     notifications: boolean;
+
     streamingUrlPattern: string;
+    spoilerMode: boolean;
+    accentColor: string;
 
     setTheme: (theme: Theme) => void;
     toggleTheme: () => void;
@@ -16,6 +19,8 @@ interface SettingsState {
     toggleSound: () => void;
     toggleNotifications: () => void;
     setStreamingUrlPattern: (pattern: string) => void;
+    toggleSpoilerMode: () => void;
+    setAccentColor: (color: string) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -38,6 +43,10 @@ export const useSettingsStore = create<SettingsState>()(
             toggleReducedMotion: () => set((state) => ({ reducedMotion: !state.reducedMotion })),
             toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
             toggleNotifications: () => set((state) => ({ notifications: !state.notifications })),
+            spoilerMode: false,
+            toggleSpoilerMode: () => set((state) => ({ spoilerMode: !state.spoilerMode })),
+            accentColor: '#FF2E63',
+            setAccentColor: (color) => set({ accentColor: color }),
         }),
         {
             name: 'bingeki-settings',

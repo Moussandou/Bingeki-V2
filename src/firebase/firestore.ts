@@ -560,7 +560,7 @@ export async function getUserChallenges(userId: string): Promise<Challenge[]> {
     try {
         const q = query(
             collection(db, 'challenges'),
-            where('participants', 'array-contains', userId)
+            where('participantIds', 'array-contains', userId)
         );
 
         const querySnapshot = await getDocs(q);
@@ -706,5 +706,123 @@ export async function updateWatchPartyProgress(partyId: string, newEpisode: numb
         });
     } catch (error) {
         console.error('[Firestore] Error updating party progress:', error);
+    }
+}
+
+// ==================== CHALLENGE INVITATION SYSTEM ====================
+
+// Accept challenge invitation
+export async function acceptChallengeInvitation(challengeId: string, participantId: string): Promise<void> {
+    try {
+        const challengeRef = doc(db, 'challenges', challengeId);
+        const challengeSnap = await getDoc(challengeRef);
+
+        if (challengeSnap.exists()) {
+            const challenge = challengeSnap.data() as Challenge;
+            const participants = challenge.participants.map(p =>
+                p.id === participantId ? { ...p, status: 'accepted' as const } : p
+            );
+
+            // Check if all participants have accepted
+            const allAccepted = participants.every(p => p.status === 'accepted');
+
+            await updateDoc(challengeRef, {
+                participants,
+                status: allAccepted ? 'active' : 'pending'
+            });
+            console.log('[Firestore] Challenge invitation accepted');
+        }
+    } catch (error) {
+        console.error('[Firestore] Error accepting challenge:', error);
+        throw error;
+    }
+}
+
+// Decline challenge invitation
+export async function declineChallengeInvitation(challengeId: string, participantId: string): Promise<void> {
+    try {
+        const challengeRef = doc(db, 'challenges', challengeId);
+        const challengeSnap = await getDoc(challengeRef);
+
+        if (challengeSnap.exists()) {
+            const challenge = challengeSnap.data() as Challenge;
+            const participants = challenge.participants.map(p =>
+                p.id === participantId ? { ...p, status: 'declined' as const } : p
+            );
+            const participantIds = challenge.participantIds.filter(id => id !== participantId);
+
+            await updateDoc(challengeRef, { participants, participantIds });
+            console.log('[Firestore] Challenge invitation declined');
+        }
+    } catch (error) {
+        console.error('[Firestore] Error declining challenge:', error);
+        throw error;
+    }
+}
+
+// Cancel/End a challenge (only creator can do this)
+export async function cancelChallenge(challengeId: string): Promise<void> {
+    try {
+        await updateDoc(doc(db, 'challenges', challengeId), {
+            status: 'cancelled',
+            endDate: Date.now()
+        });
+        console.log('[Firestore] Challenge cancelled');
+    } catch (error) {
+        console.error('[Firestore] Error cancelling challenge:', error);
+        throw error;
+    }
+}
+
+// Complete a challenge
+export async function completeChallenge(challengeId: string, winnerId?: string): Promise<void> {
+    try {
+        await updateDoc(doc(db, 'challenges', challengeId), {
+            status: 'completed',
+            endDate: Date.now(),
+            winnerId: winnerId || null
+        });
+        console.log('[Firestore] Challenge completed');
+    } catch (error) {
+        console.error('[Firestore] Error completing challenge:', error);
+        throw error;
+    }
+}
+
+// ==================== WATCH PARTY CONTROLS ====================
+
+// End a watch party (only host can do this)
+export async function endWatchParty(partyId: string): Promise<void> {
+    try {
+        await updateDoc(doc(db, 'watchparties', partyId), {
+            status: 'completed',
+            lastActivity: Date.now()
+        });
+        console.log('[Firestore] Watch party ended');
+    } catch (error) {
+        console.error('[Firestore] Error ending watch party:', error);
+        throw error;
+    }
+}
+
+// Leave a watch party (for participants)
+export async function leaveWatchParty(partyId: string, participantId: string): Promise<void> {
+    try {
+        const partyRef = doc(db, 'watchparties', partyId);
+        const partySnap = await getDoc(partyRef);
+
+        if (partySnap.exists()) {
+            const party = partySnap.data() as WatchParty;
+            const participants = party.participants.filter(p => p.id !== participantId);
+
+            await updateDoc(partyRef, {
+                participants,
+                lastActivity: Date.now()
+            });
+            console.log('[Firestore] Left watch party');
+        }
+    } catch (error) {
+        console.error('[Firestore] Error leaving watch party:', error);
+        throw error;
     }
 }

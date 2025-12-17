@@ -154,3 +154,14 @@ button {
         font-size: 1.5rem !important;
     }
 }
+
+/* Spoiler Mode */
+.spoiler-blur {
+    filter: blur(5px);
+    transition: filter 0.3s ease;
+    cursor: pointer;
+}
+
+.spoiler-blur:hover {
+    filter: blur(0);
+}

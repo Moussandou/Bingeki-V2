@@ -1,9 +1,9 @@
 import { Layout } from '@/components/layout/Layout';
-import { Card } from '@/components/ui/Card';
+// Card component removed as part of redesign
 import { Button } from '@/components/ui/Button';
 import { XPBar } from '@/components/XPBar';
 import { StreakCounter } from '@/components/StreakCounter';
-import { Play, Plus, ChevronRight, Target, TrendingUp, BookOpen, Users, Flame, Clock } from 'lucide-react';
+import { Play, Plus, ChevronRight, Target, TrendingUp, BookOpen, Users, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
@@ -14,6 +14,11 @@ import { useState, useEffect } from 'react';
 import { getFriendsActivity } from '@/firebase/firestore';
 import type { ActivityEvent } from '@/types/activity';
 import { ACTIVITY_EMOJIS, ACTIVITY_LABELS } from '@/types/activity';
+import { getTopWorks } from '@/services/animeApi';
+import type { JikanResult } from '@/services/animeApi';
+import { Star } from 'lucide-react';
+import { AddWorkModal } from '@/components/AddWorkModal';
+import { Card } from '@/components/ui/Card';
 
 export default function Dashboard() {
     const { user } = useAuthStore();
@@ -22,6 +27,11 @@ export default function Dashboard() {
 
     const [friendsActivity, setFriendsActivity] = useState<ActivityEvent[]>([]);
     const [isLoadingActivity, setIsLoadingActivity] = useState(true);
+    const [recommendations, setRecommendations] = useState<JikanResult[]>([]);
+
+    // Modal state
+    const [selectedWork, setSelectedWork] = useState<JikanResult | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Filter works
     const inProgressWorks = works.filter(w => w.status === 'reading').slice(0, 4);
@@ -36,13 +46,26 @@ export default function Dashboard() {
         if (user) {
             loadFriendsActivity();
         }
+        loadRecommendations();
     }, [user]);
+
     const loadFriendsActivity = async () => {
         if (!user) return;
         setIsLoadingActivity(true);
         const activity = await getFriendsActivity(user.uid, 5);
         setFriendsActivity(activity);
         setIsLoadingActivity(false);
+    };
+
+    const loadRecommendations = async () => {
+        // Fetch top manga by popularity
+        const topManga = await getTopWorks('manga', 'bypopularity', 6); // Fetch 6 for a better grid
+        setRecommendations(topManga);
+    };
+
+    const handleRecommendationClick = (work: JikanResult) => {
+        setSelectedWork(work);
+        setIsModalOpen(true);
     };
 
     const formatTimeAgo = (timestamp: number) => {
@@ -125,120 +148,131 @@ export default function Dashboard() {
                         </div>
                     </motion.section>
 
-                    {/* Stats & Goals Row */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+                    {/* Stats HUD (Bar Style) */}
+                    <div className="manga-panel" style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(3, 1fr)',
+                        gap: '2px', // For dividers
+                        background: '#000',
+                        overflow: 'hidden',
+                        marginBottom: '3rem',
+                        padding: 0 // Remove padding to let children fill
+                    }}>
                         {/* Daily Goal */}
-                        <Card variant="manga" style={{ padding: '1.25rem', background: '#fff' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                                <Target size={24} color="var(--color-primary)" />
-                                <span style={{ fontWeight: 800, fontSize: '1rem' }}>OBJECTIF DU JOUR</span>
+                        <div style={{ background: '#fff', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', opacity: 0.7 }}>
+                                <Target size={20} />
+                                <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>Objectif</span>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                <span style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>{todayProgress}</span>
-                                <span style={{ opacity: 0.6 }}>/ {dailyGoal} chapitres</span>
+                            <div style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>
+                                {todayProgress}<span style={{ fontSize: '1rem', opacity: 0.4 }}>/{dailyGoal}</span>
                             </div>
-                            <div style={{ height: '8px', background: '#eee', borderRadius: '4px', overflow: 'hidden' }}>
-                                <div style={{
-                                    height: '100%',
-                                    width: `${(todayProgress / dailyGoal) * 100}%`,
-                                    background: 'var(--color-primary)',
-                                    transition: 'width 0.3s'
-                                }} />
+                            <div style={{ width: '60px', height: '4px', background: '#eee', marginTop: '0.5rem', borderRadius: '2px' }}>
+                                <div style={{ width: `${(todayProgress / dailyGoal) * 100}%`, height: '100%', background: 'var(--color-primary)' }} />
                             </div>
-                            {todayProgress >= dailyGoal && (
-                                <p style={{ fontSize: '0.8rem', color: 'var(--color-primary)', marginTop: '0.5rem', fontWeight: 600 }}>
-                                    ✓ Objectif atteint ! +50 XP
-                                </p>
-                            )}
-                        </Card>
+                        </div>
 
                         {/* Weekly Stats */}
-                        <Card variant="manga" style={{ padding: '1.25rem', background: '#fff' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                                <TrendingUp size={24} color="var(--color-primary)" />
-                                <span style={{ fontWeight: 800, fontSize: '1rem' }}>CETTE SEMAINE</span>
+                        <div style={{ background: '#fff', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', borderLeft: '2px solid #000' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', opacity: 0.7 }}>
+                                <TrendingUp size={20} />
+                                <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>Hebdo</span>
                             </div>
-                            <div style={{ display: 'flex', gap: '1.5rem' }}>
-                                <div>
-                                    <span style={{ fontSize: '1.5rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>{weeklyChapters}</span>
-                                    <p style={{ fontSize: '0.75rem', opacity: 0.6 }}>chapitres</p>
-                                </div>
-                                <div>
-                                    <span style={{ fontSize: '1.5rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>{inProgressWorks.length}</span>
-                                    <p style={{ fontSize: '0.75rem', opacity: 0.6 }}>en cours</p>
-                                </div>
+                            <div style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>
+                                {weeklyChapters}
                             </div>
-                        </Card>
+                            <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.25rem' }}>chapitres lus</p>
+                        </div>
 
-                        {/* Streak Warning / Status */}
-                        <Card variant="manga" style={{ padding: '1.25rem', background: streak > 0 ? '#fff' : '#fef2f2' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                                <Flame size={24} color={streak > 0 ? 'var(--color-primary)' : '#9ca3af'} />
-                                <span style={{ fontWeight: 800, fontSize: '1rem' }}>STREAK</span>
+                        {/* Streak */}
+                        <div style={{ background: streak > 0 ? '#fff' : '#fef2f2', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', borderLeft: '2px solid #000' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', opacity: 0.7 }}>
+                                <Flame size={20} color={streak > 0 ? 'var(--color-primary)' : 'currentColor'} />
+                                <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>Série</span>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-                                <span style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', color: streak > 0 ? 'var(--color-primary)' : '#9ca3af' }}>
-                                    {streak}
-                                </span>
-                                <span style={{ opacity: 0.6 }}>jours</span>
+                            <div style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1, color: streak > 0 ? 'var(--color-primary)' : 'inherit' }}>
+                                {streak}
                             </div>
-                            {streak === 0 ? (
-                                <p style={{ fontSize: '0.8rem', color: 'var(--color-primary)', marginTop: '0.5rem' }}>
-                                    ⚠️ Lis un chapitre pour démarrer !
-                                </p>
-                            ) : streak < 3 ? (
-                                <p style={{ fontSize: '0.8rem', color: 'var(--color-primary)', marginTop: '0.5rem' }}>
-                                    Continue comme ça !
-                                </p>
-                            ) : (
-                                <p style={{ fontSize: '0.8rem', color: 'var(--color-primary)', marginTop: '0.5rem' }}>
-                                    🔥 Tu es en feu !
-                                </p>
-                            )}
-                        </Card>
+                            <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.25rem' }}>jours</p>
+                        </div>
                     </div>
 
                     {/* Two Column Layout */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem' }}>
 
                         {/* Left Column - Continue Reading */}
                         <div>
-                            {/* Last Read Quick Continue */}
+                            {/* Last Read HERO BANNER */}
                             {lastUpdatedWork && (
                                 <motion.div
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    style={{ marginBottom: '2rem' }}
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    style={{ marginBottom: '3rem' }}
+                                    className="manga-panel"
                                 >
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                                        <Clock size={20} />
-                                        <span style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase' }}>Continuer</span>
-                                    </div>
-                                    <Link to={`/work/${lastUpdatedWork.id}`} style={{ textDecoration: 'none' }}>
-                                        <Card variant="manga" hoverable style={{
-                                            padding: 0,
+                                    <Link to={`/work/${lastUpdatedWork.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+                                        <div style={{
+                                            position: 'relative',
+                                            height: '220px',
                                             overflow: 'hidden',
-                                            display: 'flex',
-                                            background: '#fff'
+                                            cursor: 'pointer',
                                         }}>
-                                            <div style={{ width: 100, height: 140, flexShrink: 0, borderRight: '2px solid #000' }}>
-                                                <img src={lastUpdatedWork.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                            </div>
-                                            <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                            {/* Background Image */}
+                                            <div style={{
+                                                position: 'absolute',
+                                                inset: 0,
+                                                background: `url(${lastUpdatedWork.image}) center/cover`,
+                                                filter: 'brightness(0.8)'
+                                            }} />
+
+                                            {/* Gradient Overlay */}
+                                            <div style={{
+                                                position: 'absolute',
+                                                inset: 0,
+                                                background: 'linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)'
+                                            }} />
+
+                                            {/* Content */}
+                                            <div style={{
+                                                position: 'relative',
+                                                zIndex: 10,
+                                                height: '100%',
+                                                padding: '2rem',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                justifyContent: 'center',
+                                                color: '#fff',
+                                                maxWidth: '70%'
+                                            }}>
+                                                <span style={{
+                                                    fontSize: '0.8rem',
+                                                    textTransform: 'uppercase',
+                                                    background: 'var(--color-primary)',
+                                                    padding: '4px 8px',
+                                                    width: 'fit-content',
+                                                    fontWeight: 800,
+                                                    marginBottom: '0.5rem',
+                                                }}>
+                                                    {lastUpdatedWork.type}
+                                                </span>
                                                 <h3 style={{
                                                     fontFamily: 'var(--font-heading)',
-                                                    fontSize: '1.25rem',
+                                                    fontSize: '2rem',
                                                     fontWeight: 900,
-                                                    marginBottom: '0.5rem'
-                                                }}>{lastUpdatedWork.title}</h3>
-                                                <p style={{ opacity: 0.6, marginBottom: '0.75rem' }}>
-                                                    Chapitre {lastUpdatedWork.currentChapter} / {lastUpdatedWork.totalChapters || '?'}
+                                                    lineHeight: 1.1,
+                                                    marginBottom: '0.5rem',
+                                                    textShadow: '2px 2px 0 #000'
+                                                }}>
+                                                    {lastUpdatedWork.title}
+                                                </h3>
+                                                <p style={{ opacity: 0.9, fontSize: '1rem', fontWeight: 600 }}>
+                                                    Chapitre {lastUpdatedWork.currentChapter} <span style={{ opacity: 0.6 }}>/ {lastUpdatedWork.totalChapters || '?'}</span>
                                                 </p>
-                                                <Button size="sm" variant="primary" icon={<Play size={14} fill="currentColor" />}>
-                                                    CONTINUER
-                                                </Button>
+                                                <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-primary)', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.9rem' }}>
+                                                    <Play size={20} fill="currentColor" /> Continuer la lecture
+                                                </div>
                                             </div>
-                                        </Card>
+                                        </div>
                                     </Link>
                                 </motion.div>
                             )}
@@ -254,7 +288,7 @@ export default function Dashboard() {
                                 </Link>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1.5rem' }}>
                                 {inProgressWorks.length === 0 ? (
                                     <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem' }}>
                                         <p style={{ marginBottom: '1rem', opacity: 0.7 }}>Aucune lecture en cours</p>
@@ -264,25 +298,44 @@ export default function Dashboard() {
                                     </div>
                                 ) : (
                                     inProgressWorks.map((work) => (
-                                        <motion.div key={work.id} whileHover={{ y: -3 }}>
-                                            <Link to={`/work/${work.id}`} style={{ textDecoration: 'none' }}>
-                                                <Card variant="manga" hoverable style={{ padding: 0, overflow: 'hidden', height: '100%' }}>
-                                                    <div style={{ height: '120px', background: `url(${work.image}) center/cover`, borderBottom: '2px solid #000' }} />
-                                                    <div style={{ padding: '0.75rem', background: '#fff' }}>
-                                                        <h4 style={{
-                                                            fontFamily: 'var(--font-heading)',
-                                                            fontSize: '0.9rem',
-                                                            fontWeight: 800,
-                                                            marginBottom: '0.25rem',
-                                                            whiteSpace: 'nowrap',
-                                                            overflow: 'hidden',
-                                                            textOverflow: 'ellipsis'
-                                                        }}>{work.title}</h4>
-                                                        <p style={{ fontSize: '0.75rem', opacity: 0.6 }}>
-                                                            Ch. {work.currentChapter} / {work.totalChapters || '?'}
-                                                        </p>
+                                        <motion.div key={work.id} whileHover={{ y: -5 }}>
+                                            <Link to={`/work/${work.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+                                                <Card
+                                                    variant="manga"
+                                                    hoverable
+                                                    style={{
+                                                        overflow: 'hidden',
+                                                        marginBottom: '0.75rem',
+                                                        position: 'relative',
+                                                        padding: 0
+                                                    }}
+                                                >
+                                                    <div style={{ paddingTop: '140%', position: 'relative' }}>
+                                                        <img src={work.image} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    </div>
+                                                    <div style={{
+                                                        position: 'absolute',
+                                                        bottom: 0,
+                                                        left: 0,
+                                                        right: 0,
+                                                        background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
+                                                        padding: '2rem 0.5rem 0.5rem',
+                                                        color: '#fff'
+                                                    }}>
+                                                        <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>Ch. {work.currentChapter}</span>
                                                     </div>
                                                 </Card>
+                                                <h4 style={{
+                                                    fontFamily: 'var(--font-heading)',
+                                                    fontSize: '0.9rem',
+                                                    fontWeight: 700,
+                                                    lineHeight: 1.2,
+                                                    color: '#000',
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 2,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden'
+                                                }}>{work.title}</h4>
                                             </Link>
                                         </motion.div>
                                     ))
@@ -292,16 +345,21 @@ export default function Dashboard() {
 
                         {/* Right Column - Activity Feed */}
                         <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
                                 <Users size={20} />
                                 <span style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase' }}>Activité amis</span>
                             </div>
 
-                            <Card variant="manga" style={{ padding: '1rem', background: '#fff' }}>
+                            <div className="manga-panel" style={{
+                                background: '#fff',
+                                padding: '0',
+                                marginBottom: '3rem',
+                                overflow: 'hidden'
+                            }}>
                                 {isLoadingActivity ? (
-                                    <p style={{ textAlign: 'center', opacity: 0.6, padding: '1rem' }}>Chargement...</p>
+                                    <p style={{ textAlign: 'center', opacity: 0.6, padding: '2rem' }}>Chargement...</p>
                                 ) : friendsActivity.length === 0 ? (
-                                    <div style={{ textAlign: 'center', padding: '1rem' }}>
+                                    <div style={{ textAlign: 'center', padding: '2rem' }}>
                                         <Users size={32} style={{ opacity: 0.3, marginBottom: '0.5rem' }} />
                                         <p style={{ opacity: 0.6, fontSize: '0.9rem' }}>Pas encore d'activité</p>
                                         <Link to="/social">
@@ -309,37 +367,110 @@ export default function Dashboard() {
                                         </Link>
                                     </div>
                                 ) : (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
                                         {friendsActivity.map((activity, i) => (
                                             <div key={i} style={{
                                                 display: 'flex',
                                                 alignItems: 'flex-start',
-                                                gap: '0.75rem',
-                                                paddingBottom: i < friendsActivity.length - 1 ? '0.75rem' : 0,
-                                                borderBottom: i < friendsActivity.length - 1 ? '1px solid #eee' : 'none'
-                                            }}>
-                                                <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000', flexShrink: 0 }}>
+                                                gap: '1rem',
+                                                padding: '1rem',
+                                                borderBottom: i < friendsActivity.length - 1 ? '1px solid #f5f5f5' : 'none',
+                                                transition: 'background 0.2s'
+                                            }}
+                                                onMouseEnter={(e) => e.currentTarget.style.background = '#fafafa'}
+                                                onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
+                                            >
+                                                <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', flexShrink: 0 }}>
                                                     <img src={activity.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${activity.userName}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                 </div>
                                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                                    <p style={{ fontSize: '0.85rem', lineHeight: 1.4 }}>
-                                                        <strong>{activity.userName}</strong> {ACTIVITY_LABELS[activity.type]}
-                                                        {activity.workTitle && <span style={{ opacity: 0.7 }}> {activity.workTitle}</span>}
+                                                    <p style={{ fontSize: '0.9rem', lineHeight: 1.4 }}>
+                                                        <span style={{ fontWeight: 700 }}>{activity.userName}</span>
+                                                        <span style={{ opacity: 0.8 }}> {ACTIVITY_LABELS[activity.type]}</span>
+                                                        {activity.workTitle && <span> <strong>{activity.workTitle}</strong></span>}
                                                     </p>
-                                                    <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.25rem' }}>
+                                                    <p style={{ fontSize: '0.75rem', opacity: 0.5, marginTop: '0.25rem' }}>
                                                         {ACTIVITY_EMOJIS[activity.type]} {formatTimeAgo(activity.timestamp)}
                                                     </p>
                                                 </div>
                                             </div>
                                         ))}
-                                        <Link to="/social" style={{ textAlign: 'center' }}>
-                                            <Button size="sm" variant="ghost" style={{ width: '100%' }}>Voir plus</Button>
+                                        <Link to="/social" style={{ textAlign: 'center', padding: '0.75rem', borderTop: '1px solid #f5f5f5' }}>
+                                            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-primary)' }}>VOIR TOUTE L'ACTIVITÉ</span>
                                         </Link>
                                     </div>
                                 )}
-                            </Card>
+                            </div>
+
+                            {/* Recommendations Section */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                                <Star size={20} className="text-gradient" />
+                                <span style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase' }}>À DÉCOUVRIR</span>
+                            </div>
+
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+                                gap: '1rem'
+                            }}>
+                                {recommendations.length > 0 ? (
+                                    <>
+                                        {recommendations.map(manga => (
+                                            <motion.div
+                                                key={manga.mal_id}
+                                                whileHover={{ y: -5 }}
+                                                onClick={() => handleRecommendationClick(manga)}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                <Card variant="manga" hoverable style={{ padding: 0, overflow: 'hidden', height: '100%' }}>
+                                                    <div style={{ position: 'relative', paddingTop: '150%' }}>
+                                                        <img
+                                                            src={manga.images.jpg.image_url}
+                                                            alt={manga.title}
+                                                            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                                                        />
+                                                        <div style={{
+                                                            position: 'absolute',
+                                                            bottom: 0,
+                                                            left: 0,
+                                                            width: '100%',
+                                                            background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)',
+                                                            padding: '2rem 0.5rem 0.5rem',
+                                                            color: '#fff'
+                                                        }}>
+                                                            <div style={{ fontSize: '0.8rem', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                                {manga.title}
+                                                            </div>
+                                                            <div style={{ fontSize: '0.7rem', opacity: 0.8, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                                <Star size={10} fill="#FFD700" color="#FFD700" /> {manga.score}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </Card>
+                                            </motion.div>
+                                        ))}
+                                    </>
+                                ) : (
+                                    <div className="manga-panel" style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem' }}>
+                                        <p style={{ opacity: 0.6 }}>Chargement...</p>
+                                    </div>
+                                )}
+                                <Link to="/discover" style={{ gridColumn: '1/-1' }}>
+                                    <Button variant="ghost" size="sm" style={{ width: '100%' }}>VOIR PLUS DE SUGGESTIONS</Button>
+                                </Link>
+                            </div>
                         </div>
                     </div>
+
+                    {/* Add Work Modal */}
+                    {selectedWork && (
+                        <AddWorkModal
+                            isOpen={isModalOpen}
+                            onClose={() => setIsModalOpen(false)}
+                            initialWork={selectedWork}
+                        />
+                    )}
+
                 </div>
             </div>
         </Layout>

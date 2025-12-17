@@ -4,6 +4,7 @@ import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { useAuthStore } from '@/store/authStore';
 import { useLibraryStore } from '@/store/libraryStore';
 import { useGamificationStore } from '@/store/gamificationStore';
+import { useSettingsStore } from '@/store/settingsStore';
 import { useShallow } from 'zustand/react/shallow';
 import { auth } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -49,6 +50,10 @@ function App() {
       setUser(firebaseUser);
 
       if (firebaseUser) {
+        // Clear local stores first to avoid data bleed between accounts
+        useLibraryStore.getState().resetStore();
+        useGamificationStore.getState().resetStore();
+
         // Sync user profile (email, name, photo)
         await saveUserProfileToFirestore(firebaseUser);
 
@@ -59,9 +64,6 @@ function App() {
         if (cloudLibrary) {
           // Cloud data exists - load it into Zustand
           useLibraryStore.setState({ works: cloudLibrary });
-        } else if (libraryWorks.length > 0) {
-          // No cloud data but local data exists - upload to Firestore
-          await saveLibraryToFirestore(firebaseUser.uid, libraryWorks);
         }
 
         if (cloudGamification) {
@@ -69,10 +71,11 @@ function App() {
           useGamificationStore.setState(cloudGamification);
           // Force sync to main user doc (ensures new fields like badges, stats are on root doc)
           await saveGamificationToFirestore(firebaseUser.uid, cloudGamification);
-        } else if (gamificationState.level > 1 || gamificationState.totalWorksAdded > 0) {
-          // No cloud data but local progress exists - upload
-          await saveGamificationToFirestore(firebaseUser.uid, gamificationState);
         }
+      } else {
+        // User logged out - clear local stores
+        useLibraryStore.getState().resetStore();
+        useGamificationStore.getState().resetStore();
       }
 
       setLoading(false);
@@ -103,6 +106,23 @@ function App() {
 
     return () => clearTimeout(timeout);
   }, [gamificationState, user]);
+
+  // Apply global accent color
+  const accentColor = useSettingsStore(s => s.accentColor);
+  useEffect(() => {
+    document.documentElement.style.setProperty('--color-primary', accentColor);
+    // Also update glow for consistency
+    const hexToRgb = (hex: string) => {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : null;
+    }
+    const rgb = hexToRgb(accentColor);
+    if (rgb) {
+      document.documentElement.style.setProperty('--color-primary-glow', `rgba(${rgb}, 0.5)`);
+      // Update gradient to use the accent color (simple gradient for now)
+      document.documentElement.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${accentColor} 0%, ${accentColor} 100%)`);
+    }
+  }, [accentColor]);
 
   return (
     <ToastProvider>

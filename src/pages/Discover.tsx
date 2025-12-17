@@ -1,17 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Carousel } from '@/components/ui/Carousel';
 import { searchWorks, getTopWorks, getSeasonalAnime, type JikanResult } from '@/services/animeApi';
 import { useLibraryStore } from '@/store/libraryStore';
+import { useAuthStore } from '@/store/authStore';
 import { Search, Check, Loader2, Flame, Sparkles, Star, Dice5, TrendingUp, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { FriendRecommendations } from '@/components/FriendRecommendations';
 
 export default function Discover() {
-    const [searchQuery, setSearchQuery] = useState('');
+    const navigate = useNavigate();
+    const { user } = useAuthStore();
+    const [searchParams] = useSearchParams();
+    const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
     const [searchResults, setSearchResults] = useState<JikanResult[]>([]);
     const [loading, setLoading] = useState(false);
 
@@ -102,11 +107,19 @@ export default function Discover() {
     };
 
     const handleWorkClick = (work: JikanResult) => {
+        if (!user) {
+            navigate('/auth');
+            return;
+        }
         setSelectedWork(work);
         setIsModalOpen(true);
     };
 
     const handleQuickAdd = (work: JikanResult) => {
+        if (!user) {
+            navigate('/auth');
+            return;
+        }
         setSelectedWork(work);
         setIsModalOpen(true);
     };
@@ -134,6 +147,33 @@ export default function Discover() {
     return (
         <Layout>
             <div style={{ minHeight: 'calc(100vh - 80px)', paddingBottom: '6rem' }}>
+
+                {/* Guest Banner */}
+                {!user && (
+                    <div style={{
+                        background: 'linear-gradient(135deg, #000 0%, #333 100%)',
+                        color: '#fff',
+                        padding: '1rem 2rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: '1rem',
+                        borderBottom: '3px solid var(--color-primary)'
+                    }}>
+                        <div>
+                            <p style={{ fontWeight: 900, fontSize: '1.1rem', marginBottom: '0.25rem' }}>
+                                ✨ Créez un compte pour débloquer toutes les fonctionnalités !
+                            </p>
+                            <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>
+                                Bibliothèque personnelle, suivi de progression, badges, classements et plus encore...
+                            </p>
+                        </div>
+                        <Button onClick={() => navigate('/auth')} variant="primary" size="sm">
+                            S'inscrire gratuitement
+                        </Button>
+                    </div>
+                )}
 
                 {/* Hero Section */}
                 {heroWork && !searchQuery && (
@@ -281,7 +321,7 @@ export default function Discover() {
                                             onClick={() => handleGenreClick(genre.id)}
                                             style={{
                                                 padding: '0.5rem 1rem',
-                                                borderRadius: '2rem',
+                                                borderRadius: '0',
                                                 border: isActive ? 'none' : '2px solid #000',
                                                 background: isActive ? 'var(--color-primary)' : '#fff',
                                                 color: isActive ? '#fff' : '#000',
@@ -343,7 +383,7 @@ export default function Discover() {
                                                     <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid #000', flexShrink: 0 }}>
                                                         <img src={work.images.jpg.image_url} alt={work.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                         {isOwned && (
-                                                            <div style={{ position: 'absolute', top: 5, right: 5, background: '#000', color: '#fff', padding: '4px', borderRadius: '50%' }}>
+                                                            <div style={{ position: 'absolute', top: 5, right: 5, background: '#000', color: '#fff', padding: '4px', borderRadius: '0' }}>
                                                                 <Check size={14} strokeWidth={3} />
                                                             </div>
                                                         )}

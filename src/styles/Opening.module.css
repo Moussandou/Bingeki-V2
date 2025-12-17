@@ -21,6 +21,19 @@
     pointer-events: none;
 }
 
+/* Onomatopoeia */
+.sfx {
+    position: absolute;
+    font-weight: 900;
+    font-style: italic;
+    color: #808080;
+    /* Gray as requested */
+    opacity: 0.1;
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
+}
+
 /* Speed Lines Overlay */
 .speedLines {
     position: absolute;
@@ -70,107 +83,109 @@
     font-family: var(--font-body);
 }
 
-/* Manga Panels Grid */
-.panelsGrid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 1.5rem;
+/* Feature Sections (Zigzag Layout) */
+.featureSection {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4rem;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 4rem 1.5rem;
+    padding: 6rem 2rem;
     position: relative;
     z-index: 10;
 }
 
-.panel {
-    background: #fff;
-    border: 3px solid #000;
-    padding: 2rem;
-    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
-    overflow: hidden;
+.featureSectionReverse {
+    flex-direction: row-reverse;
+}
+
+.textContent {
+    flex: 1;
+    max-width: 500px;
+}
+
+.visualContent {
+    flex: 1.2;
     position: relative;
     display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
+    justify-content: center;
+    align-items: center;
 }
 
-.panel:hover {
-    transform: translate(-4px, -4px);
-    box-shadow: 12px 12px 0px var(--color-primary);
+/* Make visuals pop */
+.mockupContainer {
+    position: relative;
+    z-index: 5;
+    transition: transform 0.3s ease;
 }
 
-/* Panel Variations */
-.panelLarge {
-    grid-column: span 12;
-    height: 400px;
+.mockupContainer:hover {
+    transform: scale(1.02);
 }
 
-.panelMedium {
-    grid-column: span 6;
-    height: 350px;
+/* Section specific styling */
+.progressionVisual {
+    /* Straighten the license card as requested */
+    transform: none !important;
 }
 
-.panelSmall {
-    grid-column: span 4;
-    height: 300px;
+/* Titles */
+.sectionTitle {
+    font-size: 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    line-height: 1;
+    position: relative;
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: #fff;
+    border: 3px solid #000;
+    box-shadow: 6px 6px 0 var(--color-primary);
 }
 
-@media (max-width: 768px) {
+.sectionDescription {
+    font-family: var(--font-body);
+    font-size: 1.2rem;
+    line-height: 1.6;
+    opacity: 0.9;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 1.5rem;
+    border-left: 4px solid var(--color-primary);
+}
 
-    .panelMedium,
-    .panelSmall {
-        grid-column: span 12;
-        height: auto;
-        min-height: 300px;
+@media (max-width: 900px) {
+    .featureSection {
+        flex-direction: column;
+        padding: 4rem 1.5rem;
+        text-align: center;
+        gap: 3rem;
+    }
+
+    .featureSectionReverse {
+        flex-direction: column;
+    }
+
+    .textContent {
+        max-width: 100%;
+    }
+
+    .sectionDescription {
+        border-left: none;
+        border-top: 4px solid var(--color-primary);
     }
 }
 
-/* Typography inside Panels */
-.panelTitle {
-    font-size: 2.5rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    position: relative;
-    z-index: 2;
-    background: #fff;
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border: 2px solid #000;
-    box-shadow: 4px 4px 0 #000;
-    transform: rotate(-1deg);
-    margin-bottom: 1rem;
-}
-
-.panelText {
-    font-family: var(--font-body);
-    font-size: 1.1rem;
-    line-height: 1.5;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 1rem;
-    border-radius: 4px;
-    z-index: 2;
-}
-
-/* Onomatopoeia */
-.sfx {
-    position: absolute;
-    font-weight: 900;
-    font-style: italic;
-    opacity: 0.15;
-    pointer-events: none;
-    user-select: none;
-    z-index: 1;
-}
-
+/* Reuse existing CTA styles but ensure they are below everything */
 .ctaSection {
-    padding: 6rem 2rem;
+    padding: 8rem 2rem;
     text-align: center;
     background: #000;
     color: #fff;
     position: relative;
     clip-path: polygon(0 5%, 100% 0, 100% 100%, 0 100%);
-    margin-top: 4rem;
+    margin-top: 0;
 }
 
 .ctaButton {

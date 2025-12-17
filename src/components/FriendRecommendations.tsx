@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Users } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { getFriends, getUserLibrary } from '@/firebase/firestore';
@@ -19,13 +19,7 @@ export function FriendRecommendations() {
     const [recommendations, setRecommendations] = useState<RecommendedWork[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        if (user) {
-            loadRecommendations();
-        }
-    }, [user]);
-
-    const loadRecommendations = async () => {
+    const loadRecommendations = useCallback(async () => {
         if (!user) return;
         setIsLoading(true);
 
@@ -89,7 +83,13 @@ export function FriendRecommendations() {
         }
 
         setIsLoading(false);
-    };
+    }, [user]);
+
+    useEffect(() => {
+        if (user) {
+            loadRecommendations();
+        }
+    }, [user, loadRecommendations]);
 
     if (!user) return null;
 

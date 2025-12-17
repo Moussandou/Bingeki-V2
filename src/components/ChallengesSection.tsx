@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
-import { Trophy, Swords, Target, Flame, Plus, Users } from 'lucide-react';
+import { Trophy, Swords, Target, Flame, Plus, Users, BookOpen, Check, X, Ban } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import { useLibraryStore } from '@/store/libraryStore';
 import {
     getUserChallenges,
     createChallenge,
     getFriends,
+    acceptChallengeInvitation,
+    declineChallengeInvitation,
+    cancelChallenge,
     type Friend,
 } from '@/firebase/firestore';
 import type { Challenge, ChallengeParticipant } from '@/types/challenge';
@@ -19,6 +23,7 @@ interface ChallengesSectionProps {
 
 export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProps) {
     const { user } = useAuthStore();
+    const { works } = useLibraryStore();
     const { addToast } = useToast();
 
     const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -30,7 +35,9 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
     const [newChallenge, setNewChallenge] = useState({
         title: '',
         type: 'race_to_finish' as Challenge['type'],
+        workId: 0,
         workTitle: '',
+        workImage: '',
         selectedFriends: [] as string[]
     });
 
@@ -66,7 +73,8 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                 name: user.displayName || 'Moi',
                 photo: user.photoURL || '',
                 progress: 0,
-                joinedAt: Date.now()
+                joinedAt: Date.now(),
+                status: 'accepted' // Creator is automatically accepted
             },
             ...newChallenge.selectedFriends.map(friendUid => {
                 const friend = friends.find(f => f.uid === friendUid);
@@ -75,7 +83,8 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                     name: friend?.displayName || 'Ami',
                     photo: friend?.photoURL || '',
                     progress: 0,
-                    joinedAt: Date.now()
+                    joinedAt: Date.now(),
+                    status: 'pending' as const // Invited friends start as pending
                 };
             })
         ];
@@ -83,8 +92,11 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
         const challenge: Omit<Challenge, 'id'> = {
             title: newChallenge.title,
             type: newChallenge.type,
+            workId: newChallenge.workId || undefined,
             workTitle: newChallenge.workTitle || undefined,
+            workImage: newChallenge.workImage || undefined,
             participants,
+            participantIds: [user.uid, ...newChallenge.selectedFriends], // For querying
             startDate: Date.now(),
             status: 'active',
             createdBy: user.uid
@@ -93,7 +105,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
         await createChallenge(challenge);
         addToast('Défi créé !', 'success');
         setIsCreateModalOpen(false);
-        setNewChallenge({ title: '', type: 'race_to_finish', workTitle: '', selectedFriends: [] });
+        setNewChallenge({ title: '', type: 'race_to_finish', workId: 0, workTitle: '', workImage: '', selectedFriends: [] });
         loadData();
     };
 
@@ -111,7 +123,33 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
             case 'active': return '#22c55e';
             case 'pending': return '#eab308';
             case 'completed': return '#6b7280';
+            case 'cancelled': return '#ef4444';
         }
+    };
+
+    const handleAccept = async (challengeId: string) => {
+        if (!user) return;
+        await acceptChallengeInvitation(challengeId, user.uid);
+        addToast('Défi accepté !', 'success');
+        loadData();
+    };
+
+    const handleDecline = async (challengeId: string) => {
+        if (!user) return;
+        await declineChallengeInvitation(challengeId, user.uid);
+        addToast('Défi refusé', 'info');
+        loadData();
+    };
+
+    const handleCancel = async (challengeId: string) => {
+        await cancelChallenge(challengeId);
+        addToast('Défi annulé', 'info');
+        loadData();
+    };
+
+    const getMyParticipantStatus = (challenge: Challenge): ChallengeParticipant['status'] | null => {
+        const me = challenge.participants.find(p => p.id === user?.uid);
+        return me?.status || null;
     };
 
     const getChallengeIcon = (type: Challenge['type']) => {
@@ -215,6 +253,43 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                                         </div>
                                     ))}
                             </div>
+
+                            {/* Action Buttons */}
+                            <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                {/* Accept/Decline for pending invitations */}
+                                {getMyParticipantStatus(challenge) === 'pending' && challenge.createdBy !== user.uid && (
+                                    <>
+                                        <Button
+                                            size="sm"
+                                            variant="manga"
+                                            onClick={() => handleAccept(challenge.id)}
+                                            icon={<Check size={16} />}
+                                        >
+                                            Accepter
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => handleDecline(challenge.id)}
+                                            icon={<X size={16} />}
+                                        >
+                                            Refuser
+                                        </Button>
+                                    </>
+                                )}
+                                {/* Cancel button for creator */}
+                                {challenge.createdBy === user.uid && challenge.status !== 'completed' && challenge.status !== 'cancelled' && (
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => handleCancel(challenge.id)}
+                                        icon={<Ban size={16} />}
+                                        style={{ color: '#ef4444' }}
+                                    >
+                                        Annuler
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -266,20 +341,40 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                     </div>
 
                     <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>Œuvre (optionnel)</label>
-                        <input
-                            type="text"
-                            value={newChallenge.workTitle}
-                            onChange={e => setNewChallenge(prev => ({ ...prev, workTitle: e.target.value }))}
-                            placeholder="Ex: One Piece, Naruto..."
-                            style={{
-                                width: '100%',
-                                padding: '0.75rem',
-                                border: '2px solid #000',
-                                fontSize: '1rem',
-                                fontFamily: 'inherit'
-                            }}
-                        />
+                        <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>
+                            <BookOpen size={16} style={{ marginRight: '0.5rem' }} />
+                            Œuvre du défi
+                        </label>
+                        {works.length === 0 ? (
+                            <p style={{ opacity: 0.6, fontStyle: 'italic' }}>Ajoutez des œuvres à votre bibliothèque</p>
+                        ) : (
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', maxHeight: '200px', overflowY: 'auto' }}>
+                                {works.map(work => (
+                                    <div
+                                        key={work.id}
+                                        onClick={() => setNewChallenge(prev => ({
+                                            ...prev,
+                                            workId: Number(work.id),
+                                            workTitle: work.title,
+                                            workImage: work.image
+                                        }))}
+                                        style={{
+                                            width: 70,
+                                            cursor: 'pointer',
+                                            opacity: newChallenge.workId === work.id ? 1 : 0.6,
+                                            border: newChallenge.workId === work.id ? '2px solid #000' : '2px solid transparent',
+                                            borderRadius: '4px',
+                                            padding: '2px'
+                                        }}
+                                    >
+                                        <div style={{ width: '100%', aspectRatio: '2/3', borderRadius: '4px', overflow: 'hidden' }}>
+                                            <img src={work.image} alt={work.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        </div>
+                                        <p style={{ fontSize: '0.65rem', textAlign: 'center', marginTop: '0.25rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{work.title}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div style={{ marginBottom: '1.5rem' }}>

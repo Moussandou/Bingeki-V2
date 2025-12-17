@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { useLibraryStore, type Work } from '@/store/libraryStore';
-import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle, Users, BookOpen, CheckCircle, SortAsc, ChevronDown } from 'lucide-react';
+import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle, BookOpen, CheckCircle, SortAsc, ChevronDown, Download, Upload, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { statusToFrench } from '@/utils/statusTranslation';
 import { useToast } from '@/context/ToastContext';
+import { exportData, importData } from '@/utils/storageUtils';
 // Removed unused imports
 // Removed unused gamification store
 
@@ -116,61 +117,86 @@ export default function Library() {
             <div style={{ minHeight: 'calc(100vh - 80px)' }}>
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
 
-                    {/* Stats Header */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                        gap: '1.5rem',
-                        marginBottom: '2rem'
+                    {/* Stats Header - Consolidated */}
+                    <div className="manga-panel" style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0',
+                        marginBottom: '2rem',
+                        background: '#fff',
+                        overflow: 'hidden'
                     }}>
-                        <Card variant="manga" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff' }}>
-                            <div style={{ padding: '0.75rem', background: 'rgba(255, 46, 99, 0.1)', borderRadius: '50%', border: '2px solid var(--color-primary)' }}>
-                                <BookOpen size={24} color="var(--color-primary)" />
+                        <div style={{ display: 'flex', flex: 1, minWidth: '300px' }}>
+                            <div style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRight: '2px solid #000' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.6, marginBottom: '0.5rem' }}>
+                                    <BookOpen size={18} />
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>Total</span>
+                                </div>
+                                <span style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.total}</span>
                             </div>
-                            <div>
-                                <span style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.total}</span>
-                                <p style={{ fontSize: '0.8rem', opacity: 0.6, textTransform: 'uppercase', fontWeight: 600 }}>Total Œuvres</p>
+                            <div style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRight: '2px solid #000' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.6, marginBottom: '0.5rem' }}>
+                                    <CheckCircle size={18} />
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>Terminées</span>
+                                </div>
+                                <span style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.completed}</span>
                             </div>
-                        </Card>
-                        <Card variant="manga" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff' }}>
-                            <div style={{ padding: '0.75rem', background: 'rgba(255, 46, 99, 0.1)', borderRadius: '50%', border: '2px solid var(--color-primary)' }}>
-                                <CheckCircle size={24} color="var(--color-primary)" />
+                            <div style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.6, marginBottom: '0.5rem' }}>
+                                    <TrendingUp size={18} />
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>Progression</span>
+                                </div>
+                                <span style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.avgProgress}%</span>
                             </div>
-                            <div>
-                                <span style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.completed}</span>
-                                <p style={{ fontSize: '0.8rem', opacity: 0.6, textTransform: 'uppercase', fontWeight: 600 }}>Terminées</p>
-                            </div>
-                        </Card>
-                        <Card variant="manga" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff' }}>
-                            <div style={{ padding: '0.75rem', background: 'rgba(255, 46, 99, 0.1)', borderRadius: '50%', border: '2px solid var(--color-primary)' }}>
-                                <Users size={24} color="var(--color-primary)" />
-                            </div>
-                            <div>
-                                <span style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.avgProgress}%</span>
-                                <p style={{ fontSize: '0.8rem', opacity: 0.6, textTransform: 'uppercase', fontWeight: 600 }}>Progression</p>
-                            </div>
-                        </Card>
-                        <Button
-                            variant="primary"
-                            onClick={() => setIsAddModalOpen(true)}
-                            icon={<Plus size={18} />}
-                            style={{
-                                height: 'fit-content',
-                                alignSelf: 'center',
-                                width: '100%',
-                                padding: '1rem'
-                            }}
-                        >
-                            AJOUTER
-                        </Button>
+                        </div>
+
+                        <div style={{ padding: '1.5rem', borderLeft: '2px solid #000', background: '#000' }}>
+                            <Button
+                                variant="primary"
+                                onClick={() => setIsAddModalOpen(true)}
+                                icon={<Plus size={20} />}
+                                style={{
+                                    height: 'auto',
+                                    padding: '0.75rem 1.5rem',
+                                    fontWeight: 800,
+                                    fontSize: '1rem',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                AJOUTER UNE ŒUVRE
+                            </Button>
+                        </div>
                     </div>
 
                     {/* Controls Bar */}
                     <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
 
                         {/* Search */}
-                        <Card variant="manga" style={{ flex: 1, minWidth: '300px', padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', background: '#fff' }}>
-                            <Search size={20} style={{ marginRight: '0.75rem', opacity: 0.5 }} />
+                        {/* Search */}
+                        <Card
+                            variant="manga"
+                            style={{
+                                flex: 1,
+                                minWidth: '300px',
+                                padding: '0.25rem 0.75rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.75rem',
+                                background: '#fff',
+                                borderWidth: '3px',
+                                borderStyle: 'solid',
+                                borderColor: '#000',
+                                boxShadow: '6px 6px 0 #000'
+                            }}
+                            whileHover={{
+                                borderColor: 'var(--color-primary)',
+                                boxShadow: '6px 6px 0 var(--color-primary)'
+                            }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <Search size={20} style={{ opacity: 0.4 }} />
                             <input
                                 placeholder="Rechercher..."
                                 value={searchQuery}
@@ -181,7 +207,9 @@ export default function Library() {
                                     width: '100%',
                                     fontSize: '1rem',
                                     background: 'transparent',
-                                    fontFamily: 'inherit'
+                                    fontFamily: 'var(--font-heading)',
+                                    fontWeight: 700,
+                                    padding: '0.5rem 0'
                                 }}
                             />
                         </Card>
@@ -389,6 +417,39 @@ export default function Library() {
                                 SUPPRIMER ({selectedWorks.size})
                             </Button>
                         )}
+
+                        {/* Import/Export */}
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <Button
+                                variant="manga"
+                                icon={<Download size={18} />}
+                                onClick={exportData}
+                                title="Exporter la bibliothèque"
+                                style={{ minWidth: '40px', padding: '0.5rem' }}
+                            />
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type="file"
+                                    accept=".json"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            importData(file).then(() => {
+                                                addToast('Données importées !', 'success');
+                                            }).catch(() => addToast('Erreur', 'error'));
+                                        }
+                                    }}
+                                    style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', zIndex: 10 }}
+                                />
+                                <Button
+                                    variant="manga"
+                                    icon={<Upload size={18} />}
+                                    title="Importer la bibliothèque"
+                                    style={{ minWidth: '40px', padding: '0.5rem' }}
+                                />
+                            </div>
+                        </div>
+
                     </div>
 
                     {/* Content Grid/List */}
@@ -486,7 +547,7 @@ export default function Library() {
                                                 </div>
 
                                                 {/* Progress Bar */}
-                                                <div style={{ height: '10px', background: '#f4f4f5', borderRadius: '5px', overflow: 'hidden', marginTop: 'auto', border: '1px solid #000' }}>
+                                                <div style={{ height: '10px', background: '#f4f4f5', borderRadius: '0', overflow: 'hidden', marginTop: 'auto', border: '1px solid #000' }}>
                                                     <div style={{
                                                         height: '100%',
                                                         width: `${((work.currentChapter || 0) / (work.totalChapters || 1)) * 100}%`,
@@ -501,6 +562,44 @@ export default function Library() {
                                                 </div>
                                             </div>
                                         </Card>
+
+                                        {/* Delete Button (visible on hover or always on mobile? defaulting to always for visibility) */}
+                                        {!isSelectionMode && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setWorkToDelete(work);
+                                                }}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: 10,
+                                                    right: 10,
+                                                    background: 'rgba(255, 255, 255, 0.9)',
+                                                    border: '2px solid #000',
+                                                    borderRadius: '50%',
+                                                    width: '32px',
+                                                    height: '32px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    cursor: 'pointer',
+                                                    zIndex: 20,
+                                                    boxShadow: '2px 2px 0 #000',
+                                                    transition: 'transform 0.2s'
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.transform = 'scale(1.1)';
+                                                    e.currentTarget.style.background = '#fee2e2';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.transform = 'scale(1)';
+                                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)';
+                                                }}
+                                                title="Supprimer l'oeuvre"
+                                            >
+                                                <Trash2 size={16} color="#dc2626" />
+                                            </button>
+                                        )}
 
                                         {/* Selection Checkbox (Visual only) */}
                                         {isSelectionMode && (
