@@ -11,7 +11,7 @@ import { logout } from '@/firebase/auth';
 import {
     Settings, Award, BookOpen, CheckCircle, Library, Trophy, Flame, Info,
     PenTool,
-    X, Upload, Star
+    X, Upload
 } from 'lucide-react';
 import { HunterLicenseCard } from '@/components/HunterLicenseCard';
 import { getUserProfile, saveUserProfileToFirestore, type UserProfile } from '@/firebase/firestore';
