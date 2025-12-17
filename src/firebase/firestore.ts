@@ -599,3 +599,94 @@ export async function getFriendsReadingWork(userId: string, workId: number): Pro
         return { count: 0, friends: [] };
     }
 }
+
+// ==================== WATCH PARTY FUNCTIONS ====================
+
+import type { WatchParty, PartyParticipant } from '@/types/watchparty';
+
+// Create a watch party
+export async function createWatchParty(party: Omit<WatchParty, 'id'>): Promise<string> {
+    try {
+        const partyRef = doc(collection(db, 'watchparties'));
+        const partyData: WatchParty = {
+            ...party,
+            id: partyRef.id
+        };
+        await setDoc(partyRef, partyData);
+        console.log('[Firestore] Watch party created:', partyData.id);
+        return partyRef.id;
+    } catch (error) {
+        console.error('[Firestore] Error creating watch party:', error);
+        throw error;
+    }
+}
+
+// Get user's watch parties
+export async function getUserWatchParties(userId: string): Promise<WatchParty[]> {
+    try {
+        // Get parties where user is host or participant
+        const hostQuery = query(
+            collection(db, 'watchparties'),
+            where('hostId', '==', userId),
+            orderBy('lastActivity', 'desc')
+        );
+        const hostSnap = await getDocs(hostQuery);
+
+        const parties: WatchParty[] = hostSnap.docs.map(doc => doc.data() as WatchParty);
+
+        // Also get parties where user is a participant (simplified - would need more complex query in production)
+        const allParties = query(
+            collection(db, 'watchparties'),
+            where('status', '==', 'active'),
+            orderBy('lastActivity', 'desc'),
+            limit(50)
+        );
+        const allSnap = await getDocs(allParties);
+
+        allSnap.docs.forEach(doc => {
+            const party = doc.data() as WatchParty;
+            if (party.participants.some(p => p.id === userId) && !parties.find(p => p.id === party.id)) {
+                parties.push(party);
+            }
+        });
+
+        return parties.sort((a, b) => b.lastActivity - a.lastActivity);
+    } catch (error) {
+        console.error('[Firestore] Error getting user watch parties:', error);
+        return [];
+    }
+}
+
+// Join a watch party
+export async function joinWatchParty(partyId: string, participant: PartyParticipant): Promise<void> {
+    try {
+        const partyRef = doc(db, 'watchparties', partyId);
+        const partySnap = await getDoc(partyRef);
+
+        if (!partySnap.exists()) throw new Error('Party not found');
+
+        const party = partySnap.data() as WatchParty;
+        if (!party.participants.find(p => p.id === participant.id)) {
+            await updateDoc(partyRef, {
+                participants: [...party.participants, participant],
+                lastActivity: Date.now()
+            });
+        }
+        console.log('[Firestore] Joined watch party:', partyId);
+    } catch (error) {
+        console.error('[Firestore] Error joining watch party:', error);
+        throw error;
+    }
+}
+
+// Update party progress
+export async function updateWatchPartyProgress(partyId: string, newEpisode: number): Promise<void> {
+    try {
+        await updateDoc(doc(db, 'watchparties', partyId), {
+            currentEpisode: newEpisode,
+            lastActivity: Date.now()
+        });
+    } catch (error) {
+        console.error('[Firestore] Error updating party progress:', error);
+    }
+}

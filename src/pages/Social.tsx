@@ -302,7 +302,22 @@ export default function Social() {
                                         <img src={player.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.displayName}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     </div>
                                     <div style={{ flex: 1, minWidth: 0, marginRight: '0.5rem', cursor: 'pointer' }} onClick={() => navigate(`/profile/${player.uid}`)}>
-                                        <div style={{ fontWeight: 700, fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{player.displayName || 'Anonyme'}</div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <span style={{ fontWeight: 700, fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{player.displayName || 'Anonyme'}</span>
+                                            {player.featuredBadge && (
+                                                <span style={{
+                                                    fontSize: '0.7rem',
+                                                    padding: '0.15rem 0.4rem',
+                                                    background: '#6b7280',
+                                                    color: '#fff',
+                                                    borderRadius: '4px',
+                                                    fontWeight: 700,
+                                                    whiteSpace: 'nowrap'
+                                                }}>
+                                                    {player.featuredBadge}
+                                                </span>
+                                            )}
+                                        </div>
                                         <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>Lvl {player.level || 1}</div>
                                     </div>
                                     <div style={{ fontWeight: 900, fontSize: '1.2rem', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
