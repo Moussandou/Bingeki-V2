@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { useLibraryStore, type Work } from '@/store/libraryStore';
-import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle, Users, BookOpen, CheckCircle } from 'lucide-react';
+import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle, Users, BookOpen, CheckCircle, SortAsc } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { statusToFrench } from '@/utils/statusTranslation';
@@ -109,46 +109,44 @@ export default function Library() {
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
 
                     {/* Stats Header */}
-                    <div className="manga-panel" style={{
+                    <div style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
                         gap: '1.5rem',
-                        marginBottom: '2rem',
-                        background: '#fff',
-                        padding: '1.5rem'
+                        marginBottom: '2rem'
                     }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div style={{ padding: '0.75rem', background: '#f4f4f5', borderRadius: '50%' }}>
+                        <Card variant="manga" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff' }}>
+                            <div style={{ padding: '0.75rem', background: '#f4f4f5', borderRadius: '50%', border: '2px solid #000' }}>
                                 <BookOpen size={24} color="#000" />
                             </div>
                             <div>
                                 <span style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.total}</span>
                                 <p style={{ fontSize: '0.8rem', opacity: 0.6, textTransform: 'uppercase', fontWeight: 600 }}>Total Œuvres</p>
                             </div>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div style={{ padding: '0.75rem', background: '#f4f4f5', borderRadius: '50%' }}>
+                        </Card>
+                        <Card variant="manga" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff' }}>
+                            <div style={{ padding: '0.75rem', background: '#f4f4f5', borderRadius: '50%', border: '2px solid #000' }}>
                                 <CheckCircle size={24} color="#22c55e" />
                             </div>
                             <div>
                                 <span style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.completed}</span>
                                 <p style={{ fontSize: '0.8rem', opacity: 0.6, textTransform: 'uppercase', fontWeight: 600 }}>Terminées</p>
                             </div>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div style={{ padding: '0.75rem', background: '#f4f4f5', borderRadius: '50%' }}>
+                        </Card>
+                        <Card variant="manga" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff' }}>
+                            <div style={{ padding: '0.75rem', background: '#f4f4f5', borderRadius: '50%', border: '2px solid #000' }}>
                                 <Users size={24} color="var(--color-primary)" />
                             </div>
                             <div>
                                 <span style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.avgProgress}%</span>
                                 <p style={{ fontSize: '0.8rem', opacity: 0.6, textTransform: 'uppercase', fontWeight: 600 }}>Progression</p>
                             </div>
-                        </div>
+                        </Card>
                         <Button
                             variant="primary"
                             onClick={() => setIsAddModalOpen(true)}
                             icon={<Plus size={18} />}
-                            style={{ height: '100%', minHeight: '60px', marginLeft: 'auto' }}
+                            style={{ height: 'auto', minHeight: '100%', fontSize: '1.1rem' }}
                         >
                             AJOUTER
                         </Button>
@@ -158,7 +156,7 @@ export default function Library() {
                     <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
 
                         {/* Search */}
-                        <div className="manga-panel" style={{ flex: 1, minWidth: '300px', padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', background: '#fff' }}>
+                        <Card variant="manga" style={{ flex: 1, minWidth: '300px', padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', background: '#fff' }}>
                             <Search size={20} style={{ marginRight: '0.75rem', opacity: 0.5 }} />
                             <input
                                 placeholder="Rechercher..."
@@ -169,10 +167,11 @@ export default function Library() {
                                     outline: 'none',
                                     width: '100%',
                                     fontSize: '1rem',
-                                    background: 'transparent'
+                                    background: 'transparent',
+                                    fontFamily: 'inherit'
                                 }}
                             />
-                        </div>
+                        </Card>
 
                         {/* Filters Dropdown */}
                         <div style={{ position: 'relative' }}>
@@ -180,37 +179,44 @@ export default function Library() {
                                 variant="manga"
                                 icon={<Filter size={18} />}
                                 onClick={() => setFilterOpen(!filterOpen)}
-                                style={{ background: filterOpen ? '#000' : '#fff', color: filterOpen ? '#fff' : '#000' }}
+                                style={{
+                                    background: filterOpen ? '#000' : '#fff',
+                                    color: filterOpen ? '#fff' : '#000',
+                                    minWidth: '130px'
+                                }}
                             >
                                 FILTRES
                             </Button>
                             {filterOpen && (
-                                <div className="manga-panel" style={{
+                                <Card variant="manga" style={{
                                     position: 'absolute',
                                     top: '110%',
                                     right: 0,
                                     zIndex: 50,
                                     background: '#fff',
                                     padding: '1rem',
-                                    width: '250px',
-                                    border: '2px solid #000'
+                                    width: '280px',
                                 }}>
                                     <div style={{ marginBottom: '1rem' }}>
-                                        <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.5rem' }}>TYPE</h4>
+                                        <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.9rem', marginBottom: '0.5rem', opacity: 0.7 }}>TYPE</h4>
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                             {['all', 'manga', 'anime'].map(t => (
                                                 <button
                                                     key={t}
                                                     onClick={() => setFilterType(t as any)}
                                                     style={{
-                                                        padding: '0.25rem 0.5rem',
+                                                        padding: '0.5rem 1rem',
                                                         border: '2px solid #000',
                                                         background: filterType === t ? '#000' : '#fff',
                                                         color: filterType === t ? '#fff' : '#000',
-                                                        fontWeight: 'bold',
+                                                        fontWeight: 800,
                                                         textTransform: 'uppercase',
                                                         fontSize: '0.8rem',
-                                                        cursor: 'pointer'
+                                                        cursor: 'pointer',
+                                                        flex: 1,
+                                                        boxShadow: filterType === t ? 'none' : '2px 2px 0 #000',
+                                                        transform: filterType === t ? 'translate(2px, 2px)' : 'none',
+                                                        transition: 'all 0.1s'
                                                     }}
                                                 >
                                                     {t === 'all' ? 'TOUS' : t}
@@ -219,21 +225,24 @@ export default function Library() {
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.5rem' }}>STATUT</h4>
+                                        <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.9rem', marginBottom: '0.5rem', opacity: 0.7 }}>STATUT</h4>
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                                             {['all', 'reading', 'completed', 'plan_to_read'].map(s => (
                                                 <button
                                                     key={s}
                                                     onClick={() => setFilterStatus(s as any)}
                                                     style={{
-                                                        padding: '0.25rem 0.5rem',
+                                                        padding: '0.4rem 0.8rem',
                                                         border: '2px solid #000',
                                                         background: filterStatus === s ? '#000' : '#fff',
                                                         color: filterStatus === s ? '#fff' : '#000',
-                                                        fontWeight: 'bold',
+                                                        fontWeight: 700,
                                                         textTransform: 'uppercase',
-                                                        fontSize: '0.8rem',
-                                                        cursor: 'pointer'
+                                                        fontSize: '0.75rem',
+                                                        cursor: 'pointer',
+                                                        boxShadow: filterStatus === s ? 'none' : '2px 2px 0 #000',
+                                                        transform: filterStatus === s ? 'translate(2px, 2px)' : 'none',
+                                                        transition: 'all 0.1s'
                                                     }}
                                                 >
                                                     {s === 'all' ? 'TOUS' : s.replace(/_/g, ' ')}
@@ -241,37 +250,68 @@ export default function Library() {
                                             ))}
                                         </div>
                                     </div>
-                                </div>
+                                </Card>
                             )}
                         </div>
 
-                        {/* Sort Dropdown (Simplified as Select) */}
-                        <select
-                            value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value as any)}
-                            style={{ padding: '0.75rem', borderRadius: '8px', border: '2px solid #000', fontWeight: 600, cursor: 'pointer' }}
-                        >
-                            <option value="updated">Récents</option>
-                            <option value="added">Ajoutés</option>
-                            <option value="alphabetical">A-Z</option>
-                            <option value="progress">Progression</option>
-                        </select>
+                        {/* Sort Select */}
+                        <Card variant="manga" style={{ padding: 0, background: '#fff', border: '2px solid #000', boxShadow: '4px 4px 0 #000', display: 'flex', alignItems: 'center' }}>
+                            <SortAsc size={18} style={{ marginLeft: '1rem' }} />
+                            <select
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value as any)}
+                                style={{
+                                    padding: '0.75rem 1rem 0.75rem 0.5rem',
+                                    borderRadius: 0,
+                                    border: 'none',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                    background: 'transparent',
+                                    outline: 'none',
+                                    fontSize: '0.9rem',
+                                    fontFamily: 'inherit',
+                                    textTransform: 'uppercase'
+                                }}
+                            >
+                                <option value="updated">Récents</option>
+                                <option value="added">Ajoutés</option>
+                                <option value="alphabetical">A-Z</option>
+                                <option value="progress">Progression</option>
+                            </select>
+                        </Card>
 
                         {/* View Toggle */}
-                        <div style={{ display: 'flex', background: '#fff', border: '2px solid #000', borderRadius: '8px', overflow: 'hidden' }}>
+                        <Card variant="manga" style={{ display: 'flex', padding: 0, overflow: 'hidden', gap: 0, background: '#fff' }}>
                             <button
                                 onClick={() => setViewMode('grid')}
-                                style={{ padding: '0.75rem', background: viewMode === 'grid' ? '#000' : '#fff', color: viewMode === 'grid' ? '#fff' : '#000', cursor: 'pointer', border: 'none' }}
+                                style={{
+                                    padding: '0.75rem',
+                                    background: viewMode === 'grid' ? '#000' : '#fff',
+                                    color: viewMode === 'grid' ? '#fff' : '#000',
+                                    cursor: 'pointer',
+                                    border: 'none',
+                                    borderRight: '2px solid #000',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}
                             >
                                 <Grid size={20} />
                             </button>
                             <button
                                 onClick={() => setViewMode('list')}
-                                style={{ padding: '0.75rem', background: viewMode === 'list' ? '#000' : '#fff', color: viewMode === 'list' ? '#fff' : '#000', cursor: 'pointer', border: 'none' }}
+                                style={{
+                                    padding: '0.75rem',
+                                    background: viewMode === 'list' ? '#000' : '#fff',
+                                    color: viewMode === 'list' ? '#fff' : '#000',
+                                    cursor: 'pointer',
+                                    border: 'none',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}
                             >
                                 <List size={20} />
                             </button>
-                        </div>
+                        </Card>
 
                         {/* Selection Mode Toggle */}
                         <Button
@@ -280,14 +320,18 @@ export default function Library() {
                                 setIsSelectionMode(!isSelectionMode);
                                 setSelectedWorks(new Set());
                             }}
-                            style={{ border: isSelectionMode ? '2px solid var(--color-primary)' : '2px solid #ddd', color: isSelectionMode ? 'var(--color-primary)' : '#666' }}
+                            style={{
+                                border: isSelectionMode ? '2px solid var(--color-primary)' : '2px solid #000',
+                                color: isSelectionMode ? 'var(--color-primary)' : '#000',
+                                boxShadow: isSelectionMode ? '4px 4px 0 var(--color-primary-glow)' : '4px 4px 0 #000'
+                            }}
                         >
-                            {isSelectionMode ? 'Annuler' : 'Sélectionner'}
+                            {isSelectionMode ? 'ANNULER' : 'SÉLECTIONNER'}
                         </Button>
 
                         {isSelectionMode && selectedWorks.size > 0 && (
-                            <Button variant="outline" onClick={handleBulkDelete} style={{ borderColor: '#ef4444', color: '#ef4444' }} icon={<Trash2 size={16} />}>
-                                Supprimer ({selectedWorks.size})
+                            <Button variant="outline" onClick={handleBulkDelete} style={{ borderColor: '#ef4444', color: '#ef4444', boxShadow: '4px 4px 0 rgba(239, 68, 68, 0.2)' }} icon={<Trash2 size={16} />}>
+                                SUPPRIMER ({selectedWorks.size})
                             </Button>
                         )}
                     </div>
@@ -302,7 +346,7 @@ export default function Library() {
                         <div style={{
                             display: viewMode === 'grid' ? 'grid' : 'flex',
                             flexDirection: 'column',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
                             gap: '1.5rem'
                         }}>
                             <AnimatePresence>
@@ -325,7 +369,10 @@ export default function Library() {
                                                 height: '100%',
                                                 cursor: isSelectionMode ? 'default' : 'pointer',
                                                 display: viewMode === 'list' ? 'flex' : 'block',
-                                                alignItems: 'center'
+                                                alignItems: 'center',
+                                                border: selectedWorks.has(work.id) ? '2px solid var(--color-primary)' : undefined,
+                                                transform: selectedWorks.has(work.id) ? 'translate(-2px, -2px)' : undefined,
+                                                boxShadow: selectedWorks.has(work.id) ? '6px 6px 0 var(--color-primary)' : undefined
                                             }}
                                             onClick={() => {
                                                 if (isSelectionMode) toggleSelection(work.id);
@@ -337,51 +384,62 @@ export default function Library() {
                                                 <div style={{
                                                     position: 'absolute',
                                                     inset: 0,
-                                                    background: selectedWorks.has(work.id) ? 'rgba(255, 46, 99, 0.2)' : 'transparent',
+                                                    background: selectedWorks.has(work.id) ? 'rgba(255, 46, 99, 0.1)' : 'transparent',
                                                     pointerEvents: 'none',
-                                                    border: selectedWorks.has(work.id) ? '3px solid var(--color-primary)' : 'none',
                                                     zIndex: 10
                                                 }} />
                                             )}
 
                                             {/* Image */}
                                             <div style={{
-                                                height: viewMode === 'grid' ? '200px' : '100px',
-                                                width: viewMode === 'list' ? '80px' : '100%',
+                                                height: viewMode === 'grid' ? '240px' : '120px',
+                                                width: viewMode === 'list' ? '100px' : '100%',
                                                 background: `url(${work.image}) center/cover`,
-                                                flexShrink: 0
+                                                flexShrink: 0,
+                                                borderRight: viewMode === 'list' ? '2px solid #000' : 'none',
+                                                borderBottom: viewMode === 'grid' ? '2px solid #000' : 'none'
                                             }} />
 
                                             {/* Info */}
-                                            <div style={{ padding: '1rem', flex: 1 }}>
+                                            <div style={{ padding: '1rem', flex: 1, background: '#fff' }}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.5rem' }}>
                                                     <h3 style={{
                                                         fontFamily: 'var(--font-heading)',
-                                                        fontSize: '1rem',
-                                                        fontWeight: 800,
+                                                        fontSize: viewMode === 'list' ? '1.2rem' : '1rem',
+                                                        fontWeight: 900,
                                                         lineHeight: 1.2,
-                                                        marginBottom: '0.25rem'
+                                                        marginBottom: '0.25rem',
+                                                        textTransform: 'uppercase'
                                                     }}>
                                                         {work.title}
                                                     </h3>
                                                 </div>
 
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                                    <span style={{ fontSize: '0.75rem', padding: '2px 6px', borderRadius: '4px', background: '#eee', fontWeight: 600 }}>{work.type}</span>
-                                                    <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>{statusToFrench(work.status)}</span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                                                    <span style={{
+                                                        fontSize: '0.7rem',
+                                                        padding: '2px 6px',
+                                                        background: '#000',
+                                                        color: '#fff',
+                                                        fontWeight: 800,
+                                                        textTransform: 'uppercase'
+                                                    }}>
+                                                        {work.type}
+                                                    </span>
+                                                    <span style={{ fontSize: '0.75rem', fontWeight: 700, opacity: 0.7, textTransform: 'uppercase' }}>{statusToFrench(work.status)}</span>
                                                 </div>
 
                                                 {/* Progress Bar */}
-                                                <div style={{ height: '6px', background: '#eee', borderRadius: '3px', overflow: 'hidden', marginTop: 'auto' }}>
+                                                <div style={{ height: '8px', background: '#f4f4f5', borderRadius: '4px', overflow: 'hidden', marginTop: 'auto', border: '1px solid #000' }}>
                                                     <div style={{
                                                         height: '100%',
                                                         width: `${((work.currentChapter || 0) / (work.totalChapters || 1)) * 100}%`,
                                                         background: 'var(--color-primary)'
                                                     }} />
                                                 </div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.25rem' }}>
-                                                    <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>Ch. {work.currentChapter} / {work.totalChapters || '?'}</span>
-                                                    {work.rating && <span style={{ fontSize: '0.7rem', fontWeight: 600 }}>★ {work.rating}</span>}
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+                                                    <span style={{ fontSize: '0.75rem', fontWeight: 800 }}>Ch. {work.currentChapter} / {work.totalChapters || '?'}</span>
+                                                    {work.rating && <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#fbbf24' }}>★ {work.rating}</span>}
                                                 </div>
                                             </div>
                                         </Card>
@@ -400,9 +458,10 @@ export default function Library() {
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
-                                                zIndex: 20
+                                                zIndex: 20,
+                                                boxShadow: '2px 2px 0 #000'
                                             }}>
-                                                {selectedWorks.has(work.id) && <CheckCircle size={14} color="#fff" />}
+                                                {selectedWorks.has(work.id) && <CheckCircle size={16} color="#fff" />}
                                             </div>
                                         )}
                                     </motion.div>
@@ -420,11 +479,11 @@ export default function Library() {
                     <Modal isOpen={!!workToDelete} onClose={() => setWorkToDelete(null)} title="SUPPRESSION">
                         <div style={{ textAlign: 'center', padding: '1rem' }}>
                             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-                                <div style={{ background: '#fee2e2', padding: '1rem', borderRadius: '50%', color: '#dc2626' }}>
+                                <div style={{ background: '#fee2e2', padding: '1rem', borderRadius: '50%', color: '#dc2626', border: '2px solid #dc2626' }}>
                                     <AlertTriangle size={32} />
                                 </div>
                             </div>
-                            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem', color: '#000' }}>
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
                                 Supprimer "{workToDelete?.title}" ?
                             </h3>
                             <p style={{ marginBottom: '2rem', opacity: 0.7 }}>
