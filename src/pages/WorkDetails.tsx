@@ -409,7 +409,7 @@ export default function WorkDetails() {
 
                                 <div style={{ marginBottom: '2rem' }}>
                                     <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>PROGRESSION</h3>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#000' }}>
+                                    <div style={{ color: '#000' }}>
                                         {isEditing ? (
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                                 <input
@@ -431,12 +431,57 @@ export default function WorkDetails() {
                                                 <Button onClick={handleSave} variant="primary" icon={<Check size={20} />}>OK</Button>
                                             </div>
                                         ) : (
-                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem', marginTop: '1.5rem' }}>
-                                                <div className="manga-panel" style={{ padding: '1rem', background: '#fff' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                                                {/* Left: Decrement buttons */}
+                                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 5))}
+                                                        style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                    >-5</Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 3))}
+                                                        style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                    >-3</Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 1))}
+                                                        style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                    >-1</Button>
+                                                </div>
+
+                                                {/* Center: Progress display */}
+                                                <div style={{ textAlign: 'center' }}>
                                                     <span style={{ fontSize: '3rem', fontWeight: 900, lineHeight: 1 }}>
                                                         {work.currentChapter} <span style={{ fontSize: '1.5rem', opacity: 0.5 }}>/ {work.totalChapters || '?'}</span>
                                                     </span>
-                                                    <Button onClick={() => setIsEditing(true)} variant="manga">Mettre à jour</Button>
+                                                </div>
+
+                                                {/* Right: Increment buttons + Edit */}
+                                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 1)}
+                                                        style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                    >+1</Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 3)}
+                                                        style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                    >+3</Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 5)}
+                                                        style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                    >+5</Button>
+                                                    <Button onClick={() => setIsEditing(true)} variant="manga" size="sm">Éditer</Button>
                                                 </div>
                                             </div>
                                         )}
