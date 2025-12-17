@@ -13,7 +13,8 @@ import { RefreshCw } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
 import { getLocalStorageSize, exportData, importData, clearImageCache } from '@/utils/storageUtils';
 import { useAuthStore } from '@/store/authStore';
-import { saveLibraryToFirestore, saveGamificationToFirestore } from '@/firebase/firestore';
+import { saveLibraryToFirestore, saveGamificationToFirestore, deleteUserData } from '@/firebase/firestore';
+import { deleteUser } from 'firebase/auth';
 
 function SyncButton() {
     // ... existing SyncButton code ...
@@ -160,6 +161,35 @@ export default function Settings() {
             addToast('Données importées avec succès !', 'success');
         } catch (error) {
             addToast('Échec de l\'importation', 'error');
+        }
+    };
+
+    const [showConfirmAccountDelete, setShowConfirmAccountDelete] = useState(false);
+
+    const handleDeleteAccount = async () => {
+        if (!user) return;
+
+        try {
+            // 1. Delete Firestore Data
+            await deleteUserData(user.uid);
+
+            // 2. Delete Auth Account
+            await deleteUser(user);
+
+            // 3. Clear Local State
+            useLibraryStore.getState().resetStore();
+            useGamificationStore.getState().resetStore();
+            localStorage.clear();
+
+            addToast('Compte supprimé. Sayonara.', 'success');
+            navigate('/');
+        } catch (error: any) {
+            console.error('Delete account error:', error);
+            if (error.code === 'auth/requires-recent-login') {
+                addToast('Veuillez vous reconnecter pour supprimer votre compte', 'error');
+            } else {
+                addToast('Erreur lors de la suppression', 'error');
+            }
         }
     };
 
@@ -313,13 +343,35 @@ export default function Settings() {
                                             <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>Actions irréversibles</p>
                                         </div>
                                         {!showConfirmReset ? (
-                                            <Button variant="outline" size="sm" onClick={() => setShowConfirmReset(true)} style={{ borderColor: '#ef4444', color: '#ef4444' }}>
-                                                <ShieldAlert size={16} /> Reset All
-                                            </Button>
-                                        ) : (
+                                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                                <Button variant="outline" size="sm" onClick={() => setShowConfirmReset(true)} style={{ borderColor: '#ef4444', color: '#ef4444' }}>
+                                                    <ShieldAlert size={16} /> Reset All
+                                                </Button>
+                                                <Button variant="outline" size="sm" onClick={() => setShowConfirmAccountDelete(true)} style={{ borderColor: '#ef4444', color: '#ef4444' }}>
+                                                    <Trash2 size={16} /> Supprimer Compte
+                                                </Button>
+                                            </div>
+                                        ) : showConfirmReset ? (
                                             <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                <Button variant="ghost" size="sm" onClick={() => setShowConfirmReset(false)}>Annuler</Button>
-                                                <Button variant="primary" size="sm" onClick={resetAll} style={{ background: '#ef4444' }}>Confirmer</Button>
+                                                <span style={{ fontSize: '0.8rem', color: '#ef4444', alignSelf: 'center', fontWeight: 'bold' }}>Sûr ?</span>
+                                                <Button variant="ghost" size="sm" onClick={() => setShowConfirmReset(false)}>Non</Button>
+                                                <Button variant="primary" size="sm" onClick={resetAll} style={{ background: '#ef4444' }}>Oui, Reset</Button>
+                                            </div>
+                                        ) : null}
+
+                                        {/* Account Deletion Confirmation */}
+                                        {showConfirmAccountDelete && (
+                                            <div style={{ marginTop: '1rem', padding: '1rem', border: '2px solid #ef4444', background: '#fef2f2' }}>
+                                                <p style={{ fontWeight: 700, color: '#ef4444', marginBottom: '0.5rem' }}>SUPPRIMER DÉFINITIVEMENT ?</p>
+                                                <p style={{ fontSize: '0.85rem', marginBottom: '1rem' }}>
+                                                    Cette action supprimera votre compte, votre bibliothèque et toute votre progression. Impossible d'annuler.
+                                                </p>
+                                                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                    <Button variant="ghost" size="sm" onClick={() => setShowConfirmAccountDelete(false)}>Annuler</Button>
+                                                    <Button variant="primary" size="sm" onClick={handleDeleteAccount} style={{ background: '#ef4444' }}>
+                                                        ADIEU
+                                                    </Button>
+                                                </div>
                                             </div>
                                         )}
                                     </div>

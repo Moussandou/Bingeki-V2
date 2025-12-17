@@ -868,3 +868,32 @@ export async function submitFeedback(feedback: Omit<FeedbackData, 'timestamp'>):
         return false;
     }
 }
+
+export async function getAllFeedback(): Promise<FeedbackData[]> {
+    try {
+        const q = query(collection(db, 'feedback'), orderBy('timestamp', 'desc'));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as FeedbackData));
+    } catch (error) {
+        console.error('[Firestore] Error getting feedback:', error);
+        return [];
+    }
+}
+
+export async function deleteUserData(userId: string): Promise<void> {
+    try {
+        // Delete user libraries
+        await deleteDoc(doc(db, 'libraries', userId));
+
+        // Delete user gamification
+        await deleteDoc(doc(db, 'gamification', userId));
+
+        // Delete user profile
+        await deleteDoc(doc(db, 'users', userId));
+
+        console.log('[Firestore] All user data deleted for:', userId);
+    } catch (error) {
+        console.error('[Firestore] Error deleting user data:', error);
+        throw error;
+    }
+}
