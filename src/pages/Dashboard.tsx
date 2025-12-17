@@ -37,7 +37,6 @@ export default function Dashboard() {
             loadFriendsActivity();
         }
     }, [user]);
-
     const loadFriendsActivity = async () => {
         if (!user) return;
         setIsLoadingActivity(true);
@@ -131,7 +130,7 @@ export default function Dashboard() {
                         {/* Daily Goal */}
                         <Card variant="manga" style={{ padding: '1.25rem', background: '#fff' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                                <Target size={24} color="#22c55e" />
+                                <Target size={24} color="var(--color-primary)" />
                                 <span style={{ fontWeight: 800, fontSize: '1rem' }}>OBJECTIF DU JOUR</span>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
@@ -142,12 +141,12 @@ export default function Dashboard() {
                                 <div style={{
                                     height: '100%',
                                     width: `${(todayProgress / dailyGoal) * 100}%`,
-                                    background: todayProgress >= dailyGoal ? '#22c55e' : '#3b82f6',
+                                    background: 'var(--color-primary)',
                                     transition: 'width 0.3s'
                                 }} />
                             </div>
                             {todayProgress >= dailyGoal && (
-                                <p style={{ fontSize: '0.8rem', color: '#22c55e', marginTop: '0.5rem', fontWeight: 600 }}>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--color-primary)', marginTop: '0.5rem', fontWeight: 600 }}>
                                     ✓ Objectif atteint ! +50 XP
                                 </p>
                             )}
@@ -156,7 +155,7 @@ export default function Dashboard() {
                         {/* Weekly Stats */}
                         <Card variant="manga" style={{ padding: '1.25rem', background: '#fff' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                                <TrendingUp size={24} color="#3b82f6" />
+                                <TrendingUp size={24} color="var(--color-primary)" />
                                 <span style={{ fontWeight: 800, fontSize: '1rem' }}>CETTE SEMAINE</span>
                             </div>
                             <div style={{ display: 'flex', gap: '1.5rem' }}>
@@ -174,25 +173,25 @@ export default function Dashboard() {
                         {/* Streak Warning / Status */}
                         <Card variant="manga" style={{ padding: '1.25rem', background: streak > 0 ? '#fff' : '#fef2f2' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                                <Flame size={24} color={streak > 0 ? '#ef4444' : '#9ca3af'} />
+                                <Flame size={24} color={streak > 0 ? 'var(--color-primary)' : '#9ca3af'} />
                                 <span style={{ fontWeight: 800, fontSize: '1rem' }}>STREAK</span>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-                                <span style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', color: streak > 0 ? '#ef4444' : '#9ca3af' }}>
+                                <span style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', color: streak > 0 ? 'var(--color-primary)' : '#9ca3af' }}>
                                     {streak}
                                 </span>
                                 <span style={{ opacity: 0.6 }}>jours</span>
                             </div>
                             {streak === 0 ? (
-                                <p style={{ fontSize: '0.8rem', color: '#ef4444', marginTop: '0.5rem' }}>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--color-primary)', marginTop: '0.5rem' }}>
                                     ⚠️ Lis un chapitre pour démarrer !
                                 </p>
                             ) : streak < 3 ? (
-                                <p style={{ fontSize: '0.8rem', color: '#f59e0b', marginTop: '0.5rem' }}>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--color-primary)', marginTop: '0.5rem' }}>
                                     🔥 Continue comme ça !
                                 </p>
                             ) : (
-                                <p style={{ fontSize: '0.8rem', color: '#22c55e', marginTop: '0.5rem' }}>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--color-primary)', marginTop: '0.5rem' }}>
                                     🔥 Tu es en feu !
                                 </p>
                             )}
