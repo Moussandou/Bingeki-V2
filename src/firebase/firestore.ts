@@ -28,15 +28,20 @@ export interface UserProfile {
     displayName: string | null;
     photoURL: string | null;
     lastLogin: number;
-    xp?: number;   // Added for leaderboard
-    level?: number; // Added for leaderboard
-    banner?: string;      // Custom profile banner
-    bio?: string;         // Custom bio
-    themeColor?: string;  // Custom theme color (accent)
-    cardBgColor?: string; // Custom card background color
-    borderColor?: string; // Custom border color
-    favoriteManga?: string; // Optional: showcase a favorite work ID
-    featuredBadge?: string; // Optional: badge ID to showcase
+    xp?: number;
+    level?: number;
+    streak?: number;
+    badges?: { id: string; name: string; description: string; icon: string; rarity: string; unlockedAt?: number }[];
+    totalChaptersRead?: number;
+    totalWorksAdded?: number;
+    totalWorksCompleted?: number;
+    banner?: string;
+    bio?: string;
+    themeColor?: string;
+    cardBgColor?: string;
+    borderColor?: string;
+    favoriteManga?: string;
+    featuredBadge?: string;
 }
 
 // Save user profile to Firestore
@@ -115,11 +120,16 @@ export async function saveGamificationToFirestore(
             lastUpdated: Date.now()
         });
 
-        // 2. Sync essential stats (XP, Level) to root user document for Leaderboards
+        // 2. Sync essential stats to root user document for Leaderboards & Profile Viewing
         const userDocRef = doc(db, 'users', userId);
         await setDoc(userDocRef, {
             xp: data.xp,
-            level: data.level
+            level: data.level,
+            streak: data.streak,
+            badges: data.badges,
+            totalChaptersRead: data.totalChaptersRead,
+            totalWorksAdded: data.totalWorksAdded,
+            totalWorksCompleted: data.totalWorksCompleted
         }, { merge: true });
 
         console.log('[Firestore] Gamification saved');

@@ -63,12 +63,12 @@ export default function Profile() {
                     setVisitedStats({
                         level: profile.level || 1,
                         xp: profile.xp || 0,
-                        xpToNextLevel: 100, // Default
-                        streak: 0, // Not available in main profile, could be added later
-                        badges: [], // Could be fetched separately if needed
-                        totalChaptersRead: 0,
-                        totalWorksAdded: 0,
-                        totalWorksCompleted: 0
+                        xpToNextLevel: 100,
+                        streak: profile.streak || 0,
+                        badges: profile.badges || [],
+                        totalChaptersRead: profile.totalChaptersRead || 0,
+                        totalWorksAdded: profile.totalWorksAdded || 0,
+                        totalWorksCompleted: profile.totalWorksCompleted || 0
                     });
                 }
             }
