@@ -154,7 +154,12 @@ export default function Library() {
                             variant="primary"
                             onClick={() => setIsAddModalOpen(true)}
                             icon={<Plus size={18} />}
-                            style={{ height: 'auto', alignSelf: 'stretch' }}
+                            style={{
+                                height: 'fit-content',
+                                alignSelf: 'center',
+                                width: '100%',
+                                padding: '1rem'
+                            }}
                         >
                             AJOUTER
                         </Button>
