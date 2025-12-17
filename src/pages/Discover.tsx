@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Layout } from '@/components/layout/Layout';
-import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 import { Carousel } from '@/components/ui/Carousel';
 import { searchWorks, getTopWorks, getSeasonalAnime, type JikanResult } from '@/services/animeApi';
 import { useLibraryStore } from '@/store/libraryStore';
-import { Search, Check, Loader2, Flame, Sparkles, BookOpen, Star } from 'lucide-react';
+import { Search, Check, Loader2, Flame, Sparkles, Star, Dice5, TrendingUp, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { FriendRecommendations } from '@/components/FriendRecommendations';
@@ -86,145 +86,314 @@ export default function Discover() {
         setIsModalOpen(true);
     };
 
+    const [heroWork, setHeroWork] = useState<JikanResult | null>(null);
+
+    // Update hero when data loads
+    useEffect(() => {
+        if (seasonalAnime.length > 0) {
+            setHeroWork(seasonalAnime[0]);
+        } else if (topAnime.length > 0) {
+            setHeroWork(topAnime[0]);
+        }
+    }, [seasonalAnime, topAnime]);
+
+    // Handle Surprise Me
+    const handleSurpriseMe = () => {
+        const allWorks = [...seasonalAnime, ...topAnime, ...popularManga, ...topManga];
+        if (allWorks.length > 0) {
+            const random = allWorks[Math.floor(Math.random() * allWorks.length)];
+            handleWorkClick(random);
+        }
+    };
+
     return (
         <Layout>
-            <div style={{ minHeight: 'calc(100vh - 80px)', paddingBottom: '6rem', paddingTop: '2rem' }} className="container">
+            <div style={{ minHeight: 'calc(100vh - 80px)', paddingBottom: '6rem' }}>
 
-                {/* Header & Search */}
-                <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
-                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '3rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '1rem', color: '#000' }}>
-                        Découvrir
-                    </h1>
-                    <div className="manga-panel" style={{ maxWidth: '600px', margin: '0 auto', background: '#fff', padding: '0.5rem' }}>
-                        <Input
-                            placeholder="Rechercher un anime ou manga..."
-                            icon={<Search size={20} />}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            style={{ fontSize: '1.2rem', padding: '1rem', paddingLeft: '3rem' }}
-                        />
-                    </div>
-                </div>
+                {/* Hero Section */}
+                {heroWork && !searchQuery && (
+                    <div style={{ position: 'relative', height: '60vh', minHeight: '500px', overflow: 'hidden', borderBottom: '4px solid #000' }}>
+                        {/* Background */}
+                        <div style={{
+                            position: 'absolute',
+                            inset: 0,
+                            backgroundImage: `url(${heroWork.images.jpg.large_image_url})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            filter: 'blur(20px) brightness(0.5)',
+                            transform: 'scale(1.1)'
+                        }} />
 
-                {/* Content Area */}
-                {searchQuery.length > 2 ? (
-                    /* Search Results Grid */
-                    <div>
-                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '2rem', color: '#000' }}>
-                            Résultats pour "{searchQuery}"
-                        </h2>
-                        {loading ? (
-                            <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
-                                <Loader2 className="spin" size={48} />
+                        <div className="container" style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center', gap: '3rem', paddingTop: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                            {/* Hero Image */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 50 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5 }}
+                                style={{
+                                    height: '400px',
+                                    aspectRatio: '2/3',
+                                    borderRadius: '0',
+                                    border: '4px solid #fff',
+                                    boxShadow: '10px 10px 0 #000',
+                                    flexShrink: 0
+                                }}
+                                className="hidden md:block"
+                            >
+                                <img src={heroWork.images.jpg.large_image_url} alt={heroWork.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            </motion.div>
+
+                            {/* Hero Content */}
+                            <div style={{ color: '#fff', maxWidth: '800px' }}>
+                                <motion.div
+                                    initial={{ opacity: 0, x: -50 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.2 }}
+                                >
+                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-primary)', color: '#fff', padding: '0.5rem 1rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '1rem', boxShadow: '4px 4px 0 #000' }}>
+                                        <Flame size={18} fill="#fff" /> A LA UNE
+                                    </div>
+                                    <h1 style={{
+                                        fontFamily: 'var(--font-heading)',
+                                        fontSize: 'min(4rem, 10vw)',
+                                        fontWeight: 900,
+                                        lineHeight: 0.9,
+                                        marginBottom: '1rem',
+                                        textShadow: '4px 4px 0 #000'
+                                    }}>
+                                        {heroWork.title}
+                                    </h1>
+                                    <p style={{ fontSize: '1.1rem', lineHeight: 1.6, opacity: 0.9, marginBottom: '2rem', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', maxWidth: '600px', textShadow: '1px 1px 2px #000' }}>
+                                        {heroWork.synopsis}
+                                    </p>
+
+                                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                                        <Button
+                                            variant="primary"
+                                            size="lg"
+                                            onClick={() => handleQuickAdd(heroWork)}
+                                            icon={<Plus size={24} />}
+                                            style={{ fontSize: '1.2rem', padding: '1rem 2rem', border: '2px solid #fff', boxShadow: '6px 6px 0 #000' }}
+                                        >
+                                            AJOUTER À MA LISTE
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="lg"
+                                            onClick={() => handleWorkClick(heroWork)}
+                                            style={{ background: '#fff', color: '#000', border: '2px solid #fff', fontSize: '1.2rem', padding: '1rem 2rem', boxShadow: '6px 6px 0 #000' }}
+                                        >
+                                            PLUS DE DÉTAILS
+                                        </Button>
+                                    </div>
+                                </motion.div>
                             </div>
-                        ) : (
-                            <div style={{
-                                display: 'flex',
-                                flexWrap: 'wrap',
-                                gap: '1rem',
-                                justifyContent: 'flex-start'
-                            }}>
-                                {searchResults.map((work) => {
-                                    const isOwned = libraryIds.has(work.mal_id);
-                                    return (
-                                        <motion.div key={work.mal_id} whileHover={{ y: -5 }} style={{ width: 'calc(20% - 0.8rem)', minWidth: '140px', maxWidth: '180px' }}>
-                                            <Card
-                                                variant="manga"
-                                                style={{
-                                                    padding: 0,
-                                                    overflow: 'hidden',
-                                                    height: '100%',
-                                                    border: '2px solid #000',
-                                                    cursor: 'pointer',
-                                                    display: 'flex',
-                                                    flexDirection: 'column'
-                                                }}
-                                                onClick={() => handleWorkClick(work)}
-                                            >
-                                                <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid #000', flexShrink: 0 }}>
-                                                    <img src={work.images.jpg.image_url} alt={work.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                    {isOwned && (
-                                                        <div style={{ position: 'absolute', top: 5, right: 5, background: '#000', color: '#fff', padding: '4px', borderRadius: '50%' }}>
-                                                            <Check size={14} strokeWidth={3} />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div style={{ padding: '0.75rem', background: '#fff', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                                                    <h3 style={{
-                                                        fontSize: '0.9rem',
-                                                        fontWeight: 800,
-                                                        fontFamily: 'var(--font-heading)',
-                                                        lineHeight: 1.2,
-                                                        overflow: 'hidden',
-                                                        textOverflow: 'ellipsis',
-                                                        display: '-webkit-box',
-                                                        WebkitLineClamp: 2,
-                                                        WebkitBoxOrient: 'vertical'
-                                                    }}>{work.title}</h3>
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', fontSize: '0.75rem', opacity: 0.7 }}>
-                                                        <span>{work.type}</span>
-                                                        <span>{work.status}</span>
-                                                    </div>
-                                                </div>
-                                            </Card>
-                                        </motion.div>
-                                    );
-                                })}
+                        </div>
+                    </div>
+                )}
+
+                <div className="container" style={{ marginTop: '3rem' }}>
+                    {/* Search Section */}
+                    <div style={{ margin: '0 auto 4rem', maxWidth: '800px' }}>
+                        <Card variant="manga" style={{ padding: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', border: '3px solid #000', boxShadow: '8px 8px 0 #000' }}>
+                            <Search size={28} style={{ marginLeft: '1rem', opacity: 0.4 }} />
+                            <input
+                                placeholder="Rechercher un anime, un manga..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{
+                                    border: 'none',
+                                    outline: 'none',
+                                    width: '100%',
+                                    fontSize: '1.5rem',
+                                    background: 'transparent',
+                                    fontFamily: 'var(--font-heading)',
+                                    fontWeight: 700,
+                                    padding: '1rem 0'
+                                }}
+                            />
+                        </Card>
+
+                        {/* Quick Genres */}
+                        {!searchQuery && (
+                            <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                {['Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Sci-Fi'].map(genre => (
+                                    <button
+                                        key={genre}
+                                        onClick={() => setSearchQuery(genre)}
+                                        style={{
+                                            padding: '0.5rem 1rem',
+                                            borderRadius: '2rem',
+                                            border: '2px solid #000',
+                                            background: '#fff',
+                                            fontWeight: 700,
+                                            fontSize: '0.9rem',
+                                            cursor: 'pointer',
+                                            transition: 'transform 0.1s',
+                                            boxShadow: '2px 2px 0 #000'
+                                        }}
+                                        onMouseDown={e => e.currentTarget.style.transform = 'translate(1px, 1px)'}
+                                        onMouseUp={e => e.currentTarget.style.transform = 'translate(0, 0)'}
+                                    >
+                                        {genre}
+                                    </button>
+                                ))}
                             </div>
                         )}
                     </div>
-                ) : (
-                    /* Home Content */
-                    <div>
-                        {/* Friend Recommendations */}
-                        <FriendRecommendations />
 
-                        {/* Carousels */}
-                        <>
+                    {/* Content Area */}
+                    {searchQuery.length > 2 ? (
+                        /* Search Results */
+                        <div>
+                            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '2rem', color: '#000', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <Search size={32} /> Résultats pour "{searchQuery}"
+                            </h2>
+                            {loading ? (
+                                <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
+                                    <Loader2 className="spin" size={48} />
+                                </div>
+                            ) : (
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                                    gap: '2rem'
+                                }}>
+                                    {searchResults.map((work) => {
+                                        const isOwned = libraryIds.has(work.mal_id);
+                                        return (
+                                            <motion.div key={work.mal_id} whileHover={{ y: -5 }}>
+                                                <Card
+                                                    variant="manga"
+                                                    hoverable
+                                                    style={{
+                                                        padding: 0,
+                                                        overflow: 'hidden',
+                                                        height: '100%',
+                                                        border: '2px solid #000',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        flexDirection: 'column'
+                                                    }}
+                                                    onClick={() => handleWorkClick(work)}
+                                                >
+                                                    <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid #000', flexShrink: 0 }}>
+                                                        <img src={work.images.jpg.image_url} alt={work.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                        {isOwned && (
+                                                            <div style={{ position: 'absolute', top: 5, right: 5, background: '#000', color: '#fff', padding: '4px', borderRadius: '50%' }}>
+                                                                <Check size={14} strokeWidth={3} />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div style={{ padding: '1rem', background: '#fff', flex: 1 }}>
+                                                        <h3 style={{
+                                                            fontSize: '1rem',
+                                                            fontWeight: 800,
+                                                            fontFamily: 'var(--font-heading)',
+                                                            lineHeight: 1.2,
+                                                            marginBottom: '0.5rem',
+                                                            overflow: 'hidden',
+                                                            display: '-webkit-box',
+                                                            WebkitLineClamp: 2,
+                                                            WebkitBoxOrient: 'vertical'
+                                                        }}>{work.title}</h3>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', opacity: 0.7 }}>
+                                                            <span style={{ fontWeight: 600 }}>{work.type}</span>
+                                                            {work.score && <span>★ {work.score}</span>}
+                                                        </div>
+                                                    </div>
+                                                </Card>
+                                            </motion.div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        /* Home Content */
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+
+                            {/* Surprise Me Section */}
+                            <div style={{ marginBottom: '2rem' }}>
+                                <Card variant="manga" style={{
+                                    padding: '2rem',
+                                    background: 'linear-gradient(135deg, #000 0%, #333 100%)',
+                                    color: '#fff',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    gap: '2rem',
+                                    flexWrap: 'wrap'
+                                }}>
+                                    <div>
+                                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '0.5rem', color: '#fff' }}>
+                                            En panne d'inspiration ?
+                                        </h2>
+                                        <p style={{ opacity: 0.8, fontSize: '1.1rem' }}>Laisse le destin choisir ta prochaine aventure.</p>
+                                    </div>
+                                    <Button
+                                        variant="primary"
+                                        onClick={handleSurpriseMe}
+                                        icon={<Dice5 size={24} />}
+                                        style={{ fontSize: '1.2rem', padding: '1rem 2rem', background: 'var(--color-primary)', border: '2px solid #fff', color: '#fff' }}
+                                    >
+                                        SURPRENDS-MOI
+                                    </Button>
+                                </Card>
+                            </div>
+
+                            {/* Carousels */}
                             <Carousel
-                                title={<><Flame size={20} color="#ef4444" style={{ marginRight: '0.5rem' }} /> Anime de la Saison</>}
+                                title={<><Flame size={24} color="#ef4444" /> Anime de la Saison</>}
                                 items={seasonalAnime}
                                 onItemClick={handleWorkClick}
                                 libraryIds={libraryIds}
                                 onAdd={handleQuickAdd}
                                 loading={seasonalAnime.length === 0}
                             />
+
                             <Carousel
-                                title={<><Sparkles size={20} color="#eab308" style={{ marginRight: '0.5rem' }} /> Top 10 Animes (All Time)</>}
+                                title={<><Sparkles size={24} color="#eab308" /> Top 10 Animes</>}
                                 items={topAnime}
                                 onItemClick={handleWorkClick}
                                 libraryIds={libraryIds}
                                 onAdd={handleQuickAdd}
                                 loading={topAnime.length === 0}
+                                showRank
                             />
+
                             <Carousel
-                                title={<><BookOpen size={20} color="#3b82f6" style={{ marginRight: '0.5rem' }} /> Mangas Populaires</>}
+                                title={<><TrendingUp size={24} color="var(--color-primary)" /> Mangas Populaires</>}
                                 items={popularManga}
                                 onItemClick={handleWorkClick}
                                 libraryIds={libraryIds}
                                 onAdd={handleQuickAdd}
                                 loading={popularManga.length === 0}
                             />
+
                             <Carousel
-                                title={<><Star size={20} color="#f59e0b" style={{ marginRight: '0.5rem' }} /> Top 10 Mangas (All Time)</>}
+                                title={<><Star size={24} color="#f59e0b" /> Top 10 Mangas</>}
                                 items={topManga}
                                 onItemClick={handleWorkClick}
                                 libraryIds={libraryIds}
                                 onAdd={handleQuickAdd}
                                 loading={topManga.length === 0}
+                                showRank
                             />
-                        </>
-                    </div>
-                )}
 
-                {/* Modals */}
-                {selectedWork && (
-                    <AddWorkModal
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
-                        initialWork={selectedWork}
-                    />
-                )}
+                            <FriendRecommendations />
+                        </div>
+                    )}
+
+                    {/* Modals */}
+                    {selectedWork && (
+                        <AddWorkModal
+                            isOpen={isModalOpen}
+                            onClose={() => setIsModalOpen(false)}
+                            initialWork={selectedWork}
+                        />
+                    )}
+                </div>
             </div>
         </Layout>
     );
