@@ -354,16 +354,16 @@ export default function Library() {
 
                         {/* Selection Mode Toggle */}
                         <Button
-                            variant="ghost"
+                            variant={isSelectionMode ? 'primary' : 'manga'}
                             onClick={() => {
                                 setIsSelectionMode(!isSelectionMode);
                                 setSelectedWorks(new Set());
                             }}
                             style={{
-                                border: isSelectionMode ? '2px solid var(--color-primary)' : '2px solid #000',
-                                color: isSelectionMode ? 'var(--color-primary)' : '#000',
-                                boxShadow: isSelectionMode ? 'none' : '4px 4px 0 #000',
-                                transform: isSelectionMode ? 'translate(2px, 2px)' : 'none'
+                                minWidth: '140px',
+                                background: isSelectionMode ? 'var(--color-primary)' : '#fff',
+                                color: isSelectionMode ? '#fff' : '#000',
+                                borderColor: isSelectionMode ? 'var(--color-primary)' : '#000'
                             }}
                         >
                             {isSelectionMode ? 'ANNULER' : 'SÉLECTIONNER'}
@@ -386,8 +386,8 @@ export default function Library() {
                         <div style={{
                             display: viewMode === 'grid' ? 'grid' : 'flex',
                             flexDirection: 'column',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                            gap: '2rem'
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                            gap: '1.5rem'
                         }}>
                             <AnimatePresence>
                                 {filteredWorks.map(work => (
@@ -433,7 +433,7 @@ export default function Library() {
 
                                             {/* Image */}
                                             <div style={{
-                                                height: viewMode === 'grid' ? '320px' : '150px',
+                                                height: viewMode === 'grid' ? '280px' : '150px',
                                                 width: viewMode === 'list' ? '120px' : '100%',
                                                 background: `url(${work.image}) center/cover`,
                                                 flexShrink: 0,
