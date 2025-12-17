@@ -326,107 +326,106 @@ export default function Social() {
                                         </>
                                     )}
                                 </div>
-                                </div>
                             ))}
-                    </div>
-            </>
+                        </div>
+                    </>
                 )}
 
-            {/* FRIENDS VIEW */}
-            {activeTab === 'friends' && (
-                <div>
-                    {/* Add Friend Section */}
-                    <div className="manga-panel" style={{ padding: '1.5rem', marginBottom: '2rem', background: '#fff' }}>
-                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1rem' }}>AJOUTER UN AMI</h3>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', border: '2px solid #000', padding: '0.5rem' }}>
-                                <Search size={20} style={{ marginRight: '0.5rem', opacity: 0.5 }} />
-                                <input
-                                    type="email"
-                                    placeholder="Pseudo ou Email exact..."
-                                    value={searchEmail}
-                                    onChange={(e) => setSearchEmail(e.target.value)}
-                                    style={{ border: 'none', outline: 'none', width: '100%', fontSize: '1rem', fontFamily: 'inherit' }}
-                                />
+                {/* FRIENDS VIEW */}
+                {activeTab === 'friends' && (
+                    <div>
+                        {/* Add Friend Section */}
+                        <div className="manga-panel" style={{ padding: '1.5rem', marginBottom: '2rem', background: '#fff' }}>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1rem' }}>AJOUTER UN AMI</h3>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', border: '2px solid #000', padding: '0.5rem' }}>
+                                    <Search size={20} style={{ marginRight: '0.5rem', opacity: 0.5 }} />
+                                    <input
+                                        type="email"
+                                        placeholder="Pseudo ou Email exact..."
+                                        value={searchEmail}
+                                        onChange={(e) => setSearchEmail(e.target.value)}
+                                        style={{ border: 'none', outline: 'none', width: '100%', fontSize: '1rem', fontFamily: 'inherit' }}
+                                    />
+                                </div>
+                                <Button onClick={handleSearch} disabled={loading}>CHERCHER</Button>
                             </div>
-                            <Button onClick={handleSearch} disabled={loading}>CHERCHER</Button>
+
+                            {/* Search Result */}
+                            {searchResult && (
+                                <div style={{ marginTop: '1rem', padding: '1rem', border: '2px dashed #000', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                            <img src={searchResult.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${searchResult.displayName}`} alt="Avatar" style={{ width: '100%', height: '100%' }} />
+                                        </div>
+                                        <div>
+                                            <div style={{ fontWeight: 700 }}>{searchResult.displayName}</div>
+                                        </div>
+                                    </div>
+                                    {requestSent ? (
+                                        <Button variant="ghost" icon={<Check size={18} />}>DEMANDE ENVOYÉE</Button>
+                                    ) : (
+                                        <Button variant="manga" onClick={handleSendRequest} icon={<UserPlus size={18} />}>AJOUTER</Button>
+                                    )}
+                                </div>
+                            )}
+                            {searchResult === null && searchEmail && !loading && searchResult !== undefined && ( // Check if strictly null (not found) vs undefined (initial)
+                                <div style={{ marginTop: '0.5rem', color: 'red', fontWeight: 600 }}>Aucun utilisateur trouvé avec cet email.</div>
+                            )}
                         </div>
 
-                        {/* Search Result */}
-                        {searchResult && (
-                            <div style={{ marginTop: '1rem', padding: '1rem', border: '2px dashed #000', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
-                                        <img src={searchResult.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${searchResult.displayName}`} alt="Avatar" style={{ width: '100%', height: '100%' }} />
-                                    </div>
-                                    <div>
-                                        <div style={{ fontWeight: 700 }}>{searchResult.displayName}</div>
-                                    </div>
-                                </div>
-                                {requestSent ? (
-                                    <Button variant="ghost" icon={<Check size={18} />}>DEMANDE ENVOYÉE</Button>
-                                ) : (
-                                    <Button variant="manga" onClick={handleSendRequest} icon={<UserPlus size={18} />}>AJOUTER</Button>
-                                )}
-                            </div>
-                        )}
-                        {searchResult === null && searchEmail && !loading && searchResult !== undefined && ( // Check if strictly null (not found) vs undefined (initial)
-                            <div style={{ marginTop: '0.5rem', color: 'red', fontWeight: 600 }}>Aucun utilisateur trouvé avec cet email.</div>
-                        )}
-                    </div>
-
-                    {/* Requests List */}
-                    {friends.filter(f => f.status === 'pending' && f.direction === 'incoming').length > 0 && (
-                        <div style={{ marginBottom: '2rem' }}>
-                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1rem' }}>DEMANDES REÇUES</h3>
-                            <div className="manga-panel" style={{ padding: 0 }}>
-                                {friends.filter(f => f.status === 'pending' && f.direction === 'incoming').map(friend => (
-                                    <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                            <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
-                                                <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        {/* Requests List */}
+                        {friends.filter(f => f.status === 'pending' && f.direction === 'incoming').length > 0 && (
+                            <div style={{ marginBottom: '2rem' }}>
+                                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1rem' }}>DEMANDES REÇUES</h3>
+                                <div className="manga-panel" style={{ padding: 0 }}>
+                                    {friends.filter(f => f.status === 'pending' && f.direction === 'incoming').map(friend => (
+                                        <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                                <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                                    <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                </div>
+                                                <div style={{ fontWeight: 700 }}>{friend.displayName}</div>
                                             </div>
-                                            <div style={{ fontWeight: 700 }}>{friend.displayName}</div>
+                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                <Button
+                                                    variant="ghost"
+                                                    onClick={() => handleReject(friend.uid)}
+                                                    style={{ color: '#ef4444' }}
+                                                    title="Refuser"
+                                                >
+                                                    <X size={20} />
+                                                </Button>
+                                                <Button variant="primary" onClick={() => handleAccept(friend.uid)}>ACCEPTER</Button>
+                                            </div>
                                         </div>
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            <Button
-                                                variant="ghost"
-                                                onClick={() => handleReject(friend.uid)}
-                                                style={{ color: '#ef4444' }}
-                                                title="Refuser"
-                                            >
-                                                <X size={20} />
-                                            </Button>
-                                            <Button variant="primary" onClick={() => handleAccept(friend.uid)}>ACCEPTER</Button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Friends List */}
-                    <div className="manga-panel" style={{ padding: 0 }}>
-                        {friends.filter(f => f.status === 'accepted').length === 0 ? (
-                            <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.6 }}>
-                                Vous n'avez pas encore d'amis. Lancez une recherche !
-                            </div>
-                        ) : (
-                            friends.filter(f => f.status === 'accepted').map(friend => (
-                                <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => navigate(`/profile/${friend.uid}`)}>
-                                    <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
-                                        <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    </div>
-                                    <div style={{ flex: 1, fontWeight: 700 }}>{friend.displayName}</div>
-                                    <Button variant="ghost" size="icon"><User size={20} /></Button>
+                                    ))}
                                 </div>
-                            ))
+                            </div>
                         )}
-                    </div>
 
-                </div>
-            )}
-        </div>
+                        {/* Friends List */}
+                        <div className="manga-panel" style={{ padding: 0 }}>
+                            {friends.filter(f => f.status === 'accepted').length === 0 ? (
+                                <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.6 }}>
+                                    Vous n'avez pas encore d'amis. Lancez une recherche !
+                                </div>
+                            ) : (
+                                friends.filter(f => f.status === 'accepted').map(friend => (
+                                    <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => navigate(`/profile/${friend.uid}`)}>
+                                        <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                            <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        </div>
+                                        <div style={{ flex: 1, fontWeight: 700 }}>{friend.displayName}</div>
+                                        <Button variant="ghost" size="icon"><User size={20} /></Button>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                    </div>
+                )}
+            </div>
         </Layout >
     );
 }
