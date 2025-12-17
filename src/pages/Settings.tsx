@@ -3,15 +3,20 @@ import { Button } from '@/components/ui/Button';
 import { Switch } from '@/components/ui/Switch';
 import { useSettingsStore } from '@/store/settingsStore';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Eye, Volume2, Trash2, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Volume2, Trash2, Palette, HardDrive, Download, Upload, Info, Github, ShieldAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLibraryStore } from '@/store/libraryStore';
+import { useGamificationStore } from '@/store/gamificationStore';
 import { getWorkDetails } from '@/services/animeApi';
 import { RefreshCw } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
+import { getLocalStorageSize, exportData, importData, clearImageCache } from '@/utils/storageUtils';
+import { useAuthStore } from '@/store/authStore';
+import { saveLibraryToFirestore, saveGamificationToFirestore } from '@/firebase/firestore';
 
 function SyncButton() {
+    // ... existing SyncButton code ...
     const { works, updateWorkDetails } = useLibraryStore();
     const { addToast } = useToast();
     const [isSyncing, setIsSyncing] = useState(false);
@@ -31,29 +36,22 @@ function SyncButton() {
         try {
             for (let i = 0; i < works.length; i++) {
                 const work = works[i];
-                // Only sync if ID is a number (Jikan ID), skip manual ones with timestamp IDs (usually large numbers but let's assume manual ones might fail gracefully or we check type)
-                // Actually Jikan IDs are numbers. timestamp IDs are also numbers.
-                // We'll try to fetch all. Manual ones (timestamp IDs) will likely fail 404 or 400, so we count errors but continue.
-
                 try {
                     const details = await getWorkDetails(Number(work.id), work.type);
                     if (details) {
                         updateWorkDetails(work.id, {
                             score: details.score || undefined,
                             synopsis: details.synopsis || undefined,
-                            image: details.images.jpg.image_url, // Update image just in case
+                            image: details.images.jpg.image_url,
                             totalChapters: work.type === 'manga' ? details.chapters : details.episodes,
                         });
                         updatedCount++;
                     }
                 } catch (e) {
-                    // Ignore errors for individual works (e.g. manual items)
                     errorCount++;
                 }
-
                 setProgress(Math.round(((i + 1) / works.length) * 100));
             }
-
             addToast(`Synchronisation terminée : ${updatedCount} mis à jour`, 'success');
         } catch (error) {
             addToast('Erreur lors de la synchronisation', 'error');
@@ -91,35 +89,92 @@ function SyncButton() {
 
 export default function Settings() {
     const navigate = useNavigate();
+    const { addToast } = useToast();
     const [showConfirmReset, setShowConfirmReset] = useState(false);
+    const [storageSize, setStorageSize] = useState('0.00');
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const { user } = useAuthStore();
 
     const {
         reducedMotion,
         soundEnabled,
         notifications,
+        spoilerMode,
+        accentColor,
         toggleReducedMotion,
         toggleSound,
-        toggleNotifications
+        toggleNotifications,
+        toggleSpoilerMode,
+        setAccentColor
     } = useSettingsStore();
 
-    const resetGamification = () => {
-        // Clear gamification data from localStorage
-        localStorage.removeItem('bingeki-gamification-storage');
-        window.location.reload();
+    useEffect(() => {
+        setStorageSize(getLocalStorageSize());
+    }, []);
+
+    const handleImportClick = () => {
+        fileInputRef.current?.click();
     };
 
-    const resetLibrary = () => {
-        // Clear library data from localStorage
-        localStorage.removeItem('bingeki-library-storage');
-        window.location.reload();
+    const resetAll = async () => {
+        try {
+            // Reset Zustand stores
+            useLibraryStore.getState().resetStore();
+            useGamificationStore.getState().resetStore();
+
+            // Save empty data to Firestore
+            if (user) {
+                await saveLibraryToFirestore(user.uid, []);
+                await saveGamificationToFirestore(user.uid, {
+                    level: 1,
+                    xp: 0,
+                    xpToNextLevel: 100,
+                    streak: 0,
+                    lastActivityDate: null,
+                    badges: [],
+                    totalChaptersRead: 0,
+                    totalWorksAdded: 0,
+                    totalWorksCompleted: 0
+                });
+            }
+
+            // Clear localStorage
+            localStorage.clear();
+
+            addToast('Toutes les données ont été réinitialisées !', 'success');
+
+            // Reload after a short delay to show the toast
+            setTimeout(() => window.location.reload(), 1000);
+        } catch (error) {
+            addToast('Erreur lors de la réinitialisation', 'error');
+            console.error(error);
+        }
     };
 
-    const resetAll = () => {
-        localStorage.removeItem('bingeki-gamification-storage');
-        localStorage.removeItem('bingeki-library-storage');
-        localStorage.removeItem('bingeki-settings');
-        window.location.reload();
+    const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            await importData(file);
+            addToast('Données importées avec succès !', 'success');
+        } catch (error) {
+            addToast('Échec de l\'importation', 'error');
+        }
     };
+
+    const handleClearCache = () => {
+        clearImageCache();
+        addToast('Cache nettoyé (simulation)', 'success');
+    };
+
+    const COLORS = [
+        { name: 'Bingeki Red', value: '#FF2E63' },
+        { name: 'Cyan Future', value: '#08D9D6' },
+        { name: 'Toxic Green', value: '#10B981' },
+        { name: 'Sunny Yellow', value: '#F59E0B' },
+        { name: 'Royal Purple', value: '#8B5CF6' },
+    ];
 
     return (
         <Layout>
@@ -138,29 +193,62 @@ export default function Settings() {
 
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
-                        {/* Accessibilité */}
+                        {/* Personnalisation */}
                         <section>
                             <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>
-                                <Eye size={20} /> ACCESSIBILITÉ
+                                <Palette size={20} /> APPARENCE
                             </h2>
                             <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <p style={{ fontWeight: 700, marginBottom: '0.5rem' }}>Couleur d'accentuation</p>
+                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                        {COLORS.map(c => (
+                                            <button
+                                                key={c.value}
+                                                onClick={() => setAccentColor(c.value)}
+                                                style={{
+                                                    width: '40px',
+                                                    height: '40px',
+                                                    borderRadius: '50%',
+                                                    background: c.value,
+                                                    border: accentColor === c.value ? '3px solid #000' : '1px solid #ddd',
+                                                    cursor: 'pointer',
+                                                    transform: accentColor === c.value ? 'scale(1.1)' : 'scale(1)',
+                                                    transition: 'all 0.2s ease'
+                                                }}
+                                                title={c.name}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                                <div style={{ height: '1px', background: '#eee', margin: '1rem 0' }} />
+                                <Switch
+                                    label="Mode Spoiler"
+                                    isOn={spoilerMode}
+                                    onToggle={() => {
+                                        toggleSpoilerMode();
+                                        // Feedback toast (state value is old value here, so inversion logic applies for message)
+                                        addToast(!spoilerMode ? 'Mode Spoiler activé' : 'Mode Spoiler désactivé', 'info');
+                                    }}
+                                />
+                                <p style={{ fontSize: '0.85rem', opacity: 0.6, marginTop: '0.5rem' }}>
+                                    Floute les synopsis pour éviter les révélations.
+                                </p>
+                            </div>
+                        </section>
+
+                        {/* Accessibilité & Audio */}
+                        <section>
+                            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>
+                                <Volume2 size={20} /> PRÉFÉRENCES
+                            </h2>
+                            <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 <Switch
                                     label="Réduire les animations"
                                     isOn={reducedMotion}
                                     onToggle={toggleReducedMotion}
                                 />
-                                <p style={{ fontSize: '0.85rem', opacity: 0.6, marginTop: '0.5rem' }}>
-                                    Désactive les effets de parallaxe et transitions complexes
-                                </p>
-                            </div>
-                        </section>
-
-                        {/* Audio & Notifications */}
-                        <section>
-                            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>
-                                <Volume2 size={20} /> AUDIO & NOTIFICATIONS
-                            </h2>
-                            <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div style={{ height: '1px', background: '#eee' }} />
                                 <Switch
                                     label="Effets sonores (UI)"
                                     isOn={soundEnabled}
@@ -175,70 +263,93 @@ export default function Settings() {
                             </div>
                         </section>
 
-                        {/* Données */}
+                        {/* Stockage & Données */}
                         <section>
                             <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>
-                                <Trash2 size={20} /> GESTION DES DONNÉES
+                                <HardDrive size={20} /> GESTION DES DONNÉES
                             </h2>
                             <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                    <div>
+                                        <p style={{ fontWeight: 700 }}>Espace utilisé</p>
+                                        <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>{storageSize} MB stockés localement</p>
+                                    </div>
+                                    <Button variant="outline" size="sm" onClick={handleClearCache}>
+                                        <Trash2 size={16} /> Nettoyer Cache
+                                    </Button>
+                                </div>
 
-                                    {/* Synchronization */}
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                                    <Button variant="outline" onClick={exportData} icon={<Download size={18} />} style={{ justifyContent: 'center' }}>
+                                        Exporter Backup
+                                    </Button>
+                                    <div style={{ position: 'relative' }}>
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept=".json"
+                                            onChange={handleImport}
+                                            style={{ display: 'none' }}
+                                        />
+                                        <Button variant="outline" style={{ width: '100%', justifyContent: 'center' }} icon={<Upload size={18} />} onClick={handleImportClick}>
+                                            Importer Backup
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <div style={{ height: '1px', background: '#eee', margin: '1rem 0' }} />
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
                                             <p style={{ fontWeight: 700 }}>Synchroniser la bibliothèque</p>
-                                            <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>Met à jour les synopsis, scores et statuts depuis l'API</p>
                                         </div>
                                         <SyncButton />
                                     </div>
-
                                     <div style={{ height: '1px', background: '#eee' }} />
-
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
-                                            <p style={{ fontWeight: 700 }}>Réinitialiser la progression</p>
-                                            <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>XP, niveau, streak et badges</p>
-                                        </div>
-                                        <Button variant="outline" size="sm" onClick={resetGamification} style={{ borderColor: '#f59e0b', color: '#f59e0b' }}>
-                                            <RotateCcw size={16} /> Reset
-                                        </Button>
-                                    </div>
-
-                                    <div style={{ height: '1px', background: '#eee' }} />
-
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <div>
-                                            <p style={{ fontWeight: 700 }}>Vider la bibliothèque</p>
-                                            <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>Supprimer toutes les œuvres</p>
-                                        </div>
-                                        <Button variant="outline" size="sm" onClick={resetLibrary} style={{ borderColor: '#ef4444', color: '#ef4444' }}>
-                                            <Trash2 size={16} /> Vider
-                                        </Button>
-                                    </div>
-
-                                    <div style={{ height: '1px', background: '#eee' }} />
-
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <div>
-                                            <p style={{ fontWeight: 700, color: '#ef4444' }}>Tout réinitialiser</p>
-                                            <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>Efface TOUTES les données locales</p>
+                                            <p style={{ fontWeight: 700, color: '#ef4444' }}>Zone de danger</p>
+                                            <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>Actions irréversibles</p>
                                         </div>
                                         {!showConfirmReset ? (
                                             <Button variant="outline" size="sm" onClick={() => setShowConfirmReset(true)} style={{ borderColor: '#ef4444', color: '#ef4444' }}>
-                                                <Trash2 size={16} /> Reset All
+                                                <ShieldAlert size={16} /> Reset All
                                             </Button>
                                         ) : (
                                             <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                <Button variant="ghost" size="sm" onClick={() => setShowConfirmReset(false)}>
-                                                    Annuler
-                                                </Button>
-                                                <Button variant="primary" size="sm" onClick={resetAll} style={{ background: '#ef4444' }}>
-                                                    Confirmer
-                                                </Button>
+                                                <Button variant="ghost" size="sm" onClick={() => setShowConfirmReset(false)}>Annuler</Button>
+                                                <Button variant="primary" size="sm" onClick={resetAll} style={{ background: '#ef4444' }}>Confirmer</Button>
                                             </div>
                                         )}
                                     </div>
                                 </div>
+                            </div>
+                        </section>
+
+                        {/* À propos */}
+                        <section>
+                            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>
+                                <Info size={20} /> À PROPOS
+                            </h2>
+                            <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                    <div>
+                                        <h3 style={{ fontSize: '1.2rem', fontWeight: 900 }}>BINGEKI</h3>
+                                        <p style={{ opacity: 0.6, fontSize: '0.9rem' }}>Version 1.0.0 (Alpha)</p>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '1rem' }}>
+                                        <a href="https://github.com/Moussandou" target="_blank" rel="noopener noreferrer" style={{ opacity: 0.7, transition: 'opacity 0.2s' }}>
+                                            <Github size={24} />
+                                        </a>
+                                    </div>
+                                </div>
+                                <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+                                    Développé avec ❤️ pour les fans d'anime et de manga.
+                                </p>
+                                <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>
+                                    Données fournies par l'API Jikan (MyAnimeList). Les images et titres appartiennent à leurs créateurs respectifs.
+                                </p>
                             </div>
                         </section>
 

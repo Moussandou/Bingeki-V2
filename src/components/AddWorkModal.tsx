@@ -7,6 +7,8 @@ import { PenTool, Globe, Loader2, Plus, Check, Upload, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLibraryStore, type Work } from '@/store/libraryStore';
 import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
+import { useAuthStore } from '@/store/authStore';
+import { logActivity } from '@/firebase/firestore';
 
 interface AddWorkModalProps {
     isOpen: boolean;
@@ -22,6 +24,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
     const [type, setType] = useState<'manga' | 'anime'>('manga');
     const { addWork, works } = useLibraryStore();
     const { addXp, recordActivity, incrementStat } = useGamificationStore();
+    const { user } = useAuthStore();
 
     // Manual mode state
     const [manualTitle, setManualTitle] = useState('');
@@ -80,6 +83,19 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
         addXp(XP_REWARDS.ADD_WORK);
         recordActivity();
         incrementStat('works');
+
+        // Log activity for friends feed
+        if (user) {
+            logActivity(user.uid, {
+                userId: user.uid,
+                userName: user.displayName || 'Héros',
+                userPhoto: user.photoURL || '',
+                type: 'add_work',
+                workId: newWork.id as number,
+                workTitle: newWork.title,
+                workImage: newWork.image
+            });
+        }
 
         // Reset and close
         setManualTitle('');
@@ -142,6 +158,19 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
         addXp(XP_REWARDS.ADD_WORK);
         recordActivity();
         incrementStat('works');
+
+        // Log activity for friends feed
+        if (user) {
+            logActivity(user.uid, {
+                userId: user.uid,
+                userName: user.displayName || 'Héros',
+                userPhoto: user.photoURL || '',
+                type: 'add_work',
+                workId: work.mal_id,
+                workTitle: work.title,
+                workImage: work.images.jpg.image_url
+            });
+        }
     };
 
     const isAdded = (id: number) => works.some(w => w.id === id);

@@ -14,12 +14,12 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         return (
             <motion.div
                 ref={ref}
+                data-hoverable={hoverable}
                 className={cn(
                     styles.card,
                     variant === 'glass' && styles.glass,
                     variant === 'manga' && 'manga-panel',
-                    hoverable && styles.hoverable,
-                    hoverable && styles.hoverable,
+                    hoverable && variant !== 'manga' && styles.hoverable,
                     className
                 )}
                 initial={false}

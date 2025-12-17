@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
-import { Play, Users, Plus, BookOpen, Tv } from 'lucide-react';
+import { Play, Users, Plus, BookOpen, Tv, LogOut, Ban } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useLibraryStore } from '@/store/libraryStore';
 import {
@@ -9,6 +9,8 @@ import {
     createWatchParty,
     updateWatchPartyProgress,
     getFriends,
+    endWatchParty,
+    leaveWatchParty,
     type Friend
 } from '@/firebase/firestore';
 import type { WatchParty, PartyParticipant } from '@/types/watchparty';
@@ -18,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 
 export function WatchPartiesSection() {
     const { user } = useAuthStore();
-    const { works } = useLibraryStore();
+    const { works, updateProgress } = useLibraryStore();
     const { addToast } = useToast();
     const navigate = useNavigate();
 
@@ -34,13 +36,7 @@ export function WatchPartiesSection() {
         selectedFriends: [] as string[]
     });
 
-    useEffect(() => {
-        if (user) {
-            loadData();
-        }
-    }, [user]);
-
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         if (!user) return;
         setIsLoading(true);
 
@@ -52,7 +48,13 @@ export function WatchPartiesSection() {
         setParties(partyData);
         setFriends(friendData.filter(f => f.status === 'accepted'));
         setIsLoading(false);
-    };
+    }, [user]);
+
+    useEffect(() => {
+        if (user) {
+            loadData();
+        }
+    }, [user, loadData]);
 
     const handleCreateParty = async () => {
         if (!user || !newParty.workId) {
@@ -107,8 +109,18 @@ export function WatchPartiesSection() {
         loadData();
     };
 
-    const handleAdvanceEpisode = async (partyId: string, currentEp: number) => {
-        await updateWatchPartyProgress(partyId, currentEp + 1);
+    const handleAdvanceEpisode = async (partyId: string, currentEp: number, workId: number) => {
+        const newEpisode = currentEp + 1;
+
+        // Update watch party
+        await updateWatchPartyProgress(partyId, newEpisode);
+
+        // Sync with library
+        const libraryWork = works.find(w => Number(w.id) === workId);
+        if (libraryWork && newEpisode > (libraryWork.currentChapter || 0)) {
+            updateProgress(libraryWork.id, newEpisode);
+        }
+
         addToast('Épisode avancé !', 'success');
         loadData();
     };
@@ -120,6 +132,19 @@ export function WatchPartiesSection() {
                 ? prev.selectedFriends.filter(id => id !== uid)
                 : [...prev.selectedFriends, uid]
         }));
+    };
+
+    const handleEndParty = async (partyId: string) => {
+        await endWatchParty(partyId);
+        addToast('Party terminée', 'success');
+        loadData();
+    };
+
+    const handleLeaveParty = async (partyId: string) => {
+        if (!user) return;
+        await leaveWatchParty(partyId, user.uid);
+        addToast('Vous avez quitté la party', 'info');
+        loadData();
     };
 
     if (!user) {
@@ -195,7 +220,7 @@ export function WatchPartiesSection() {
                                             <Button
                                                 size="sm"
                                                 variant="ghost"
-                                                onClick={() => handleAdvanceEpisode(party.id, party.currentEpisode)}
+                                                onClick={() => handleAdvanceEpisode(party.id, party.currentEpisode, party.workId)}
                                                 style={{ marginLeft: 'auto' }}
                                             >
                                                 +1
@@ -222,6 +247,32 @@ export function WatchPartiesSection() {
                                         </div>
                                         <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{party.participants.length} participant{party.participants.length > 1 ? 's' : ''}</span>
                                     </div>
+
+                                    {/* Action Buttons */}
+                                    {party.status === 'active' && (
+                                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                            {party.hostId === user.uid ? (
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    onClick={() => handleEndParty(party.id)}
+                                                    icon={<Ban size={14} />}
+                                                    style={{ color: '#ef4444' }}
+                                                >
+                                                    Terminer
+                                                </Button>
+                                            ) : (
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    onClick={() => handleLeaveParty(party.id)}
+                                                    icon={<LogOut size={14} />}
+                                                >
+                                                    Quitter
+                                                </Button>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>

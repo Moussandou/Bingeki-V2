@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { useLibraryStore } from '@/store/libraryStore';
 import { Button } from '@/components/ui/Button';
@@ -12,22 +12,36 @@ import { ContentList, type ContentItem } from '@/components/ContentList';
 import { getAnimeEpisodes, getAnimeEpisodeDetails } from '@/services/animeApi';
 import { getCommentsWithReplies, addComment, toggleCommentLike, getFriendsReadingWork, type UserProfile } from '@/firebase/firestore';
 import { useAuthStore } from '@/store/authStore';
+import { useSettingsStore } from '@/store/settingsStore';
 import type { CommentWithReplies } from '@/types/comment';
 import logoCrunchyroll from '@/assets/logo_crunchyroll.png';
 import logoADN from '@/assets/logo_adn.png';
+import { getWorkDetails } from '@/services/animeApi';
 
 export default function WorkDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToast } = useToast(); // Initialize hook
-    const { getWork, updateProgress, updateStatus, updateWorkDetails, removeWork } = useLibraryStore(); // Add removeWork
+    const { getWork, addWork, updateProgress, updateStatus, updateWorkDetails, removeWork } = useLibraryStore(); // Add removeWork
     const { addXp, recordActivity, incrementStat } = useGamificationStore();
     const { user } = useAuthStore();
-    const work = getWork(Number(id));
+    const { spoilerMode } = useSettingsStore();
+
+    // Query Params for Public/Guest Access
+    const [searchParams] = useSearchParams();
+    const typeParam = searchParams.get('type') as 'anime' | 'manga' | null;
+    const [fetchedWork, setFetchedWork] = useState<any | null>(null);
+    const [isFetchingDetails, setIsFetchingDetails] = useState(false);
+
+    const libraryWork = getWork(Number(id));
+    const work = libraryWork || fetchedWork; // Merged work object for display consistency
+
     const [isEditing, setIsEditing] = useState(false);
-    const [progress, setProgress] = useState(work?.currentChapter || 0);
+    const [progress, setProgress] = useState(libraryWork?.currentChapter || 0); // Use libraryWork for initial progress
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isSynopsisExpanded, setIsSynopsisExpanded] = useState(false);
+    const [isNotesExpanded, setIsNotesExpanded] = useState(false);
+    const [isCommentsExpanded, setIsCommentsExpanded] = useState(false);
 
     // Tab & Episodes State
     const [activeTab, setActiveTab] = useState<'info' | 'episodes'>('info');
@@ -48,7 +62,48 @@ export default function WorkDetails() {
     // Friends reading this
     const [friendsReading, setFriendsReading] = useState<{ count: number; friends: UserProfile[] }>({ count: 0, friends: [] });
 
+
+    // Initial Fetch for non-library items
+    useEffect(() => {
+        if (!libraryWork && id && !fetchedWork && !isFetchingDetails) {
+            setIsFetchingDetails(true);
+            const typeToFetch = typeParam || 'anime'; // Default to anime if unknown, could be improved
+            getWorkDetails(Number(id), typeToFetch).then(res => {
+                // Map JikanResult to compatible format for UI (partial)
+                const mapped = {
+                    id: res.mal_id,
+                    title: res.title,
+                    type: res.type ? res.type.toLowerCase() : typeToFetch,
+                    image: res.images.jpg.large_image_url,
+                    synopsis: res.synopsis,
+                    totalChapters: res.chapters || res.episodes || 0,
+                    status: res.status ? res.status.toLowerCase().replace(/ /g, '_') : 'unknown',
+                    score: res.score,
+                    // Default library fields to null/0
+                    currentChapter: 0,
+                    rating: 0,
+                    notes: '',
+                    isPublic: true // Flag to indicate this is a public/fetched work
+                };
+                setFetchedWork(mapped);
+                setIsFetchingDetails(false);
+            }).catch(err => {
+                console.error("Failed to fetch work details", err);
+                setIsFetchingDetails(false);
+            });
+        }
+    }, [id, libraryWork, fetchedWork, typeParam]);
+
     if (!work) {
+        if (isFetchingDetails) {
+            return (
+                <Layout>
+                    <div className="container" style={{ textAlign: 'center', paddingTop: '4rem' }}>
+                        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem' }}>CHARGEMENT...</h1>
+                    </div>
+                </Layout>
+            );
+        }
         return (
             <Layout>
                 <div className="container" style={{ textAlign: 'center', paddingTop: '4rem' }}>
@@ -59,9 +114,14 @@ export default function WorkDetails() {
         );
     }
 
+    // Normalize displayWork for UI usage (deprecated activeWork, just use work)
+    // const activeWork = displayWork; 
+    // const isInLibrary = !!work; <- This is wrong now, isInLibrary = !!libraryWork
+
     const handleSave = () => {
-        const oldProgress = work?.currentChapter || 0;
-        updateProgress(work.id, progress);
+        if (!libraryWork) return; // Guard for guests
+        const oldProgress = libraryWork.currentChapter || 0;
+        updateProgress(libraryWork.id, progress);
 
         // Award XP if progress increased
         if (progress > oldProgress) {
@@ -490,7 +550,7 @@ export default function WorkDetails() {
                                             onClick={() => setIsSynopsisExpanded(!isSynopsisExpanded)}
                                             style={{ cursor: 'pointer', position: 'relative' }}
                                         >
-                                            <p style={{
+                                            <p className={spoilerMode ? 'spoiler-blur' : ''} style={{
                                                 fontSize: '1rem',
                                                 lineHeight: '1.6',
                                                 opacity: 0.8,
@@ -535,377 +595,453 @@ export default function WorkDetails() {
                                 )}
 
                                 <div style={{ marginBottom: '2rem' }}>
-                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>PROGRESSION</h3>
-                                    <div style={{ color: '#000' }}>
-                                        {isEditing ? (
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                <input
-                                                    type="number"
-                                                    value={progress}
-                                                    onChange={(e) => setProgress(Number(e.target.value))}
-                                                    style={{
-                                                        fontSize: '2rem',
-                                                        fontWeight: 900,
-                                                        width: '100px',
-                                                        border: '2px solid #000',
-                                                        padding: '0.5rem',
-                                                        textAlign: 'center',
-                                                        color: '#000',
-                                                        background: '#fff'
-                                                    }}
-                                                />
-                                                <span style={{ fontSize: '1.5rem', fontWeight: 900 }}>/ {work.totalChapters || '?'}</span>
-                                                <Button onClick={handleSave} variant="primary" icon={<Check size={20} />}>OK</Button>
-                                            </div>
-                                        ) : (
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                                                {/* Decrement buttons */}
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 5))}
-                                                    style={{ fontWeight: 700, border: '1px solid #ccc' }}
-                                                >-5</Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 3))}
-                                                    style={{ fontWeight: 700, border: '1px solid #ccc' }}
-                                                >-3</Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 1))}
-                                                    style={{ fontWeight: 700, border: '1px solid #ccc' }}
-                                                >-1</Button>
-
-                                                {/* Progress display */}
-                                                <span style={{ fontSize: '2.5rem', fontWeight: 900, lineHeight: 1, margin: '0 0.5rem' }}>
-                                                    {work.currentChapter} <span style={{ fontSize: '1.25rem', opacity: 0.5 }}>/ {work.totalChapters || '?'}</span>
-                                                </span>
-
-                                                {/* Increment buttons */}
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 1)}
-                                                    style={{ fontWeight: 700, border: '1px solid #ccc' }}
-                                                >+1</Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 3)}
-                                                    style={{ fontWeight: 700, border: '1px solid #ccc' }}
-                                                >+3</Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 5)}
-                                                    style={{ fontWeight: 700, border: '1px solid #ccc' }}
-                                                >+5</Button>
-                                                <Button onClick={() => setIsEditing(true)} variant="manga" size="sm">Éditer</Button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div style={{ marginBottom: '2rem' }}>
-                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>STATUT</h3>
-                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                        {['reading', 'completed', 'plan_to_read', 'dropped'].map((s) => (
-                                            <button
-                                                key={s}
-                                                onClick={() => updateStatus(work.id, s as any)}
-                                                style={{
-                                                    padding: '0.5rem 1rem',
-                                                    border: '2px solid #000',
-                                                    background: work.status === s ? '#000' : '#fff',
-                                                    color: work.status === s ? '#fff' : '#000',
-                                                    fontWeight: 900,
-                                                    textTransform: 'uppercase',
-                                                    cursor: 'pointer',
-                                                    transform: work.status === s ? 'translateY(-2px)' : 'none',
-                                                    boxShadow: work.status === s ? '4px 4px 0 rgba(0,0,0,0.2)' : 'none',
-                                                    transition: 'all 0.2s'
+                                    {!libraryWork ? (
+                                        <div style={{ padding: '2rem', background: '#f9f9f9', textAlign: 'center', border: '2px dashed #000' }}>
+                                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem' }}>INTÉRESSÉ ?</h3>
+                                            <p style={{ marginBottom: '1.5rem' }}>Ajoutez cette œuvre à votre bibliothèque pour suivre votre progression !</p>
+                                            <Button
+                                                onClick={() => {
+                                                    if (user) {
+                                                        addWork(fetchedWork);
+                                                        addToast('Ajouté à votre bibliothèque !', 'success');
+                                                    } else {
+                                                        navigate('/auth');
+                                                    }
                                                 }}
+                                                variant="primary"
+                                                size="lg"
+                                                icon={<BookOpen size={20} />}
                                             >
-                                                {statusToFrench(s)}
-                                            </button>
-                                        ))}
-                                    </div>
+                                                {user ? 'AJOUTER À MA COLLECTION' : 'SE CONNECTER POUR AJOUTER'}
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>PROGRESSION</h3>
+                                            <div style={{ color: '#000' }}>
+                                                {isEditing ? (
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                        <input
+                                                            type="number"
+                                                            value={progress}
+                                                            onChange={(e) => setProgress(Number(e.target.value))}
+                                                            style={{
+                                                                fontSize: '2rem',
+                                                                fontWeight: 900,
+                                                                width: '100px',
+                                                                border: '2px solid #000',
+                                                                padding: '0.5rem',
+                                                                textAlign: 'center',
+                                                                color: '#000',
+                                                                background: '#fff'
+                                                            }}
+                                                        />
+                                                        <span style={{ fontSize: '1.5rem', fontWeight: 900 }}>/ {work.totalChapters || '?'}</span>
+                                                        <Button onClick={handleSave} variant="primary" icon={<Check size={20} />}>OK</Button>
+                                                    </div>
+                                                ) : (
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                                        {/* Decrement buttons */}
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 5))}
+                                                            style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                        >-5</Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 3))}
+                                                            style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                        >-3</Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 1))}
+                                                            style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                        >-1</Button>
+
+                                                        {/* Progress display */}
+                                                        <span style={{ fontSize: '2.5rem', fontWeight: 900, lineHeight: 1, margin: '0 0.5rem' }}>
+                                                            {work.currentChapter} <span style={{ fontSize: '1.25rem', opacity: 0.5 }}>/ {work.totalChapters || '?'}</span>
+                                                        </span>
+
+                                                        {/* Increment buttons */}
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 1)}
+                                                            style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                        >+1</Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 3)}
+                                                            style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                        >+3</Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 5)}
+                                                            style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                        >+5</Button>
+                                                        <Button onClick={() => setIsEditing(true)} variant="manga" size="sm">Éditer</Button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
+
+                                {libraryWork && (
+                                    <div style={{ marginBottom: '2rem' }}>
+                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>STATUT</h3>
+                                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                            {['reading', 'completed', 'plan_to_read', 'dropped'].map((s) => (
+                                                <button
+                                                    key={s}
+                                                    onClick={() => updateStatus(work.id, s as any)}
+                                                    style={{
+                                                        padding: '0.5rem 1rem',
+                                                        border: '2px solid #000',
+                                                        background: work.status === s ? '#000' : '#fff',
+                                                        color: work.status === s ? '#fff' : '#000',
+                                                        fontWeight: 900,
+                                                        textTransform: 'uppercase',
+                                                        cursor: 'pointer',
+                                                        transform: work.status === s ? 'translateY(-2px)' : 'none',
+                                                        boxShadow: work.status === s ? '4px 4px 0 rgba(0,0,0,0.2)' : 'none',
+                                                        transition: 'all 0.2s'
+                                                    }}
+                                                >
+                                                    {statusToFrench(s)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )
+                                }
 
                                 {/* Rating Section */}
-                                <div style={{ marginBottom: '2rem' }}>
-                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>MA NOTE</h3>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
-                                            <button
-                                                key={star}
-                                                onClick={() => updateWorkDetails(work.id, { rating: star })}
-                                                style={{
-                                                    background: 'none',
-                                                    border: 'none',
-                                                    cursor: 'pointer',
-                                                    padding: 0,
-                                                    transition: 'transform 0.1s'
-                                                }}
-                                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
-                                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                            >
-                                                <Star
-                                                    size={32}
-                                                    fill={(work.rating || 0) >= star ? '#000' : 'none'}
-                                                    color="#000"
-                                                    strokeWidth={2}
-                                                />
-                                            </button>
-                                        ))}
-                                        <span style={{ marginLeft: '1rem', fontSize: '1.5rem', fontWeight: 900 }}>{work.rating ? `${work.rating}/10` : '-/10'}</span>
+                                {libraryWork && (
+                                    <div style={{ marginBottom: '2rem' }}>
+                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>MA NOTE</h3>
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
+                                                <button
+                                                    key={star}
+                                                    onClick={() => updateWorkDetails(work.id, { rating: star })}
+                                                    style={{
+                                                        background: 'none',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        padding: 0,
+                                                        transition: 'transform 0.1s'
+                                                    }}
+                                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+                                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                                >
+                                                    <Star
+                                                        size={32}
+                                                        fill={(work.rating || 0) >= star ? '#000' : 'none'}
+                                                        color="#000"
+                                                        strokeWidth={2}
+                                                    />
+                                                </button>
+                                            ))}
+                                            <span style={{ marginLeft: '1rem', fontSize: '1.5rem', fontWeight: 900 }}>{work.rating ? `${work.rating}/10` : '-/10'}</span>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
 
                                 {/* Notes Section */}
-                                <div style={{ marginBottom: '2rem' }}>
-                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>MES NOTES</h3>
-                                    <textarea
-                                        value={work.notes || ''}
-                                        onChange={(e) => updateWorkDetails(work.id, { notes: e.target.value })}
-                                        placeholder="Écrivez vos pensées ici..."
-                                        style={{
-                                            width: '100%',
-                                            minHeight: '150px',
-                                            border: '2px solid #000',
-                                            padding: '1rem',
-                                            fontFamily: 'inherit',
-                                            fontSize: '1rem',
-                                            resize: 'vertical',
-                                            background: '#f9f9f9',
-                                            marginBottom: '2rem'
-                                        }}
-                                    />
-                                </div>
-
-                                {/* Comments Section */}
-                                <div style={{ marginBottom: '2rem' }}>
-                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <MessageCircle size={24} /> COMMENTAIRES ({comments.length})
-                                    </h3>
-
-                                    {/* Friends reading indicator */}
-                                    {friendsReading.count > 0 && (
-                                        <div style={{
-                                            background: 'linear-gradient(135deg, #dbeafe, #ede9fe)',
-                                            padding: '1rem',
-                                            borderRadius: '8px',
-                                            marginBottom: '1rem',
-                                            border: '1px solid #c7d2fe'
-                                        }}>
-                                            <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>
-                                                👥 <strong>{friendsReading.count} ami{friendsReading.count > 1 ? 's' : ''}</strong> {work.type === 'anime' ? 'regarde' : 'lit'} aussi cette œuvre
-                                            </p>
-                                            <div style={{ display: 'flex', gap: '-8px', marginTop: '0.5rem' }}>
-                                                {friendsReading.friends.slice(0, 5).map(f => (
-                                                    <div key={f.uid} style={{
-                                                        width: 28,
-                                                        height: 28,
-                                                        borderRadius: '50%',
-                                                        overflow: 'hidden',
-                                                        border: '2px solid #fff',
-                                                        marginLeft: '-8px'
-                                                    }}>
-                                                        <img src={f.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${f.displayName}`}
-                                                            alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* New comment form */}
-                                    {user ? (
-                                        <div style={{ marginBottom: '1.5rem', background: '#f9f9f9', padding: '1rem', border: '1px solid #eee', borderRadius: '8px' }}>
+                                {libraryWork && (
+                                    <div style={{ marginBottom: '2rem' }}>
+                                        <h3
+                                            onClick={() => setIsNotesExpanded(!isNotesExpanded)}
+                                            style={{
+                                                fontFamily: 'var(--font-heading)',
+                                                fontSize: '1.5rem',
+                                                marginBottom: '1rem',
+                                                color: '#000',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.5rem',
+                                                userSelect: 'none'
+                                            }}
+                                        >
+                                            MES NOTES {isNotesExpanded ? '▼' : '►'}
+                                        </h3>
+                                        {isNotesExpanded && (
                                             <textarea
-                                                value={newComment}
-                                                onChange={(e) => setNewComment(e.target.value)}
-                                                placeholder="Partagez votre avis..."
+                                                value={work.notes || ''}
+                                                onChange={(e) => updateWorkDetails(work.id, { notes: e.target.value })}
+                                                placeholder="Écrivez vos pensées ici..."
                                                 style={{
                                                     width: '100%',
-                                                    minHeight: '80px',
-                                                    border: '1px solid #ccc',
-                                                    padding: '0.75rem',
+                                                    minHeight: '150px',
+                                                    border: '2px solid #000',
+                                                    padding: '1rem',
                                                     fontFamily: 'inherit',
-                                                    fontSize: '0.95rem',
+                                                    fontSize: '1rem',
                                                     resize: 'vertical',
-                                                    borderRadius: '4px',
-                                                    marginBottom: '0.75rem'
+                                                    background: '#f9f9f9',
+                                                    marginBottom: '2rem'
                                                 }}
                                             />
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem' }}>
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={isSpoiler}
-                                                        onChange={(e) => setIsSpoiler(e.target.checked)}
-                                                    />
-                                                    <EyeOff size={16} /> Contient des spoilers
-                                                </label>
-                                                <Button onClick={handleSubmitComment} variant="manga" size="sm" icon={<Send size={16} />}>
-                                                    Publier
-                                                </Button>
-                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Comments Section */}
+                                <div style={{
+                                    marginBottom: '2rem',
+                                    border: '2px solid #000',
+                                    padding: '1.5rem',
+                                    boxShadow: '8px 8px 0 #000',
+                                    background: '#fff'
+                                }}>
+                                    <h3
+                                        onClick={() => setIsCommentsExpanded(!isCommentsExpanded)}
+                                        style={{
+                                            fontFamily: 'var(--font-heading)',
+                                            fontSize: '1.5rem',
+                                            marginBottom: isCommentsExpanded ? '1.5rem' : 0,
+                                            color: '#000',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem',
+                                            cursor: 'pointer',
+                                            userSelect: 'none',
+                                            justifyContent: 'space-between'
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <MessageCircle size={24} /> COMMENTAIRES ({comments.length})
                                         </div>
-                                    ) : (
-                                        <p style={{ opacity: 0.6, fontStyle: 'italic', marginBottom: '1rem' }}>Connectez-vous pour commenter</p>
-                                    )}
+                                        <span>{isCommentsExpanded ? '▼' : '►'}</span>
+                                    </h3>
 
-                                    {/* Comments list */}
-                                    {isLoadingComments ? (
-                                        <p style={{ textAlign: 'center', opacity: 0.6 }}>Chargement des commentaires...</p>
-                                    ) : comments.length === 0 ? (
-                                        <p style={{ textAlign: 'center', opacity: 0.6, padding: '2rem' }}>Aucun commentaire. Soyez le premier !</p>
-                                    ) : (
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                            {comments.map(comment => {
-                                                const isRevealed = revealedSpoilers.includes(comment.id);
-                                                const timeDiff = Date.now() - comment.timestamp;
-                                                const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-                                                const timeAgo = hours < 1 ? 'À l\'instant' : hours < 24 ? `Il y a ${hours}h` : `Il y a ${Math.floor(hours / 24)}j`;
+                                    {isCommentsExpanded && (
+                                        <div>
 
-                                                return (
-                                                    <div key={comment.id} style={{
-                                                        padding: '1rem',
-                                                        background: '#fff',
-                                                        border: '1px solid #eee',
-                                                        borderRadius: '8px'
-                                                    }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                                                            <div style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
-                                                                <img src={comment.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.userName}`}
+                                            {/* Friends reading indicator */}
+                                            {friendsReading.count > 0 && (
+                                                <div style={{
+                                                    background: 'linear-gradient(135deg, #dbeafe, #ede9fe)',
+                                                    padding: '1rem',
+                                                    borderRadius: '8px',
+                                                    marginBottom: '1rem',
+                                                    border: '1px solid #c7d2fe'
+                                                }}>
+                                                    <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                                                        👥 <strong>{friendsReading.count} ami{friendsReading.count > 1 ? 's' : ''}</strong> {work.type === 'anime' ? 'regarde' : 'lit'} aussi cette œuvre
+                                                    </p>
+                                                    <div style={{ display: 'flex', gap: '-8px', marginTop: '0.5rem' }}>
+                                                        {friendsReading.friends.slice(0, 5).map(f => (
+                                                            <div key={f.uid} style={{
+                                                                width: 28,
+                                                                height: 28,
+                                                                borderRadius: '50%',
+                                                                overflow: 'hidden',
+                                                                border: '2px solid #fff',
+                                                                marginLeft: '-8px'
+                                                            }}>
+                                                                <img src={f.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${f.displayName}`}
                                                                     alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                             </div>
-                                                            <div>
-                                                                <p style={{ fontWeight: 700, fontSize: '0.95rem' }}>{comment.userName}</p>
-                                                                <p style={{ fontSize: '0.75rem', opacity: 0.5 }}>{timeAgo}</p>
-                                                            </div>
-                                                        </div>
-
-                                                        {comment.spoiler && !isRevealed ? (
-                                                            <div
-                                                                onClick={() => setRevealedSpoilers(prev => [...prev, comment.id])}
-                                                                style={{
-                                                                    padding: '1rem',
-                                                                    background: '#000',
-                                                                    color: '#fff',
-                                                                    cursor: 'pointer',
-                                                                    borderRadius: '4px',
-                                                                    textAlign: 'center',
-                                                                    fontSize: '0.9rem'
-                                                                }}
-                                                            >
-                                                                <EyeOff size={16} style={{ marginRight: '0.5rem' }} />
-                                                                ⚠️ Spoiler - Cliquez pour révéler
-                                                            </div>
-                                                        ) : (
-                                                            <p style={{ lineHeight: 1.5, fontSize: '0.95rem' }}>{comment.text}</p>
-                                                        )}
-
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem' }}>
-                                                            <button
-                                                                onClick={() => handleLikeComment(comment.id)}
-                                                                style={{
-                                                                    background: 'none',
-                                                                    border: 'none',
-                                                                    cursor: 'pointer',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '0.25rem',
-                                                                    color: user && comment.likes.includes(user.uid) ? '#ef4444' : '#666'
-                                                                }}
-                                                            >
-                                                                <Heart size={16} fill={user && comment.likes.includes(user.uid) ? '#ef4444' : 'none'} />
-                                                                <span style={{ fontSize: '0.85rem' }}>{comment.likes.length}</span>
-                                                            </button>
-                                                            {user && (
-                                                                <button
-                                                                    onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                                                                    style={{
-                                                                        background: 'none',
-                                                                        border: 'none',
-                                                                        cursor: 'pointer',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        gap: '0.25rem',
-                                                                        color: replyingTo === comment.id ? '#3b82f6' : '#666'
-                                                                    }}
-                                                                >
-                                                                    <Reply size={16} />
-                                                                    <span style={{ fontSize: '0.85rem' }}>Répondre</span>
-                                                                </button>
-                                                            )}
-                                                        </div>
-
-                                                        {/* Inline reply form */}
-                                                        {replyingTo === comment.id && (
-                                                            <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
-                                                                <input
-                                                                    type="text"
-                                                                    value={replyText}
-                                                                    onChange={(e) => setReplyText(e.target.value)}
-                                                                    placeholder="Votre réponse..."
-                                                                    style={{
-                                                                        flex: 1,
-                                                                        padding: '0.5rem 0.75rem',
-                                                                        border: '1px solid #ccc',
-                                                                        borderRadius: '4px',
-                                                                        fontSize: '0.9rem'
-                                                                    }}
-                                                                    onKeyDown={(e) => e.key === 'Enter' && handleReply(comment.id)}
-                                                                />
-                                                                <button
-                                                                    onClick={() => handleReply(comment.id)}
-                                                                    style={{
-                                                                        background: '#000',
-                                                                        color: '#fff',
-                                                                        border: 'none',
-                                                                        borderRadius: '4px',
-                                                                        padding: '0.5rem 1rem',
-                                                                        cursor: 'pointer',
-                                                                        fontWeight: 600
-                                                                    }}
-                                                                >
-                                                                    <Send size={16} />
-                                                                </button>
-                                                            </div>
-                                                        )}
-
-                                                        {/* Nested replies */}
-                                                        {comment.replies && comment.replies.length > 0 && (
-                                                            <div style={{ marginTop: '1rem', marginLeft: '1.5rem', borderLeft: '2px solid #eee', paddingLeft: '1rem' }}>
-                                                                {comment.replies.map(reply => {
-                                                                    const replyTimeDiff = Date.now() - reply.timestamp;
-                                                                    const replyHours = Math.floor(replyTimeDiff / (1000 * 60 * 60));
-                                                                    const replyTimeAgo = replyHours < 1 ? 'À l\'instant' : replyHours < 24 ? `Il y a ${replyHours}h` : `Il y a ${Math.floor(replyHours / 24)}j`;
-
-                                                                    return (
-                                                                        <div key={reply.id} style={{ marginBottom: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid #f0f0f0' }}>
-                                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                                                                <div style={{ width: 24, height: 24, borderRadius: '50%', overflow: 'hidden', border: '1px solid #ccc' }}>
-                                                                                    <img src={reply.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${reply.userName}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                                                </div>
-                                                                                <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{reply.userName}</span>
-                                                                                <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>{replyTimeAgo}</span>
-                                                                            </div>
-                                                                            <p style={{ fontSize: '0.9rem', lineHeight: 1.4 }}>{reply.text}</p>
-                                                                        </div>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        )}
+                                                        ))}
                                                     </div>
-                                                );
-                                            })}
+                                                </div>
+                                            )}
+
+                                            {/* New comment form */}
+                                            {user ? (
+                                                <div style={{ marginBottom: '1.5rem', background: '#f9f9f9', padding: '1rem', border: '1px solid #eee', borderRadius: '8px' }}>
+                                                    <textarea
+                                                        value={newComment}
+                                                        onChange={(e) => setNewComment(e.target.value)}
+                                                        placeholder="Partagez votre avis..."
+                                                        style={{
+                                                            width: '100%',
+                                                            minHeight: '80px',
+                                                            border: '1px solid #ccc',
+                                                            padding: '0.75rem',
+                                                            fontFamily: 'inherit',
+                                                            fontSize: '0.95rem',
+                                                            resize: 'vertical',
+                                                            borderRadius: '4px',
+                                                            marginBottom: '0.75rem'
+                                                        }}
+                                                    />
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem' }}>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={isSpoiler}
+                                                                onChange={(e) => setIsSpoiler(e.target.checked)}
+                                                            />
+                                                            <EyeOff size={16} /> Contient des spoilers
+                                                        </label>
+                                                        <Button onClick={handleSubmitComment} variant="manga" size="sm" icon={<Send size={16} />}>
+                                                            Publier
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <p style={{ opacity: 0.6, fontStyle: 'italic', marginBottom: '1rem' }}>Connectez-vous pour commenter</p>
+                                            )}
+
+                                            {/* Comments list */}
+                                            {isLoadingComments ? (
+                                                <p style={{ textAlign: 'center', opacity: 0.6 }}>Chargement des commentaires...</p>
+                                            ) : comments.length === 0 ? (
+                                                <p style={{ textAlign: 'center', opacity: 0.6, padding: '2rem' }}>Aucun commentaire. Soyez le premier !</p>
+                                            ) : (
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                                    {comments.map(comment => {
+                                                        const isRevealed = revealedSpoilers.includes(comment.id);
+                                                        const timeDiff = Date.now() - comment.timestamp;
+                                                        const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+                                                        const timeAgo = hours < 1 ? 'À l\'instant' : hours < 24 ? `Il y a ${hours}h` : `Il y a ${Math.floor(hours / 24)}j`;
+
+                                                        return (
+                                                            <div key={comment.id} style={{
+                                                                padding: '1rem',
+                                                                background: '#fff',
+                                                                border: '1px solid #eee',
+                                                                borderRadius: '8px'
+                                                            }}>
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                                                                    <div style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                                                        <img src={comment.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.userName}`}
+                                                                            alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                                    </div>
+                                                                    <div>
+                                                                        <p style={{ fontWeight: 700, fontSize: '0.95rem' }}>{comment.userName}</p>
+                                                                        <p style={{ fontSize: '0.75rem', opacity: 0.5 }}>{timeAgo}</p>
+                                                                    </div>
+                                                                </div>
+
+                                                                {comment.spoiler && !isRevealed ? (
+                                                                    <div
+                                                                        onClick={() => setRevealedSpoilers(prev => [...prev, comment.id])}
+                                                                        style={{
+                                                                            padding: '1rem',
+                                                                            background: '#000',
+                                                                            color: '#fff',
+                                                                            cursor: 'pointer',
+                                                                            borderRadius: '4px',
+                                                                            textAlign: 'center',
+                                                                            fontSize: '0.9rem'
+                                                                        }}
+                                                                    >
+                                                                        <EyeOff size={16} style={{ marginRight: '0.5rem' }} />
+                                                                        ⚠️ Spoiler - Cliquez pour révéler
+                                                                    </div>
+                                                                ) : (
+                                                                    <p style={{ lineHeight: 1.5, fontSize: '0.95rem' }}>{comment.text}</p>
+                                                                )}
+
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem' }}>
+                                                                    <button
+                                                                        onClick={() => handleLikeComment(comment.id)}
+                                                                        style={{
+                                                                            background: 'none',
+                                                                            border: 'none',
+                                                                            cursor: 'pointer',
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            gap: '0.25rem',
+                                                                            color: user && comment.likes.includes(user.uid) ? '#ef4444' : '#666'
+                                                                        }}
+                                                                    >
+                                                                        <Heart size={16} fill={user && comment.likes.includes(user.uid) ? '#ef4444' : 'none'} />
+                                                                        <span style={{ fontSize: '0.85rem' }}>{comment.likes.length}</span>
+                                                                    </button>
+                                                                    {user && (
+                                                                        <button
+                                                                            onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+                                                                            style={{
+                                                                                background: 'none',
+                                                                                border: 'none',
+                                                                                cursor: 'pointer',
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                gap: '0.25rem',
+                                                                                color: replyingTo === comment.id ? '#3b82f6' : '#666'
+                                                                            }}
+                                                                        >
+                                                                            <Reply size={16} />
+                                                                            <span style={{ fontSize: '0.85rem' }}>Répondre</span>
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+
+                                                                {/* Inline reply form */}
+                                                                {replyingTo === comment.id && (
+                                                                    <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
+                                                                        <input
+                                                                            type="text"
+                                                                            value={replyText}
+                                                                            onChange={(e) => setReplyText(e.target.value)}
+                                                                            placeholder="Votre réponse..."
+                                                                            style={{
+                                                                                flex: 1,
+                                                                                padding: '0.5rem 0.75rem',
+                                                                                border: '1px solid #ccc',
+                                                                                borderRadius: '4px',
+                                                                                fontSize: '0.9rem'
+                                                                            }}
+                                                                            onKeyDown={(e) => e.key === 'Enter' && handleReply(comment.id)}
+                                                                        />
+                                                                        <button
+                                                                            onClick={() => handleReply(comment.id)}
+                                                                            style={{
+                                                                                background: '#000',
+                                                                                color: '#fff',
+                                                                                border: 'none',
+                                                                                borderRadius: '4px',
+                                                                                padding: '0.5rem 1rem',
+                                                                                cursor: 'pointer',
+                                                                                fontWeight: 600
+                                                                            }}
+                                                                        >
+                                                                            <Send size={16} />
+                                                                        </button>
+                                                                    </div>
+                                                                )}
+
+                                                                {/* Nested replies */}
+                                                                {comment.replies && comment.replies.length > 0 && (
+                                                                    <div style={{ marginTop: '1rem', marginLeft: '1.5rem', borderLeft: '2px solid #eee', paddingLeft: '1rem' }}>
+                                                                        {comment.replies.map(reply => {
+                                                                            const replyTimeDiff = Date.now() - reply.timestamp;
+                                                                            const replyHours = Math.floor(replyTimeDiff / (1000 * 60 * 60));
+                                                                            const replyTimeAgo = replyHours < 1 ? 'À l\'instant' : replyHours < 24 ? `Il y a ${replyHours}h` : `Il y a ${Math.floor(replyHours / 24)}j`;
+
+                                                                            return (
+                                                                                <div key={reply.id} style={{ marginBottom: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid #f0f0f0' }}>
+                                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                                                                        <div style={{ width: 24, height: 24, borderRadius: '50%', overflow: 'hidden', border: '1px solid #ccc' }}>
+                                                                                            <img src={reply.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${reply.userName}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                                                        </div>
+                                                                                        <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{reply.userName}</span>
+                                                                                        <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>{replyTimeAgo}</span>
+                                                                                    </div>
+                                                                                    <p style={{ fontSize: '0.9rem', lineHeight: 1.4 }}>{reply.text}</p>
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -960,6 +1096,6 @@ export default function WorkDetails() {
                     </div>
                 </Modal>
             </div>
-        </Layout>
+        </Layout >
     );
 }

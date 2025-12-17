@@ -53,6 +53,16 @@ export function Header() {
                         </nav>
                     )}
 
+                    {/* Discover link - accessible to all */}
+                    {!user && (
+                        <nav className={styles.desktopNav}>
+                            <Link to="/discover" className={`${styles.navLink} ${isActive('/discover') ? styles.activeLink : ''}`}>
+                                <Search size={18} />
+                                <span>Découvrir</span>
+                            </Link>
+                        </nav>
+                    )}
+
                     {/* Right: Stats & Actions */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
 
@@ -180,6 +190,27 @@ export function Header() {
                     </Link>
                     <Link to="/profile">
                         <Button variant={isActive('/profile') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                            <User size={22} />
+                        </Button>
+                    </Link>
+                </nav>
+            )}
+
+            {/* Mobile Bottom Dock for Guests - Only Discover */}
+            {!user && (
+                <nav className={styles.mobileNav}>
+                    <Link to="/">
+                        <Button variant={isActive('/') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                            <Home size={22} />
+                        </Button>
+                    </Link>
+                    <Link to="/discover">
+                        <Button variant={isActive('/discover') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                            <Search size={22} />
+                        </Button>
+                    </Link>
+                    <Link to="/auth">
+                        <Button variant={isActive('/auth') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
                             <User size={22} />
                         </Button>
                     </Link>

@@ -3,26 +3,66 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Mail, Lock, User } from 'lucide-react';
-import { loginWithGoogle } from '@/firebase/auth';
+import { loginWithGoogle, loginWithEmail, registerWithEmail } from '@/firebase/auth';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate, Link } from 'react-router-dom';
 
 export default function Auth() {
     const [isLogin, setIsLogin] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    // Form state
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [displayName, setDisplayName] = useState('');
+
     const { setUser } = useAuthStore();
     const navigate = useNavigate();
 
-    const toggleMode = () => setIsLogin(!isLogin);
+    const toggleMode = () => {
+        setIsLogin(!isLogin);
+        setError(null);
+    };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError(null);
         setLoading(true);
-        setTimeout(() => setLoading(false), 2000);
+
+        try {
+            if (isLogin) {
+                const { user, error: loginError } = await loginWithEmail(email, password);
+                if (loginError) {
+                    setError(loginError);
+                } else if (user) {
+                    setUser(user);
+                    navigate('/dashboard');
+                }
+            } else {
+                if (!displayName.trim()) {
+                    setError("Veuillez entrer un pseudo");
+                    setLoading(false);
+                    return;
+                }
+                const { user, error: registerError } = await registerWithEmail(email, password, displayName);
+                if (registerError) {
+                    setError(registerError);
+                } else if (user) {
+                    setUser(user);
+                    navigate('/dashboard');
+                }
+            }
+        } catch (err) {
+            setError("Une erreur est survenue");
+        }
+
+        setLoading(false);
     };
 
     const handleGoogleLogin = async () => {
         setLoading(true);
+        setError(null);
         const user = await loginWithGoogle();
         if (user) {
             setUser(user);
@@ -94,19 +134,52 @@ export default function Auth() {
                             </p>
                         </div>
 
+                        {error && (
+                            <div style={{
+                                background: '#fee2e2',
+                                border: '2px solid #ef4444',
+                                color: '#b91c1c',
+                                padding: '0.75rem 1rem',
+                                marginBottom: '1rem',
+                                fontWeight: 600,
+                                fontSize: '0.9rem'
+                            }}>
+                                {error}
+                            </div>
+                        )}
+
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                             {!isLogin && (
                                 <div>
-                                    <Input placeholder="Pseudo" icon={<User size={18} />} />
+                                    <Input
+                                        placeholder="Pseudo"
+                                        icon={<User size={18} />}
+                                        value={displayName}
+                                        onChange={(e) => setDisplayName(e.target.value)}
+                                    />
                                 </div>
                             )}
 
                             <div>
-                                <Input type="email" placeholder="Email" icon={<Mail size={18} />} />
+                                <Input
+                                    type="email"
+                                    placeholder="Email"
+                                    icon={<Mail size={18} />}
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
                             </div>
 
                             <div>
-                                <Input type="password" placeholder="Mot de passe" icon={<Lock size={18} />} />
+                                <Input
+                                    type="password"
+                                    placeholder="Mot de passe"
+                                    icon={<Lock size={18} />}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
                             </div>
 
                             <Button type="submit" variant="manga" isLoading={loading} style={{ marginTop: '0.5rem', padding: '1rem', fontSize: '1rem' }}>

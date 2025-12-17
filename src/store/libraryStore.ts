@@ -26,6 +26,7 @@ interface LibraryState {
     updateStatus: (id: number | string, status: Work['status']) => void;
     updateWorkDetails: (id: number | string, details: Partial<Work>) => void;
     getWork: (id: number | string) => Work | undefined;
+    resetStore: () => void;
 }
 
 export const useLibraryStore = create<LibraryState>()(
@@ -62,6 +63,7 @@ export const useLibraryStore = create<LibraryState>()(
                 ),
             })),
             getWork: (id) => get().works.find((w) => w.id === id),
+            resetStore: () => set({ works: [] }),
         }),
         {
             name: 'bingeki-library-storage',

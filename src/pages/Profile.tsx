@@ -106,6 +106,14 @@ export default function Profile() {
 
     }, [uid, user?.uid, isOwnProfile]);
 
+    // Redirect guest if no UID provided (visiting /profile directly)
+    useEffect(() => {
+        // If checking own profile but no user is logged in, redirect
+        if (!uid && !user) {
+            navigate('/auth');
+        }
+    }, [uid, user, navigate]);
+
     // Computed Stats to display
     const displayStats = isOwnProfile ? {
         level, xp, xpToNextLevel, streak, badgeCount: badges.length
@@ -318,14 +326,14 @@ export default function Profile() {
                             {/* Common Works Section (only for visited profiles) */}
                             {!isOwnProfile && commonWorks && commonWorks.count > 0 && (
                                 <div style={{ marginBottom: '2rem' }}>
-                                    <h3 className="manga-title" style={{ fontSize: '1.2rem', marginBottom: '1rem', background: 'linear-gradient(135deg, #dbeafe, #ede9fe)', color: '#000' }}>
-                                        📚 {commonWorks.count} œuvre{commonWorks.count > 1 ? 's' : ''} en commun
+                                    <h3 className="manga-title" style={{ fontSize: '1.2rem', marginBottom: '1rem', background: 'linear-gradient(135deg, #dbeafe, #ede9fe)', color: '#000', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <Library size={20} /> {commonWorks.count} œuvre{commonWorks.count > 1 ? 's' : ''} en commun
                                     </h3>
                                     <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                                         {commonWorks.common.slice(0, 8).map(work => (
                                             <div
                                                 key={work.id}
-                                                onClick={() => navigate(`/work/${work.id}`)}
+                                                onClick={() => navigate(`/work/${work.id}?type=${work.type || 'manga'}`)}
                                                 style={{
                                                     width: 80,
                                                     cursor: 'pointer',

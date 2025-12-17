@@ -22,6 +22,7 @@ interface GamificationState {
     clearRecentUnlock: () => void;
     incrementStat: (stat: 'chapters' | 'works' | 'completed') => void;
     checkBadges: () => void;
+    resetStore: () => void;
 }
 
 const LEVEL_BASE = 100;
@@ -153,7 +154,20 @@ export const useGamificationStore = create<GamificationState>()(
                 if (level >= 10) unlockBadge('level_10');
                 if (level >= 25) unlockBadge('level_25');
                 if (level >= 50) unlockBadge('level_50');
-            }
+            },
+
+            resetStore: () => set({
+                level: 1,
+                xp: 0,
+                xpToNextLevel: LEVEL_BASE,
+                streak: 0,
+                lastActivityDate: null,
+                badges: [],
+                recentUnlock: null,
+                totalChaptersRead: 0,
+                totalWorksAdded: 0,
+                totalWorksCompleted: 0
+            })
         }),
         {
             name: 'bingeki-gamification-storage',
