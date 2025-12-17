@@ -319,36 +319,48 @@ export default function WorkDetails() {
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                             {/* Crunchyroll */}
                                             <button
-                                                onClick={() => window.open(`https://www.google.com/search?q=site:crunchyroll.com/fr/watch ${encodeURIComponent(work.title)}`, '_blank')}
+                                                onClick={() => {
+                                                    handleEpisodeSelect((work.currentChapter || 0) + 1);
+                                                    window.open(`https://www.google.com/search?q=site:crunchyroll.com/fr/watch ${encodeURIComponent(work.title)}`, '_blank');
+                                                }}
                                                 style={{ border: '2px solid #ea580c', padding: '0.5rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center' }}
-                                                title="Crunchyroll"
+                                                title="Crunchyroll (+1 épisode)"
                                             >
                                                 <img src={logoCrunchyroll} alt="CR" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
                                             </button>
 
                                             {/* ADN */}
                                             <button
-                                                onClick={() => window.open(`https://www.google.com/search?q=site:animationdigitalnetwork.fr ${encodeURIComponent(work.title)}`, '_blank')}
+                                                onClick={() => {
+                                                    handleEpisodeSelect((work.currentChapter || 0) + 1);
+                                                    window.open(`https://www.google.com/search?q=site:animationdigitalnetwork.fr ${encodeURIComponent(work.title)}`, '_blank');
+                                                }}
                                                 style={{ border: '2px solid #0099ff', padding: '0.5rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center' }}
-                                                title="ADN"
+                                                title="ADN (+1 épisode)"
                                             >
                                                 <img src={logoADN} alt="ADN" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
                                             </button>
 
                                             {/* Generic Streaming */}
                                             <button
-                                                onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} streaming vostfr`, '_blank')}
+                                                onClick={() => {
+                                                    handleEpisodeSelect((work.currentChapter || 0) + 1);
+                                                    window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} streaming vostfr`, '_blank');
+                                                }}
                                                 style={{ border: '2px solid #000', padding: '0.5rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center' }}
-                                                title="Recherche Streaming Générale"
+                                                title="Streaming (+1 épisode)"
                                             >
                                                 <Tv size={20} />
                                             </button>
                                         </div>
                                     ) : (
                                         <button
-                                            onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} manga scan fr`, '_blank')}
+                                            onClick={() => {
+                                                handleEpisodeSelect((work.currentChapter || 0) + 1);
+                                                window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} manga scan fr`, '_blank');
+                                            }}
                                             style={{ border: '2px solid #22c55e', color: '#22c55e', padding: '0.5rem 1rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700 }}
-                                            title="Lire les scans"
+                                            title="Lire (+1 chapitre)"
                                         >
                                             <FileText size={20} />
                                             <span>LIRE</span>
