@@ -44,7 +44,7 @@ service cloud.firestore {
     // FEEDBACK
     match /feedback/{feedbackId} {
       allow create: if true; // Guests can submit feedback
-      allow read: if isAuthenticated(); // For now, all logged-in users can see feedback (temporary admin)
+      allow read: if request.auth.token.email == 'moussandou.m@gmail.com'; // ONLY Admin (You)
     }
 
     // WATCH PARTIES
