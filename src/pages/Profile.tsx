@@ -14,7 +14,7 @@ import {
     X, Upload
 } from 'lucide-react';
 import { HunterLicenseCard } from '@/components/HunterLicenseCard';
-import { getUserProfile, saveUserProfileToFirestore, type UserProfile } from '@/firebase/firestore';
+import { getUserProfile, saveUserProfileToFirestore, compareLibraries, type UserProfile } from '@/firebase/firestore';
 import { Input } from '@/components/ui/Input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -43,6 +43,9 @@ export default function Profile() {
 
     // Visited Profile Stats (if viewing someone else)
     const [visitedStats, setVisitedStats] = useState<any>(null);
+
+    // Library comparison (for visited profiles)
+    const [commonWorks, setCommonWorks] = useState<{ common: any[]; count: number } | null>(null);
 
     // Determine if we are viewing our own profile
     const isOwnProfile = !uid || (user && user.uid === uid);
@@ -90,6 +93,13 @@ export default function Profile() {
                         featuredBadge: p.featuredBadge || ''
                     });
                 }
+            });
+        }
+
+        // Load common works if visiting another profile
+        if (!isOwnProfile && user?.uid && uid) {
+            compareLibraries(user.uid, uid).then(common => {
+                setCommonWorks(common);
             });
         }
 
@@ -299,6 +309,69 @@ export default function Profile() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Common Works Section (only for visited profiles) */}
+                            {!isOwnProfile && commonWorks && commonWorks.count > 0 && (
+                                <div style={{ marginBottom: '2rem' }}>
+                                    <h3 className="manga-title" style={{ fontSize: '1.2rem', marginBottom: '1rem', background: 'linear-gradient(135deg, #dbeafe, #ede9fe)', color: '#000' }}>
+                                        📚 {commonWorks.count} œuvre{commonWorks.count > 1 ? 's' : ''} en commun
+                                    </h3>
+                                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                        {commonWorks.common.slice(0, 8).map(work => (
+                                            <div
+                                                key={work.id}
+                                                onClick={() => navigate(`/work/${work.id}`)}
+                                                style={{
+                                                    width: 80,
+                                                    cursor: 'pointer',
+                                                    transition: 'transform 0.2s'
+                                                }}
+                                                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                            >
+                                                <div style={{
+                                                    width: 80,
+                                                    height: 110,
+                                                    borderRadius: '4px',
+                                                    overflow: 'hidden',
+                                                    border: '2px solid #000',
+                                                    marginBottom: '0.25rem'
+                                                }}>
+                                                    <img
+                                                        src={work.image || `https://via.placeholder.com/80x110?text=${work.type}`}
+                                                        alt={work.title}
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    />
+                                                </div>
+                                                <p style={{
+                                                    fontSize: '0.7rem',
+                                                    fontWeight: 600,
+                                                    textAlign: 'center',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    whiteSpace: 'nowrap'
+                                                }}>{work.title}</p>
+                                            </div>
+                                        ))}
+                                        {commonWorks.count > 8 && (
+                                            <div style={{
+                                                width: 80,
+                                                height: 110,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                background: '#f0f0f0',
+                                                borderRadius: '4px',
+                                                border: '2px dashed #ccc',
+                                                fontWeight: 700,
+                                                fontSize: '0.9rem'
+                                            }}>
+                                                +{commonWorks.count - 8}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
 
                             <h3 className="manga-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem', background: 'var(--color-secondary)', color: '#000' }}>Badges Récents</h3>
                             <div className="manga-panel" style={{ padding: '2rem', background: '#fff', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '2rem' }}>
