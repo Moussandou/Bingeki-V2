@@ -21,6 +21,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getBadgeIcon, getBadgeColors } from '@/utils/badges';
 import type { Badge } from '@/types/badge';
+import { storage } from '@/firebase/config';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 
 export default function Profile() {
     const { user, setUser } = useAuthStore();
@@ -180,13 +182,34 @@ export default function Profile() {
     };
     // ---------------------------
 
+    // ---------------------------
+
+
+
     const handleSaveProfile = async () => {
         if (!user) return;
+
+        let bannerUrl = editForm.banner;
+
+        // If banner is a Data URL (new upload), upload to Storage
+        if (bannerUrl && bannerUrl.startsWith('data:')) {
+            try {
+                const storageRef = ref(storage, `banners/${user.uid}_${Date.now()}`);
+                await uploadString(storageRef, bannerUrl, 'data_url');
+                bannerUrl = await getDownloadURL(storageRef);
+            } catch (error) {
+                console.error("Error uploading banner:", error);
+                // Fallback: try saving as is (might fail if too big) or notify user
+                // For now, we proceed, but the Firestore save might fail.
+            }
+        }
+
         await saveUserProfileToFirestore({
             uid: user.uid,
-            ...editForm
+            ...editForm,
+            banner: bannerUrl
         });
-        setExtendedProfile({ ...extendedProfile, ...editForm });
+        setExtendedProfile({ ...extendedProfile, ...editForm, banner: bannerUrl });
         setIsEditModalOpen(false);
     };
 
