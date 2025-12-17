@@ -966,34 +966,54 @@ export default function WorkDetails() {
 
                                             {/* New comment form */}
                                             {user ? (
-                                                <div style={{ marginBottom: '1.5rem', background: '#f9f9f9', padding: '1rem', border: '1px solid #eee', borderRadius: '8px' }}>
+                                                <div style={{
+                                                    marginBottom: '2rem',
+                                                    background: '#fff',
+                                                    padding: '1.5rem',
+                                                    border: '3px solid #000',
+                                                    boxShadow: '6px 6px 0 #000', // Brutalist shadow
+                                                    position: 'relative'
+                                                }}>
                                                     <textarea
                                                         value={newComment}
                                                         onChange={(e) => setNewComment(e.target.value)}
                                                         placeholder="Partagez votre avis..."
                                                         style={{
                                                             width: '100%',
-                                                            minHeight: '80px',
-                                                            border: '1px solid #ccc',
-                                                            padding: '0.75rem',
+                                                            minHeight: '100px',
+                                                            border: '2px solid #000',
+                                                            padding: '1rem',
                                                             fontFamily: 'inherit',
-                                                            fontSize: '0.95rem',
+                                                            fontSize: '1rem',
+                                                            fontWeight: 500,
                                                             resize: 'vertical',
-                                                            borderRadius: '4px',
-                                                            marginBottom: '0.75rem'
+                                                            marginBottom: '1rem',
+                                                            outline: 'none',
+                                                            background: '#f9f9f9',
                                                         }}
                                                     />
                                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem' }}>
+                                                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.9rem' }}>
                                                             <input
                                                                 type="checkbox"
                                                                 checked={isSpoiler}
                                                                 onChange={(e) => setIsSpoiler(e.target.checked)}
+                                                                style={{ accentColor: '#000', width: 16, height: 16 }}
                                                             />
                                                             <EyeOff size={16} /> Contient des spoilers
                                                         </label>
-                                                        <Button onClick={handleSubmitComment} variant="manga" size="sm" icon={<Send size={16} />}>
-                                                            Publier
+                                                        <Button
+                                                            onClick={handleSubmitComment}
+                                                            variant="primary"
+                                                            size="md"
+                                                            icon={<Send size={18} />}
+                                                            style={{
+                                                                border: '2px solid #000',
+                                                                boxShadow: '4px 4px 0 #000',
+                                                                fontWeight: 900
+                                                            }}
+                                                        >
+                                                            PUBLIER
                                                         </Button>
                                                     </div>
                                                 </div>
