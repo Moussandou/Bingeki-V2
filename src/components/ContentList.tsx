@@ -28,6 +28,7 @@ interface ContentListProps {
     page?: number;
     workTitle: string;
     workType: 'anime' | 'manga';
+    readOnly?: boolean;
 }
 
 export function ContentList({
@@ -42,7 +43,8 @@ export function ContentList({
     onPrevPage,
     page = 1,
     workTitle,
-    workType
+    workType,
+    readOnly = false
 }: ContentListProps) {
     const [visibleCount, setVisibleCount] = useState(25);
     const [expandedIds, setExpandedIds] = useState<number[]>([]);
@@ -184,14 +186,16 @@ export function ContentList({
                                     >
                                         {isExpanded ? <ChevronLeft style={{ transform: 'rotate(-90deg)' }} /> : <ChevronLeft style={{ transform: 'rotate(0deg)' }} />}
                                     </Button>
-                                    <Button
-                                        variant={isWatched ? 'ghost' : 'outline'}
-                                        size="sm"
-                                        onClick={() => onSelect(item.number)}
-                                        icon={isWatched ? <Check size={16} /> : <Eye size={16} />}
-                                    >
-                                        {isWatched ? 'VU' : 'VOIR'}
-                                    </Button>
+                                    {!readOnly && (
+                                        <Button
+                                            variant={isWatched ? 'ghost' : 'outline'}
+                                            size="sm"
+                                            onClick={() => onSelect(item.number)}
+                                            icon={isWatched ? <Check size={16} /> : <Eye size={16} />}
+                                        >
+                                            {isWatched ? 'VU' : 'VOIR'}
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
 

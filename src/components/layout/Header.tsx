@@ -155,11 +155,7 @@ export function Header() {
                         )}
 
                         {/* Mobile Menu Toggle (if needed, but using dock) */}
-                        <div className="mobileOnly" style={{ display: 'none' }}> {/* Keeping consistent with new design - using Dock */}
-                            <Button variant="ghost" size="icon">
-                                <Menu size={20} />
-                            </Button>
-                        </div>
+
 
                     </div>
                 </div>

@@ -1,0 +1,86 @@
+/* Base container */
+.container {
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+    composes: manga-panel from global;
+}
+
+/* Main Grid Layout */
+.mainGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    align-items: start;
+}
+
+/* Mobile Stack */
+@media (max-width: 768px) {
+    .mainGrid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+/* Avatar Container */
+.avatarContainer {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    margin-top: -5rem;
+}
+
+/* Avatar Image Box */
+.avatarBox {
+    width: 140px;
+    height: 140px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #333;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Level Badge */
+.levelBadge {
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    font-size: 1.5rem;
+    transform: rotate(-5deg);
+    color: #fff;
+    padding: 2px 8px;
+    /* Basic padding if class doesn't handle it */
+}
+
+/* Favorites Section */
+.favoritesSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Chart Container */
+.chartContainer {
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Name */
+.name {
+    font-size: 2rem;
+    font-family: var(--font-heading);
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+}
+
+/* ID text */
+.idText {
+    font-family: monospace;
+    font-size: 1rem;
+    opacity: 0.7;
+    margin-bottom: 1rem;
+}

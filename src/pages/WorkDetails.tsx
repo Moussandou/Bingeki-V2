@@ -16,7 +16,9 @@ import { useSettingsStore } from '@/store/settingsStore';
 import type { CommentWithReplies } from '@/types/comment';
 import logoCrunchyroll from '@/assets/logo_crunchyroll.png';
 import logoADN from '@/assets/logo_adn.png';
+
 import { getWorkDetails } from '@/services/animeApi';
+import styles from './WorkDetails.module.css';
 
 export default function WorkDetails() {
     const { id } = useParams();
@@ -67,7 +69,15 @@ export default function WorkDetails() {
     useEffect(() => {
         if (!libraryWork && id && !fetchedWork && !isFetchingDetails) {
             setIsFetchingDetails(true);
-            const typeToFetch = typeParam || 'anime'; // Default to anime if unknown, could be improved
+            let typeToFetch: 'anime' | 'manga' = 'anime';
+            if (typeParam) {
+                const normalized = typeParam.toLowerCase();
+                if (['manga', 'novel', 'manhwa', 'manhua', 'doujinshi', 'oneshot', 'oel'].includes(normalized)) {
+                    typeToFetch = 'manga';
+                }
+            }
+            // Fallback: If unknown, try anime first (or maybe we should try both? For now default to anime)
+
             getWorkDetails(Number(id), typeToFetch).then(res => {
                 // Map JikanResult to compatible format for UI (partial)
                 const mapped = {
@@ -94,25 +104,7 @@ export default function WorkDetails() {
         }
     }, [id, libraryWork, fetchedWork, typeParam]);
 
-    if (!work) {
-        if (isFetchingDetails) {
-            return (
-                <Layout>
-                    <div className="container" style={{ textAlign: 'center', paddingTop: '4rem' }}>
-                        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem' }}>CHARGEMENT...</h1>
-                    </div>
-                </Layout>
-            );
-        }
-        return (
-            <Layout>
-                <div className="container" style={{ textAlign: 'center', paddingTop: '4rem' }}>
-                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem' }}>ŒUVRE INTROUVABLE</h1>
-                    <Button onClick={() => navigate('/library')} style={{ marginTop: '1rem' }}>Retour à la base</Button>
-                </div>
-            </Layout>
-        );
-    }
+
 
     // Normalize displayWork for UI usage (deprecated activeWork, just use work)
     // const activeWork = displayWork; 
@@ -154,7 +146,7 @@ export default function WorkDetails() {
         if (activeTab === 'episodes') {
             setIsLoadingEpisodes(true);
 
-            if (work?.type === 'anime') {
+            if (work?.type === 'anime' || work?.type === 'tv' || work?.type === 'movie' || work?.type === 'ova' || work?.type === 'special' || work?.type === 'ona') {
                 getAnimeEpisodes(Number(work.id), episodesPage).then(res => {
                     const mapped = res.data.map((ep: any) => ({
                         id: ep.mal_id,
@@ -168,10 +160,10 @@ export default function WorkDetails() {
                     setHasMoreEpisodes(res.pagination.has_next_page);
                     setIsLoadingEpisodes(false);
                 });
-            } else if (work?.type === 'manga' && work.totalChapters) {
+            } else {
                 // Generate chapters locally with simulated pagination (100 per page to be manageable)
                 const itemsPerPage = 50; // Use 50 as default chunk size for chapters
-                const total = work.totalChapters;
+                const total = work.totalChapters || 100; // Fallback if unknown
                 const start = (episodesPage - 1) * itemsPerPage + 1;
                 const end = Math.min(start + itemsPerPage - 1, total);
 
@@ -192,9 +184,6 @@ export default function WorkDetails() {
                     setHasMoreEpisodes(end < total);
                     setIsLoadingEpisodes(false);
                 }, 300);
-            } else {
-                setEpisodes([]);
-                setIsLoadingEpisodes(false);
             }
         }
     }, [work?.id, work?.type, work?.totalChapters, activeTab, episodesPage]);
@@ -217,6 +206,27 @@ export default function WorkDetails() {
             }
         }
     }, [work?.id, user?.uid]);
+
+    if (!work) {
+        if (isFetchingDetails) {
+            return (
+                <Layout>
+                    <div className="container" style={{ textAlign: 'center', paddingTop: '4rem' }}>
+                        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem' }}>CHARGEMENT...</h1>
+                    </div>
+                </Layout>
+            );
+        }
+        return (
+            <Layout>
+                <div className="container" style={{ textAlign: 'center', paddingTop: '4rem' }}>
+                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem' }}>ŒUVRE INTROUVABLE</h1>
+                    <p>Impossible de récupérer les détails. Vérifiez votre connexion ou l'ID.</p>
+                    <Button onClick={() => navigate('/discover')} style={{ marginTop: '1rem' }}>Retour</Button>
+                </div>
+            </Layout>
+        );
+    }
 
     const handleSubmitComment = async () => {
         if (!newComment.trim() || !user || !work) {
@@ -295,7 +305,7 @@ export default function WorkDetails() {
     };
 
     const handleEpisodeSelect = (number: number) => {
-        if (work) {
+        if (work && libraryWork) {
             updateProgress(work.id, number);
             setProgress(number);
 
@@ -311,7 +321,7 @@ export default function WorkDetails() {
     };
 
     const handleExpandEpisode = async (episodeNumber: number) => {
-        if (work.type !== 'anime') return;
+        if (work.type !== 'anime' && work.type !== 'tv' && work.type !== 'ova' && work.type !== 'movie') return;
 
         console.log(`Fetching details for anime ${work.id} episode ${episodeNumber}`);
         try {
@@ -331,78 +341,47 @@ export default function WorkDetails() {
 
     return (
         <Layout>
-            <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
+            <div className={`container ${styles.container}`}>
                 <Button
-                    onClick={() => navigate('/library')}
+                    onClick={() => navigate(-1)}
                     variant="ghost"
                     icon={<ArrowLeft size={20} />}
-                    style={{ marginBottom: '2rem', paddingLeft: 0 }}
+                    className={styles.backButton}
                 >
                     RETOUR
                 </Button>
 
-                <div className="manga-panel" style={{ background: '#fff', color: '#000', padding: '2rem', display: 'flex', gap: '2rem', flexDirection: 'row', alignItems: 'flex-start' }}>
+                <div className={`manga-panel ${styles.detailsPanel}`}>
 
                     {/* Cover Image */}
-                    <div style={{ width: '250px', flexShrink: 0 }}>
-                        <div style={{ border: '4px solid #000', boxShadow: '8px 8px 0 #000', position: 'relative' }}>
+                    <div className={styles.coverSection}>
+                        <div className={styles.coverImageWrapper}>
                             <img
                                 src={work.image}
                                 alt={work.title}
-                                style={{ width: '100%', display: 'block' }}
+                                className={styles.coverImage}
                             />
-                            <div style={{
-                                position: 'absolute',
-                                top: '10px',
-                                left: '-10px',
-                                background: '#000',
-                                color: '#fff',
-                                padding: '0.25rem 1rem',
-                                transform: 'rotate(-5deg)',
-                                fontWeight: 900,
-                                fontSize: '1.2rem',
-                                border: '2px solid #fff'
-                            }}>
-                                {work.type.toUpperCase()}
+                            <div className={styles.typeLabel}>
+                                {work.type ? work.type.toUpperCase() : 'TYPE'}
                             </div>
                         </div>
                     </div>
 
                     {/* Info */}
-                    <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '2px solid #EEE' }}>
+                    <div className={styles.infoSection}>
+                        <div className={styles.tabsContainer}>
                             <button
                                 onClick={() => setActiveTab('info')}
-                                style={{
-                                    padding: '0.5rem 1rem',
-                                    fontWeight: 900,
-                                    fontSize: '1rem',
-                                    background: activeTab === 'info' ? '#000' : 'transparent',
-                                    color: activeTab === 'info' ? '#fff' : '#000',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    borderBottom: activeTab === 'info' ? '4px solid #000' : 'none',
-                                    marginBottom: '-2px'
-                                }}
+                                className={`${styles.tabButton} ${activeTab === 'info' ? styles.activeTab : ''}`}
                             >
                                 GÉNÉRAL
                             </button>
-                            {(work.type === 'anime' || work.type === 'manga') && (
+                            {(work.type) && (
                                 <button
                                     onClick={() => setActiveTab('episodes')}
-                                    style={{
-                                        padding: '0.5rem 1rem',
-                                        fontWeight: 900,
-                                        fontSize: '1rem',
-                                        background: activeTab === 'episodes' ? '#000' : 'transparent',
-                                        color: activeTab === 'episodes' ? '#fff' : '#000',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        borderBottom: activeTab === 'episodes' ? '4px solid #000' : 'none',
-                                        marginBottom: '-2px'
-                                    }}
+                                    className={`${styles.tabButton} ${activeTab === 'episodes' ? styles.activeTab : ''}`}
                                 >
-                                    {work.type === 'manga' ? 'LISTE DES CHAPITRES' : 'LISTE DES ÉPISODES'}
+                                    {['manga', 'novel', 'manhwa'].includes(work.type?.toLowerCase()) ? 'LISTE DES CHAPITRES' : 'LISTE DES ÉPISODES'}
                                 </button>
                             )}
                         </div>
@@ -437,25 +416,18 @@ export default function WorkDetails() {
                                     onNextPage={() => setEpisodesPage(p => p + 1)}
                                     onPrevPage={() => setEpisodesPage(p => p - 1)}
                                     workTitle={work.title}
-                                    workType={work.type}
+                                    workType={work.type === 'manga' ? 'manga' : 'anime'}
+                                    readOnly={!libraryWork}
                                 />
                             )
                         ) : (
                             <>
-                                <h1 style={{
-                                    fontFamily: 'var(--font-heading)',
-                                    fontSize: '3rem',
-                                    lineHeight: 1,
-                                    marginBottom: '1rem',
-                                    textTransform: 'uppercase',
-                                    textShadow: '3px 3px 0 rgba(0,0,0,0.1)',
-                                    color: '#000'
-                                }}>
+                                <h1 className={styles.title}>
                                     {work.title}
                                 </h1>
 
-                                <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', color: '#000', flexWrap: 'wrap', alignItems: 'center' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, border: '2px solid #000', padding: '0.5rem 1rem' }}>
+                                <div className={styles.metaContainer}>
+                                    <div className={styles.metaItem}>
                                         <Trophy size={20} />
                                         <span>Score: {work.score || '?'}</span>
                                     </div>
@@ -466,19 +438,8 @@ export default function WorkDetails() {
                                                 updateWorkDetails(Number(work.id), { totalChapters: Number(newTotal) });
                                             }
                                         }}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.5rem',
-                                            fontWeight: 600,
-                                            border: '2px solid #000',
-                                            padding: '0.5rem 1rem',
-                                            cursor: 'pointer',
-                                            background: '#fff',
-                                            transition: 'background 0.2s'
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = '#f0f0f0'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
+                                        className={styles.metaItem}
+                                        style={{ cursor: 'pointer', userSelect: 'none' }}
                                         title="Cliquez pour modifier le total"
                                     >
                                         <BookOpen size={20} />
@@ -545,22 +506,14 @@ export default function WorkDetails() {
 
                                 {work.synopsis && (
                                     <div style={{ marginBottom: '2rem' }}>
-                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '0.5rem', color: '#000' }}>SYNOPSIS</h3>
+                                        <h3 className={styles.synopsisTitle}>SYNOPSIS</h3>
                                         <div
                                             onClick={() => setIsSynopsisExpanded(!isSynopsisExpanded)}
                                             style={{ cursor: 'pointer', position: 'relative' }}
                                         >
-                                            <p className={spoilerMode ? 'spoiler-blur' : ''} style={{
-                                                fontSize: '1rem',
-                                                lineHeight: '1.6',
-                                                opacity: 0.8,
-                                                color: '#000',
+                                            <p className={`${spoilerMode ? 'spoiler-blur' : ''} ${styles.synopsisText}`} style={{
                                                 maxHeight: isSynopsisExpanded ? 'none' : '100px',
-                                                overflow: 'hidden',
-                                                display: '-webkit-box',
                                                 WebkitLineClamp: isSynopsisExpanded ? 'none' : 4,
-                                                WebkitBoxOrient: 'vertical',
-                                                transition: 'max-height 0.3s ease'
                                             }}>
                                                 {work.synopsis}
                                             </p>
@@ -620,27 +573,18 @@ export default function WorkDetails() {
                                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>PROGRESSION</h3>
                                             <div style={{ color: '#000' }}>
                                                 {isEditing ? (
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                    <div className={styles.progressContainer}>
                                                         <input
                                                             type="number"
                                                             value={progress}
                                                             onChange={(e) => setProgress(Number(e.target.value))}
-                                                            style={{
-                                                                fontSize: '2rem',
-                                                                fontWeight: 900,
-                                                                width: '100px',
-                                                                border: '2px solid #000',
-                                                                padding: '0.5rem',
-                                                                textAlign: 'center',
-                                                                color: '#000',
-                                                                background: '#fff'
-                                                            }}
+                                                            className={styles.progressInput}
                                                         />
                                                         <span style={{ fontSize: '1.5rem', fontWeight: 900 }}>/ {work.totalChapters || '?'}</span>
                                                         <Button onClick={handleSave} variant="primary" icon={<Check size={20} />}>OK</Button>
                                                     </div>
                                                 ) : (
-                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                                    <div className={styles.progressControls}>
                                                         {/* Decrement buttons */}
                                                         <Button
                                                             variant="ghost"
@@ -662,7 +606,7 @@ export default function WorkDetails() {
                                                         >-1</Button>
 
                                                         {/* Progress display */}
-                                                        <span style={{ fontSize: '2.5rem', fontWeight: 900, lineHeight: 1, margin: '0 0.5rem' }}>
+                                                        <span className={styles.progressDisplay}>
                                                             {work.currentChapter} <span style={{ fontSize: '1.25rem', opacity: 0.5 }}>/ {work.totalChapters || '?'}</span>
                                                         </span>
 
@@ -696,7 +640,7 @@ export default function WorkDetails() {
                                 {libraryWork && (
                                     <div style={{ marginBottom: '2rem' }}>
                                         <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>STATUT</h3>
-                                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                        <div className={styles.statusButtons}>
                                             {['reading', 'completed', 'plan_to_read', 'dropped'].map((s) => (
                                                 <button
                                                     key={s}
@@ -726,7 +670,7 @@ export default function WorkDetails() {
                                 {libraryWork && (
                                     <div style={{ marginBottom: '2rem' }}>
                                         <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>MA NOTE</h3>
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <div className={styles.ratingContainer}>
                                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
                                                 <button
                                                     key={star}
@@ -779,17 +723,7 @@ export default function WorkDetails() {
                                                 value={work.notes || ''}
                                                 onChange={(e) => updateWorkDetails(work.id, { notes: e.target.value })}
                                                 placeholder="Écrivez vos pensées ici..."
-                                                style={{
-                                                    width: '100%',
-                                                    minHeight: '150px',
-                                                    border: '2px solid #000',
-                                                    padding: '1rem',
-                                                    fontFamily: 'inherit',
-                                                    fontSize: '1rem',
-                                                    resize: 'vertical',
-                                                    background: '#f9f9f9',
-                                                    marginBottom: '2rem'
-                                                }}
+                                                className={styles.notesArea}
                                             />
                                         )}
                                     </div>
@@ -1047,21 +981,23 @@ export default function WorkDetails() {
                                 </div>
 
                                 {/* Danger Zone */}
-                                <div style={{ borderTop: '2px dashed #000', paddingTop: '2rem' }}>
-                                    <Button
-                                        onClick={() => setIsDeleteModalOpen(true)}
-                                        style={{
-                                            background: '#ff0000',
-                                            color: '#fff',
-                                            width: '100%',
-                                            fontWeight: 900,
-                                            textTransform: 'uppercase'
-                                        }}
-                                        icon={<Trash2 size={20} />}
-                                    >
-                                        Supprimer de la bibliothèque
-                                    </Button>
-                                </div>
+                                {libraryWork && (
+                                    <div style={{ borderTop: '2px dashed #000', paddingTop: '2rem' }}>
+                                        <Button
+                                            onClick={() => setIsDeleteModalOpen(true)}
+                                            style={{
+                                                background: '#ff0000',
+                                                color: '#fff',
+                                                width: '100%',
+                                                fontWeight: 900,
+                                                textTransform: 'uppercase'
+                                            }}
+                                            icon={<Trash2 size={20} />}
+                                        >
+                                            Supprimer de la bibliothèque
+                                        </Button>
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>

@@ -1,0 +1,150 @@
+/* Discover.module.css */
+
+.heroSection {
+    position: relative;
+    height: 60vh;
+    min-height: 500px;
+    overflow: hidden;
+    border-bottom: 4px solid #000;
+}
+
+.heroBackground {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px) brightness(0.5);
+    transform: scale(1.1);
+}
+
+.heroContainer {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    padding-top: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.heroImageContainer {
+    height: 400px;
+    aspect-ratio: 2/3;
+    border-radius: 0;
+    border: 4px solid #fff;
+    box-shadow: 10px 10px 0 #000;
+    flex-shrink: 0;
+}
+
+.heroImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.heroContent {
+    color: #fff;
+    max-width: 800px;
+    z-index: 10;
+}
+
+.heroTitle {
+    font-family: var(--font-heading);
+    font-size: 3.5rem;
+    /* Better default than min() soup */
+    font-weight: 900;
+    line-height: 0.9;
+    margin-bottom: 1rem;
+    text-shadow: 4px 4px 0 #000;
+}
+
+.heroSynopsis {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-width: 600px;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.heroActions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .heroSection {
+        height: auto;
+        min-height: auto;
+        padding-bottom: 3rem;
+    }
+
+    .heroContainer {
+        padding-top: 5rem;
+        /* More space for header */
+        gap: 1rem;
+        flex-direction: row-reverse;
+        /* Image on Right, Text on Left */
+        align-items: flex-start;
+        /* Align to top */
+        padding-bottom: 1rem;
+    }
+
+    /* Side-by-side image styling */
+    .heroImageContainer {
+        display: block;
+        width: 100px;
+        /* Thumbnail size */
+        height: 150px;
+        margin: 0;
+        border-width: 2px;
+        box-shadow: 4px 4px 0 #000;
+        flex-shrink: 0;
+        /* Keep size fixed */
+    }
+
+    .heroContent {
+        flex: 1;
+        /* Take remaining width */
+        min-width: 0;
+        /* Prevent overflow */
+        padding-top: 0.5rem;
+        /* Align visual top with image */
+    }
+
+    .heroTitle {
+        font-size: 1.8rem;
+        /* Smaller title for side-by-side */
+        line-height: 1.1;
+        margin-bottom: 0.5rem;
+    }
+
+    .heroSynopsis {
+        font-size: 0.9rem;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        margin-bottom: 1rem;
+    }
+
+    .heroActions {
+        width: 100%;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .heroActions button {
+        width: 100%;
+        justify-content: center;
+        font-size: 0.9rem;
+        /* Smaller buttons */
+        padding: 0.5rem;
+    }
+}

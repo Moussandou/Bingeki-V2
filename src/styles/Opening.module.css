@@ -60,7 +60,7 @@
 }
 
 .heroTitle {
-    font-size: clamp(3rem, 10vw, 8rem);
+    font-size: clamp(4.5rem, 12vw, 9rem) !important;
     font-weight: 900;
     line-height: 0.9;
     text-transform: uppercase;
@@ -124,6 +124,17 @@
     transform: scale(1.02);
 }
 
+/* Responsive width for mockup containers */
+.mockupWrapper {
+    width: 80%;
+}
+
+@media (max-width: 900px) {
+    .mockupWrapper {
+        width: 100%;
+    }
+}
+
 /* Section specific styling */
 .progressionVisual {
     /* Straighten the license card as requested */
@@ -158,7 +169,7 @@
 @media (max-width: 900px) {
     .featureSection {
         flex-direction: column;
-        padding: 4rem 1.5rem;
+        padding: 4rem 0.5rem;
         text-align: center;
         gap: 3rem;
     }

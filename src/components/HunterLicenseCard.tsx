@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { type UserProfile } from '@/firebase/firestore';
 import { BADGE_ICONS } from '@/utils/badges';
 import { NenChart } from './profile/NenChart';
+import styles from './HunterLicenseCard.module.css';
 
 interface HunterLicenseCardProps {
     user: Partial<UserProfile> & { uid: string, photoURL?: string | null, displayName?: string | null };
@@ -32,7 +33,6 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
     return (
         <div className="manga-panel" style={{ padding: '0', overflow: 'hidden', background: bgColor, color: textColor, position: 'relative', border: `3px solid ${borderColor} ` }}>
             {/* Banner */}
-            {/* ... banner code same ... */}
             <div style={{
                 height: '120px',
                 background: user.banner ? `url(${user.banner}) center / cover` : accentColor,
@@ -52,18 +52,18 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
 
             <div style={{ padding: '2rem', textAlign: 'center', position: 'relative' }}>
                 {/* Avatar with Level Badge */}
-                <div style={{ position: 'relative', display: 'inline-block', marginBottom: '1.5rem', marginTop: '-5rem' }}>
-                    <div style={{ width: '140px', height: '140px', borderRadius: '4px', border: `3px solid ${borderColor} `, overflow: 'hidden', background: '#333', boxShadow: '4px 4px 0 rgba(0,0,0,0.2)' }}>
+                <div className={styles.avatarContainer}>
+                    <div className={styles.avatarBox} style={{ border: `3px solid ${borderColor} ` }}>
                         <img src={user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div >
-                    <div className="manga-title" style={{ position: 'absolute', bottom: -10, right: -10, fontSize: '1.5rem', transform: 'rotate(-5deg)', color: '#fff', background: accentColor, border: `2px solid ${borderColor}` }}>
+                    <div className={`${styles.levelBadge} manga-title`} style={{ background: accentColor, border: `2px solid ${borderColor}` }}>
                         LVL {stats.level}
                     </div>
                 </div >
 
                 {/* Name & ID */}
-                <h2 style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900, textTransform: 'uppercase', marginBottom: '0.2rem', color: textColor }}> {user.displayName || 'Chasseur'}</h2>
-                <p style={{ fontFamily: 'monospace', fontSize: '1rem', opacity: 0.7, marginBottom: '1rem' }}>ID: {user.uid.slice(0, 8).toUpperCase()}</p>
+                <h2 className={styles.name} style={{ color: textColor }}> {user.displayName || 'Chasseur'}</h2>
+                <p className={styles.idText}>ID: {user.uid.slice(0, 8).toUpperCase()}</p>
 
                 {/* Bio */}
                 {user.bio && (
@@ -72,10 +72,10 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
                     </p>
                 )}
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem', alignItems: 'start' }}>
+                <div className={styles.mainGrid}>
 
                     {/* Left Col: Favorites & Badge */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div className={styles.favoritesSection}>
 
                         {/* Featured Badge */}
                         {featuredBadgeData && (
@@ -123,7 +123,7 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
                     </div>
 
                     {/* Right Col: Nen Chart */}
-                    <div style={{ height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className={styles.chartContainer}>
                         <NenChart stats={{
                             level: stats.level,
                             xp: stats.xp,
