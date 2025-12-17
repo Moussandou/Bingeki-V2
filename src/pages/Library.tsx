@@ -375,7 +375,17 @@ export default function Library() {
                         </Button>
 
                         {isSelectionMode && selectedWorks.size > 0 && (
-                            <Button variant="outline" onClick={handleBulkDelete} style={{ borderColor: '#ef4444', color: '#ef4444', boxShadow: '4px 4px 0 rgba(239, 68, 68, 0.2)' }} icon={<Trash2 size={16} />}>
+                            <Button
+                                variant="primary"
+                                onClick={handleBulkDelete}
+                                style={{
+                                    background: '#ef4444',
+                                    borderColor: '#000',
+                                    boxShadow: '4px 4px 0 #000',
+                                    color: '#fff'
+                                }}
+                                icon={<Trash2 size={16} />}
+                            >
                                 SUPPRIMER ({selectedWorks.size})
                             </Button>
                         )}
