@@ -510,20 +510,30 @@ export async function getComments(workId: number, limitCount: number = 50): Prom
 }
 
 // Get comments organized with replies
+// Get comments organized with replies (Recursive)
 export async function getCommentsWithReplies(workId: number): Promise<CommentWithReplies[]> {
-    const allComments = await getComments(workId, 100);
+    const allComments = await getComments(workId, 200); // Fetch more to be safe
 
-    // Separate top-level comments and replies
-    const topLevel = allComments.filter(c => !c.replyTo);
-    const replies = allComments.filter(c => c.replyTo);
+    // Helper to build tree
+    const buildTree = (comments: Comment[], parentId: string | undefined): CommentWithReplies[] => {
+        return comments
+            .filter(c => c.replyTo === parentId) // Find direct children
+            .sort((a, b) => a.timestamp - b.timestamp) // Oldest first
+            .map(c => ({
+                ...c,
+                replies: buildTree(comments, c.id) // Recursively find children of this child
+            }));
+    };
 
-    // Attach replies to their parent comments
-    const withReplies: CommentWithReplies[] = topLevel.map(comment => ({
-        ...comment,
-        replies: replies.filter(r => r.replyTo === comment.id).sort((a, b) => a.timestamp - b.timestamp)
+    // Start with top-level comments (replyTo is undefined or null or empty)
+    const topLevel = allComments
+        .filter(c => !c.replyTo)
+        .sort((a, b) => b.timestamp - a.timestamp); // Newest top-level first
+
+    return topLevel.map(c => ({
+        ...c,
+        replies: buildTree(allComments, c.id)
     }));
-
-    return withReplies;
 }
 
 // Like/unlike a comment

@@ -816,169 +816,21 @@ export default function WorkDetails() {
                                                 <p style={{ textAlign: 'center', opacity: 0.6, padding: '2rem' }}>Aucun commentaire. Soyez le premier !</p>
                                             ) : (
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                                    {comments.map(comment => {
-                                                        const isRevealed = revealedSpoilers.includes(comment.id);
-                                                        const timeDiff = Date.now() - comment.timestamp;
-                                                        const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-                                                        const timeAgo = hours < 1 ? 'À l\'instant' : hours < 24 ? `Il y a ${hours}h` : `Il y a ${Math.floor(hours / 24)}j`;
-
-                                                        return (
-                                                            <div key={comment.id} style={{
-                                                                padding: '1rem',
-                                                                background: '#fff',
-                                                                border: '1px solid #eee',
-                                                                borderRadius: '8px'
-                                                            }}>
-                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                                                                    <div style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
-                                                                        <img src={comment.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.userName}`}
-                                                                            alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                                    </div>
-                                                                    <div>
-                                                                        <p style={{ fontWeight: 700, fontSize: '0.95rem' }}>{comment.userName}</p>
-                                                                        <p style={{ fontSize: '0.75rem', opacity: 0.5 }}>{timeAgo}</p>
-                                                                    </div>
-                                                                </div>
-
-                                                                {comment.spoiler && !isRevealed ? (
-                                                                    <div
-                                                                        onClick={() => setRevealedSpoilers(prev => [...prev, comment.id])}
-                                                                        style={{
-                                                                            padding: '1rem',
-                                                                            background: '#000',
-                                                                            color: '#fff',
-                                                                            cursor: 'pointer',
-                                                                            borderRadius: '4px',
-                                                                            textAlign: 'center',
-                                                                            fontSize: '0.9rem'
-                                                                        }}
-                                                                    >
-                                                                        <EyeOff size={16} style={{ marginRight: '0.5rem' }} />
-                                                                        ⚠️ Spoiler - Cliquez pour révéler
-                                                                    </div>
-                                                                ) : (
-                                                                    <p style={{ lineHeight: 1.5, fontSize: '0.95rem' }}>{comment.text}</p>
-                                                                )}
-
-                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem' }}>
-                                                                    <button
-                                                                        onClick={() => handleLikeComment(comment.id)}
-                                                                        style={{
-                                                                            background: 'none',
-                                                                            border: 'none',
-                                                                            cursor: 'pointer',
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            gap: '0.25rem',
-                                                                            color: user && comment.likes.includes(user.uid) ? '#ef4444' : '#666'
-                                                                        }}
-                                                                    >
-                                                                        <Heart size={16} fill={user && comment.likes.includes(user.uid) ? '#ef4444' : 'none'} />
-                                                                        <span style={{ fontSize: '0.85rem' }}>{comment.likes.length}</span>
-                                                                    </button>
-                                                                    {user && (
-                                                                        <button
-                                                                            onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                                                                            style={{
-                                                                                background: 'none',
-                                                                                border: 'none',
-                                                                                cursor: 'pointer',
-                                                                                display: 'flex',
-                                                                                alignItems: 'center',
-                                                                                gap: '0.25rem',
-                                                                                color: replyingTo === comment.id ? '#3b82f6' : '#666'
-                                                                            }}
-                                                                        >
-                                                                            <Reply size={16} />
-                                                                            <span style={{ fontSize: '0.85rem' }}>Répondre</span>
-                                                                        </button>
-                                                                    )}
-                                                                </div>
-
-                                                                {/* Inline reply form */}
-                                                                {replyingTo === comment.id && (
-                                                                    <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
-                                                                        <input
-                                                                            type="text"
-                                                                            value={replyText}
-                                                                            onChange={(e) => setReplyText(e.target.value)}
-                                                                            placeholder="Votre réponse..."
-                                                                            style={{
-                                                                                flex: 1,
-                                                                                padding: '0.5rem 0.75rem',
-                                                                                border: '1px solid #ccc',
-                                                                                borderRadius: '4px',
-                                                                                fontSize: '0.9rem'
-                                                                            }}
-                                                                            onKeyDown={(e) => e.key === 'Enter' && handleReply(comment.id)}
-                                                                        />
-                                                                        <button
-                                                                            onClick={() => handleReply(comment.id)}
-                                                                            style={{
-                                                                                background: '#000',
-                                                                                color: '#fff',
-                                                                                border: 'none',
-                                                                                borderRadius: '4px',
-                                                                                padding: '0.5rem 1rem',
-                                                                                cursor: 'pointer',
-                                                                                fontWeight: 600
-                                                                            }}
-                                                                        >
-                                                                            <Send size={16} />
-                                                                        </button>
-                                                                    </div>
-                                                                )}
-
-                                                                {/* Nested replies */}
-                                                                {comment.replies && comment.replies.length > 0 && (
-                                                                    <div style={{ marginTop: '1rem', marginLeft: '1.5rem', borderLeft: '2px solid #eee', paddingLeft: '1rem' }}>
-                                                                        {comment.replies.map(reply => {
-                                                                            const replyTimeDiff = Date.now() - reply.timestamp;
-                                                                            const replyHours = Math.floor(replyTimeDiff / (1000 * 60 * 60));
-                                                                            const replyTimeAgo = replyHours < 1 ? 'À l\'instant' : replyHours < 24 ? `Il y a ${replyHours}h` : `Il y a ${Math.floor(replyHours / 24)}j`;
-
-                                                                            return (
-                                                                                <div key={reply.id} style={{ marginBottom: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid #f0f0f0' }}>
-                                                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                                                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                                                            <div style={{ width: 24, height: 24, borderRadius: '50%', overflow: 'hidden', border: '1px solid #ccc' }}>
-                                                                                                <img src={reply.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${reply.userName}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                                                            </div>
-                                                                                            <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{reply.userName}</span>
-                                                                                            <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>{replyTimeAgo}</span>
-                                                                                        </div>
-                                                                                        {user && (
-                                                                                            <button
-                                                                                                onClick={() => {
-                                                                                                    setReplyingTo(comment.id);
-                                                                                                    setReplyText(`@${reply.userName} `);
-                                                                                                    // Ideally focus the input, but state update will reveal it
-                                                                                                }}
-                                                                                                style={{
-                                                                                                    background: 'none',
-                                                                                                    border: 'none',
-                                                                                                    cursor: 'pointer',
-                                                                                                    display: 'flex',
-                                                                                                    alignItems: 'center',
-                                                                                                    gap: '0.25rem',
-                                                                                                    color: '#666',
-                                                                                                    fontSize: '0.75rem',
-                                                                                                    opacity: 0.7
-                                                                                                }}
-                                                                                            >
-                                                                                                <Reply size={12} /> Répondre
-                                                                                            </button>
-                                                                                        )}
-                                                                                    </div>
-                                                                                    <p style={{ fontSize: '0.9rem', lineHeight: 1.4 }}>{reply.text}</p>
-                                                                                </div>
-                                                                            );
-                                                                        })}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })}
+                                                    {comments.map(comment => (
+                                                        <RecursiveComment
+                                                            key={comment.id}
+                                                            comment={comment}
+                                                            user={user}
+                                                            replyingTo={replyingTo}
+                                                            setReplyingTo={setReplyingTo}
+                                                            replyText={replyText}
+                                                            setReplyText={setReplyText}
+                                                            handleReply={handleReply}
+                                                            handleLike={handleLikeComment}
+                                                            revealedSpoilers={revealedSpoilers}
+                                                            setRevealedSpoilers={setRevealedSpoilers}
+                                                        />
+                                                    ))}
                                                 </div>
                                             )}
                                         </div>
