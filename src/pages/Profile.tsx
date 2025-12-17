@@ -26,7 +26,7 @@ import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { useToast } from '@/context/ToastContext';
 
 export default function Profile() {
-    const { user, setUser } = useAuthStore();
+    const { user, setUser, loading } = useAuthStore();
     // Default (local) stats
     const { level, xp, xpToNextLevel, streak, badges, totalChaptersRead, totalWorksAdded, totalWorksCompleted } = useGamificationStore();
     const { works } = useLibraryStore();
@@ -112,11 +112,13 @@ export default function Profile() {
 
     // Redirect guest if no UID provided (visiting /profile directly)
     useEffect(() => {
+        if (loading) return; // Wait for auth check to complete
+
         // If checking own profile but no user is logged in, redirect
         if (!uid && !user) {
             navigate('/auth');
         }
-    }, [uid, user, navigate]);
+    }, [uid, user, navigate, loading]);
 
     // Computed Stats to display
     const displayStats = isOwnProfile ? {
