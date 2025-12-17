@@ -107,3 +107,28 @@
     transform: scale(0.98);
     transition: opacity 300ms, transform 300ms;
 }
+
+/* Holographic Badge Effect */
+@keyframes holoShine {
+    0% {
+        background-position: 200% center;
+    }
+
+    100% {
+        background-position: -200% center;
+    }
+}
+
+.holo-badge {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 1) 40%,
+            #facc15 50%,
+            rgba(255, 255, 255, 1) 60%,
+            rgba(255, 255, 255, 1) 100%);
+    background-size: 200% auto;
+    animation: holoShine 3s linear infinite;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}

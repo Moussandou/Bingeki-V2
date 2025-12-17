@@ -90,6 +90,7 @@ export default function Profile() {
                         cardBgColor: p.cardBgColor || '#ffffff',
                         borderColor: p.borderColor || '#000000',
                         favoriteManga: p.favoriteManga || '',
+                        top3Favorites: p.top3Favorites || [],
                         featuredBadge: p.featuredBadge || ''
                     });
                 }
@@ -135,6 +136,7 @@ export default function Profile() {
         cardBgColor: '#ffffff',
         borderColor: '#000000',
         favoriteManga: '',
+        top3Favorites: [] as string[],
         featuredBadge: ''
     });
 
@@ -221,22 +223,25 @@ export default function Profile() {
                                     photoURL: extendedProfile.photoURL || (isOwnProfile ? user?.photoURL : ''),
                                     ...extendedProfile
                                 }}
-                                stats={displayStats}
+
                                 isOwnProfile={!!isOwnProfile}
                                 onLogout={handleLogout}
                                 featuredBadgeData={extendedProfile.featuredBadge ? displayBadges.find((b: Badge) => b.id === extendedProfile.featuredBadge) : null}
                                 favoriteMangaData={extendedProfile.favoriteManga ? (() => {
-                                    // If own profile, we can search in local store
-                                    // If visited profile, we might not have the full work details unless we fetch them or store basic info in profile
-                                    // For now, let's try to match ID if it's a number, but without the full work object available for visitors, 
-                                    // this might be limited. 
-                                    // Only show if we can find it. For visitors, 'works' store is empty/irrelevant.
-                                    // TODO: Fetch favorite work details for visitors. For now, works only for self if works loaded.
                                     if (!isOwnProfile) return null;
-
                                     const w = works.find(w => w.id === Number(extendedProfile.favoriteManga) || w.title === extendedProfile.favoriteManga);
                                     return w ? { title: w.title, image: w.image } : null;
                                 })() : null}
+                                top3FavoritesData={extendedProfile.top3Favorites ? extendedProfile.top3Favorites.map(fid => {
+                                    const w = works.find(w => w.id === Number(fid) || w.title === fid);
+                                    return w ? { id: String(w.id), title: w.title, image: w.image } : null;
+                                }).filter(Boolean) as any[] : []}
+                                stats={{
+                                    ...displayStats,
+                                    totalChaptersRead: displayTotalChapters,
+                                    totalWorksAdded: displayTotalWorks,
+                                    totalWorksCompleted: displayWorksCompleted
+                                }}
                             />
                         </motion.div>
 
@@ -537,17 +542,32 @@ export default function Profile() {
 
                             {/* SELECTORS */}
                             <div>
-                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>MANGA PRÉFÉRÉ</label>
-                                <select
-                                    value={editForm.favoriteManga}
-                                    onChange={(e) => setEditForm(prev => ({ ...prev, favoriteManga: e.target.value }))}
-                                    style={{ width: '100%', padding: '0.75rem', border: '2px solid #000', fontWeight: 'bold' }}
-                                >
-                                    <option value="">Aucun</option>
-                                    {works.map(w => (
-                                        <option key={w.id} value={w.id}>{w.title}</option>
+                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>TOP 3 FAVORIS</label>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                    {[0, 1, 2].map(index => (
+                                        <select
+                                            key={index}
+                                            value={editForm.top3Favorites[index] || ''}
+                                            onChange={(e) => {
+                                                const newTop3 = [...editForm.top3Favorites];
+                                                if (e.target.value === "") {
+                                                    newTop3.splice(index, 1);
+                                                } else {
+                                                    newTop3[index] = e.target.value;
+                                                }
+                                                setEditForm(prev => ({ ...prev, top3Favorites: newTop3 }));
+                                            }}
+                                            style={{ width: '100%', padding: '0.75rem', border: '2px solid #000', fontWeight: 'bold' }}
+                                        >
+                                            <option value="">Sélectionner un favori #{index + 1}</option>
+                                            {works.sort((a, b) => a.title.localeCompare(b.title)).map(w => (
+                                                <option key={w.id} value={w.id} disabled={editForm.top3Favorites.includes(String(w.id)) && editForm.top3Favorites[index] !== String(w.id)}>
+                                                    {w.title}
+                                                </option>
+                                            ))}
+                                        </select>
                                     ))}
-                                </select>
+                                </div>
                             </div>
 
                             <div>

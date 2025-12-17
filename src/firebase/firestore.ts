@@ -44,6 +44,7 @@ export interface UserProfile {
     cardBgColor?: string;
     borderColor?: string;
     favoriteManga?: string;
+    top3Favorites?: string[];
     featuredBadge?: string;
 }
 
