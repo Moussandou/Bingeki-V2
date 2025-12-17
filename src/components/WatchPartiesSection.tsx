@@ -17,10 +17,11 @@ import type { WatchParty, PartyParticipant } from '@/types/watchparty';
 import { PARTY_STATUS_LABELS } from '@/types/watchparty';
 import { useToast } from '@/context/ToastContext';
 import { useNavigate } from 'react-router-dom';
+import { handleProgressUpdateWithXP } from '@/utils/progressUtils';
 
 export function WatchPartiesSection() {
     const { user } = useAuthStore();
-    const { works, updateProgress } = useLibraryStore();
+    const { works } = useLibraryStore();
     const { addToast } = useToast();
     const navigate = useNavigate();
 
@@ -118,7 +119,7 @@ export function WatchPartiesSection() {
         // Sync with library
         const libraryWork = works.find(w => Number(w.id) === workId);
         if (libraryWork && newEpisode > (libraryWork.currentChapter || 0)) {
-            updateProgress(libraryWork.id, newEpisode);
+            handleProgressUpdateWithXP(libraryWork.id, newEpisode, libraryWork.totalChapters);
         }
 
         addToast('Épisode avancé !', 'success');

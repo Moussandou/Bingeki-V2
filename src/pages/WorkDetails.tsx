@@ -6,7 +6,7 @@ import { Modal } from '@/components/ui/Modal'; // Import Modal
 import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff, Reply } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { statusToFrench } from '@/utils/statusTranslation';
-import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
+import { useGamificationStore } from '@/store/gamificationStore';
 import { useToast } from '@/context/ToastContext';
 import { ContentList, type ContentItem } from '@/components/ContentList';
 import { getAnimeEpisodes, getAnimeEpisodeDetails } from '@/services/animeApi';
@@ -18,14 +18,15 @@ import logoCrunchyroll from '@/assets/logo_crunchyroll.png';
 import logoADN from '@/assets/logo_adn.png';
 
 import { getWorkDetails } from '@/services/animeApi';
+import { handleProgressUpdateWithXP } from '@/utils/progressUtils';
 import styles from './WorkDetails.module.css';
 
 export default function WorkDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToast } = useToast(); // Initialize hook
-    const { getWork, addWork, updateProgress, updateStatus, updateWorkDetails, removeWork } = useLibraryStore(); // Add removeWork
-    const { addXp, recordActivity, incrementStat } = useGamificationStore();
+    const { getWork, addWork, updateStatus, updateWorkDetails, removeWork } = useLibraryStore(); // Add removeWork
+    const { } = useGamificationStore(); // Removed unused destructuring
     const { user } = useAuthStore();
     const { spoilerMode } = useSettingsStore();
 
@@ -112,24 +113,10 @@ export default function WorkDetails() {
 
     const handleSave = () => {
         if (!libraryWork) return; // Guard for guests
-        const oldProgress = libraryWork.currentChapter || 0;
-        updateProgress(libraryWork.id, progress);
-
-        // Award XP if progress increased
-        if (progress > oldProgress) {
-            const chaptersRead = progress - oldProgress;
-            for (let i = 0; i < chaptersRead; i++) {
-                incrementStat('chapters');
-            }
-            addXp(XP_REWARDS.UPDATE_PROGRESS * chaptersRead);
-            recordActivity();
-
-            // Bonus XP if work is completed
-            if (work.totalChapters && progress >= work.totalChapters) {
-                addXp(XP_REWARDS.COMPLETE_WORK);
-                updateStatus(work.id, 'completed');
-                incrementStat('completed');
-            }
+        // Use centralized utility for progress & XP logic
+        const success = handleProgressUpdateWithXP(libraryWork.id, progress, work.totalChapters);
+        if (success) {
+            addToast('Progression sauvegardée !', 'success');
         }
 
         setIsEditing(false);
@@ -306,17 +293,11 @@ export default function WorkDetails() {
 
     const handleEpisodeSelect = (number: number) => {
         if (work && libraryWork) {
-            updateProgress(work.id, number);
-            setProgress(number);
-
-            const oldProgress = work.currentChapter || 0;
-            if (number > oldProgress) {
-                const diff = number - oldProgress;
-                addXp(XP_REWARDS.UPDATE_PROGRESS * diff);
-                incrementStat('chapters');
-                recordActivity();
+            const success = handleProgressUpdateWithXP(work.id, number, work.totalChapters);
+            if (success) {
+                setProgress(number);
+                addToast(`Progression mise à jour: ${(work.type === 'anime' || work.type === 'tv') ? 'Épisode' : 'Chapitre'} ${number}`, 'success');
             }
-            addToast(`Progression mise à jour: Épisode ${number}`, 'success');
         }
     };
 
