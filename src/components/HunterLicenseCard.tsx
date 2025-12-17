@@ -123,7 +123,7 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
                     </div>
 
                     {/* Right Col: Nen Chart */}
-                    <div style={{ height: '200px', marginTop: '-2rem' }}>
+                    <div style={{ height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <NenChart stats={{
                             level: stats.level,
                             xp: stats.xp,
