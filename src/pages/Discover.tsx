@@ -173,15 +173,28 @@ export default function Discover() {
                                             size="lg"
                                             onClick={() => handleQuickAdd(heroWork)}
                                             icon={<Plus size={24} />}
-                                            style={{ fontSize: '1.2rem', padding: '1rem 2rem', border: '2px solid #fff', boxShadow: '6px 6px 0 #000' }}
+                                            style={{
+                                                fontSize: '1.1rem',
+                                                padding: '0.75rem 1.5rem',
+                                                border: '2px solid #000',
+                                                boxShadow: '4px 4px 0 #000',
+                                                background: '#000',
+                                                color: '#fff'
+                                            }}
                                         >
                                             AJOUTER À MA LISTE
                                         </Button>
                                         <Button
-                                            variant="ghost"
+                                            variant="manga"
                                             size="lg"
                                             onClick={() => handleWorkClick(heroWork)}
-                                            style={{ background: '#fff', color: '#000', border: '2px solid #fff', fontSize: '1.2rem', padding: '1rem 2rem', boxShadow: '6px 6px 0 #000' }}
+                                            style={{
+                                                fontSize: '1.1rem',
+                                                padding: '0.75rem 1.5rem',
+                                                background: '#fff',
+                                                color: '#000',
+                                                borderColor: '#000'
+                                            }}
                                         >
                                             PLUS DE DÉTAILS
                                         </Button>
@@ -332,10 +345,17 @@ export default function Discover() {
                                         <p style={{ opacity: 0.8, fontSize: '1.1rem' }}>Laisse le destin choisir ta prochaine aventure.</p>
                                     </div>
                                     <Button
-                                        variant="primary"
+                                        variant="manga"
                                         onClick={handleSurpriseMe}
                                         icon={<Dice5 size={24} />}
-                                        style={{ fontSize: '1.2rem', padding: '1rem 2rem', background: 'var(--color-primary)', border: '2px solid #fff', color: '#fff' }}
+                                        style={{
+                                            fontSize: '1.2rem',
+                                            padding: '1rem 2rem',
+                                            background: '#fff',
+                                            border: '2px solid #000',
+                                            color: '#000',
+                                            boxShadow: '4px 4px 0 #000'
+                                        }}
                                     >
                                         SURPRENDS-MOI
                                     </Button>
