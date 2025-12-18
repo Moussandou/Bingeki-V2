@@ -63,7 +63,7 @@ export async function saveUserProfileToFirestore(user: Partial<UserProfile>): Pr
 
         // List of allowed fields to sync
         const allowedFields: (keyof UserProfile)[] = [
-            'email', 'displayName', 'photoURL', 'banner', 'bio',
+            'uid', 'email', 'displayName', 'photoURL', 'banner', 'bio',
             'themeColor', 'cardBgColor', 'borderColor',
             'favoriteManga', 'top3Favorites', 'featuredBadge'
         ];
@@ -207,7 +207,8 @@ export async function searchUserByEmail(email: string): Promise<UserProfile | nu
         const q = query(collection(db, 'users'), where('email', '==', email), limit(1));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
-            return querySnapshot.docs[0].data() as UserProfile;
+            const doc = querySnapshot.docs[0];
+            return { uid: doc.id, ...doc.data() } as UserProfile;
         }
         return null;
     } catch (error) {
@@ -222,7 +223,8 @@ export async function searchUserByName(name: string): Promise<UserProfile | null
         const q = query(collection(db, 'users'), where('displayName', '==', name), limit(1));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
-            return querySnapshot.docs[0].data() as UserProfile;
+            const doc = querySnapshot.docs[0];
+            return { uid: doc.id, ...doc.data() } as UserProfile;
         }
         return null;
     } catch (error) {
@@ -237,7 +239,7 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
         const docRef = doc(db, 'users', uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return docSnap.data() as UserProfile;
+            return { uid: docSnap.id, ...docSnap.data() } as UserProfile;
         }
         return null;
     } catch (error) {
@@ -318,7 +320,7 @@ export async function getFriends(userId: string): Promise<Friend[]> {
         const querySnapshot = await getDocs(q);
         const friends: Friend[] = [];
         querySnapshot.forEach((doc) => {
-            friends.push(doc.data() as Friend);
+            friends.push({ uid: doc.id, ...doc.data() } as Friend);
         });
         return friends;
     } catch (error) {
@@ -338,7 +340,7 @@ export async function getLeaderboard(limitCount: number = 10): Promise<UserProfi
         const querySnapshot = await getDocs(q);
         const users: UserProfile[] = [];
         querySnapshot.forEach((doc) => {
-            users.push(doc.data() as UserProfile);
+            users.push({ uid: doc.id, ...doc.data() } as UserProfile);
         });
         return users;
     } catch (error) {
@@ -460,7 +462,7 @@ export async function getFilteredLeaderboard(
         const querySnapshot = await getDocs(q);
         const users: UserProfile[] = [];
         querySnapshot.forEach((doc) => {
-            users.push(doc.data() as UserProfile);
+            users.push({ uid: doc.id, ...doc.data() } as UserProfile);
         });
         return users;
     } catch (error) {
