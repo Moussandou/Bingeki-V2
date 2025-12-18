@@ -46,7 +46,7 @@ export default function Social() {
 
     useEffect(() => {
         loadData();
-    }, [activeTab, leaderboardCategory, leaderboardPeriod]);
+    }, [activeTab, leaderboardCategory, leaderboardPeriod, user]);
 
     const loadData = async () => {
         setLoading(true);
