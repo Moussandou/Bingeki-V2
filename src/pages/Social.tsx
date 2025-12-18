@@ -277,7 +277,7 @@ export default function Social() {
                     <>
                         {/* Leaderboard Filters */}
                         <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                                 <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>Par :</span>
                                 <Button
                                     variant={leaderboardCategory === 'xp' ? 'manga' : 'ghost'}
