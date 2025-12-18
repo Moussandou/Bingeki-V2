@@ -132,12 +132,15 @@
     height: 280px;
     width: 100%;
     background-position: center;
+    background-size: cover;
+    /* CHANGED: Cover to fill space better on desktop too, or keep contain if user prefers full image. Let's stick to contain as per previous file but ensure mobile is better. */
     background-size: contain;
-    /* Show FULL image on desktop too */
     background-repeat: no-repeat;
     background-color: #f4f4f5;
     flex-shrink: 0;
     transition: background-size 0.3s;
+    border-bottom: 2px solid #000;
+    /* Added border */
 }
 
 /* Mobile Responsiveness */
@@ -222,19 +225,16 @@
     /* Mobile Grid Overrides */
     .worksGrid {
         grid-template-columns: repeat(2, 1fr);
-        /* Force 2 columns */
-        gap: 0.5rem;
-        /* Tighter gap */
+        gap: 0.75rem;
     }
 
     /* Mobile Cover Overrides */
     .workCover {
-        height: 220px;
-        /* Smaller height on mobile */
+        height: 180px;
+        /* Reduced height for 2-column layout */
         background-size: contain;
-        /* Show FULL image */
         background-repeat: no-repeat;
         background-color: #f4f4f5;
-        /* Light grey background for padding */
+        border-bottom: 2px solid #000;
     }
 }
