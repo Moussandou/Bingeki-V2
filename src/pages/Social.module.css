@@ -1,0 +1,159 @@
+/* Social.module.css */
+
+.container {
+    padding-bottom: 6rem;
+    /* Extra padding for bottom dock */
+    padding-top: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.title {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+/* Scrollable Tabs - Bingeki Style */
+.tabContainer {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.tabContainer::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+/* Leaderboard Ranking Items */
+.leaderboardItem {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+    gap: 1rem;
+    transition: background 0.2s;
+}
+
+.rank {
+    width: 40px;
+    font-size: 1.5rem;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+
+.avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #000;
+    flex-shrink: 0;
+}
+
+.playerInfo {
+    flex: 1;
+    min-width: 0;
+    margin-right: 0.5rem;
+    cursor: pointer;
+}
+
+.playerName {
+    font-weight: 700;
+    font-size: 1.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.playerBadge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+    background: #000;
+    color: #fff;
+    border-radius: 4px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.playerLvl {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    font-weight: 600;
+}
+
+.playerStats {
+    font-weight: 900;
+    font-size: 1.1rem;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding-top: 1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .title {
+        font-size: 1.8rem;
+    }
+
+    /* Transform Table Rows to Compact Cards on Mobile */
+    .leaderboardItem {
+        position: relative;
+        flex-wrap: wrap;
+        /* Allow wrapping */
+        gap: 0.75rem;
+        padding: 1rem 0.5rem;
+        border-bottom: 2px solid #000;
+        /* Distinct separation */
+        border-radius: 0;
+    }
+
+    .rank {
+        width: 30px;
+        font-size: 1.2rem;
+    }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+    .playerInfo {
+        flex-basis: calc(100% - 90px);
+        /* Fill remaining space minus rank/avatar */
+    }
+
+    .playerName {
+        font-size: 1rem;
+    }
+
+    .playerStats {
+        position: absolute;
+        top: 1rem;
+        right: 0.5rem;
+        font-size: 1rem;
+    }
+
+    /* Move actions to a new "row" on mobile if needed, or keep compact */
+    .actions {
+        margin-left: auto;
+    }
+}

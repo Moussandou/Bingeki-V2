@@ -24,6 +24,7 @@ import { WatchPartiesSection } from '@/components/WatchPartiesSection';
 
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/context/ToastContext';
+import styles from './Social.module.css';
 
 export default function Social() {
     const { user } = useAuthStore();
@@ -156,13 +157,13 @@ export default function Social() {
 
     return (
         <Layout>
-            <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
-                <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', marginBottom: '1.5rem', textTransform: 'uppercase' }}>
+            <div className={styles.container}>
+                <h1 className={styles.title}>
                     SOCIAL
                 </h1>
 
                 {/* Tabs */}
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+                <div className={styles.tabContainer}>
                     <Button
                         variant={activeTab === 'ranking' ? 'primary' : 'ghost'}
                         onClick={() => setActiveTab('ranking')}
@@ -301,45 +302,33 @@ export default function Social() {
 
                         <div className="manga-panel" style={{ padding: '0' }}>
                             {leaderboard.map((player, index) => (
-                                <div key={player.uid} style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    padding: '1rem',
-                                    borderBottom: '1px solid #eee',
+                                <div key={player.uid} className={styles.leaderboardItem} style={{
                                     background: player.uid === user?.uid ? '#f0f0f0' : '#fff'
                                 }}>
-                                    <div style={{ width: '40px', fontSize: '1.5rem', fontWeight: 900, color: index < 3 ? '#ffce00' : '#000' }}>
+                                    <div className={styles.rank} style={{ color: index < 3 ? '#ffce00' : '#000' }}>
                                         #{index + 1}
                                     </div>
-                                    <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', marginRight: '1rem', border: '2px solid #000' }}>
+                                    <div className={styles.avatar}>
                                         <img src={player.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.displayName}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     </div>
-                                    <div style={{ flex: 1, minWidth: 0, marginRight: '0.5rem', cursor: 'pointer' }} onClick={() => navigate(`/profile/${player.uid}`)}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            <span style={{ fontWeight: 700, fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{player.displayName || 'Anonyme'}</span>
+                                    <div className={styles.playerInfo} onClick={() => navigate(`/profile/${player.uid}`)}>
+                                        <div className={styles.playerName}>
+                                            {player.displayName || 'Anonyme'}
                                             {player.featuredBadge && (
-                                                <span style={{
-                                                    fontSize: '0.7rem',
-                                                    padding: '0.15rem 0.4rem',
-                                                    background: '#6b7280',
-                                                    color: '#fff',
-                                                    borderRadius: '4px',
-                                                    fontWeight: 700,
-                                                    whiteSpace: 'nowrap'
-                                                }}>
+                                                <span className={styles.playerBadge}>
                                                     {player.featuredBadge}
                                                 </span>
                                             )}
                                         </div>
-                                        <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>Lvl {player.level || 1}</div>
+                                        <div className={styles.playerLvl}>Lvl {player.level || 1}</div>
                                     </div>
-                                    <div style={{ fontWeight: 900, fontSize: '1.2rem', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                    <div className={styles.playerStats}>
                                         {leaderboardCategory === 'xp' && <>{player.xp || 0} XP</>}
                                         {leaderboardCategory === 'chapters' && <><BookOpen size={16} /> {player.totalChaptersRead || 0}</>}
                                         {leaderboardCategory === 'streak' && <><Flame size={16} /> {player.streak || 0}j</>}
                                     </div>
                                     {player.uid !== user?.uid && (
-                                        <>
+                                        <div className={styles.actions}>
                                             {getFriendStatus(player.uid) === 'none' && (
                                                 <Button size="sm" variant="ghost" onClick={() => handleQuickAdd(player)}>
                                                     <UserPlus size={18} />
@@ -351,7 +340,7 @@ export default function Social() {
                                             {getFriendStatus(player.uid) === 'accepted' && (
                                                 <User size={18} style={{ opacity: 0.3 }} />
                                             )}
-                                        </>
+                                        </div>
                                     )}
                                 </div>
                             ))}

@@ -123,7 +123,7 @@
     align-items: center;
 }
 
-/* Mobile Bottom Dock */
+/* Mobile Bottom Dock - Bingeki Compact Style */
 .mobileNav {
     display: none;
     position: fixed;
@@ -131,11 +131,22 @@
     left: 50%;
     transform: translateX(-50%);
     background: #fff;
-    padding: 0.75rem 2rem;
+    padding: 0.5rem 1.5rem;
     border: 3px solid #000;
-    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.8);
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 1);
     z-index: 100;
-    gap: 2rem;
+    gap: 1.5rem;
+    border-radius: 50px;
+    /* Capsule shape */
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    max-width: 90vw;
+}
+
+.mobileNav a span {
+    display: none;
+    /* Hide text labels on mobile for compactness */
 }
 
 .profileDropdown {
