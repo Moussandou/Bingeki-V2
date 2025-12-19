@@ -20,9 +20,11 @@ service cloud.firestore {
       allow write: if isOwner(userId);
 
       // --- Subcollection: Data (Library & Gamification) ---
-      // Private Data. Only the owner can read/write their library and details.
+      // Read: Allowed for all authenticated users (needed for Social features like "Friends reading this")
+      // Write: Only owner
       match /data/{document=**} {
-        allow read, write: if isOwner(userId);
+        allow read: if isAuthenticated();
+        allow write: if isOwner(userId);
       }
 
       // --- Subcollection: Friends ---
