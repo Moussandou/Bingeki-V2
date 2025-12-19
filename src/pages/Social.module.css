@@ -103,6 +103,8 @@
     flex-shrink: 0;
 }
 
+/* Override for leaderboard panel on mobile - defined in @media below */
+
 /* ============ MOBILE ============ */
 @media (max-width: 768px) {
     .container {
@@ -156,12 +158,23 @@
     }
 
     .playerStats {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-weight: 700;
+        flex-shrink: 0;
+        min-width: 45px;
+        text-align: right;
     }
 
     .actions {
         display: none;
-        /* Hide add button on mobile to save space */
+    }
+
+    /* Remove manga-panel styles on mobile */
+    .leaderboardPanelMobileHack {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 -0.5rem !important;
+        width: calc(100% + 1rem) !important;
     }
 }
