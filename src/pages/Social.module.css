@@ -111,50 +111,88 @@
         padding-right: 1rem;
     }
 
+    /* Force reset padding for leaderboard panel on mobile to avoid double padding */
+    .leaderboardPanelMobileHack {
+        padding: 0 !important;
+    }
+
     .title {
         font-size: 1.8rem;
     }
 
-    /* Transform Table Rows to Compact Cards on Mobile */
+    /* GRID LAYOUT FOR MOBILE LEADERBOARD */
     .leaderboardItem {
-        position: relative;
-        flex-wrap: wrap;
-        /* Allow wrapping */
-        gap: 0.75rem;
-        padding: 1rem 0.5rem;
+        display: grid;
+        /* create a 3-column grid: [rank] [avatar] [content] */
+        grid-template-columns: auto auto 1fr;
+        grid-template-rows: auto auto;
+        /* Two rows: main content, then stats/actions */
+        align-items: center;
+        gap: 0.5rem 1rem;
+        padding: 1rem 0.75rem;
         border-bottom: 2px solid #000;
-        /* Distinct separation */
-        border-radius: 0;
+        /* Reset flex props */
+        position: relative;
+        flex-wrap: initial;
     }
 
     .rank {
-        width: 30px;
+        grid-column: 1;
+        grid-row: 1;
+        width: auto;
         font-size: 1.2rem;
+        margin-right: 0.25rem;
     }
 
     .avatar {
+        grid-column: 2;
+        grid-row: 1;
         width: 40px;
         height: 40px;
     }
 
+    /* Player Info takes remaining space on row 1 */
     .playerInfo {
-        flex-basis: calc(100% - 90px);
-        /* Fill remaining space minus rank/avatar */
+        grid-column: 3;
+        grid-row: 1;
+        width: 100%;
+        min-width: 0;
+        /* Crucial for text truncation */
     }
 
     .playerName {
         font-size: 1rem;
+        flex-wrap: wrap;
+        /* allow badge to wrap if needed */
     }
 
+    .playerLvl {
+        margin-top: 0.1rem;
+    }
+
+    /* Stats move to row 2, spanning full width or partial */
     .playerStats {
+        grid-column: 1 / -1;
+        /* Span full width */
+        grid-row: 2;
+        width: 100%;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px dashed #eee;
+        display: flex;
+        justify-content: space-between;
+        /* Space out stats */
+        align-items: center;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    /* Actions (Add Friend) float or join stats */
+    .actions {
+        /* position absolute to top-right of the card? */
+        /* Or integrated into the grid. Let's try absolute top-right for cleanliness */
         position: absolute;
         top: 1rem;
         right: 0.5rem;
-        font-size: 1rem;
-    }
-
-    /* Move actions to a new "row" on mobile if needed, or keep compact */
-    .actions {
-        margin-left: auto;
     }
 }

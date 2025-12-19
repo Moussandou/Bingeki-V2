@@ -247,8 +247,16 @@ export default function Social() {
                                                 <img src={activity.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${activity.userName}`}
                                                     alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                             </div>
-                                            <div style={{ flex: 1 }}>
-                                                <p style={{ fontWeight: 600 }}>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <p style={{
+                                                    fontWeight: 600,
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 2,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    lineHeight: '1.2'
+                                                }}>
                                                     {ACTIVITY_EMOJIS[activity.type]} <strong>{activity.userName}</strong> {ACTIVITY_LABELS[activity.type]}
                                                     {activity.workTitle && <span style={{ color: 'var(--color-primary)' }}> {activity.workTitle}</span>}
                                                     {activity.episodeNumber && <span> (Ep. {activity.episodeNumber})</span>}
@@ -300,7 +308,7 @@ export default function Social() {
                             </div>
                         </div>
 
-                        <div className="manga-panel" style={{ padding: '0' }}>
+                        <div className={`manga-panel ${styles.leaderboardPanelMobileHack}`} style={{ padding: '0' }}>
                             {leaderboard.map((player, index) => (
                                 <div key={player.uid} className={styles.leaderboardItem} style={{
                                     background: player.uid === user?.uid ? '#f0f0f0' : '#fff'
