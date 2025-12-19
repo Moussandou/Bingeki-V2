@@ -308,85 +308,50 @@ export default function Social() {
                             </div>
                         </div>
 
-                        <div style={{
-                            background: '#fff',
-                            border: 'none',
-                            boxShadow: 'none',
-                            padding: 0,
-                            margin: 0,
-                            width: '100%',
-                            overflow: 'hidden'
-                        }}>
+                        <div className={styles.leaderboardPanel}>
                             {leaderboard.map((player, index) => (
-                                <div key={player.uid} style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    padding: '0.5rem',
-                                    borderBottom: '1px solid #eee',
-                                    background: player.uid === user?.uid ? '#f0f0f0' : '#fff',
-                                    width: '100%',
-                                    boxSizing: 'border-box'
+                                <div key={player.uid} className={styles.leaderboardItem} style={{
+                                    background: player.uid === user?.uid ? '#f0f0f0' : '#fff'
                                 }}>
-                                    {/* Rank */}
-                                    <div style={{
-                                        width: '24px',
-                                        fontSize: '0.9rem',
-                                        fontWeight: 900,
-                                        color: index < 3 ? '#ffce00' : '#000',
-                                        flexShrink: 0
-                                    }}>
+                                    <div className={styles.rank} style={{ color: index < 3 ? '#ffce00' : '#000' }}>
                                         #{index + 1}
                                     </div>
-                                    {/* Avatar */}
-                                    <div style={{
-                                        width: '30px',
-                                        height: '30px',
-                                        borderRadius: '50%',
-                                        overflow: 'hidden',
-                                        border: '1px solid #000',
-                                        flexShrink: 0
-                                    }}>
+                                    <div className={styles.avatar}>
                                         <img
                                             src={player.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.displayName}`}
                                             alt=""
                                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                         />
                                     </div>
-                                    {/* Name & Level */}
-                                    <div
-                                        style={{
-                                            flex: 1,
-                                            minWidth: 0,
-                                            overflow: 'hidden',
-                                            cursor: 'pointer'
-                                        }}
-                                        onClick={() => navigate(`/profile/${player.uid}`)}
-                                    >
-                                        <div style={{
-                                            fontSize: '0.85rem',
-                                            fontWeight: 700,
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis'
-                                        }}>
+                                    <div className={styles.playerInfo} onClick={() => navigate(`/profile/${player.uid}`)}>
+                                        <div className={styles.playerName}>
                                             {player.displayName || 'Anonyme'}
+                                            {player.featuredBadge && (
+                                                <span className={styles.playerBadge}>{player.featuredBadge}</span>
+                                            )}
                                         </div>
-                                        <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>
-                                            Lvl {player.level || 1}
+                                        <div className={styles.playerLvl}>Lvl {player.level || 1}</div>
+                                    </div>
+                                    <div className={styles.playerStats}>
+                                        {leaderboardCategory === 'xp' && <>{(player.xp || 0).toLocaleString()} XP</>}
+                                        {leaderboardCategory === 'chapters' && <><BookOpen size={14} /> {player.totalChaptersRead || 0}</>}
+                                        {leaderboardCategory === 'streak' && <><Flame size={14} /> {player.streak || 0}j</>}
+                                    </div>
+                                    {player.uid !== user?.uid && (
+                                        <div className={styles.actions}>
+                                            {getFriendStatus(player.uid) === 'none' && (
+                                                <Button size="sm" variant="ghost" onClick={() => handleQuickAdd(player)}>
+                                                    <UserPlus size={16} />
+                                                </Button>
+                                            )}
+                                            {getFriendStatus(player.uid) === 'pending' && (
+                                                <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>En attente</span>
+                                            )}
+                                            {getFriendStatus(player.uid) === 'accepted' && (
+                                                <User size={16} style={{ opacity: 0.3 }} />
+                                            )}
                                         </div>
-                                    </div>
-                                    {/* Stats - ALWAYS VISIBLE */}
-                                    <div style={{
-                                        fontSize: '0.8rem',
-                                        fontWeight: 700,
-                                        whiteSpace: 'nowrap',
-                                        flexShrink: 0
-                                    }}>
-                                        {leaderboardCategory === 'xp' && <>{(player.xp || 0).toLocaleString()}</>}
-                                        {leaderboardCategory === 'chapters' && <>{player.totalChaptersRead || 0}</>}
-                                        {leaderboardCategory === 'streak' && <>{player.streak || 0}j</>}
-                                    </div>
+                                    )}
                                 </div>
                             ))}
                         </div>
