@@ -78,8 +78,12 @@ export function FriendRecommendations() {
                 }));
 
             setRecommendations(sortedWorks);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error loading recommendations:', error);
+            // If it's a permission error, effectively just hide the section
+            if (error.code === 'permission-denied') {
+                console.warn('Social features require updated Firestore rules. Check firestore.rules deployment.');
+            }
         }
 
         setIsLoading(false);

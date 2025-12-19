@@ -85,7 +85,9 @@ export default function Discover() {
                 // Clear genre if searching by text
                 if (selectedGenre) setSelectedGenre(null);
                 const results = await searchWorks(searchQuery);
-                setSearchResults(results);
+                // Filter out duplicates
+                const uniqueResults = Array.from(new Map(results.map(item => [item.mal_id, item])).values());
+                setSearchResults(uniqueResults);
                 setLoading(false);
             } else if (selectedGenre) {
                 setLoading(true);
@@ -338,11 +340,7 @@ export default function Discover() {
                                     <Loader2 className="spin" size={48} />
                                 </div>
                             ) : (
-                                <div style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                                    gap: '2rem'
-                                }}>
+                                <div className={styles.resultsGrid}>
                                     {searchResults.map((work) => {
                                         const isOwned = libraryIds.has(work.mal_id);
                                         return (
