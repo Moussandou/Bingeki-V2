@@ -63,8 +63,10 @@
 /* Chart Container */
 .chartContainer {
     height: 220px;
-    display: flex;
-    align-items: stretch;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    /* Prevent potential overflow causing recalc issues */
 }
 
 /* Name */
