@@ -142,6 +142,11 @@ button {
     .manga-panel {
         padding: 1rem !important;
     }
+
+    /* But NOT for Social leaderboard - it needs no padding */
+    .manga-panel.social-leaderboard-override {
+        padding: 0 !important;
+    }
 }
 
 /* Small mobile */

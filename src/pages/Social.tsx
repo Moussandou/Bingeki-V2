@@ -308,7 +308,7 @@ export default function Social() {
                             </div>
                         </div>
 
-                        <div className={`manga-panel ${styles.leaderboardPanelMobileHack}`} style={{ padding: '0' }}>
+                        <div className={`manga-panel social-leaderboard-override ${styles.leaderboardPanelMobileHack}`} style={{ padding: '0' }}>
                             {leaderboard.map((player, index) => (
                                 <div key={player.uid} className={styles.leaderboardItem} style={{
                                     background: player.uid === user?.uid ? '#f0f0f0' : '#fff'
