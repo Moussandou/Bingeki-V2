@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Mail, Lock, User } from 'lucide-react';
+import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { loginWithGoogle, loginWithEmail, registerWithEmail } from '@/firebase/auth';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate, Link } from 'react-router-dom';
@@ -81,6 +81,29 @@ export default function Auth() {
             padding: '1rem',
             overflow: 'hidden'
         }}>
+            {/* Back Button */}
+            <button
+                onClick={() => navigate('/')}
+                style={{
+                    position: 'absolute',
+                    top: '1.5rem',
+                    left: '1.5rem',
+                    zIndex: 20,
+                    background: '#fff',
+                    border: '3px solid #000',
+                    padding: '0.5rem',
+                    boxShadow: '4px 4px 0 #000',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontWeight: 900
+                }}
+            >
+                <ArrowLeft size={24} />
+                <span className="hidden-mobile">RETOUR</span>
+            </button>
+
             <div className="manga-bg-container">
                 <div className="manga-halftone"></div>
                 <div className="manga-speedlines"></div>
