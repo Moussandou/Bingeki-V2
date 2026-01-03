@@ -35,6 +35,7 @@ const Changelog = lazy(() => import('@/pages/Changelog'));
 const Schedule = lazy(() => import('@/pages/Schedule'));
 const CharacterDetails = lazy(() => import('@/pages/CharacterDetails'));
 const PersonDetails = lazy(() => import('@/pages/PersonDetails'));
+const Credits = lazy(() => import('@/pages/Credits'));
 
 function App() {
   const { setUser, setLoading, user } = useAuthStore();
@@ -177,7 +178,13 @@ function App() {
                 <PersonDetails />
               </Suspense>
             } />
+
             <Route path="/legal" element={<Legal />} />
+            <Route path="/credits" element={
+              <Suspense fallback={<LoadingScreen />}>
+                <Credits />
+              </Suspense>
+            } />
           </Routes>
         </Suspense>
       </BrowserRouter>

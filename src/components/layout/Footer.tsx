@@ -108,6 +108,9 @@ export function Footer() {
                         <a href="/legal" style={{ color: '#000', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
                             MENTIONS LÉGALES & RGPD
                         </a>
+                        <a href="/credits" style={{ color: '#000', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
+                            CRÉDITS
+                        </a>
                     </div>
                 </div>
             </div>

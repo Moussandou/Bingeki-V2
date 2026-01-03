@@ -5,7 +5,7 @@ import { Layout } from '@/components/layout/Layout';
 import styles from '@/styles/Opening.module.css';
 import { Card } from '@/components/ui/Card';
 import { HunterLicenseCard } from '@/components/HunterLicenseCard';
-import { Search, Check, Users, MessageCircle, Heart, TrendingUp, ChevronUp, History as HistoryIcon } from 'lucide-react';
+import { Search, Check, Users, MessageCircle, Heart, TrendingUp, ChevronUp, History as HistoryIcon, Trophy, Star, ArrowRight } from 'lucide-react';
 
 // Counter Component for Animated Numbers
 function Counter({ from, to }: { from: number; to: number }) {
@@ -461,8 +461,97 @@ export default function Opening() {
                     </div>
                 </section>
 
-                {/* SECTION 5: CHANGELOG / BUILDING IN PUBLIC */}
+                {/* SECTION 4.5: DETAILS SHOWCASE (NEW) */}
                 <section className={styles.featureSection}>
+                    <div className={styles.textContent}>
+                        <div className={styles.sfx} style={{ bottom: -40, left: 10, fontSize: '6rem', color: '#808080', opacity: 0.1, transform: 'rotate(-5deg)' }}>FOCUS</div>
+                        <h2 className={styles.sectionTitle}>TOUT SAVOIR</h2>
+                        <div className={styles.sectionDescription}>
+                            <p>Plongez au cœur de vos œuvres.</p>
+                            <p style={{ marginTop: '1rem' }}>Synopsis, staff, statistiques détaillées, personnages... Accédez à une fiche d'identité complète pour chaque Anime et Manga. Ne ratez aucun détail.</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.visualContent}>
+                        <div className={styles.mockupContainer} style={{ width: '90%' }}>
+                            <Link to="/work/113138?type=manga" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <motion.div whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300 }}>
+                                    <div style={{
+                                        background: '#fff',
+                                        border: '4px solid #000',
+                                        boxShadow: '8px 8px 0 #000',
+                                        overflow: 'hidden',
+                                        position: 'relative',
+                                        display: 'flex',
+                                        flexDirection: 'column'
+                                    }}>
+                                        {/* Fake WorkDetails Header/Cover */}
+                                        <div style={{ height: '160px', position: 'relative', overflow: 'hidden', background: '#333' }}>
+                                            <img
+                                                src="https://cdn.myanimelist.net/images/manga/3/210341l.jpg"
+                                                alt="JJK Banner"
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8, objectPosition: 'center 25%' }}
+                                            />
+                                            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }} />
+
+                                            <div style={{ position: 'absolute', bottom: '1rem', left: '1rem', display: 'flex', alignItems: 'flex-end', gap: '1rem' }}>
+                                                {/* Mini Poster */}
+                                                <div style={{ width: '80px', height: '120px', border: '3px solid #fff', boxShadow: '0 4px 6px rgba(0,0,0,0.3)', marginBottom: '-3rem', zIndex: 10, background: '#000' }}>
+                                                    <img src="https://cdn.myanimelist.net/images/manga/3/210341l.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                </div>
+
+                                                <div style={{ paddingBottom: '0.5rem' }}>
+                                                    <h3 style={{ color: '#fff', fontSize: '1.5rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1, textShadow: '2px 2px 0 #000' }}>
+                                                        JUJUTSU KAISEN
+                                                    </h3>
+                                                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                                        <span style={{ fontSize: '0.7rem', fontWeight: 800, background: '#fff', color: '#000', padding: '2px 6px' }}>MANGA</span>
+                                                        <span style={{ fontSize: '0.7rem', fontWeight: 800, background: 'var(--color-primary)', color: '#000', padding: '2px 6px', border: '1px solid #000' }}>EN COURS</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Fake Tabs & Content */}
+                                        <div style={{ padding: '1rem 1rem 1rem 1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                            {/* Tabs Mockup */}
+                                            <div style={{ display: 'flex', gap: '1.5rem', borderBottom: '2px solid #eee', paddingBottom: '0.5rem', paddingLeft: '90px' }}>
+                                                <span style={{ fontSize: '0.8rem', fontWeight: 900, borderBottom: '3px solid #000', paddingBottom: '0.5rem', marginBottom: '-0.6rem' }}>GÉNÉRAL</span>
+                                                <span style={{ fontSize: '0.8rem', fontWeight: 700, opacity: 0.4 }}>CHAPITRES</span>
+                                                <span style={{ fontSize: '0.8rem', fontWeight: 700, opacity: 0.4 }}>STATS</span>
+                                                <span style={{ fontSize: '0.8rem', fontWeight: 700, opacity: 0.4 }}>AVIS</span>
+                                            </div>
+
+                                            {/* Content Area */}
+                                            <div style={{ marginTop: '0.5rem' }}>
+                                                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                                                    <div style={{ flex: 1, fontSize: '0.9rem', lineHeight: 1.5, color: '#444', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                        Pour sauver ses amis, Yuji Itadori avale un doigt maudit et partage désormais son corps avec Ryomen Sukuna, le plus puissant des fléaux.
+                                                    </div>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', minWidth: '80px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem', fontWeight: 800 }}>
+                                                            <Trophy size={16} /> #4
+                                                        </div>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem', fontWeight: 800 }}>
+                                                            <Star size={16} fill="black" /> 8.64
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div style={{ background: '#000', color: '#fff', textAlign: 'center', padding: '0.8rem', fontWeight: 900, fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                                    VOIR LA FICHE COMPLÈTE <ArrowRight size={16} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </Link>
+                        </div>
+                    </div>
+                </section>
+
+                {/* SECTION 5: CHANGELOG / BUILDING IN PUBLIC */}
+                <section className={`${styles.featureSection} ${styles.featureSectionReverse}`}>
                     <div className={styles.textContent}>
                         <div className={styles.sfx} style={{ top: -30, right: 20, fontSize: '4rem', color: '#808080', opacity: 0.1, transform: 'rotate(-5deg)' }}>BETA</div>
                         <h2 className={styles.sectionTitle}>WORK IN PROGRESS</h2>
