@@ -69,10 +69,18 @@ export function Header() {
 
                     {/* Discover link - accessible to all */}
                     {!user && (
-                        <nav className={styles.desktopNav}>
+                        <nav className={styles.desktopNav} style={{ gap: '1rem' }}>
                             <Link to="/discover" className={`${styles.navLink} ${isActive('/discover') ? styles.activeLink : ''}`}>
                                 <Search size={18} />
                                 <span>Découvrir</span>
+                            </Link>
+                            <Link to="/schedule" className={`${styles.navLink} ${isActive('/schedule') ? styles.activeLink : ''}`}>
+                                <Calendar size={18} />
+                                <span className="hidden-tablet">Agenda</span>
+                            </Link>
+                            <Link to="/changelog" className={`${styles.navLink} ${isActive('/changelog') ? styles.activeLink : ''}`} title="Nouveautés">
+                                <History size={18} />
+                                <span className="hidden-tablet">Changelog</span>
                             </Link>
                         </nav>
                     )}
@@ -220,6 +228,16 @@ export function Header() {
                         <Link to="/discover">
                             <Button variant={isActive('/discover') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
                                 <Search size={22} />
+                            </Button>
+                        </Link>
+                        <Link to="/schedule">
+                            <Button variant={isActive('/schedule') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                                <Calendar size={22} />
+                            </Button>
+                        </Link>
+                        <Link to="/changelog">
+                            <Button variant={isActive('/changelog') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                                <History size={22} />
                             </Button>
                         </Link>
                         <Link to="/auth">
