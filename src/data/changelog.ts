@@ -8,6 +8,18 @@ export interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
     {
+        version: "v2.3",
+        date: "03 Janvier 2026",
+        title: "Discovery & Immersion",
+        description: "Enrichissement visuel et découverte de nouvelles pépites.",
+        changes: [
+            "Nouvel onglet 'Galerie' : Explorez les artworks officiels en haute qualité.",
+            "Section 'Vous Aimerez Aussi' : Recommandations basées sur les votes de la communauté.",
+            "Intégration d'une modale 'Click-to-Zoom' pour les images.",
+            "Amélioration UX : Stop de l'autoplay vidéo et optimisation des grilles."
+        ]
+    },
+    {
         version: "v2.2",
         date: "03 Janvier 2026",
         title: "Deep Dive Update",
