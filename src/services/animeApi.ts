@@ -207,3 +207,49 @@ export const getWorkRelations = async (id: number, type: 'anime' | 'manga') => {
         return [];
     }
 };
+
+export interface JikanRecommendation {
+    entry: {
+        mal_id: number;
+        url: string;
+        images: {
+            jpg: {
+                image_url: string;
+                large_image_url: string;
+            };
+        };
+        title: string;
+    };
+    votes: number;
+}
+
+export const getWorkRecommendations = async (id: number, type: 'anime' | 'manga') => {
+    try {
+        const response = await fetch(`${BASE_URL}/${type}/${id}/recommendations`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        return (data.data as JikanRecommendation[]).slice(0, 12); // Limit to 12 recs
+    } catch (error) {
+        console.error('API Error:', error);
+        return [];
+    }
+};
+
+export interface JikanPicture {
+    jpg: {
+        image_url: string;
+        large_image_url: string;
+    };
+}
+
+export const getWorkPictures = async (id: number, type: 'anime' | 'manga') => {
+    try {
+        const response = await fetch(`${BASE_URL}/${type}/${id}/pictures`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        return data.data as JikanPicture[];
+    } catch (error) {
+        console.error('API Error:', error);
+        return [];
+    }
+};

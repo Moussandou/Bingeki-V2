@@ -54,7 +54,8 @@
 .infoSection {
     flex: 1;
     width: 100%;
-    /* Ensure full width */
+    min-width: 0;
+    /* Critical for preventing flex child overflow */
 }
 
 .tabsContainer {

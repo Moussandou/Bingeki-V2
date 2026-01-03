@@ -17,7 +17,7 @@ import type { CommentWithReplies } from '@/types/comment';
 import logoCrunchyroll from '@/assets/logo_crunchyroll.png';
 import logoADN from '@/assets/logo_adn.png';
 
-import { getWorkDetails, getWorkCharacters, getWorkRelations, type JikanCharacter, type JikanRelation } from '@/services/animeApi';
+import { getWorkDetails, getWorkCharacters, getWorkRelations, getWorkRecommendations, getWorkPictures, type JikanCharacter, type JikanRelation, type JikanRecommendation, type JikanPicture } from '@/services/animeApi';
 import { handleProgressUpdateWithXP } from '@/utils/progressUtils';
 import styles from './WorkDetails.module.css';
 
@@ -255,7 +255,7 @@ export default function WorkDetails() {
     const [isCommentsExpanded, setIsCommentsExpanded] = useState(false);
 
     // Tab & Episodes State
-    const [activeTab, setActiveTab] = useState<'info' | 'episodes'>('info');
+    const [activeTab, setActiveTab] = useState<'info' | 'episodes' | 'gallery'>('info');
     const [episodes, setEpisodes] = useState<ContentItem[]>([]);
     const [episodesPage, setEpisodesPage] = useState(1);
     const [hasMoreEpisodes, setHasMoreEpisodes] = useState(false);
@@ -276,6 +276,8 @@ export default function WorkDetails() {
     // New Data: Characters & Relations
     const [characters, setCharacters] = useState<JikanCharacter[]>([]);
     const [relations, setRelations] = useState<JikanRelation[]>([]);
+    const [recommendations, setRecommendations] = useState<JikanRecommendation[]>([]);
+    const [pictures, setPictures] = useState<JikanPicture[]>([]);
 
 
     // Initial Fetch for non-library items
@@ -328,12 +330,14 @@ export default function WorkDetails() {
         }
     }, [id, libraryWork, fetchedWork, typeParam]);
 
-    // Fetch Characters & Relations
+    // Fetch Characters, Relations, Recommendations, Pictures
     useEffect(() => {
         if (id && work) {
             const type = work.type === 'manga' ? 'manga' : 'anime';
             getWorkCharacters(Number(id), type).then(setCharacters);
             getWorkRelations(Number(id), type).then(setRelations);
+            getWorkRecommendations(Number(id), type).then(setRecommendations);
+            getWorkPictures(Number(id), type).then(setPictures);
         }
     }, [id, work?.type]);
 
@@ -594,12 +598,18 @@ export default function WorkDetails() {
                                     onClick={() => setActiveTab('episodes')}
                                     className={`${styles.tabButton} ${activeTab === 'episodes' ? styles.activeTab : ''}`}
                                 >
-                                    {['manga', 'novel', 'manhwa'].includes(work.type?.toLowerCase()) ? 'LISTE DES CHAPITRES' : 'LISTE DES ÉPISODES'}
+                                    {['manga', 'novel', 'manhwa', 'manhua', 'doujinshi', 'oneshot', 'oel'].includes(work.type?.toLowerCase()) ? 'LISTE DES CHAPITRES' : 'LISTE DES ÉPISODES'}
                                 </button>
                             )}
+                            <button
+                                onClick={() => setActiveTab('gallery')}
+                                className={`${styles.tabButton} ${activeTab === 'gallery' ? styles.activeTab : ''}`}
+                            >
+                                GALERIE
+                            </button>
                         </div>
 
-                        {activeTab === 'episodes' ? (
+                        {activeTab === 'episodes' && (
                             work.type === 'manga' && (!work.totalChapters || work.totalChapters === 0) ? (
                                 <div style={{ textAlign: 'center', padding: '3rem', border: '2px dashed #000' }}>
                                     <h3 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>NOMBRE DE CHAPITRES INCONNU</h3>
@@ -633,7 +643,9 @@ export default function WorkDetails() {
                                     readOnly={!libraryWork}
                                 />
                             )
-                        ) : (
+                        )}
+
+                        {activeTab === 'info' && (
                             <>
                                 <h1 className={styles.title}>
                                     {work.title}
@@ -836,10 +848,10 @@ export default function WorkDetails() {
                                                 boxShadow: '8px 8px 0 rgba(0,0,0,1)'
                                             }}>
                                                 <iframe
-                                                    src={work.trailer.embed_url}
+                                                    src={`${work.trailer.embed_url}?autoplay=0`}
                                                     title="Trailer"
                                                     frameBorder="0"
-                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                                     allowFullScreen
                                                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                                                 />
@@ -1292,8 +1304,120 @@ export default function WorkDetails() {
                                 )}
                             </>
                         )}
+
+                        {activeTab === 'gallery' && (
+                            <div className="animate-fade-in">
+                                <h2 className={styles.sectionTitle} style={{ marginBottom: '1.5rem' }}>GALERIE OFFICIELLE</h2>
+                                {pictures.length > 0 ? (
+                                    <div style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
+                                        gap: '0.5rem'
+                                    }}>
+                                        {pictures.map((pic, idx) => (
+                                            <div key={idx} style={{
+                                                border: '2px solid #000',
+                                                boxShadow: '4px 4px 0 #000',
+                                                aspectRatio: '1/1.4',
+                                                overflow: 'hidden',
+                                                cursor: 'pointer',
+                                                background: '#fff',
+                                                transition: 'transform 0.1s'
+                                            }}
+                                                onMouseEnter={(e) => e.currentTarget.style.transform = 'translate(-2px, -2px)'}
+                                                onMouseLeave={(e) => e.currentTarget.style.transform = 'translate(0, 0)'}
+                                                onClick={() => window.open(pic.jpg.large_image_url, '_blank')}
+                                            >
+                                                <img
+                                                    src={pic.jpg.large_image_url}
+                                                    alt={`Gallery ${idx}`}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.6, fontStyle: 'italic' }}>
+                                        Aucune image disponible.
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
+
+                {/* RECOMMENDATIONS SECTION (Outside infoSection for full width or bottom) */}
+                {recommendations.length > 0 && (
+                    <div className="manga-panel" style={{ marginTop: '3rem', padding: '2rem' }}>
+                        <h2 style={{
+                            fontFamily: 'var(--font-heading)',
+                            fontSize: '2rem',
+                            marginBottom: '1.5rem',
+                            textTransform: 'uppercase',
+                            textAlign: 'center'
+                        }}>
+                            VOUS AIMEREZ AUSSI
+                        </h2>
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+                            gap: '1.5rem'
+                        }}>
+                            {recommendations.map((rec) => (
+                                <a
+                                    key={rec.entry.mal_id}
+                                    href={`/work/${rec.entry.mal_id}?type=${work.type}`}
+                                    style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+                                >
+                                    <div style={{
+                                        position: 'relative',
+                                        marginBottom: '0.75rem',
+                                        border: '3px solid #000',
+                                        boxShadow: '6px 6px 0 #000',
+                                        transition: 'transform 0.2s',
+                                        background: '#000'
+                                    }}
+                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translate(-4px, -4px)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translate(0, 0)'}
+                                    >
+                                        <img
+                                            src={rec.entry.images.jpg.large_image_url}
+                                            alt={rec.entry.title}
+                                            style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block' }}
+                                        />
+                                        <div style={{
+                                            position: 'absolute',
+                                            bottom: 0,
+                                            left: 0,
+                                            right: 0,
+                                            background: '#000',
+                                            color: '#fff',
+                                            padding: '4px 8px',
+                                            fontSize: '0.7rem',
+                                            fontWeight: 800,
+                                            textAlign: 'center'
+                                        }}>
+                                            {rec.votes} VOTES
+                                        </div>
+                                    </div>
+                                    <h4 style={{
+                                        fontSize: '0.9rem',
+                                        fontWeight: 800,
+                                        lineHeight: 1.3,
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 2,
+                                        WebkitBoxOrient: 'vertical',
+                                        textTransform: 'uppercase'
+                                    }}>
+                                        {rec.entry.title}
+                                    </h4>
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Delete Confirmation Modal */}
                 <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} title="SUPPRESSION">
