@@ -17,7 +17,7 @@ import type { CommentWithReplies } from '@/types/comment';
 import logoCrunchyroll from '@/assets/logo_crunchyroll.png';
 import logoADN from '@/assets/logo_adn.png';
 
-import { getWorkDetails, getWorkCharacters, getWorkRelations, getWorkRecommendations, getWorkPictures, getWorkThemes, type JikanCharacter, type JikanRelation, type JikanRecommendation, type JikanPicture, type JikanTheme } from '@/services/animeApi';
+import { getWorkDetails, getWorkCharacters, getWorkRelations, getWorkRecommendations, getWorkPictures, getWorkThemes, getWorkStatistics, type JikanCharacter, type JikanRelation, type JikanRecommendation, type JikanPicture, type JikanTheme, type JikanStatistics } from '@/services/animeApi';
 import { handleProgressUpdateWithXP } from '@/utils/progressUtils';
 import styles from './WorkDetails.module.css';
 
@@ -279,6 +279,7 @@ export default function WorkDetails() {
     const [recommendations, setRecommendations] = useState<JikanRecommendation[]>([]);
     const [pictures, setPictures] = useState<JikanPicture[]>([]);
     const [themes, setThemes] = useState<JikanTheme | null>(null);
+    const [statistics, setStatistics] = useState<JikanStatistics | null>(null);
 
 
     // Initial Fetch for non-library items
@@ -339,6 +340,7 @@ export default function WorkDetails() {
             getWorkRelations(Number(id), type).then(setRelations);
             getWorkRecommendations(Number(id), type).then(setRecommendations);
             getWorkPictures(Number(id), type).then(setPictures);
+            getWorkStatistics(Number(id), type).then(setStatistics);
             if (type === 'anime') {
                 getWorkThemes(Number(id)).then(setThemes);
             }
@@ -882,35 +884,62 @@ export default function WorkDetails() {
                                                 paddingBottom: '1rem',
                                                 scrollSnapType: 'x mandatory'
                                             }}>
-                                                {characters.filter(c => c.character.images?.jpg?.image_url).map((c) => (
-                                                    <div key={c.character.mal_id} style={{
-                                                        flex: '0 0 100px',
-                                                        scrollSnapAlign: 'start',
-                                                        position: 'relative'
-                                                    }}>
-                                                        <div style={{
-                                                            width: '100px',
-                                                            height: '100px',
-                                                            borderRadius: '50%',
-                                                            border: '3px solid #000',
-                                                            overflow: 'hidden',
-                                                            marginBottom: '0.5rem',
-                                                            background: '#f0f0f0'
+                                                {characters.filter(c => c.character.images?.jpg?.image_url).map((c) => {
+                                                    const jpVa = c.voice_actors?.find((va: any) => va.language === 'Japanese');
+                                                    return (
+                                                        <div key={c.character.mal_id} style={{
+                                                            flex: '0 0 120px',
+                                                            scrollSnapAlign: 'start',
+                                                            position: 'relative',
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            alignItems: 'center'
                                                         }}>
-                                                            <img
-                                                                src={c.character.images.jpg.image_url}
-                                                                alt={c.character.name}
-                                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                            />
+                                                            {/* Character Image */}
+                                                            <div style={{
+                                                                width: '100px',
+                                                                height: '100px',
+                                                                borderRadius: '50%',
+                                                                border: '3px solid #000',
+                                                                overflow: 'hidden',
+                                                                marginBottom: '0.5rem',
+                                                                background: '#f0f0f0'
+                                                            }}>
+                                                                <img
+                                                                    src={c.character.images.jpg.image_url}
+                                                                    alt={c.character.name}
+                                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                                />
+                                                            </div>
+                                                            <div style={{ fontSize: '0.8rem', fontWeight: 800, textAlign: 'center', lineHeight: 1.2, marginBottom: '4px' }}>
+                                                                {c.character.name}
+                                                            </div>
+                                                            <div style={{ fontSize: '0.7rem', opacity: 0.6, textAlign: 'center', fontWeight: 600, marginBottom: '0.5rem' }}>
+                                                                {c.role}
+                                                            </div>
+
+                                                            {/* Seiyuu Info */}
+                                                            {jpVa && (
+                                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 'auto', borderTop: '1px dashed #ccc', paddingTop: '4px', width: '100%' }}>
+                                                                    <div style={{
+                                                                        width: '40px',
+                                                                        height: '40px',
+                                                                        borderRadius: '50%',
+                                                                        overflow: 'hidden',
+                                                                        border: '2px solid #555',
+                                                                        marginBottom: '2px'
+                                                                    }}>
+                                                                        <img src={jpVa.person.images.jpg.image_url} alt={jpVa.person.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                                    </div>
+                                                                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#555', textAlign: 'center', lineHeight: 1.1 }}>
+                                                                        {jpVa.person.name}
+                                                                    </div>
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                        <div style={{ fontSize: '0.8rem', fontWeight: 800, textAlign: 'center', lineHeight: 1.2 }}>
-                                                            {c.character.name}
-                                                        </div>
-                                                        <div style={{ fontSize: '0.7rem', opacity: 0.6, textAlign: 'center', fontWeight: 600, marginTop: '2px' }}>
-                                                            {c.role}
-                                                        </div>
-                                                    </div>
-                                                ))}
+                                                    );
+                                                })}
+
                                             </div>
                                         </div>
                                     )}
@@ -966,7 +995,67 @@ export default function WorkDetails() {
                                         </div>
                                     )}
 
-                                    {/* THEMES SECTION (Openings/Endings) */}
+                                    {/* STATISTICS SECTION */}
+                                    {statistics && (
+                                        <div style={{ marginTop: '2rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>
+                                                <BarChart size={24} strokeWidth={2.5} />
+                                                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', margin: 0 }}>STATISTIQUES</h3>
+                                            </div>
+
+                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                                                {/* Status Distribution */}
+                                                <div style={{ border: '2px solid #000', padding: '1rem', background: '#fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.1)' }}>
+                                                    <h4 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>DANS LES BIBLIOTHÈQUES</h4>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                                        {[
+                                                            { label: 'En cours', value: statistics.watching, color: '#2ecc71' },
+                                                            { label: 'Terminé', value: statistics.completed, color: '#3498db' },
+                                                            { label: 'En pause', value: statistics.on_hold, color: '#f1c40f' },
+                                                            { label: 'Abandonné', value: statistics.dropped, color: '#e74c3c' },
+                                                            { label: 'À voir', value: statistics.plan_to_watch, color: '#95a5a6' }
+                                                        ].map(stat => (
+                                                            <div key={stat.label}>
+                                                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 600, marginBottom: '2px' }}>
+                                                                    <span>{stat.label}</span>
+                                                                    <span>{stat.value.toLocaleString()}</span>
+                                                                </div>
+                                                                <div style={{ height: '8px', background: '#eee', borderRadius: '4px', overflow: 'hidden' }}>
+                                                                    <div style={{
+                                                                        height: '100%',
+                                                                        width: `${(stat.value / statistics.total) * 100}%`,
+                                                                        background: stat.color
+                                                                    }} />
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Score Distribution (if available) */}
+                                                {statistics.scores && (
+                                                    <div style={{ border: '2px solid #000', padding: '1rem', background: '#fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.1)' }}>
+                                                        <h4 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>NOTES DES MEMBRES</h4>
+                                                        <div style={{ display: 'flex', alignItems: 'flex-end', height: '150px', gap: '2px' }}>
+                                                            {statistics.scores.sort((a, b) => a.score - b.score).map((score) => (
+                                                                <div key={score.score} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                                                    <div style={{
+                                                                        width: '100%',
+                                                                        background: '#000',
+                                                                        height: `${score.percentage}%`,
+                                                                        minHeight: '2px', // Ensure visibility
+                                                                        position: 'relative',
+                                                                        transition: 'height 0.3s ease'
+                                                                    }} title={`${score.percentage}%`}></div>
+                                                                    <span style={{ fontSize: '0.7rem', fontWeight: 700, marginTop: '4px' }}>{score.score}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
 
                                 </div>
 

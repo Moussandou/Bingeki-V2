@@ -158,6 +158,20 @@ export const getWorkDetails = async (id: number, type: 'anime' | 'manga'): Promi
     }
 };
 
+export interface JikanVoiceActor {
+    person: {
+        mal_id: number;
+        url: string;
+        images: {
+            jpg: {
+                image_url: string;
+            };
+        };
+        name: string;
+    };
+    language: string;
+}
+
 export interface JikanCharacter {
     character: {
         mal_id: number;
@@ -171,6 +185,7 @@ export interface JikanCharacter {
     };
     role: string;
     favorites: number;
+    voice_actors: JikanVoiceActor[];
 }
 
 export const getWorkCharacters = async (id: number, type: 'anime' | 'manga') => {
@@ -268,5 +283,31 @@ export const getWorkThemes = async (id: number): Promise<JikanTheme> => {
     } catch (error) {
         console.error('API Error:', error);
         return { openings: [], endings: [] };
+    }
+};
+
+export interface JikanStatistics {
+    watching: number;
+    completed: number;
+    on_hold: number;
+    dropped: number;
+    plan_to_watch: number;
+    total: number;
+    scores: {
+        score: number;
+        percentage: number;
+        votes: number;
+    }[];
+}
+
+export const getWorkStatistics = async (id: number, type: 'anime' | 'manga') => {
+    try {
+        const response = await fetch(`${BASE_URL}/${type}/${id}/statistics`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        return data.data as JikanStatistics;
+    } catch (error) {
+        console.error(`API Error fetching ${type} ${id} statistics:`, error);
+        throw error;
     }
 };
