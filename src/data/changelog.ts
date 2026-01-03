@@ -8,6 +8,18 @@ export interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
     {
+        version: "v2.4",
+        date: "03 Janvier 2026",
+        title: "Profondeur de Données",
+        description: "Une immersion totale avec les détails du casting et les statistiques de la communauté.",
+        changes: [
+            "Casting Enrichi : Découvrez les Seiyuu (doubleurs) originaux sous chaque personnage.",
+            "Statistiques : Visualisez la popularité et la répartition des notes de l'œuvre.",
+            "Visualisation Brutaliste : Nouveaux graphiques pour les scores et le statut de visionnage.",
+            "Optimisation de la structure de la page Détails."
+        ]
+    },
+    {
         version: "v2.3",
         date: "03 Janvier 2026",
         title: "Discovery & Immersion",
