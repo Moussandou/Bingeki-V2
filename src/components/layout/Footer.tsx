@@ -101,9 +101,14 @@ export function Footer() {
                     <p style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.6, fontSize: '0.8rem', margin: 0 }}>
                         &copy; {new Date().getFullYear()} Bingeki Experience.
                     </p>
-                    <a href="/legal" style={{ color: '#000', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
-                        MENTIONS LÉGALES & RGPD
-                    </a>
+                    <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <a href="/changelog" style={{ color: '#000', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
+                            CHANGELOG
+                        </a>
+                        <a href="/legal" style={{ color: '#000', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
+                            MENTIONS LÉGALES & RGPD
+                        </a>
+                    </div>
                 </div>
             </div>
         </footer>

@@ -9,12 +9,31 @@ export interface JikanResult {
             large_image_url: string;
         }
     };
+    trailer?: {
+        youtube_id: string;
+        url: string;
+        embed_url: string;
+        images: {
+            image_url: string;
+            large_image_url: string;
+            maximum_image_url: string;
+        }
+    };
     chapters?: number | null; // API can return null
     episodes?: number | null;
     synopsis: string;
     type: string;
     status: string;
     score?: number | null;
+    studios?: { mal_id: number; type: string; name: string; url: string }[];
+    genres?: { mal_id: number; type: string; name: string; url: string }[];
+    rating?: string;
+    season?: string;
+    year?: number;
+    duration?: string;
+    rank?: number;
+    popularity?: number;
+    source?: string;
 }
 
 export const searchWorks = async (
@@ -136,5 +155,55 @@ export const getWorkDetails = async (id: number, type: 'anime' | 'manga'): Promi
     } catch (error) {
         console.error(`API Error fetching ${type} ${id}:`, error);
         throw error;
+    }
+};
+
+export interface JikanCharacter {
+    character: {
+        mal_id: number;
+        url: string;
+        images: {
+            jpg: {
+                image_url: string;
+            };
+        };
+        name: string;
+    };
+    role: string;
+    favorites: number;
+}
+
+export const getWorkCharacters = async (id: number, type: 'anime' | 'manga') => {
+    try {
+        const response = await fetch(`${BASE_URL}/${type}/${id}/characters`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        // Return top 10 characters to keep UI clean
+        return (data.data as JikanCharacter[]).slice(0, 10);
+    } catch (error) {
+        console.error('API Error:', error);
+        return [];
+    }
+};
+
+export interface JikanRelation {
+    relation: string;
+    entry: {
+        mal_id: number;
+        type: string;
+        name: string;
+        url: string;
+    }[];
+}
+
+export const getWorkRelations = async (id: number, type: 'anime' | 'manga') => {
+    try {
+        const response = await fetch(`${BASE_URL}/${type}/${id}/relations`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        return data.data as JikanRelation[];
+    } catch (error) {
+        console.error('API Error:', error);
+        return [];
     }
 };

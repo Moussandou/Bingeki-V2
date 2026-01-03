@@ -31,6 +31,7 @@ const Legal = lazy(() => import('@/pages/Legal'));
 const Challenges = lazy(() => import('@/pages/Challenges'));
 const Feedback = lazy(() => import('@/pages/Feedback'));
 const FeedbackList = lazy(() => import('@/pages/FeedbackList'));
+const Changelog = lazy(() => import('@/pages/Changelog'));
 
 function App() {
   const { setUser, setLoading, user } = useAuthStore();
@@ -148,6 +149,7 @@ function App() {
                 <FeedbackList />
               </Suspense>
             } />
+            <Route path="/changelog" element={<Changelog />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/library" element={<Library />} />

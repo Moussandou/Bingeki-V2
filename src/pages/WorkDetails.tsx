@@ -3,7 +3,7 @@ import { Layout } from '@/components/layout/Layout';
 import { useLibraryStore } from '@/store/libraryStore';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal'; // Import Modal
-import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff, Reply } from 'lucide-react';
+import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff, Reply, Video, Calendar, BarChart } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { statusToFrench } from '@/utils/statusTranslation';
 import { useGamificationStore } from '@/store/gamificationStore';
@@ -17,7 +17,7 @@ import type { CommentWithReplies } from '@/types/comment';
 import logoCrunchyroll from '@/assets/logo_crunchyroll.png';
 import logoADN from '@/assets/logo_adn.png';
 
-import { getWorkDetails } from '@/services/animeApi';
+import { getWorkDetails, getWorkCharacters, getWorkRelations, type JikanCharacter, type JikanRelation } from '@/services/animeApi';
 import { handleProgressUpdateWithXP } from '@/utils/progressUtils';
 import styles from './WorkDetails.module.css';
 
@@ -229,7 +229,23 @@ export default function WorkDetails() {
     const [isFetchingDetails, setIsFetchingDetails] = useState(false);
 
     const libraryWork = getWork(Number(id));
-    const work = libraryWork || fetchedWork; // Merged work object for display consistency
+
+    // Merge library work with fetched details to get the best of both worlds (user progress + rich API data)
+    const work = libraryWork ? {
+        ...libraryWork,
+        ...(fetchedWork ? {
+            trailer: fetchedWork.trailer,
+            studios: fetchedWork.studios,
+            genres: fetchedWork.genres,
+            season: fetchedWork.season,
+            year: fetchedWork.year,
+            rank: fetchedWork.rank,
+            popularity: fetchedWork.popularity,
+            duration: fetchedWork.duration,
+            ratingString: fetchedWork.ratingString,
+            source: fetchedWork.source
+        } : {})
+    } : fetchedWork;
 
     const [isEditing, setIsEditing] = useState(false);
     const [progress, setProgress] = useState(libraryWork?.currentChapter || 0); // Use libraryWork for initial progress
@@ -257,10 +273,15 @@ export default function WorkDetails() {
     // Friends reading this
     const [friendsReading, setFriendsReading] = useState<{ count: number; friends: UserProfile[] }>({ count: 0, friends: [] });
 
+    // New Data: Characters & Relations
+    const [characters, setCharacters] = useState<JikanCharacter[]>([]);
+    const [relations, setRelations] = useState<JikanRelation[]>([]);
+
 
     // Initial Fetch for non-library items
     useEffect(() => {
-        if (!libraryWork && id && !fetchedWork && !isFetchingDetails) {
+        // Fetch details if we don't have them in state (fetchedWork), even if we have the library work (which might be stale/minimal)
+        if (id && !fetchedWork && !isFetchingDetails) {
             setIsFetchingDetails(true);
             let typeToFetch: 'anime' | 'manga' = 'anime';
             if (typeParam) {
@@ -282,11 +303,21 @@ export default function WorkDetails() {
                     totalChapters: res.chapters || res.episodes || 0,
                     status: res.status ? res.status.toLowerCase().replace(/ /g, '_') : 'unknown',
                     score: res.score,
-                    // Default library fields to null/0
                     currentChapter: 0,
                     rating: 0,
                     notes: '',
-                    isPublic: true // Flag to indicate this is a public/fetched work
+                    isPublic: true,
+                    // New Fields
+                    trailer: res.trailer,
+                    studios: res.studios || [],
+                    genres: res.genres || [],
+                    season: res.season,
+                    year: res.year,
+                    rank: res.rank,
+                    popularity: res.popularity,
+                    duration: res.duration,
+                    ratingString: res.rating,
+                    source: res.source
                 };
                 setFetchedWork(mapped);
                 setIsFetchingDetails(false);
@@ -296,6 +327,15 @@ export default function WorkDetails() {
             });
         }
     }, [id, libraryWork, fetchedWork, typeParam]);
+
+    // Fetch Characters & Relations
+    useEffect(() => {
+        if (id && work) {
+            const type = work.type === 'manga' ? 'manga' : 'anime';
+            getWorkCharacters(Number(id), type).then(setCharacters);
+            getWorkRelations(Number(id), type).then(setRelations);
+        }
+    }, [id, work?.type]);
 
 
 
@@ -719,6 +759,189 @@ export default function WorkDetails() {
                                         </button>
                                     </div>
                                 )}
+
+                                {/* DETAILED INFO & TRAILER SECTION */}
+                                <div style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+                                    {/* Info Grid */}
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem' }}>
+                                        {work.season && (
+                                            <div style={{
+                                                background: '#fff',
+                                                padding: '0.75rem',
+                                                border: '2px solid #000',
+                                                boxShadow: '4px 4px 0 rgba(0,0,0,1)'
+                                            }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', opacity: 0.8, fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase' }}>
+                                                    <Calendar size={14} strokeWidth={3} /> SAISON
+                                                </div>
+                                                <div style={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '1rem', fontFamily: 'var(--font-heading)' }}>{work.season} {work.year}</div>
+                                            </div>
+                                        )}
+                                        {work.studios && work.studios.length > 0 && (
+                                            <div style={{
+                                                background: '#fff',
+                                                padding: '0.75rem',
+                                                border: '2px solid #000',
+                                                boxShadow: '4px 4px 0 rgba(0,0,0,1)'
+                                            }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', opacity: 0.8, fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase' }}>
+                                                    <Video size={14} strokeWidth={3} /> STUDIO
+                                                </div>
+                                                <div style={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '1rem', fontFamily: 'var(--font-heading)' }}>{work.studios[0].name}</div>
+                                            </div>
+                                        )}
+                                        {work.rank && (
+                                            <div style={{
+                                                background: '#fff',
+                                                padding: '0.75rem',
+                                                border: '2px solid #000',
+                                                boxShadow: '4px 4px 0 rgba(0,0,0,1)'
+                                            }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', opacity: 0.8, fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase' }}>
+                                                    <Trophy size={14} strokeWidth={3} /> RANG
+                                                </div>
+                                                <div style={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '1rem', fontFamily: 'var(--font-heading)' }}>#{work.rank}</div>
+                                            </div>
+                                        )}
+                                        {work.popularity && (
+                                            <div style={{
+                                                background: '#fff',
+                                                padding: '0.75rem',
+                                                border: '2px solid #000',
+                                                boxShadow: '4px 4px 0 rgba(0,0,0,1)'
+                                            }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', opacity: 0.8, fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase' }}>
+                                                    <BarChart size={14} strokeWidth={3} /> POPULARITÉ
+                                                </div>
+                                                <div style={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '1rem', fontFamily: 'var(--font-heading)' }}>#{work.popularity}</div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Trailer */}
+                                    {work.trailer && work.trailer.embed_url && (
+                                        <div style={{ width: '100%', marginTop: '1rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                                                <Video size={20} strokeWidth={2.5} />
+                                                <h3 className={styles.synopsisTitle} style={{ marginBottom: 0 }}>BANDE-ANNONCE</h3>
+                                            </div>
+                                            <div style={{
+                                                position: 'relative',
+                                                overflow: 'hidden',
+                                                paddingBottom: '56.25%',
+                                                height: 0,
+                                                background: '#000',
+                                                border: '4px solid #000',
+                                                boxShadow: '8px 8px 0 rgba(0,0,0,1)'
+                                            }}>
+                                                <iframe
+                                                    src={work.trailer.embed_url}
+                                                    title="Trailer"
+                                                    frameBorder="0"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowFullScreen
+                                                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* CASTING SECTION */}
+                                    {characters.length > 0 && (
+                                        <div style={{ marginTop: '1rem' }}>
+                                            <h3 className={styles.synopsisTitle} style={{ marginBottom: '1rem' }}>CASTING</h3>
+                                            <div className="scrollbar-hide" style={{
+                                                display: 'flex',
+                                                gap: '1rem',
+                                                overflowX: 'auto',
+                                                paddingBottom: '1rem',
+                                                scrollSnapType: 'x mandatory'
+                                            }}>
+                                                {characters.filter(c => c.character.images?.jpg?.image_url).map((c) => (
+                                                    <div key={c.character.mal_id} style={{
+                                                        flex: '0 0 100px',
+                                                        scrollSnapAlign: 'start',
+                                                        position: 'relative'
+                                                    }}>
+                                                        <div style={{
+                                                            width: '100px',
+                                                            height: '100px',
+                                                            borderRadius: '50%',
+                                                            border: '3px solid #000',
+                                                            overflow: 'hidden',
+                                                            marginBottom: '0.5rem',
+                                                            background: '#f0f0f0'
+                                                        }}>
+                                                            <img
+                                                                src={c.character.images.jpg.image_url}
+                                                                alt={c.character.name}
+                                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                            />
+                                                        </div>
+                                                        <div style={{ fontSize: '0.8rem', fontWeight: 800, textAlign: 'center', lineHeight: 1.2 }}>
+                                                            {c.character.name}
+                                                        </div>
+                                                        <div style={{ fontSize: '0.7rem', opacity: 0.6, textAlign: 'center', fontWeight: 600, marginTop: '2px' }}>
+                                                            {c.role}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* RELATIONS SECTION */}
+                                    {relations.length > 0 && (
+                                        <div style={{ marginTop: '1rem' }}>
+                                            <h3 className={styles.synopsisTitle} style={{ marginBottom: '1rem' }}>UNIVERS ÉTENDU</h3>
+                                            <div style={{ display: 'grid', gap: '0.75rem' }}>
+                                                {relations.map((rel, idx) => (
+                                                    <div key={idx} style={{
+                                                        background: '#fff',
+                                                        border: '2px solid #000',
+                                                        padding: '1rem',
+                                                        boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
+                                                    }}>
+                                                        <div style={{ fontWeight: 900, textTransform: 'uppercase', fontSize: '0.8rem', marginBottom: '0.5rem', opacity: 0.5 }}>
+                                                            {rel.relation}
+                                                        </div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                                            {rel.entry.map(e => (
+                                                                <a
+                                                                    key={e.mal_id}
+                                                                    href={`/work/${e.mal_id}?type=${e.type}`}
+                                                                    style={{
+                                                                        textDecoration: 'none',
+                                                                        color: '#000',
+                                                                        fontWeight: 700,
+                                                                        fontSize: '0.95rem',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        gap: '0.5rem'
+                                                                    }}
+                                                                    onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                                                                    onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+                                                                >
+                                                                    • {e.name}
+                                                                    <span style={{
+                                                                        fontSize: '0.7rem',
+                                                                        background: '#000',
+                                                                        color: '#fff',
+                                                                        padding: '2px 6px',
+                                                                        borderRadius: '4px'
+                                                                    }}>
+                                                                        {e.type.toUpperCase()}
+                                                                    </span>
+                                                                </a>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
 
                                 <div style={{ marginBottom: '2rem' }}>
                                     {!libraryWork ? (
