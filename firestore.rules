@@ -64,7 +64,7 @@ service cloud.firestore {
     // COMMENTS
     match /comments/{commentId} {
       allow create: if isAuthenticated();
-      allow read: if isAuthenticated();
+      allow read: if true;
     }
 
     // CHALLENGES
