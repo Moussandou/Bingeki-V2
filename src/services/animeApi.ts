@@ -253,3 +253,20 @@ export const getWorkPictures = async (id: number, type: 'anime' | 'manga') => {
         return [];
     }
 };
+
+export interface JikanTheme {
+    openings: string[];
+    endings: string[];
+}
+
+export const getWorkThemes = async (id: number): Promise<JikanTheme> => {
+    try {
+        const response = await fetch(`${BASE_URL}/anime/${id}/themes`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        return data.data as JikanTheme;
+    } catch (error) {
+        console.error('API Error:', error);
+        return { openings: [], endings: [] };
+    }
+};

@@ -16,7 +16,8 @@ export const changelogData: ChangelogEntry[] = [
             "Nouvel onglet 'Galerie' : Explorez les artworks officiels en haute qualité.",
             "Section 'Vous Aimerez Aussi' : Recommandations basées sur les votes de la communauté.",
             "Intégration d'une modale 'Click-to-Zoom' pour les images.",
-            "Amélioration UX : Stop de l'autoplay vidéo et optimisation des grilles."
+            "Amélioration UX : Stop de l'autoplay vidéo et optimisation des grilles.",
+            "Nouvel onglet 'MUSIQUES' : Écoutez tous les openings et endings avec recherche YouTube intégrée."
         ]
     },
     {
