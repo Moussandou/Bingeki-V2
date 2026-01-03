@@ -44,7 +44,7 @@
 }
 
 .heroContent {
-    color: #fff;
+    color: var(--color-surface);
     max-width: 800px;
     z-index: 10;
 }
@@ -106,7 +106,7 @@
         height: 150px;
         margin: 0;
         border-width: 2px;
-        box-shadow: 4px 4px 0 #000;
+        box-shadow: var(--shadow-brutal);
         flex-shrink: 0;
         /* Keep size fixed */
     }

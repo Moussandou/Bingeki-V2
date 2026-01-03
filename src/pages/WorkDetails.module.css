@@ -14,8 +14,8 @@
 }
 
 .detailsPanel {
-    background: #fff;
-    color: #000;
+    background: var(--color-surface);
+    color: var(--color-text);
     padding: 1.5rem;
     /* Reduced padding */
     display: flex;
@@ -30,7 +30,7 @@
     margin: 0 auto;
     /* Center the panel */
     box-sizing: border-box;
-    border: 3px solid #000;
+    border: 3px solid var(--color-border);
     box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
 }
 
@@ -44,8 +44,8 @@
 }
 
 .coverImageWrapper {
-    border: 3px solid #000;
-    box-shadow: 6px 6px 0 #000;
+    border: 3px solid var(--color-border);
+    box-shadow: var(--shadow-brutal);
     position: relative;
     width: 100%;
 }
@@ -59,8 +59,8 @@
     position: absolute;
     top: 10px;
     left: -10px;
-    background: #000;
-    color: #fff;
+    background: var(--color-text);
+    color: var(--color-surface);
     padding: 0.25rem 0.75rem;
     transform: rotate(-5deg);
     font-weight: 900;
@@ -99,7 +99,7 @@
     font-weight: 900;
     font-size: 0.9rem;
     background: transparent;
-    color: #000;
+    color: var(--color-text);
     border: none;
     cursor: pointer;
     border-bottom: 4px solid transparent;
@@ -110,8 +110,8 @@
 }
 
 .activeTab {
-    background: #000;
-    color: #fff;
+    background: var(--color-text);
+    color: var(--color-surface);
     border-bottom: 4px solid #000;
 }
 
@@ -123,7 +123,7 @@
     margin-bottom: 1rem;
     text-transform: uppercase;
     text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
-    color: #000;
+    color: var(--color-text);
     word-break: break-word;
     overflow-wrap: anywhere;
     /* Prevent overflow */
@@ -136,7 +136,7 @@
     display: flex;
     gap: 0.75rem;
     margin-bottom: 2rem;
-    color: #000;
+    color: var(--color-text);
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
@@ -148,9 +148,9 @@
     align-items: center;
     gap: 0.5rem;
     font-weight: 600;
-    border: 2px solid #000;
+    border: 2px solid var(--color-border);
     padding: 0.4rem 0.8rem;
-    background: #fff;
+    background: var(--color-surface);
     font-size: 0.9rem;
 }
 
@@ -158,14 +158,14 @@
     font-family: var(--font-heading);
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
-    color: #000;
+    color: var(--color-text);
 }
 
 .synopsisText {
     font-size: 0.95rem;
     line-height: 1.6;
     opacity: 0.8;
-    color: #000;
+    color: var(--color-text);
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -183,11 +183,11 @@
     font-size: 1.5rem;
     font-weight: 900;
     width: 80px;
-    border: 2px solid #000;
+    border: 2px solid var(--color-border);
     padding: 0.5rem;
     text-align: center;
-    color: #000;
-    background: #fff;
+    color: var(--color-text);
+    background: var(--color-surface);
 }
 
 .progressControls {
@@ -217,9 +217,9 @@
 
 .statusButton {
     padding: 0.5rem 0.75rem;
-    border: 2px solid #000;
-    background: #fff;
-    color: #000;
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
     font-weight: 900;
     text-transform: uppercase;
     cursor: pointer;
@@ -231,8 +231,8 @@
 }
 
 .statusButtonActive {
-    background: #000;
-    color: #fff;
+    background: var(--color-text);
+    color: var(--color-surface);
     transform: translateY(-2px);
     box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
 }
@@ -248,12 +248,12 @@
 .notesArea {
     width: 100%;
     min-height: 150px;
-    border: 2px solid #000;
+    border: 2px solid var(--color-border);
     padding: 1rem;
     font-family: inherit;
     font-size: 1rem;
     resize: vertical;
-    background: #f9f9f9;
+    background: var(--color-surface-hover);
     margin-bottom: 2rem;
 }
 
@@ -268,9 +268,9 @@
 }
 
 .infoCard {
-    background: #fff;
+    background: var(--color-surface);
     padding: 0.75rem;
-    border: 2px solid #000;
+    border: 2px solid var(--color-border);
     box-shadow: 3px 3px 0 rgba(0, 0, 0, 1);
 }
 
@@ -331,9 +331,9 @@
 }
 
 .reviewCard {
-    background: #fff;
-    border: 3px solid #000;
-    box-shadow: 4px 4px 0 #000;
+    background: var(--color-surface);
+    border: 3px solid var(--color-border);
+    box-shadow: var(--shadow-brutal);
     padding: 1.25rem;
     display: flex;
     flex-direction: column;
@@ -377,7 +377,7 @@
     }
 
     .coverImageWrapper {
-        border: 4px solid #000;
+        border: 4px solid var(--color-border);
         box-shadow: 8px 8px 0 #000;
     }
 
@@ -456,6 +456,6 @@
 
     .reviewCard {
         padding: 1.5rem;
-        box-shadow: 6px 6px 0 #000;
+        box-shadow: var(--shadow-brutal);
     }
 }

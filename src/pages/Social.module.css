@@ -32,8 +32,8 @@
 
 /* Desktop Leaderboard */
 .leaderboardPanel {
-    background: #fff;
-    border: 2px solid #000;
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
     box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
 }
 
@@ -57,7 +57,7 @@
     height: 45px;
     border-radius: 50%;
     overflow: hidden;
-    border: 2px solid #000;
+    border: 2px solid var(--color-border);
     flex-shrink: 0;
 }
 
@@ -78,8 +78,8 @@
 .playerBadge {
     font-size: 0.65rem;
     padding: 0.15rem 0.4rem;
-    background: #000;
-    color: #fff;
+    background: var(--color-text);
+    color: var(--color-surface);
     border-radius: 3px;
     font-weight: 700;
 }
