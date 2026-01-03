@@ -5,7 +5,7 @@ import { Layout } from '@/components/layout/Layout';
 import styles from '@/styles/Opening.module.css';
 import { Card } from '@/components/ui/Card';
 import { HunterLicenseCard } from '@/components/HunterLicenseCard';
-import { Search, Check, Users, MessageCircle, Heart, TrendingUp, ChevronUp } from 'lucide-react';
+import { Search, Check, Users, MessageCircle, Heart, TrendingUp, ChevronUp, History as HistoryIcon } from 'lucide-react';
 
 // Counter Component for Animated Numbers
 function Counter({ from, to }: { from: number; to: number }) {
@@ -456,6 +456,81 @@ export default function Opening() {
                                         <button style={{ background: '#000', color: '#fff', border: 'none', padding: '0.5rem 1rem', fontWeight: 700, cursor: 'pointer' }}>VOIR LA DISCUSSION</button>
                                     </motion.div>
                                 )}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* SECTION 5: CHANGELOG / BUILDING IN PUBLIC */}
+                <section className={styles.featureSection}>
+                    <div className={styles.textContent}>
+                        <div className={styles.sfx} style={{ top: -30, right: 20, fontSize: '4rem', color: '#808080', opacity: 0.1, transform: 'rotate(-5deg)' }}>BETA</div>
+                        <h2 className={styles.sectionTitle}>WORK IN PROGRESS</h2>
+                        <div className={styles.sectionDescription}>
+                            <p>Bingeki est vivant. Il évolue.</p>
+                            <p style={{ marginTop: '1rem' }}>Je construis cette plateforme avec vous. Suivez chaque mise à jour, suggérez des fonctionnalités, et voyez vos idées prendre vie. </p>
+                        </div>
+                        <div style={{ marginTop: '2rem' }}>
+                            <Link to="/changelog">
+                                <button style={{
+                                    background: 'var(--color-primary)',
+                                    color: '#000',
+                                    border: 'none',
+                                    padding: '1rem 2rem',
+                                    fontSize: '1rem',
+                                    fontWeight: 900,
+                                    cursor: 'pointer',
+                                    clipPath: 'polygon(0 0, 100% 0, 95% 100%, 0% 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem'
+                                }}
+                                    className="hover:scale-105 transition-transform"
+                                >
+                                    <HistoryIcon size={20} />
+                                    VOIR LA ROADMAP
+                                </button>
+                            </Link>
+                        </div>
+                    </div>
+
+                    <div className={styles.visualContent}>
+                        <div className={styles.mockupContainer} style={{ width: '90%', height: 'auto', background: 'transparent', border: 'none', boxShadow: 'none' }}>
+                            <div style={{
+                                borderLeft: '4px dashed #000',
+                                paddingLeft: '2rem',
+                                position: 'relative',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '2rem'
+                            }}>
+                                {/* Timeline Item 1 */}
+                                <div style={{ position: 'relative' }}>
+                                    <div style={{
+                                        position: 'absolute', left: '-2.6rem', top: 0, width: '20px', height: '20px', background: 'var(--color-primary)', borderRadius: '50%', border: '4px solid #000'
+                                    }} />
+                                    <div style={{ background: '#fff', padding: '1.5rem', borderRadius: '4px', border: '3px solid #000', boxShadow: '4px 4px 0 rgba(0,0,0,0.1)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                                            <span style={{ fontWeight: 900, fontSize: '1.1rem' }}>Feedback & Changelog 2.0</span>
+                                            <span style={{ fontSize: '0.8rem', background: 'var(--color-primary)', color: '#000', padding: '0.1rem 0.5rem', fontWeight: 800, border: '1px solid #000' }}>V1.2.0</span>
+                                        </div>
+                                        <p style={{ fontSize: '0.9rem', color: '#555' }}>Refonte complète du système de feedback et de l'affichage des mises à jour.</p>
+                                    </div>
+                                </div>
+
+                                {/* Timeline Item 2 */}
+                                <div style={{ position: 'relative', opacity: 0.7 }}>
+                                    <div style={{
+                                        position: 'absolute', left: '-2.6rem', top: 0, width: '20px', height: '20px', background: '#ccc', borderRadius: '50%', border: '4px solid #000'
+                                    }} />
+                                    <div style={{ background: '#f4f4f4', padding: '1.5rem', borderRadius: '4px', border: '3px solid #000' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                                            <span style={{ fontWeight: 900, fontSize: '1.1rem' }}>Système de "Guildes"</span>
+                                            <span style={{ fontSize: '0.8rem', border: '1px solid #000', color: '#000', padding: '0.1rem 0.5rem', fontWeight: 800 }}>SOON</span>
+                                        </div>
+                                        <p style={{ fontSize: '0.9rem', color: '#555' }}>Créez votre propre clan, participez à des guerres de guildes et dominez le classement.</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
