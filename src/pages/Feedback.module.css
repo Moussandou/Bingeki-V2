@@ -1,0 +1,295 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+    min-height: 80vh;
+}
+
+.title {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 5vw, 3rem);
+    text-align: center;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+.subtitle {
+    text-align: center;
+    margin-bottom: 3rem;
+    opacity: 0.7;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+.formCard {
+    background: #fff;
+    border: 3px solid #000;
+    box-shadow: 8px 8px 0 #000;
+    padding: clamp(1.5rem, 5vw, 3rem);
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.cornerAccent {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #000;
+}
+
+.cornerTL {
+    top: 0;
+    left: 0;
+}
+
+.cornerTR {
+    top: 0;
+    right: 0;
+}
+
+.cornerBL {
+    bottom: 0;
+    left: 0;
+}
+
+.cornerBR {
+    bottom: 0;
+    right: 0;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.sectionLabel {
+    display: block;
+    font-weight: 900;
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+/* Rating Section */
+.ratingContainer {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.starButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.starButton:hover {
+    transform: scale(1.2);
+}
+
+.ratingScore {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-weight: 800;
+    font-size: 1.5rem;
+    font-family: var(--font-heading);
+    min-height: 2rem;
+}
+
+/* Categories */
+.categoryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.categoryButton {
+    padding: 1.5rem;
+    border: 2px solid #000;
+    background: #fff;
+    color: #000;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.categoryButton:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.2);
+}
+
+.categoryActive {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 transparent;
+}
+
+.catBug.categoryActive {
+    background: #FF4444;
+    color: #fff;
+    border-color: #000;
+}
+
+.catIdea.categoryActive {
+    background: #3B82F6;
+    color: #fff;
+    border-color: #000;
+}
+
+.catGeneral.categoryActive {
+    background: #10B981;
+    color: #fff;
+    border-color: #000;
+}
+
+/* Message Input */
+.textarea {
+    width: 100%;
+    min-height: 180px;
+    padding: 1.5rem;
+    border: 2px solid #000;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    background: #f8f8f8;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.textarea:focus {
+    outline: none;
+    border-color: #000;
+    background: #fff;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Email Input */
+.inputWrapper {
+    position: relative;
+}
+
+.inputIcon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 2px solid #000;
+    font-size: 1rem;
+    font-family: inherit;
+    background: #f8f8f8;
+}
+
+.input:focus {
+    outline: none;
+    background: #fff;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Submit Button */
+.submitButton {
+    align-self: center;
+    min-width: 250px;
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Success State */
+.successContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+    padding: 2rem;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.successIcon {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    animation: bounce 2s infinite;
+}
+
+.successTitle {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.successMessage {
+    font-size: 1.2rem;
+    margin-bottom: 2.5rem;
+    opacity: 0.7;
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-20px);
+    }
+
+    60% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .formCard {
+        padding: 1.5rem;
+        box-shadow: 4px 4px 0 #000;
+    }
+
+    .ratingContainer {
+        gap: 0.25rem;
+    }
+}

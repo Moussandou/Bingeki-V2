@@ -48,7 +48,7 @@
     right: -10px;
     font-size: 1.5rem;
     transform: rotate(-5deg);
-    color: #fff;
+    color: var(--color-surface);
     padding: 2px 8px;
     /* Basic padding if class doesn't handle it */
 }

@@ -21,8 +21,8 @@
     width: 200px;
     height: 200px;
     border-radius: 50%;
-    border: 4px solid #000;
-    box-shadow: 6px 6px 0 #000;
+    border: 4px solid var(--color-border);
+    box-shadow: var(--shadow-brutal);
     overflow: hidden;
     flex-shrink: 0;
 }
@@ -65,16 +65,16 @@
     align-items: center;
     gap: 0.5rem;
     font-weight: 700;
-    border: 2px solid #000;
+    border: 2px solid var(--color-border);
     padding: 0.5rem 1rem;
-    background: #fff;
+    background: var(--color-surface);
     font-size: 0.9rem;
 }
 
 .aboutSection {
-    background: #fff;
-    border: 3px solid #000;
-    box-shadow: 6px 6px 0 #000;
+    background: var(--color-surface);
+    border: 3px solid var(--color-border);
+    box-shadow: var(--shadow-brutal);
     padding: 1.5rem;
     margin-bottom: 2rem;
     text-align: left;
@@ -107,16 +107,16 @@
 .infoTag {
     display: flex;
     flex-direction: column;
-    background: #fff;
-    border: 2px solid #000;
-    box-shadow: 3px 3px 0 #000;
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    box-shadow: var(--shadow-brutal-sm);
     min-width: 120px;
     max-width: 100%;
 }
 
 .infoTagLabel {
-    background: #000;
-    color: #fff;
+    background: var(--color-text);
+    color: var(--color-surface);
     font-weight: 800;
     padding: 0.4rem 0.6rem;
     font-size: 0.7rem;
@@ -146,7 +146,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #000;
+    color: var(--color-text);
 }
 
 .biographyText {
@@ -159,8 +159,8 @@
 .sourceTag {
     margin-top: 1rem;
     padding: 0.5rem 0.75rem;
-    background: #f5f5f5;
-    border-left: 3px solid #000;
+    background: var(--color-background);
+    border-left: 3px solid var(--color-border);
     font-size: 0.8rem;
     font-style: italic;
     opacity: 0.7;
@@ -173,9 +173,9 @@
 }
 
 .card {
-    background: #fff;
-    border: 2px solid #000;
-    box-shadow: 4px 4px 0 #000;
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    box-shadow: var(--shadow-brutal);
     cursor: pointer;
     transition: transform 0.2s;
     overflow: hidden;
@@ -218,9 +218,9 @@
     display: flex;
     gap: 1rem;
     align-items: center;
-    background: #fff;
-    border: 3px solid #000;
-    box-shadow: 6px 6px 0 #000;
+    background: var(--color-surface);
+    border: 3px solid var(--color-border);
+    box-shadow: var(--shadow-brutal);
     padding: 1rem;
     cursor: pointer;
     transition: transform 0.2s;
@@ -234,7 +234,7 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    border: 2px solid #000;
+    border: 2px solid var(--color-border);
     object-fit: cover;
 }
 

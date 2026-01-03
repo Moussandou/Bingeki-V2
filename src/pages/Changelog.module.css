@@ -1,111 +1,160 @@
 .container {
-    padding: 2rem 1rem;
-    max-width: 800px;
+    padding: 2rem 1rem 6rem;
+    max-width: 900px;
     margin: 0 auto;
 }
 
 .header {
     text-align: center;
-    margin-bottom: 4rem;
+    margin-bottom: 3rem;
     position: relative;
+    padding-bottom: 2rem;
+    border-bottom: 4px solid #000;
 }
 
 .title {
-    font-size: 2.5rem;
-    /* Smaller for mobile default */
+    font-size: clamp(2.5rem, 6vw, 4rem);
     font-family: var(--font-heading);
     text-transform: uppercase;
     margin-bottom: 1rem;
     position: relative;
     display: inline-block;
-    word-break: break-word;
-    /* Prevent overflow on very narrow screens */
-}
-
-.titleUnderline {
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60%;
-    height: 4px;
-    background: #000;
+    line-height: 1;
+    text-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
 }
 
 .subtitle {
     opacity: 0.7;
     font-weight: 500;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
+/* New Stats Section */
+.statsContainer {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 4rem;
+    flex-wrap: wrap;
+}
+
+.statCard {
+    background: #000;
+    color: #fff;
+    padding: 1rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: rotate(-2deg);
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.statCard:hover {
+    transform: rotate(0deg) scale(1.05);
+}
+
+.statValue {
+    font-size: 2.5rem;
+    font-family: var(--font-heading);
+    line-height: 1;
+}
+
+.statLabel {
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+/* Timeline */
 .timelineContainer {
     position: relative;
-    padding-left: 0;
-    /* Reset default padding */
+    padding-left: 1rem;
 }
 
 .timelineLine {
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 19px;
-    /* Matches circle center */
+    left: 28px;
+    /* Center of the node */
     width: 4px;
-    background: #000;
+    background: repeating-linear-gradient(to bottom,
+            #000,
+            #000 10px,
+            transparent 10px,
+            transparent 20px);
+    z-index: 0;
 }
 
 .timelineEntry {
     margin-bottom: 4rem;
     position: relative;
-    padding-left: 3.5rem;
-    /* Space for the line/circle */
+    padding-left: 4.5rem;
 }
 
 .timelineNode {
     position: absolute;
-    left: 0;
+    left: 8px;
+    /* Adjust to center on line */
     top: 0;
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     background: #fff;
     border: 4px solid #000;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 10;
+    box-shadow: 2px 2px 0 #000;
 }
 
+/* Content Card */
 .contentCard {
     background: #fff;
     border: 3px solid #000;
-    box-shadow: 6px 6px 0 rgba(0, 0, 0, 1);
-    padding: 1.5rem;
-    /* Reduced padding for mobile */
+    box-shadow: 8px 8px 0 #000;
+    padding: 2rem;
     position: relative;
+    transition: transform 0.2s ease;
+}
+
+.contentCard:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 10px 10px 0 #000;
+}
+
+.isNew {
+    border-color: #000;
+    box-shadow: 8px 8px 0 #FFD700;
+    /* Gold shadow for new */
 }
 
 .cardHeader {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    /* Align top for wrapping */
-    margin-bottom: 1rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    border-bottom: 2px solid #eee;
+    gap: 1rem;
     padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
 }
 
-.versionTag {
+.versionBadge {
     background: #000;
     color: #fff;
-    padding: 0.25rem 0.5rem;
+    padding: 0.5rem 1rem;
     font-weight: 900;
     font-family: var(--font-heading);
-    font-size: 1rem;
+    font-size: 1.2rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    transform: skew(-10deg);
 }
 
 .dateTag {
@@ -114,22 +163,23 @@
     gap: 0.5rem;
     font-weight: 700;
     opacity: 0.6;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    font-family: monospace;
 }
 
 .entryTitle {
     font-family: var(--font-heading);
     text-transform: uppercase;
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-    line-height: 1.1;
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    line-height: 1;
 }
 
 .entryDescription {
-    margin-bottom: 1.5rem;
-    line-height: 1.5;
+    margin-bottom: 2rem;
+    line-height: 1.6;
     opacity: 0.8;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
 }
 
 .changesList {
@@ -138,55 +188,77 @@
 }
 
 .changeItem {
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
     display: flex;
     align-items: flex-start;
-    gap: 0.75rem;
-    font-size: 0.9rem;
+    gap: 1rem;
+    font-size: 1rem;
+}
+
+.bulletPoint {
+    min-width: 24px;
+    height: 24px;
+    background: #000;
+    color: #fff;
+    border-radius: 50%;
+    /* Or stick to square for brutalism? Let's use circle for check */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    margin-top: 2px;
 }
 
 .endMarkerContainer {
     text-align: center;
-    margin-top: 2rem;
+    margin-top: 4rem;
 }
 
 .endMarker {
     display: inline-block;
     background: #000;
     color: #fff;
-    padding: 0.5rem 1rem;
+    padding: 1rem 3rem;
     font-weight: 900;
     font-family: var(--font-heading);
-    transform: rotate(-2deg);
-    font-size: 1rem;
+    transform: rotate(2deg);
+    font-size: 1.5rem;
+    border: 2px solid #fff;
+    /* contrast */
+    outline: 3px solid #000;
 }
 
-/* Tablet and up */
-@media (min-width: 768px) {
-    .title {
-        font-size: 3rem;
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem 1rem 4rem;
+    }
+
+    .timelineLine {
+        left: 20px;
+    }
+
+    .timelineEntry {
+        padding-left: 3.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .timelineNode {
+        left: 0;
     }
 
     .contentCard {
-        padding: 2rem;
-    }
-
-    .cardHeader {
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .versionTag {
-        font-size: 1.2rem;
-        padding: 0.25rem 0.75rem;
+        padding: 1.25rem;
+        box-shadow: 5px 5px 0 #000;
     }
 
     .entryTitle {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
     }
 
-    .endMarker {
-        padding: 0.5rem 2rem;
-        font-size: 1.2rem;
+    .versionBadge {
+        font-size: 1rem;
+        padding: 0.25rem 0.75rem;
     }
 }

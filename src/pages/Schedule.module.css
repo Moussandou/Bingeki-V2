@@ -34,14 +34,14 @@
 
 .dayButton {
     padding: 0.5rem 1rem;
-    border: 2px solid #000;
-    background: #fff;
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
     font-weight: 700;
     font-family: var(--font-heading);
     cursor: pointer;
     text-transform: uppercase;
     transition: all 0.2s;
-    box-shadow: 3px 3px 0 #000;
+    box-shadow: var(--shadow-brutal-sm);
     flex-shrink: 0;
     scroll-snap-align: start;
     font-size: 0.9rem;
@@ -49,12 +49,12 @@
 
 .dayButton:hover {
     transform: translate(-1px, -1px);
-    box-shadow: 4px 4px 0 #000;
+    box-shadow: var(--shadow-brutal);
 }
 
 .dayButton.active {
     background: var(--color-primary);
-    color: #fff;
+    color: var(--color-surface);
     transform: translate(1px, 1px);
     box-shadow: 1px 1px 0 #000;
 }
@@ -67,9 +67,9 @@
 }
 
 .card {
-    border: 2px solid #000;
-    background: #fff;
-    box-shadow: 4px 4px 0 #000;
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-brutal);
     transition: transform 0.2s;
     cursor: pointer;
     display: flex;
@@ -136,11 +136,11 @@
     .dayButton {
         padding: 0.75rem 1.5rem;
         font-size: 1rem;
-        box-shadow: 4px 4px 0 #000;
+        box-shadow: var(--shadow-brutal);
     }
 
     .card {
-        box-shadow: 6px 6px 0 #000;
+        box-shadow: var(--shadow-brutal);
     }
 
     .grid {

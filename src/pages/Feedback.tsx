@@ -6,6 +6,7 @@ import { useToast } from '@/context/ToastContext';
 import { submitFeedback } from '@/firebase/firestore';
 import { Star, Send, Bug, Lightbulb, MessageSquare, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import styles from './Feedback.module.css';
 
 export default function Feedback() {
     const { user } = useAuthStore();
@@ -68,25 +69,12 @@ export default function Feedback() {
     if (isSuccess) {
         return (
             <Layout>
-                <div className="container" style={{
-                    maxWidth: '600px',
-                    textAlign: 'center',
-                    paddingTop: '4rem',
-                    minHeight: '60vh',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <div style={{
-                        fontSize: '4rem',
-                        marginBottom: '1rem',
-                        animation: 'bounce 1s infinite'
-                    }}>
+                <div className={styles.successContainer}>
+                    <div className={styles.successIcon}>
                         💌
                     </div>
-                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '1rem' }}>MERCI !</h1>
-                    <p style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>
+                    <h1 className={styles.successTitle}>MERCI !</h1>
+                    <p className={styles.successMessage}>
                         Votre avis a bien été reçu. C'est grâce à vous que Bingeki s'améliore !
                     </p>
                     <Button onClick={() => navigate('/')}>Retour à l'accueil</Button>
@@ -97,164 +85,107 @@ export default function Feedback() {
 
     return (
         <Layout>
-            <div className="container" style={{ maxWidth: '800px', paddingTop: '1.5rem', paddingBottom: '4rem', paddingLeft: '1rem', paddingRight: '1rem', boxSizing: 'border-box' }}>
-                <h1 style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 'clamp(1.5rem, 5vw, 2.5rem)',
-                    marginBottom: '0.5rem',
-                    textAlign: 'center'
-                }}>
+            <div className={styles.container}>
+                <h1 className={styles.title}>
                     AIDEZ-NOUS À PROGRESSER
                 </h1>
-                <p style={{ textAlign: 'center', marginBottom: '2rem', opacity: 0.7, maxWidth: '600px', margin: '0 auto 2rem auto', fontSize: 'clamp(0.9rem, 2.5vw, 1rem)' }}>
+                <p className={styles.subtitle}>
                     Bug trouvé ? Idée de génie ? Ou juste envie de dire bonjour ?<br />
                     Votre avis compte énormément pour l'évolution de la plateforme.
                 </p>
 
-                <div style={{
-                    background: '#fff',
-                    border: '2px solid #000',
-                    boxShadow: '6px 6px 0 #000',
-                    padding: 'clamp(1rem, 4vw, 2rem)',
-                    position: 'relative',
-                    maxWidth: '100%',
-                    boxSizing: 'border-box',
-                    overflow: 'hidden'
-                }}>
+                <div className={styles.formCard}>
                     {/* Corner accents */}
-                    <div style={{ position: 'absolute', top: -6, left: -6, width: 12, height: 12, background: '#000' }} />
-                    <div style={{ position: 'absolute', top: -6, right: -6, width: 12, height: 12, background: '#000' }} />
-                    <div style={{ position: 'absolute', bottom: -6, left: -6, width: 12, height: 12, background: '#000' }} />
-                    <div style={{ position: 'absolute', bottom: -6, right: -6, width: 12, height: 12, background: '#000' }} />
+                    <div className={`${styles.cornerAccent} ${styles.cornerTL}`} />
+                    <div className={`${styles.cornerAccent} ${styles.cornerTR}`} />
+                    <div className={`${styles.cornerAccent} ${styles.cornerBL}`} />
+                    <div className={`${styles.cornerAccent} ${styles.cornerBR}`} />
 
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                    <form onSubmit={handleSubmit} className={styles.form}>
 
                         {/* Rating */}
                         <div style={{ textAlign: 'center' }}>
-                            <label style={{ display: 'block', fontWeight: 900, marginBottom: '1rem', textTransform: 'uppercase' }}>
-                                Votre Note Global
+                            <label className={styles.sectionLabel}>
+                                Votre Note Globale
                             </label>
-                            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.25rem', flexWrap: 'wrap' }}>
+                            <div className={styles.ratingContainer}>
                                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
                                     <button
                                         key={star}
                                         type="button"
                                         onClick={() => setRating(star)}
-                                        style={{
-                                            background: 'none',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            padding: '0.25rem',
-                                            opacity: rating >= star ? 1 : 0.3
-                                        }}
+                                        className={styles.starButton}
+                                        style={{ opacity: rating >= star ? 1 : 0.3 }}
                                     >
-                                        <Star fill={rating >= star ? '#000' : 'none'} color="#000" size={24} />
+                                        <Star fill={rating >= star ? '#000' : 'none'} color="#000" size={28} strokeWidth={2.5} />
                                     </button>
                                 ))}
                             </div>
-                            <div style={{ marginTop: '0.5rem', fontWeight: 700, fontSize: '1.2rem' }}>
-                                {rating > 0 ? `${rating}/10` : '-'}
+                            <div className={styles.ratingScore}>
+                                {rating > 0 ? `${rating}/10` : ''}
                             </div>
                         </div>
 
                         {/* Category */}
                         <div>
-                            <label style={{ display: 'block', fontWeight: 900, marginBottom: '1rem', textTransform: 'uppercase' }}>
+                            <label className={styles.sectionLabel}>
                                 C'est à propos de quoi ?
                             </label>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '0.75rem' }}>
+                            <div className={styles.categoryGrid}>
                                 <button
                                     type="button"
                                     onClick={() => setCategory('bug')}
-                                    style={{
-                                        padding: '1rem',
-                                        border: '2px solid #000',
-                                        background: category === 'bug' ? '#ef4444' : '#fff',
-                                        color: category === 'bug' ? '#fff' : '#000',
-                                        fontWeight: 800,
-                                        cursor: 'pointer',
-                                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem'
-                                    }}
+                                    className={`${styles.categoryButton} ${styles.catBug} ${category === 'bug' ? styles.categoryActive : ''}`}
                                 >
-                                    <Bug size={24} />
-                                    UN BUG
+                                    <Bug size={32} />
+                                    <span>UN BUG</span>
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setCategory('feature')}
-                                    style={{
-                                        padding: '1rem',
-                                        border: '2px solid #000',
-                                        background: category === 'feature' ? '#3b82f6' : '#fff',
-                                        color: category === 'feature' ? '#fff' : '#000',
-                                        fontWeight: 800,
-                                        cursor: 'pointer',
-                                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem'
-                                    }}
+                                    className={`${styles.categoryButton} ${styles.catIdea} ${category === 'feature' ? styles.categoryActive : ''}`}
                                 >
-                                    <Lightbulb size={24} />
-                                    UNE IDÉE
+                                    <Lightbulb size={32} />
+                                    <span>UNE IDÉE</span>
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setCategory('general')}
-                                    style={{
-                                        padding: '1rem',
-                                        border: '2px solid #000',
-                                        background: category === 'general' ? '#10b981' : '#fff',
-                                        color: category === 'general' ? '#fff' : '#000',
-                                        fontWeight: 800,
-                                        cursor: 'pointer',
-                                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem'
-                                    }}
+                                    className={`${styles.categoryButton} ${styles.catGeneral} ${category === 'general' ? styles.categoryActive : ''}`}
                                 >
-                                    <MessageSquare size={24} />
-                                    GÉNÉRAL
+                                    <MessageSquare size={32} />
+                                    <span>GÉNÉRAL</span>
                                 </button>
                             </div>
                         </div>
 
                         {/* Message */}
                         <div>
-                            <label style={{ display: 'block', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase' }}>
+                            <label className={styles.sectionLabel}>
                                 Votre Message
                             </label>
                             <textarea
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
-                                placeholder="Racontez-nous tout..."
-                                style={{
-                                    width: '100%',
-                                    minHeight: '150px',
-                                    padding: '1rem',
-                                    border: '2px solid #000',
-                                    fontSize: '1rem',
-                                    fontFamily: 'inherit',
-                                    resize: 'vertical',
-                                    background: '#f9f9f9'
-                                }}
+                                placeholder="Dites-nous tout..."
+                                className={styles.textarea}
                             />
                         </div>
 
                         {/* Guest Contact Info */}
                         {!user && (
                             <div>
-                                <label style={{ display: 'block', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase' }}>
+                                <label className={styles.sectionLabel}>
                                     Email (Optionnel)
                                 </label>
-                                <div style={{ position: 'relative' }}>
-                                    <Mail size={20} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
+                                <div className={styles.inputWrapper}>
+                                    <Mail className={styles.inputIcon} size={20} />
                                     <input
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="Pour vous recontacter si besoin..."
-                                        style={{
-                                            width: '100%',
-                                            padding: '1rem 1rem 1rem 3rem',
-                                            border: '2px solid #000',
-                                            fontSize: '1rem'
-                                        }}
+                                        className={styles.input}
                                     />
                                 </div>
                             </div>
@@ -264,7 +195,7 @@ export default function Feedback() {
                             type="submit"
                             variant="primary"
                             size="lg"
-                            style={{ alignSelf: 'center', minWidth: '200px' }}
+                            className={styles.submitButton}
                             disabled={isSubmitting}
                             icon={<Send size={20} />}
                         >
