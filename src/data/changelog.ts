@@ -8,6 +8,18 @@ export interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
     {
+        version: 'v2.8',
+        date: '03 Janvier 2026',
+        title: 'Showcase & Accessibilité',
+        description: 'Mise en avant des détails d\'œuvres et ouverture au public.',
+        changes: [
+            'Nouveau : Section "Tout Savoir" sur la Landing Page (Showcase Brutalist)',
+            'Accessibilité : Agenda et Changelog désormais accessibles aux invités',
+            'Nouveau : Page Crédits et mentions légales',
+            'UI : Harmonisation des visuels Jujutsu Kaisen sur le showcase'
+        ]
+    },
+    {
         version: 'v2.7',
         date: '03 Janvier 2026',
         title: 'Personnages et Seiyuu',
