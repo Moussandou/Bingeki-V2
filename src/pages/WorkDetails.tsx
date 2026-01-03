@@ -3,7 +3,7 @@ import { Layout } from '@/components/layout/Layout';
 import { useLibraryStore } from '@/store/libraryStore';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal'; // Import Modal
-import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff, Reply, Video, Calendar, BarChart } from 'lucide-react';
+import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff, Reply, Video, Calendar, BarChart, Music, Disc } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { statusToFrench } from '@/utils/statusTranslation';
 import { useGamificationStore } from '@/store/gamificationStore';
@@ -17,7 +17,7 @@ import type { CommentWithReplies } from '@/types/comment';
 import logoCrunchyroll from '@/assets/logo_crunchyroll.png';
 import logoADN from '@/assets/logo_adn.png';
 
-import { getWorkDetails, getWorkCharacters, getWorkRelations, getWorkRecommendations, getWorkPictures, type JikanCharacter, type JikanRelation, type JikanRecommendation, type JikanPicture } from '@/services/animeApi';
+import { getWorkDetails, getWorkCharacters, getWorkRelations, getWorkRecommendations, getWorkPictures, getWorkThemes, type JikanCharacter, type JikanRelation, type JikanRecommendation, type JikanPicture, type JikanTheme } from '@/services/animeApi';
 import { handleProgressUpdateWithXP } from '@/utils/progressUtils';
 import styles from './WorkDetails.module.css';
 
@@ -255,7 +255,7 @@ export default function WorkDetails() {
     const [isCommentsExpanded, setIsCommentsExpanded] = useState(false);
 
     // Tab & Episodes State
-    const [activeTab, setActiveTab] = useState<'info' | 'episodes' | 'gallery'>('info');
+    const [activeTab, setActiveTab] = useState<'info' | 'episodes' | 'gallery' | 'themes'>('info');
     const [episodes, setEpisodes] = useState<ContentItem[]>([]);
     const [episodesPage, setEpisodesPage] = useState(1);
     const [hasMoreEpisodes, setHasMoreEpisodes] = useState(false);
@@ -278,6 +278,7 @@ export default function WorkDetails() {
     const [relations, setRelations] = useState<JikanRelation[]>([]);
     const [recommendations, setRecommendations] = useState<JikanRecommendation[]>([]);
     const [pictures, setPictures] = useState<JikanPicture[]>([]);
+    const [themes, setThemes] = useState<JikanTheme | null>(null);
 
 
     // Initial Fetch for non-library items
@@ -338,6 +339,9 @@ export default function WorkDetails() {
             getWorkRelations(Number(id), type).then(setRelations);
             getWorkRecommendations(Number(id), type).then(setRecommendations);
             getWorkPictures(Number(id), type).then(setPictures);
+            if (type === 'anime') {
+                getWorkThemes(Number(id)).then(setThemes);
+            }
         }
     }, [id, work?.type]);
 
@@ -599,6 +603,14 @@ export default function WorkDetails() {
                                     className={`${styles.tabButton} ${activeTab === 'episodes' ? styles.activeTab : ''}`}
                                 >
                                     {['manga', 'novel', 'manhwa', 'manhua', 'doujinshi', 'oneshot', 'oel'].includes(work.type?.toLowerCase()) ? 'LISTE DES CHAPITRES' : 'LISTE DES ÉPISODES'}
+                                </button>
+                            )}
+                            {!['manga', 'novel', 'manhwa', 'manhua', 'doujinshi', 'oneshot', 'oel'].includes(work.type?.toLowerCase() || '') && (
+                                <button
+                                    className={`${styles.tabButton} ${activeTab === 'themes' ? styles.activeTab : ''}`}
+                                    onClick={() => setActiveTab('themes')}
+                                >
+                                    MUSIQUES
                                 </button>
                             )}
                             <button
@@ -953,6 +965,9 @@ export default function WorkDetails() {
                                             </div>
                                         </div>
                                     )}
+
+                                    {/* THEMES SECTION (Openings/Endings) */}
+
                                 </div>
 
                                 <div style={{ marginBottom: '2rem' }}>
@@ -1341,6 +1356,128 @@ export default function WorkDetails() {
                                         Aucune image disponible.
                                     </div>
                                 )}
+                            </div>
+                        )}
+
+                        {activeTab === 'themes' && themes && (
+                            <div className="animate-fade-in">
+                                <h2 className={styles.sectionTitle} style={{ marginBottom: '1.5rem' }}>BANDES ORIGINALES</h2>
+
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                                    gap: '2rem'
+                                }}>
+                                    {/* Openings */}
+                                    <div style={{
+                                        background: '#fff',
+                                        border: '2px solid #000',
+                                        boxShadow: '4px 4px 0 #000',
+                                        padding: '1.5rem'
+                                    }}>
+                                        <h3 style={{
+                                            fontFamily: 'var(--font-heading)',
+                                            fontSize: '1.25rem',
+                                            marginBottom: '1rem',
+                                            borderBottom: '4px solid #000',
+                                            paddingBottom: '0.5rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem'
+                                        }}>
+                                            <Music size={24} /> OPENINGS ({themes.openings.length})
+                                        </h3>
+                                        <div style={{ maxHeight: '500px', overflowY: 'auto' }} className="scrollbar-hide">
+                                            {themes.openings.length > 0 ? (
+                                                <ul style={{ listStyle: 'none', padding: 0 }}>
+                                                    {themes.openings.map((theme, idx) => (
+                                                        <li key={idx} style={{ marginBottom: '0.75rem', borderBottom: '1px dashed #ccc', paddingBottom: '0.75rem' }}>
+                                                            <a
+                                                                href={`https://www.youtube.com/results?search_query=${encodeURIComponent(theme + ' ' + work.title)}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                style={{
+                                                                    textDecoration: 'none',
+                                                                    color: '#000',
+                                                                    display: 'flex',
+                                                                    alignItems: 'flex-start',
+                                                                    gap: '0.75rem'
+                                                                }}
+                                                                onMouseEnter={(e) => e.currentTarget.style.color = '#555'}
+                                                                onMouseLeave={(e) => e.currentTarget.style.color = '#000'}
+                                                            >
+                                                                <span style={{
+                                                                    background: '#000',
+                                                                    color: '#fff',
+                                                                    fontFamily: 'var(--font-heading)',
+                                                                    padding: '2px 6px',
+                                                                    fontSize: '0.8rem',
+                                                                    height: 'fit-content'
+                                                                }}>#{idx + 1}</span>
+                                                                <span style={{ fontWeight: 600, lineHeight: 1.4 }}>{theme} ↗</span>
+                                                            </a>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : <p style={{ opacity: 0.5, fontStyle: 'italic' }}>Aucun opening trouvé.</p>}
+                                        </div>
+                                    </div>
+
+                                    {/* Endings */}
+                                    <div style={{
+                                        background: '#fff',
+                                        border: '2px solid #000',
+                                        boxShadow: '4px 4px 0 #000',
+                                        padding: '1.5rem'
+                                    }}>
+                                        <h3 style={{
+                                            fontFamily: 'var(--font-heading)',
+                                            fontSize: '1.25rem',
+                                            marginBottom: '1rem',
+                                            borderBottom: '4px solid #000',
+                                            paddingBottom: '0.5rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem'
+                                        }}>
+                                            <Disc size={24} /> ENDINGS ({themes.endings.length})
+                                        </h3>
+                                        <div style={{ maxHeight: '500px', overflowY: 'auto' }} className="scrollbar-hide">
+                                            {themes.endings.length > 0 ? (
+                                                <ul style={{ listStyle: 'none', padding: 0 }}>
+                                                    {themes.endings.map((theme, idx) => (
+                                                        <li key={idx} style={{ marginBottom: '0.75rem', borderBottom: '1px dashed #ccc', paddingBottom: '0.75rem' }}>
+                                                            <a
+                                                                href={`https://www.youtube.com/results?search_query=${encodeURIComponent(theme + ' ' + work.title)}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                style={{
+                                                                    textDecoration: 'none',
+                                                                    color: '#000',
+                                                                    display: 'flex',
+                                                                    alignItems: 'flex-start',
+                                                                    gap: '0.75rem'
+                                                                }}
+                                                                onMouseEnter={(e) => e.currentTarget.style.color = '#555'}
+                                                                onMouseLeave={(e) => e.currentTarget.style.color = '#000'}
+                                                            >
+                                                                <span style={{
+                                                                    background: '#000',
+                                                                    color: '#fff',
+                                                                    fontFamily: 'var(--font-heading)',
+                                                                    padding: '2px 6px',
+                                                                    fontSize: '0.8rem',
+                                                                    height: 'fit-content'
+                                                                }}>#{idx + 1}</span>
+                                                                <span style={{ fontWeight: 600, lineHeight: 1.4 }}>{theme} ↗</span>
+                                                            </a>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : <p style={{ opacity: 0.5, fontStyle: 'italic' }}>Aucun ending trouvé.</p>}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
