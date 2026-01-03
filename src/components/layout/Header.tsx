@@ -3,14 +3,10 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import {
     User, Book, Home, ChevronDown, Flame, Search,
-    Menu,
     LogOut,
-    Compass,
-    Library,
     Calendar,
     MessageSquare,
     History,
-    Trophy,
     Settings
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
