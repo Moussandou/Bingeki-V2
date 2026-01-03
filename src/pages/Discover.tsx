@@ -4,11 +4,11 @@ import { Layout } from '@/components/layout/Layout';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Carousel } from '@/components/ui/Carousel';
-import { searchWorks, getTopWorks, getSeasonalAnime, type JikanResult } from '@/services/animeApi';
+import { searchWorks, getTopWorks, getSeasonalAnime, getRandomAnime, type JikanResult } from '@/services/animeApi';
 import { useLibraryStore } from '@/store/libraryStore';
 import { useAuthStore } from '@/store/authStore';
-import { Search, Check, Loader2, Flame, Sparkles, Star, Dice5, TrendingUp, Plus } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Search, Check, Loader2, Flame, Sparkles, Star, Dice5, TrendingUp, Plus, SlidersHorizontal, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { FriendRecommendations } from '@/components/FriendRecommendations';
 import styles from './Discover.module.css';
@@ -20,6 +20,14 @@ export default function Discover() {
     const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
     const [searchResults, setSearchResults] = useState<JikanResult[]>([]);
     const [loading, setLoading] = useState(false);
+
+    // Filter States
+    const [showFilters, setShowFilters] = useState(false);
+    const [filterStatus, setFilterStatus] = useState<string>('');
+    const [filterRating, setFilterRating] = useState<string>('');
+    const [filterScore, setFilterScore] = useState<number>(0);
+    const [filterYear, setFilterYear] = useState<string>('');
+    const [filterStudio, setFilterStudio] = useState<string>('');
 
     // Carousel Data States
     const [seasonalAnime, setSeasonalAnime] = useState<JikanResult[]>([]);
@@ -44,6 +52,21 @@ export default function Discover() {
         { id: 8, label: 'Drama' },
         { id: 10, label: 'Fantasy' },
         { id: 24, label: 'Sci-Fi' }
+    ];
+
+    const POPULAR_STUDIOS = [
+        { id: '569', name: 'MAPPA' },
+        { id: '11', name: 'Madhouse' },
+        { id: '4', name: 'Bones' },
+        { id: '858', name: 'Wit Studio' },
+        { id: '43', name: 'Ufotable' },
+        { id: '56', name: 'A-1 Pictures' },
+        { id: '18', name: 'Toei Animation' },
+        { id: '21', name: 'Studio Ghibli' },
+        { id: '2', name: 'Kyoto Animation' },
+        { id: '14', name: 'Sunrise' },
+        { id: '7', name: 'J.C.Staff' },
+        { id: '10', name: 'Production I.G' },
     ];
 
     // Fetch Home Data
@@ -77,24 +100,30 @@ export default function Discover() {
         fetchHomeData();
     }, []);
 
-    // Search Logic
+    // Search Logic with Filters
     useEffect(() => {
         const delayDebounceFn = setTimeout(async () => {
-            if (searchQuery.length > 2) {
+            const hasActiveFilters = filterStatus || filterRating || filterScore > 0 || filterYear || selectedGenre || filterStudio;
+
+            if (searchQuery.length > 2 || hasActiveFilters) {
                 setLoading(true);
-                // Clear genre if searching by text
-                if (selectedGenre) setSelectedGenre(null);
-                const results = await searchWorks(searchQuery);
+
+                // If searching by text, we might want to keep the genre?
+                // Previously: if (selectedGenre) setSelectedGenre(null); -> Let's allow combining
+
+                const filters: any = {};
+                if (filterStatus) filters.status = filterStatus;
+                if (filterRating) filters.rating = filterRating;
+                if (filterScore > 0) filters.min_score = filterScore;
+                if (filterYear) filters.start_date = `${filterYear}-01-01`;
+                if (selectedGenre) filters.genres = selectedGenre.toString();
+                if (filterStudio) filters.producers = filterStudio;
+
+                const results = await searchWorks(searchQuery, 'anime', filters);
+
                 // Filter out duplicates
                 const uniqueResults = Array.from(new Map(results.map(item => [item.mal_id, item])).values());
                 setSearchResults(uniqueResults);
-                setLoading(false);
-            } else if (selectedGenre) {
-                setLoading(true);
-                setSearchResults([]); // Clear previous results immediately
-                // Search by genre (empty query, specific genre)
-                const results = await searchWorks('', 'manga', { genres: selectedGenre.toString() });
-                setSearchResults(results);
                 setLoading(false);
             } else {
                 setSearchResults([]);
@@ -102,10 +131,10 @@ export default function Discover() {
         }, 500);
 
         return () => clearTimeout(delayDebounceFn);
-    }, [searchQuery, selectedGenre]);
+    }, [searchQuery, selectedGenre, filterStatus, filterRating, filterScore, filterYear, filterStudio]);
 
     const handleGenreClick = (id: number) => {
-        setSearchQuery('');
+        // setSearchQuery(''); // Allow combining search + genre
         setSelectedGenre(id === selectedGenre ? null : id);
     };
 
@@ -133,14 +162,33 @@ export default function Discover() {
         }
     }, [seasonalAnime, topAnime]);
 
-    // Handle Surprise Me
-    const handleSurpriseMe = () => {
-        const allWorks = [...seasonalAnime, ...topAnime, ...popularManga, ...topManga];
-        if (allWorks.length > 0) {
-            const random = allWorks[Math.floor(Math.random() * allWorks.length)];
-            handleWorkClick(random);
+    // Handle Surprise Me (True Random)
+    const handleSurpriseMe = async () => {
+        setLoading(true);
+        try {
+            const randomWork = await getRandomAnime();
+            if (randomWork) {
+                navigate(`/work/${randomWork.mal_id}?type=anime`); // Usually works for anime
+            }
+        } catch (error) {
+            console.error("Failed to get random anime", error);
+        } finally {
+            setLoading(false);
         }
     };
+
+    // Reset Filters
+    const resetFilters = () => {
+        setFilterStatus('');
+        setFilterRating('');
+        setFilterScore(0);
+        setFilterYear('');
+        setFilterStudio('');
+        setSelectedGenre(null);
+        setSearchQuery('');
+    };
+
+    const hasFilters = filterStatus || filterRating || filterScore > 0 || filterYear || selectedGenre || filterStudio;
 
     return (
         <Layout>
@@ -175,7 +223,7 @@ export default function Discover() {
 
 
                 {/* Hero Section */}
-                {heroWork && !searchQuery && (
+                {heroWork && !searchQuery && !hasFilters && (
                     <div className={styles.heroSection}>
                         {/* Background */}
                         <div
@@ -255,46 +303,224 @@ export default function Discover() {
 
                 <div className="container" style={{ marginTop: '3rem' }}>
                     {/* Search Section */}
-                    <div style={{ margin: '0 auto 4rem', maxWidth: '800px' }}>
-                        <Card
-                            variant="manga"
-                            style={{
-                                padding: '0.5rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '1rem',
-                                background: '#fff',
-                                borderWidth: '3px',
-                                borderStyle: 'solid',
-                                borderColor: '#000',
-                                boxShadow: '8px 8px 0 #000'
-                            }}
-                            whileHover={{
-                                borderColor: 'var(--color-primary)',
-                                boxShadow: '8px 8px 0 var(--color-primary)'
-                            }}
-                            transition={{ duration: 0.2 }}
-                        >
-                            <Search size={28} style={{ marginLeft: '1rem', opacity: 0.4 }} />
-                            <input
-                                placeholder="Rechercher un anime, un manga..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                    <div style={{ margin: '0 auto 2rem', maxWidth: '800px' }}>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <Card
+                                variant="manga"
                                 style={{
-                                    border: 'none',
-                                    outline: 'none',
-                                    width: '100%',
-                                    fontSize: '1.5rem',
-                                    background: 'transparent',
-                                    fontFamily: 'var(--font-heading)',
-                                    fontWeight: 700,
-                                    padding: '1rem 0'
+                                    padding: '0.5rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '1rem',
+                                    background: '#fff',
+                                    borderWidth: '3px',
+                                    borderStyle: 'solid',
+                                    borderColor: '#000',
+                                    boxShadow: '8px 8px 0 #000',
+                                    flex: 1
                                 }}
-                            />
-                        </Card>
+                                whileHover={{
+                                    borderColor: 'var(--color-primary)',
+                                    boxShadow: '8px 8px 0 var(--color-primary)'
+                                }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <Search size={28} style={{ marginLeft: '1rem', opacity: 0.4 }} />
+                                <input
+                                    placeholder="Rechercher un anime, un manga..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    style={{
+                                        border: 'none',
+                                        outline: 'none',
+                                        width: '100%',
+                                        fontSize: '1.5rem',
+                                        background: 'transparent',
+                                        fontFamily: 'var(--font-heading)',
+                                        fontWeight: 700,
+                                        padding: '1rem 0'
+                                    }}
+                                />
+                            </Card>
+                            <Button
+                                variant="manga"
+                                onClick={() => setShowFilters(!showFilters)}
+                                style={{
+                                    padding: '0 1.5rem',
+                                    background: showFilters ? '#000' : '#fff',
+                                    color: showFilters ? '#fff' : '#000',
+                                    border: '3px solid #000'
+                                }}
+                            >
+                                <SlidersHorizontal size={24} />
+                            </Button>
+                        </div>
+
+                        {/* Advanced Filters Panel */}
+                        <AnimatePresence>
+                            {showFilters && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                                    animate={{ height: 'auto', opacity: 1, marginTop: 20 }}
+                                    exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                                    style={{ overflow: 'hidden', padding: '4px' }} // Padding prevents shadow clipping
+                                >
+                                    <div style={{
+                                        background: '#fff',
+                                        border: '3px solid #000',
+                                        boxShadow: '8px 8px 0 #000',
+                                        padding: '2rem',
+                                        display: 'grid',
+                                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                                        gap: '1.5rem',
+                                        position: 'relative'
+                                    }}>
+                                        {/* Status */}
+                                        <div>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>Statut</label>
+                                            <select
+                                                value={filterStatus}
+                                                onChange={(e) => setFilterStatus(e.target.value)}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '0.75rem',
+                                                    border: '2px solid #000',
+                                                    borderRadius: 0,
+                                                    fontWeight: 700,
+                                                    background: '#fff',
+                                                    fontFamily: 'inherit',
+                                                    boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
+                                                }}
+                                            >
+                                                <option value="">TOUS</option>
+                                                <option value="airing">EN COURS</option>
+                                                <option value="complete">TERMINÉ</option>
+                                                <option value="upcoming">À VENIR</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Rating */}
+                                        <div>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>Public</label>
+                                            <select
+                                                value={filterRating}
+                                                onChange={(e) => setFilterRating(e.target.value)}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '0.75rem',
+                                                    border: '2px solid #000',
+                                                    borderRadius: 0,
+                                                    fontWeight: 700,
+                                                    background: '#fff',
+                                                    fontFamily: 'inherit',
+                                                    boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
+                                                }}
+                                            >
+                                                <option value="">TOUS</option>
+                                                <option value="g">TOUT PUBLIC</option>
+                                                <option value="pg13">ADO (PG-13)</option>
+                                                <option value="r17">ADULTE (R-17)</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Score */}
+                                        <div>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>Score Min : <span style={{ color: 'var(--color-primary)' }}>{filterScore}</span></label>
+                                            <input
+                                                type="range"
+                                                min="0"
+                                                max="10"
+                                                step="1"
+                                                value={filterScore}
+                                                onChange={(e) => setFilterScore(Number(e.target.value))}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '10px',
+                                                    accentColor: '#000',
+                                                    cursor: 'pointer'
+                                                }}
+                                            />
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', fontWeight: 700 }}>
+                                                <span>0</span>
+                                                <span>5</span>
+                                                <span>10</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Year */}
+                                        <div>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>Année</label>
+                                            <input
+                                                type="number"
+                                                placeholder="ex: 2024"
+                                                value={filterYear}
+                                                onChange={(e) => setFilterYear(e.target.value)}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '0.75rem',
+                                                    border: '2px solid #000',
+                                                    borderRadius: 0,
+                                                    fontWeight: 700,
+                                                    fontFamily: 'inherit',
+                                                    boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
+                                                }}
+                                            />
+                                        </div>
+
+                                        {/* Studio */}
+                                        <div style={{ gridColumn: '1 / -1' }}>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>Studio</label>
+                                            <select
+                                                value={filterStudio}
+                                                onChange={(e) => setFilterStudio(e.target.value)}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '0.75rem',
+                                                    border: '2px solid #000',
+                                                    borderRadius: 0,
+                                                    fontWeight: 700,
+                                                    background: '#fff',
+                                                    fontFamily: 'inherit',
+                                                    boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
+                                                }}
+                                            >
+                                                <option value="">TOUS LES STUDIOS</option>
+                                                {POPULAR_STUDIOS.map(studio => (
+                                                    <option key={studio.id} value={studio.id}>{studio.name.toUpperCase()}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        {/* Reset Button */}
+                                        <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                                            <button
+                                                onClick={resetFilters}
+                                                style={{
+                                                    background: '#000',
+                                                    color: '#fff',
+                                                    border: 'none',
+                                                    padding: '0.5rem 1.5rem',
+                                                    cursor: 'pointer',
+                                                    fontWeight: 900,
+                                                    fontFamily: 'var(--font-heading)',
+                                                    textTransform: 'uppercase',
+                                                    fontSize: '0.9rem',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.5rem',
+                                                    transition: 'all 0.2s'
+                                                }}
+                                            >
+                                                <X size={16} /> Réinitialiser
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
                         {/* Quick Genres */}
-                        {!searchQuery && (
+                        {!searchQuery && !showFilters && (
                             <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                                 {GENRES.map(genre => {
                                     const isActive = selectedGenre === genre.id;
@@ -325,16 +551,25 @@ export default function Discover() {
                     </div>
 
                     {/* Content Area */}
-                    {searchQuery.length > 2 || selectedGenre ? (
+                    {searchQuery.length > 2 || hasFilters ? (
                         /* Search Results */
                         <div>
                             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '2rem', color: '#000', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 <Search size={32} />
-                                {selectedGenre
-                                    ? `Résultats pour le genre "${GENRES.find(g => g.id === selectedGenre)?.label}"`
-                                    : `Résultats pour "${searchQuery}"`
-                                }
+                                Résultats de la recherche
                             </h2>
+
+                            {/* Filter Chips (if any active) */}
+                            {hasFilters && (
+                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+                                    {selectedGenre && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>Genre: {GENRES.find(g => g.id === selectedGenre)?.label || selectedGenre}</span>}
+                                    {filterStatus && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>Status: {filterStatus}</span>}
+                                    {filterYear && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>Année: {filterYear}</span>}
+                                    {filterScore > 0 && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>Score : {filterScore}</span>}
+                                    {filterStudio && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>Studio: {POPULAR_STUDIOS.find(s => s.id === filterStudio)?.name}</span>}
+                                </div>
+                            )}
+
                             {loading ? (
                                 <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
                                     <Loader2 className="spin" size={48} />
@@ -388,6 +623,11 @@ export default function Discover() {
                                             </motion.div>
                                         );
                                     })}
+                                    {searchResults.length === 0 && !loading && (
+                                        <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem', fontSize: '1.2rem', fontWeight: 600 }}>
+                                            Aucun résultat trouvé. Essayez de relâcher les filtres !
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -416,7 +656,8 @@ export default function Discover() {
                                     <Button
                                         variant="manga"
                                         onClick={handleSurpriseMe}
-                                        icon={<Dice5 size={24} />}
+                                        icon={loading ? <Loader2 className="spin" size={24} /> : <Dice5 size={24} />}
+                                        disabled={loading}
                                         style={{
                                             fontSize: '1.2rem',
                                             padding: '1rem 2rem',
@@ -424,7 +665,8 @@ export default function Discover() {
                                             border: 'none',
                                             color: '#000',
                                             boxShadow: '4px 4px 0 #000',
-                                            transition: 'all 0.2s'
+                                            transition: 'all 0.2s',
+                                            opacity: loading ? 0.7 : 1
                                         }}
                                         whileHover={{
                                             borderColor: 'var(--color-primary)',

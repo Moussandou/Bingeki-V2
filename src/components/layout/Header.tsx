@@ -1,7 +1,18 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { User, Book, Home, ChevronDown, Flame, Search, Trophy, Settings, LogOut } from 'lucide-react';
+import {
+    User, Book, Home, ChevronDown, Flame, Search,
+    Menu,
+    LogOut,
+    Compass,
+    Library,
+    Calendar,
+    MessageSquare,
+    History,
+    Trophy,
+    Settings
+} from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { auth } from '@/firebase/config';
@@ -20,12 +31,12 @@ export function Header() {
         <>
             {/* Top Header */}
             <header className={styles.header}>
-                <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '2rem' }}>
+                <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
 
                     {/* Left: Logo */}
                     <Link to="/" className={`${styles.logo} text-gradient`}>
                         {/* Using the new logo image */}
-                        <img src="/logo.png" alt="Bingeki Logo" style={{ width: 60, height: 60, objectFit: 'contain' }} />
+                        <img src="/logo.png" alt="Bingeki Logo" style={{ width: 50, height: 50, objectFit: 'contain' }} />
                         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
                             <span style={{ fontSize: '1.2rem', fontFamily: 'var(--font-heading)', letterSpacing: '-1px' }}>BINGEKI</span>
                         </div>
@@ -33,22 +44,29 @@ export function Header() {
 
                     {/* Center: Navigation (Desktop) */}
                     {user && (
-                        <nav className={styles.desktopNav}>
+                        <nav className={styles.desktopNav} style={{ gap: '1rem' }}>
                             <Link to="/dashboard" className={`${styles.navLink} ${isActive('/dashboard') ? styles.activeLink : ''}`}>
                                 <Home size={18} />
-                                <span>Q.G.</span>
+                                <span className="hidden-tablet">Q.G.</span>
                             </Link>
                             <Link to="/library" className={`${styles.navLink} ${isActive('/library') ? styles.activeLink : ''}`}>
                                 <Book size={18} />
-                                <span>Bibliothèque</span>
+                                <span className="hidden-tablet">Bibliothèque</span>
                             </Link>
                             <Link to="/discover" className={`${styles.navLink} ${isActive('/discover') ? styles.activeLink : ''}`}>
                                 <Search size={18} />
-                                <span>Découvrir</span>
+                                <span className="hidden-tablet">Découvrir</span>
                             </Link>
                             <Link to="/social" className={`${styles.navLink} ${isActive('/social') ? styles.activeLink : ''}`}>
-                                <Trophy size={18} />
-                                <span>Social</span>
+                                <MessageSquare size={18} />
+                                <span className="hidden-tablet">Communauté</span>
+                            </Link>
+                            <Link to="/schedule" className={`${styles.navLink} ${isActive('/schedule') ? styles.activeLink : ''}`}>
+                                <Calendar size={18} />
+                                <span className="hidden-tablet">Agenda</span>
+                            </Link>
+                            <Link to="/changelog" className={`${styles.navLink} ${isActive('/changelog') ? styles.activeLink : ''}`} title="Nouveautés">
+                                <History size={18} />
                             </Link>
                         </nav>
                     )}
@@ -64,12 +82,12 @@ export function Header() {
                     )}
 
                     {/* Right: Stats & Actions */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
 
                         {user ? (
                             <>
                                 {/* Stats (Desktop only mainly) */}
-                                <div className="desktopOnly" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                                <div className="desktopOnly" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                     {/* Streak */}
                                     <div className={styles.streakContainer}>
                                         <Flame size={20} fill="currentColor" />
@@ -91,13 +109,13 @@ export function Header() {
                                     <button
                                         className={styles.profileDropdown}
                                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                        style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', padding: '4px', border: '2px solid #000', background: '#fff' }}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '4px', border: '2px solid #000', background: '#fff' }}
                                     >
                                         <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#333', overflow: 'hidden', border: '2px solid #000' }}>
                                             <img src={user?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         </div>
-                                        <span className="hidden-mobile" style={{ fontSize: '0.9rem', fontWeight: 700, color: '#000' }}>{user.displayName || 'Héros'}</span>
-                                        <ChevronDown size={16} className="hidden-mobile" style={{ opacity: 0.7, color: '#000', transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+                                        {/* Username hidden to save space */}
+                                        <ChevronDown size={16} style={{ opacity: 0.7, color: '#000', transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
                                     </button>
 
                                     {/* Dropdown Menu */}
@@ -162,56 +180,59 @@ export function Header() {
             </header>
 
             {/* Mobile Bottom Dock */}
-            {user && (
-                <nav className={styles.mobileNav}>
-                    <Link to="/dashboard">
-                        <Button variant={isActive('/dashboard') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
-                            <Home size={22} />
-                        </Button>
-                    </Link>
-                    <Link to="/library">
-                        <Button variant={isActive('/library') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
-                            <Book size={22} />
-                        </Button>
-                    </Link>
-                    <Link to="/discover">
-                        <Button variant={isActive('/discover') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
-                            <Search size={22} />
-                        </Button>
-                    </Link>
-                    <Link to="/social">
-                        <Button variant={isActive('/social') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
-                            <Trophy size={22} />
-                        </Button>
-                    </Link>
-                    <Link to="/profile">
-                        <Button variant={isActive('/profile') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
-                            <User size={22} />
-                        </Button>
-                    </Link>
-                </nav>
-            )}
+            {
+                user && (
+                    <nav className={styles.mobileNav}>
+                        <Link to="/dashboard">
+                            <Button variant={isActive('/dashboard') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                                <Home size={22} />
+                            </Button>
+                        </Link>
+                        <Link to="/library">
+                            <Button variant={isActive('/library') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                                <Book size={22} />
+                            </Button>
+                        </Link>
+                        <Link to="/discover">
+                            <Button variant={isActive('/discover') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                                <Search size={22} />
+                            </Button>
+                        </Link>
+                        <Link to="/schedule">
+                            <Button variant={isActive('/schedule') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                                <Calendar size={22} />
+                            </Button>
+                        </Link>
+                        <Link to="/profile">
+                            <Button variant={isActive('/profile') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                                <User size={22} />
+                            </Button>
+                        </Link>
+                    </nav>
+                )
+            }
 
             {/* Mobile Bottom Dock for Guests - Only Discover */}
-            {!user && (
-                <nav className={styles.mobileNav}>
-                    <Link to="/">
-                        <Button variant={isActive('/') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
-                            <Home size={22} />
-                        </Button>
-                    </Link>
-                    <Link to="/discover">
-                        <Button variant={isActive('/discover') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
-                            <Search size={22} />
-                        </Button>
-                    </Link>
-                    <Link to="/auth">
-                        <Button variant={isActive('/auth') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
-                            <User size={22} />
-                        </Button>
-                    </Link>
-                </nav>
-            )}
+            {
+                !user && (
+                    <nav className={styles.mobileNav}>
+                        <Link to="/">
+                            <Button variant={isActive('/') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                                <Home size={22} />
+                            </Button>
+                        </Link>
+                        <Link to="/discover">
+                            <Button variant={isActive('/discover') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                                <Search size={22} />
+                            </Button>
+                        </Link>
+                        <Link to="/auth">
+                            <Button variant={isActive('/auth') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                                <User size={22} />
+                            </Button>
+                        </Link>
+                    </nav>
+                )}
         </>
     );
 }

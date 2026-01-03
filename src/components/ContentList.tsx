@@ -29,6 +29,7 @@ interface ContentListProps {
     workTitle: string;
     workType: 'anime' | 'manga';
     readOnly?: boolean;
+    streamingServices?: { name: string; url: string }[];
 }
 
 export function ContentList({
@@ -44,7 +45,8 @@ export function ContentList({
     page = 1,
     workTitle,
     workType,
-    readOnly = false
+    readOnly = false,
+    streamingServices = []
 }: ContentListProps) {
     const [visibleCount, setVisibleCount] = useState(25);
     const [expandedIds, setExpandedIds] = useState<number[]>([]);
@@ -138,24 +140,33 @@ export function ContentList({
                                     {/* Link Buttons */}
                                     {workType === 'anime' ? (
                                         <>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={(e) => openLink(e, `https://www.google.com/search?q=site:crunchyroll.com/fr/watch ${encodeURIComponent(workTitle)} episode ${item.number}`)}
-                                                title="Regarder sur Crunchyroll"
-                                                style={{ padding: '0', height: '36px', width: '36px', overflow: 'hidden' }}
-                                            >
-                                                <img src={logoCrunchyroll} alt="CR" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={(e) => openLink(e, `https://www.google.com/search?q=site:animationdigitalnetwork.fr ${encodeURIComponent(workTitle)} episode ${item.number}`)}
-                                                title="Regarder sur ADN"
-                                                style={{ padding: '0', height: '36px', width: '36px', overflow: 'hidden' }}
-                                            >
-                                                <img src={logoADN} alt="ADN" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                            </Button>
+                                            {/* Crunchyroll */}
+                                            {streamingServices.some(s => s.name.toLowerCase().includes('crunchyroll')) && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={(e) => openLink(e, `https://www.google.com/search?q=site:crunchyroll.com/fr/watch ${encodeURIComponent(workTitle)} episode ${item.number}`)}
+                                                    title="Regarder sur Crunchyroll"
+                                                    style={{ padding: '0', height: '36px', width: '36px', overflow: 'hidden' }}
+                                                >
+                                                    <img src={logoCrunchyroll} alt="CR" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                                </Button>
+                                            )}
+
+                                            {/* ADN */}
+                                            {streamingServices.some(s => s.name.toLowerCase().includes('adn') || s.name.toLowerCase().includes('animation digital network')) && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={(e) => openLink(e, `https://www.google.com/search?q=site:animationdigitalnetwork.fr ${encodeURIComponent(workTitle)} episode ${item.number}`)}
+                                                    title="Regarder sur ADN"
+                                                    style={{ padding: '0', height: '36px', width: '36px', overflow: 'hidden' }}
+                                                >
+                                                    <img src={logoADN} alt="ADN" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                                </Button>
+                                            )}
+
+                                            {/* Generic / Google Search */}
                                             <Button
                                                 variant="ghost"
                                                 size="sm"

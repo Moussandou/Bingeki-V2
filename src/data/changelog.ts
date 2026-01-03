@@ -8,6 +8,44 @@ export interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
     {
+        version: 'v2.7',
+        date: '03 Janvier 2026',
+        title: 'Personnages et Seiyuu',
+        description: 'Explorez les fiches détaillées des personnages et doubleurs avec un style wiki.',
+        changes: [
+            'Nouveau : Pages dédiées Personnages avec fiche wiki (Age, Clan, Kekkei Genkai, etc.)',
+            'Nouveau : Pages dédiées Seiyuu avec infos structurées (Twitter, Birthplace, etc.)',
+            'Navigation : Cliquez sur les personnages/seiyuu depuis le casting',
+            'UI : Logos des services de streaming (Crunchyroll, Netflix, ADN, etc.)',
+            'UI : Univers Étendu collapsible avec cartes adaptatives',
+            'Responsive : Amélioration mobile des pages Feedback et WorkDetails',
+        ]
+    },
+    {
+        version: 'v2.6',
+        date: '03 Janvier 2026',
+        title: 'Community Voices & Discovery',
+        description: 'Intégration des avis communautaires et amélioration de la recherche.',
+        changes: [
+            'Nouveau : Onglet "Avis" sur les fiches (Intégration MyAnimeList)',
+            'Nouveau : Filtre par Studio dans la recherche avancée',
+            'UI : Refonte brutalist de l\'écran de chargement',
+            'UI : Amélioration de la grille des avis et des filtres de recherche',
+        ]
+    },
+    {
+        version: "v2.5",
+        date: "03 Janvier 2026",
+        title: "Suivi Hebdomadaire",
+        description: "Ne ratez plus jamais un épisode grâce au nouveau Calendrier de Sorties.",
+        changes: [
+            "Nouvel Agenda : Visualisez les sorties d'animes jour par jour.",
+            "Accès rapide via le Header (Icône Calendrier).",
+            "Mise à jour des boutons de streaming pour plus de clarté.",
+            "Indication des heures de diffusion sur les cartes d'agenda."
+        ]
+    },
+    {
         version: "v2.4",
         date: "03 Janvier 2026",
         title: "Profondeur de Données",

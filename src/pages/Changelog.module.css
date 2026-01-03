@@ -1,0 +1,192 @@
+.container {
+    padding: 2rem 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 4rem;
+    position: relative;
+}
+
+.title {
+    font-size: 2.5rem;
+    /* Smaller for mobile default */
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+    word-break: break-word;
+    /* Prevent overflow on very narrow screens */
+}
+
+.titleUnderline {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 4px;
+    background: #000;
+}
+
+.subtitle {
+    opacity: 0.7;
+    font-weight: 500;
+}
+
+.timelineContainer {
+    position: relative;
+    padding-left: 0;
+    /* Reset default padding */
+}
+
+.timelineLine {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 19px;
+    /* Matches circle center */
+    width: 4px;
+    background: #000;
+}
+
+.timelineEntry {
+    margin-bottom: 4rem;
+    position: relative;
+    padding-left: 3.5rem;
+    /* Space for the line/circle */
+}
+
+.timelineNode {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 42px;
+    height: 42px;
+    background: #fff;
+    border: 4px solid #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.contentCard {
+    background: #fff;
+    border: 3px solid #000;
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 1);
+    padding: 1.5rem;
+    /* Reduced padding for mobile */
+    position: relative;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    /* Align top for wrapping */
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.versionTag {
+    background: #000;
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+    font-weight: 900;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dateTag {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    opacity: 0.6;
+    font-size: 0.85rem;
+}
+
+.entryTitle {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.1;
+}
+
+.entryDescription {
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    opacity: 0.8;
+    font-size: 0.95rem;
+}
+
+.changesList {
+    list-style: none;
+    padding: 0;
+}
+
+.changeItem {
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.endMarkerContainer {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.endMarker {
+    display: inline-block;
+    background: #000;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    font-weight: 900;
+    font-family: var(--font-heading);
+    transform: rotate(-2deg);
+    font-size: 1rem;
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+    .title {
+        font-size: 3rem;
+    }
+
+    .contentCard {
+        padding: 2rem;
+    }
+
+    .cardHeader {
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .versionTag {
+        font-size: 1.2rem;
+        padding: 0.25rem 0.75rem;
+    }
+
+    .entryTitle {
+        font-size: 1.8rem;
+    }
+
+    .endMarker {
+        padding: 0.5rem 2rem;
+        font-size: 1.2rem;
+    }
+}
