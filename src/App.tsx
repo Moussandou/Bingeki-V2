@@ -32,6 +32,9 @@ const Challenges = lazy(() => import('@/pages/Challenges'));
 const Feedback = lazy(() => import('@/pages/Feedback'));
 const FeedbackList = lazy(() => import('@/pages/FeedbackList'));
 const Changelog = lazy(() => import('@/pages/Changelog'));
+const Schedule = lazy(() => import('@/pages/Schedule'));
+const CharacterDetails = lazy(() => import('@/pages/CharacterDetails'));
+const PersonDetails = lazy(() => import('@/pages/PersonDetails'));
 
 function App() {
   const { setUser, setLoading, user } = useAuthStore();
@@ -159,6 +162,21 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:uid" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/schedule" element={
+              <Suspense fallback={<LoadingScreen />}>
+                <Schedule />
+              </Suspense>
+            } />
+            <Route path="/character/:id" element={
+              <Suspense fallback={<LoadingScreen />}>
+                <CharacterDetails />
+              </Suspense>
+            } />
+            <Route path="/person/:id" element={
+              <Suspense fallback={<LoadingScreen />}>
+                <PersonDetails />
+              </Suspense>
+            } />
             <Route path="/legal" element={<Legal />} />
           </Routes>
         </Suspense>

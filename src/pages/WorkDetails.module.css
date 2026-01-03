@@ -1,34 +1,51 @@
 .container {
-    padding-bottom: 4rem;
-    padding-top: 2rem;
+    padding-bottom: 6rem;
+    /* More space for mobile dock */
+    padding-top: 1rem;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
+    max-width: 100vw;
+    /* Constrain to viewport */
 }
 
 .backButton {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     padding-left: 0;
 }
 
 .detailsPanel {
     background: #fff;
     color: #000;
-    padding: 2rem;
+    padding: 1.5rem;
+    /* Reduced padding */
     display: flex;
     gap: 2rem;
     flex-direction: column;
     align-items: center;
     /* Center on mobile */
+    overflow-x: hidden;
+    /* Prevent child overflow */
+    max-width: 1200px;
+    /* Limit width to show background */
+    margin: 0 auto;
+    /* Center the panel */
+    box-sizing: border-box;
+    border: 3px solid #000;
+    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
 }
 
 .coverSection {
     width: 100%;
-    max-width: 300px;
+    max-width: 240px;
+    /* Smaller default for mobile */
     /* Limit width on mobile */
     flex-shrink: 0;
+    margin: 0 auto;
 }
 
 .coverImageWrapper {
-    border: 4px solid #000;
-    box-shadow: 8px 8px 0 #000;
+    border: 3px solid #000;
+    box-shadow: 6px 6px 0 #000;
     position: relative;
     width: 100%;
 }
@@ -44,10 +61,10 @@
     left: -10px;
     background: #000;
     color: #fff;
-    padding: 0.25rem 1rem;
+    padding: 0.25rem 0.75rem;
     transform: rotate(-5deg);
     font-weight: 900;
-    font-size: 1.2rem;
+    font-size: 1rem;
     border: 2px solid #fff;
 }
 
@@ -56,22 +73,31 @@
     width: 100%;
     min-width: 0;
     /* Critical for preventing flex child overflow */
+    overflow-x: hidden;
+    /* Prevent overflow */
+    max-width: 100%;
+    /* Constrain width */
+    box-sizing: border-box;
 }
 
 .tabsContainer {
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem;
+    /* Tighter gap */
     margin-bottom: 2rem;
     border-bottom: 2px solid #EEE;
     overflow-x: auto;
     /* Scrollable tabs on very small screens */
     width: 100%;
+    padding-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
 }
 
 .tabButton {
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.75rem;
     font-weight: 900;
-    font-size: 1rem;
+    font-size: 0.9rem;
     background: transparent;
     color: #000;
     border: none;
@@ -79,6 +105,8 @@
     border-bottom: 4px solid transparent;
     margin-bottom: -2px;
     white-space: nowrap;
+    scroll-snap-align: start;
+    flex-shrink: 0;
 }
 
 .activeTab {
@@ -91,22 +119,28 @@
     font-family: var(--font-heading);
     font-size: 2rem;
     /* Smaller on mobile */
-    line-height: 1;
+    line-height: 1.1;
     margin-bottom: 1rem;
     text-transform: uppercase;
     text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
     color: #000;
     word-break: break-word;
+    overflow-wrap: anywhere;
     /* Prevent overflow */
+    text-align: center;
+    /* Center title on mobile */
+    max-width: 100%;
 }
 
 .metaContainer {
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;
     margin-bottom: 2rem;
     color: #000;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
+    /* Center meta on mobile */
 }
 
 .metaItem {
@@ -115,8 +149,9 @@
     gap: 0.5rem;
     font-weight: 600;
     border: 2px solid #000;
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.8rem;
     background: #fff;
+    font-size: 0.9rem;
 }
 
 .synopsisTitle {
@@ -127,7 +162,7 @@
 }
 
 .synopsisText {
-    font-size: 1rem;
+    font-size: 0.95rem;
     line-height: 1.6;
     opacity: 0.8;
     color: #000;
@@ -141,12 +176,13 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .progressInput {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 900;
-    width: 100px;
+    width: 80px;
     border: 2px solid #000;
     padding: 0.5rem;
     text-align: center;
@@ -158,17 +194,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
     flex-wrap: wrap;
 }
 
 .progressDisplay {
-    font-size: 2rem;
+    font-size: 1.8rem;
     /* Adjusted for mobile */
     font-weight: 900;
     line-height: 1;
     margin: 0.5rem 0;
     text-align: center;
+    width: 100%;
+    /* Break to new line on mobile maybe */
 }
 
 .statusButtons {
@@ -177,11 +215,34 @@
     flex-wrap: wrap;
 }
 
+.statusButton {
+    padding: 0.5rem 0.75rem;
+    border: 2px solid #000;
+    background: #fff;
+    color: #000;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    flex: 1 1 auto;
+    /* Grow to fill space on mobile */
+    text-align: center;
+}
+
+.statusButtonActive {
+    background: #000;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+}
+
 .ratingContainer {
     display: flex;
     gap: 0.25rem;
     /* Tighter on mobile */
     flex-wrap: wrap;
+    justify-content: flex-start;
 }
 
 .notesArea {
@@ -196,28 +257,205 @@
     margin-bottom: 2rem;
 }
 
+/* NEW CLASSES FOR RESPONSIVENESS */
+
+.infoGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.75rem;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.infoCard {
+    background: #fff;
+    padding: 0.75rem;
+    border: 2px solid #000;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 1);
+}
+
+.infoLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+    opacity: 0.8;
+    font-size: 0.7rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.infoValue {
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    font-family: var(--font-heading);
+    word-break: break-word;
+    /* Prevent overflow */
+}
+
+.castingContainer {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scroll-snap-type: x mandatory;
+    /* Removed negative margin to prevent overflow */
+    padding: 0 0 1rem 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.castingItem {
+    flex: 0 0 110px;
+    scroll-snap-align: start;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.relationGrid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr;
+    /* Stack vertically on mobile */
+}
+
+.reviewGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    /* Stack reviews on mobile */
+    gap: 1.5rem;
+    align-content: start;
+}
+
+.reviewCard {
+    background: #fff;
+    border: 3px solid #000;
+    box-shadow: 4px 4px 0 #000;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.commentReplyContainer {
+    margin-left: 0.5rem;
+    /* Smaller indent on mobile */
+    padding-left: 0.5rem;
+    border-left: 2px solid #e5e5e5;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 /* Tablet and up */
 @media (min-width: 768px) {
+    .container {
+        padding-top: 2rem;
+        padding-bottom: 4rem;
+    }
+
+    .commentReplyContainer {
+        margin-left: 2rem;
+        padding-left: 1rem;
+    }
+
     .detailsPanel {
         flex-direction: row;
         align-items: flex-start;
+        padding: 2rem;
     }
+
+    /* ... existing styles ... */
 
     .coverSection {
         width: 250px;
+        max-width: none;
         margin: 0;
+    }
+
+    .coverImageWrapper {
+        border: 4px solid #000;
+        box-shadow: 8px 8px 0 #000;
+    }
+
+    .typeLabel {
+        font-size: 1.2rem;
+    }
+
+    .tabsContainer {
+        gap: 1rem;
+    }
+
+    .tabButton {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
     }
 
     .title {
         font-size: 3rem;
+        text-align: left;
+    }
+
+    .metaContainer {
+        justify-content: flex-start;
+    }
+
+    .metaItem {
+        padding: 0.5rem 1rem;
     }
 
     .progressDisplay {
         font-size: 2.5rem;
         margin: 0 0.5rem;
+        width: auto;
     }
 
     .ratingContainer {
         gap: 0.5rem;
+    }
+
+    .statusButton {
+        flex: 0 1 auto;
+        /* Don't grow on desktop */
+        padding: 0.5rem 1rem;
+    }
+
+    .infoGrid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .infoCard {
+        box-shadow: 4px 4px 0 rgba(0, 0, 0, 1);
+    }
+
+    .infoValue {
+        font-size: 1rem;
+    }
+
+    .castingContainer {
+        margin: 0;
+        padding: 0 0 1rem 0;
+    }
+
+    .castingItem {
+        flex: 0 0 120px;
+    }
+
+    .relationGrid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        align-items: start;
+    }
+
+    .reviewGrid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+
+    .reviewCard {
+        padding: 1.5rem;
+        box-shadow: 6px 6px 0 #000;
     }
 }

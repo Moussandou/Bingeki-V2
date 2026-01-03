@@ -219,16 +219,16 @@ export default function Profile() {
             <div style={{ minHeight: 'calc(100vh - 80px)' }}>
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                        <h1 className="text-outline" style={{ fontSize: '3rem', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', color: '#000', textShadow: '2px 2px 0 rgba(0,0,0,0.1)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+                        <h1 className="text-outline" style={{ fontSize: 'clamp(1.5rem, 5vw, 3rem)', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', color: '#000', textShadow: '2px 2px 0 rgba(0,0,0,0.1)', wordBreak: 'break-word' }}>
                             Fiche de Chasseur
                         </h1>
-                        <div style={{ display: 'flex', gap: '1rem' }}>
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                             {isOwnProfile && (
                                 <>
-                                    <Button variant="primary" onClick={() => setIsEditModalOpen(true)} icon={<PenTool size={20} />}>EDITER</Button>
-                                    <Button variant="ghost" onClick={() => setShowGuide(true)} icon={<Info size={20} />}>GUIDE</Button>
-                                    <Button variant="manga" size="icon" onClick={() => navigate('/settings')}><Settings size={20} /></Button>
+                                    <Button variant="primary" onClick={() => setIsEditModalOpen(true)} icon={<PenTool size={18} />}>EDITER</Button>
+                                    <Button variant="ghost" onClick={() => setShowGuide(true)} icon={<Info size={18} />}>GUIDE</Button>
+                                    <Button variant="manga" size="icon" onClick={() => navigate('/settings')}><Settings size={18} /></Button>
                                 </>
                             )}
                             {!isOwnProfile && (

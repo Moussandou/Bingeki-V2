@@ -1,4 +1,4 @@
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { useLibraryStore } from '@/store/libraryStore';
 import { Button } from '@/components/ui/Button';
@@ -17,7 +17,10 @@ import type { CommentWithReplies } from '@/types/comment';
 import logoCrunchyroll from '@/assets/logo_crunchyroll.png';
 import logoADN from '@/assets/logo_adn.png';
 
-import { getWorkDetails, getWorkCharacters, getWorkRelations, getWorkRecommendations, getWorkPictures, getWorkThemes, getWorkStatistics, type JikanCharacter, type JikanRelation, type JikanRecommendation, type JikanPicture, type JikanTheme, type JikanStatistics } from '@/services/animeApi';
+import {
+    getWorkDetails, getWorkCharacters, getWorkRelations, getWorkRecommendations, getWorkPictures, getWorkThemes, getWorkStatistics, type JikanCharacter, type JikanRelation, type JikanRecommendation, type JikanPicture, type JikanTheme, type JikanStatistics, getAnimeStreaming, type JikanStreaming,
+    getAnimeStaff, type JikanStaff, getWorkReviews, type JikanReview
+} from '../services/animeApi';
 import { handleProgressUpdateWithXP } from '@/utils/progressUtils';
 import styles from './WorkDetails.module.css';
 
@@ -184,14 +187,7 @@ function RecursiveComment({
 
             {/* Nested Replies (Staircase) */}
             {comment.replies && comment.replies.length > 0 && (
-                <div style={{
-                    marginLeft: '2rem', // Staircase indent
-                    paddingLeft: '1rem',
-                    borderLeft: '2px solid #e5e5e5', // Guide line
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '1rem'
-                }}>
+                <div className={styles.commentReplyContainer}>
                     {comment.replies.map((reply: any) => (
                         <RecursiveComment
                             key={reply.id}
@@ -255,7 +251,7 @@ export default function WorkDetails() {
     const [isCommentsExpanded, setIsCommentsExpanded] = useState(false);
 
     // Tab & Episodes State
-    const [activeTab, setActiveTab] = useState<'info' | 'episodes' | 'gallery' | 'themes'>('info');
+    const [activeTab, setActiveTab] = useState<'info' | 'episodes' | 'gallery' | 'themes' | 'stats'>('info');
     const [episodes, setEpisodes] = useState<ContentItem[]>([]);
     const [episodesPage, setEpisodesPage] = useState(1);
     const [hasMoreEpisodes, setHasMoreEpisodes] = useState(false);
@@ -280,6 +276,10 @@ export default function WorkDetails() {
     const [pictures, setPictures] = useState<JikanPicture[]>([]);
     const [themes, setThemes] = useState<JikanTheme | null>(null);
     const [statistics, setStatistics] = useState<JikanStatistics | null>(null);
+    const [streaming, setStreaming] = useState<JikanStreaming[]>([]);
+    const [reviews, setReviews] = useState<JikanReview[]>([]);
+    const [staff, setStaff] = useState<JikanStaff[]>([]);
+    const [expandedRelations, setExpandedRelations] = useState<Record<number, boolean>>({});
 
 
     // Initial Fetch for non-library items
@@ -333,18 +333,64 @@ export default function WorkDetails() {
     }, [id, libraryWork, fetchedWork, typeParam]);
 
     // Fetch Characters, Relations, Recommendations, Pictures
+    // Fetch Characters, Relations, Recommendations, Pictures
     useEffect(() => {
-        if (id && work) {
-            const type = work.type === 'manga' ? 'manga' : 'anime';
-            getWorkCharacters(Number(id), type).then(setCharacters);
-            getWorkRelations(Number(id), type).then(setRelations);
-            getWorkRecommendations(Number(id), type).then(setRecommendations);
-            getWorkPictures(Number(id), type).then(setPictures);
-            getWorkStatistics(Number(id), type).then(setStatistics);
-            if (type === 'anime') {
-                getWorkThemes(Number(id)).then(setThemes);
+        if (!id || !work) return;
+
+        // Debug Log
+        console.log('WorkDetails Debug State:', { streaming, statistics, staff });
+
+        const fetchData = async () => {
+            const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+            const type = (work.type === 'Manga' || work.type === 'manga' || work.type === 'Manhwa' || work.type === 'Manhua' || work.type === 'Novel') ? 'manga' : 'anime';
+
+            try {
+                // Sequential fetching to respect Rate Limiting (3 req/sec)
+                const chars = await getWorkCharacters(Number(id), type);
+                setCharacters(chars);
+                await delay(300);
+
+                const rels = await getWorkRelations(Number(id), type);
+                setRelations(rels);
+                await delay(300);
+
+                const recs = await getWorkRecommendations(Number(id), type);
+                setRecommendations(recs);
+                await delay(300);
+
+                const pics = await getWorkPictures(Number(id), type);
+                setPictures(pics);
+                await delay(300);
+
+                const stats = await getWorkStatistics(Number(id), type);
+                setStatistics(stats);
+
+                if (type === 'anime') {
+                    await delay(300);
+                    const themes = await getWorkThemes(Number(id));
+                    setThemes(themes);
+
+                    await delay(300);
+                    await delay(300);
+                    const stream = await getAnimeStreaming(Number(id));
+                    setStreaming(stream);
+
+                    await delay(300);
+                    const stf = await getAnimeStaff(Number(id));
+                    setStaff(stf);
+                }
+
+                // Fetch reviews for both anime and manga
+                await delay(300);
+                const revs = await getWorkReviews(Number(id), type);
+                setReviews(revs);
+
+            } catch (error) {
+                console.error('Error fetching details:', error);
             }
-        }
+        };
+
+        fetchData();
     }, [id, work?.type]);
 
 
@@ -616,10 +662,22 @@ export default function WorkDetails() {
                                 </button>
                             )}
                             <button
+                                onClick={() => setActiveTab('reviews' as any)}
+                                className={`${styles.tabButton} ${activeTab === 'reviews' as any ? styles.activeTab : ''}`}
+                            >
+                                AVIS
+                            </button>
+                            <button
                                 onClick={() => setActiveTab('gallery')}
                                 className={`${styles.tabButton} ${activeTab === 'gallery' ? styles.activeTab : ''}`}
                             >
                                 GALERIE
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('stats')}
+                                className={`${styles.tabButton} ${activeTab === 'stats' ? styles.activeTab : ''}`}
+                            >
+                                STATISTIQUES
                             </button>
                         </div>
 
@@ -649,6 +707,7 @@ export default function WorkDetails() {
                                     isLoading={isLoadingEpisodes}
                                     page={episodesPage}
                                     hasNextPage={hasMoreEpisodes}
+                                    streamingServices={streaming}
                                     hasPrevPage={episodesPage > 1}
                                     onNextPage={() => setEpisodesPage(p => p + 1)}
                                     onPrevPage={() => setEpisodesPage(p => p - 1)}
@@ -682,49 +741,80 @@ export default function WorkDetails() {
                                         title="Cliquez pour modifier le total"
                                     >
                                         <BookOpen size={20} />
-                                        <span>{work.totalChapters || '?'} Chaps</span>
+                                        <span>{work.totalChapters || '?'} {(work.type === 'Manga' || work.type === 'manga' || work.type === 'Manhwa' || work.type === 'Novel') ? 'Chaps' : 'Eps'}</span>
                                     </div>
 
                                     {/* Minimalist Streaming Buttons */}
-                                    {work.type === 'anime' ? (
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            {/* Crunchyroll */}
-                                            <button
-                                                onClick={() => {
-                                                    const nextEp = (work.currentChapter || 0) + 1;
-                                                    handleEpisodeSelect(nextEp);
-                                                    window.open(`https://www.google.com/search?q=site:crunchyroll.com/fr/watch ${encodeURIComponent(work.title)} episode ${nextEp}`, '_blank');
-                                                }}
-                                                style={{ border: '2px solid #ea580c', padding: '0.5rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center' }}
-                                                title={`Crunchyroll - Épisode ${(work.currentChapter || 0) + 1}`}
-                                            >
-                                                <img src={logoCrunchyroll} alt="CR" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
-                                            </button>
+                                    {!(work.type === 'Manga' || work.type === 'manga' || work.type === 'Manhwa' || work.type === 'Novel') ? (
+                                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                            {/* Dynamic Streaming Links */}
+                                            {streaming.map((s) => {
+                                                const name = s.name.toLowerCase();
 
-                                            {/* ADN */}
-                                            <button
-                                                onClick={() => {
-                                                    const nextEp = (work.currentChapter || 0) + 1;
-                                                    handleEpisodeSelect(nextEp);
-                                                    window.open(`https://www.google.com/search?q=site:animationdigitalnetwork.fr ${encodeURIComponent(work.title)} episode ${nextEp}`, '_blank');
-                                                }}
-                                                style={{ border: '2px solid #0099ff', padding: '0.5rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center' }}
-                                                title={`ADN - Épisode ${(work.currentChapter || 0) + 1}`}
-                                            >
-                                                <img src={logoADN} alt="ADN" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
-                                            </button>
+                                                // Service detection and styling
+                                                const getServiceStyle = () => {
+                                                    if (name.includes('crunchyroll')) return { bg: '#f47521', logo: logoCrunchyroll, short: 'CR' };
+                                                    if (name.includes('adn') || name.includes('animation digital')) return { bg: '#0099ff', logo: logoADN, short: 'ADN' };
+                                                    if (name.includes('netflix')) return { bg: '#e50914', logo: null, short: 'N' };
+                                                    if (name.includes('prime') || name.includes('amazon')) return { bg: '#00a8e1', logo: null, short: 'PRIME' };
+                                                    if (name.includes('hulu')) return { bg: '#1ce783', logo: null, short: 'HULU' };
+                                                    if (name.includes('disney')) return { bg: '#113ccf', logo: null, short: 'D+' };
+                                                    if (name.includes('funimation')) return { bg: '#5b0bb5', logo: null, short: 'FUNI' };
+                                                    if (name.includes('hidive')) return { bg: '#00baff', logo: null, short: 'HIDIVE' };
+                                                    if (name.includes('wakanim')) return { bg: '#e60012', logo: null, short: 'WAKA' };
+                                                    if (name.includes('bilibili')) return { bg: '#00a1d6', logo: null, short: 'BILI' };
+                                                    return { bg: '#000', logo: null, short: s.name.slice(0, 4).toUpperCase() };
+                                                };
 
-                                            {/* Generic Streaming */}
+                                                const service = getServiceStyle();
+
+                                                return (
+                                                    <a
+                                                        key={s.name}
+                                                        href={s.url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        style={{
+                                                            border: `2px solid ${service.bg}`,
+                                                            padding: '0.4rem 0.6rem',
+                                                            background: service.logo ? '#fff' : service.bg,
+                                                            cursor: 'pointer',
+                                                            borderRadius: '4px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            textDecoration: 'none',
+                                                            color: service.logo ? '#000' : '#fff',
+                                                            height: '36px',
+                                                            minWidth: '36px',
+                                                            justifyContent: 'center',
+                                                            fontWeight: 800,
+                                                            fontSize: '0.75rem',
+                                                            letterSpacing: '0.5px',
+                                                            boxShadow: '2px 2px 0 rgba(0,0,0,0.2)',
+                                                        }}
+                                                        title={`Regarder sur ${s.name}`}
+                                                    >
+                                                        {service.logo ? (
+                                                            <img src={service.logo} alt={service.short} style={{ width: '22px', height: '22px', objectFit: 'contain' }} />
+                                                        ) : (
+                                                            <span>{service.short}</span>
+                                                        )}
+                                                    </a>
+                                                );
+                                            })}
+
+                                            {/* Generic Streaming Fallback (Google Search) */}
                                             <button
                                                 onClick={() => {
                                                     const nextEp = (work.currentChapter || 0) + 1;
                                                     handleEpisodeSelect(nextEp);
                                                     window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} episode ${nextEp} streaming vostfr`, '_blank');
                                                 }}
-                                                style={{ border: '2px solid #000', padding: '0.5rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center' }}
-                                                title={`Streaming - Épisode ${(work.currentChapter || 0) + 1}`}
+                                                style={{ border: '2px solid #000', padding: '0.5rem 1rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center', height: '40px', gap: '0.5rem', fontWeight: 700 }}
+                                                title={`Recherche Google - Épisode ${(work.currentChapter || 0) + 1}`}
                                             >
                                                 <Tv size={20} />
+                                                <span>REGARDER</span>
                                             </button>
                                         </div>
                                     ) : (
@@ -790,57 +880,37 @@ export default function WorkDetails() {
                                 <div style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
                                     {/* Info Grid */}
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem' }}>
+                                    <div className={styles.infoGrid}>
                                         {work.season && (
-                                            <div style={{
-                                                background: '#fff',
-                                                padding: '0.75rem',
-                                                border: '2px solid #000',
-                                                boxShadow: '4px 4px 0 rgba(0,0,0,1)'
-                                            }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', opacity: 0.8, fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase' }}>
+                                            <div className={styles.infoCard}>
+                                                <div className={styles.infoLabel}>
                                                     <Calendar size={14} strokeWidth={3} /> SAISON
                                                 </div>
-                                                <div style={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '1rem', fontFamily: 'var(--font-heading)' }}>{work.season} {work.year}</div>
+                                                <div className={styles.infoValue}>{work.season} {work.year}</div>
                                             </div>
                                         )}
                                         {work.studios && work.studios.length > 0 && (
-                                            <div style={{
-                                                background: '#fff',
-                                                padding: '0.75rem',
-                                                border: '2px solid #000',
-                                                boxShadow: '4px 4px 0 rgba(0,0,0,1)'
-                                            }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', opacity: 0.8, fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase' }}>
+                                            <div className={styles.infoCard}>
+                                                <div className={styles.infoLabel}>
                                                     <Video size={14} strokeWidth={3} /> STUDIO
                                                 </div>
-                                                <div style={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '1rem', fontFamily: 'var(--font-heading)' }}>{work.studios[0].name}</div>
+                                                <div className={styles.infoValue}>{work.studios[0].name}</div>
                                             </div>
                                         )}
                                         {work.rank && (
-                                            <div style={{
-                                                background: '#fff',
-                                                padding: '0.75rem',
-                                                border: '2px solid #000',
-                                                boxShadow: '4px 4px 0 rgba(0,0,0,1)'
-                                            }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', opacity: 0.8, fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase' }}>
+                                            <div className={styles.infoCard}>
+                                                <div className={styles.infoLabel}>
                                                     <Trophy size={14} strokeWidth={3} /> RANG
                                                 </div>
-                                                <div style={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '1rem', fontFamily: 'var(--font-heading)' }}>#{work.rank}</div>
+                                                <div className={styles.infoValue}>#{work.rank}</div>
                                             </div>
                                         )}
                                         {work.popularity && (
-                                            <div style={{
-                                                background: '#fff',
-                                                padding: '0.75rem',
-                                                border: '2px solid #000',
-                                                boxShadow: '4px 4px 0 rgba(0,0,0,1)'
-                                            }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', opacity: 0.8, fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase' }}>
+                                            <div className={styles.infoCard}>
+                                                <div className={styles.infoLabel}>
                                                     <BarChart size={14} strokeWidth={3} /> POPULARITÉ
                                                 </div>
-                                                <div style={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '1rem', fontFamily: 'var(--font-heading)' }}>#{work.popularity}</div>
+                                                <div className={styles.infoValue}>#{work.popularity}</div>
                                             </div>
                                         )}
                                     </div>
@@ -877,50 +947,55 @@ export default function WorkDetails() {
                                     {characters.length > 0 && (
                                         <div style={{ marginTop: '1rem' }}>
                                             <h3 className={styles.synopsisTitle} style={{ marginBottom: '1rem' }}>CASTING</h3>
-                                            <div className="scrollbar-hide" style={{
-                                                display: 'flex',
-                                                gap: '1rem',
-                                                overflowX: 'auto',
-                                                paddingBottom: '1rem',
-                                                scrollSnapType: 'x mandatory'
-                                            }}>
+                                            <div className={`scrollbar-hide ${styles.castingContainer}`}>
                                                 {characters.filter(c => c.character.images?.jpg?.image_url).map((c) => {
                                                     const jpVa = c.voice_actors?.find((va: any) => va.language === 'Japanese');
                                                     return (
-                                                        <div key={c.character.mal_id} style={{
-                                                            flex: '0 0 120px',
-                                                            scrollSnapAlign: 'start',
-                                                            position: 'relative',
-                                                            display: 'flex',
-                                                            flexDirection: 'column',
-                                                            alignItems: 'center'
-                                                        }}>
-                                                            {/* Character Image */}
-                                                            <div style={{
-                                                                width: '100px',
-                                                                height: '100px',
-                                                                borderRadius: '50%',
-                                                                border: '3px solid #000',
-                                                                overflow: 'hidden',
-                                                                marginBottom: '0.5rem',
-                                                                background: '#f0f0f0'
-                                                            }}>
+                                                        <div key={c.character.mal_id} className={styles.castingItem}>
+                                                            {/* Character Image - Clickable */}
+                                                            <div
+                                                                onClick={() => navigate(`/character/${c.character.mal_id}`)}
+                                                                style={{
+                                                                    width: '100px',
+                                                                    height: '100px',
+                                                                    borderRadius: '50%',
+                                                                    border: '3px solid #000',
+                                                                    overflow: 'hidden',
+                                                                    marginBottom: '0.5rem',
+                                                                    background: '#f0f0f0',
+                                                                    cursor: 'pointer',
+                                                                    transition: 'transform 0.2s'
+                                                                }}
+                                                                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                                                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                                            >
                                                                 <img
                                                                     src={c.character.images.jpg.image_url}
                                                                     alt={c.character.name}
                                                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                                 />
                                                             </div>
-                                                            <div style={{ fontSize: '0.8rem', fontWeight: 800, textAlign: 'center', lineHeight: 1.2, marginBottom: '4px' }}>
+                                                            <div
+                                                                onClick={() => navigate(`/character/${c.character.mal_id}`)}
+                                                                style={{ fontSize: '0.8rem', fontWeight: 800, textAlign: 'center', lineHeight: 1.2, marginBottom: '4px', cursor: 'pointer' }}
+                                                            >
                                                                 {c.character.name}
                                                             </div>
                                                             <div style={{ fontSize: '0.7rem', opacity: 0.6, textAlign: 'center', fontWeight: 600, marginBottom: '0.5rem' }}>
                                                                 {c.role}
                                                             </div>
 
-                                                            {/* Seiyuu Info */}
+                                                            {/* Seiyuu Info - Clickable */}
                                                             {jpVa && (
-                                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 'auto', borderTop: '1px dashed #ccc', paddingTop: '4px', width: '100%' }}>
+                                                                <div
+                                                                    onClick={() => navigate(`/person/${jpVa.person.mal_id}`)}
+                                                                    style={{
+                                                                        display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 'auto',
+                                                                        borderTop: '1px dashed #ccc', paddingTop: '4px', width: '100%', cursor: 'pointer'
+                                                                    }}
+                                                                    onMouseOver={(e) => e.currentTarget.style.opacity = '0.8'}
+                                                                    onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
+                                                                >
                                                                     <div style={{
                                                                         width: '40px',
                                                                         height: '40px',
@@ -939,123 +1014,85 @@ export default function WorkDetails() {
                                                         </div>
                                                     );
                                                 })}
-
                                             </div>
                                         </div>
                                     )}
 
-                                    {/* RELATIONS SECTION */}
-                                    {relations.length > 0 && (
-                                        <div style={{ marginTop: '1rem' }}>
-                                            <h3 className={styles.synopsisTitle} style={{ marginBottom: '1rem' }}>UNIVERS ÉTENDU</h3>
-                                            <div style={{ display: 'grid', gap: '0.75rem' }}>
-                                                {relations.map((rel, idx) => (
-                                                    <div key={idx} style={{
-                                                        background: '#fff',
-                                                        border: '2px solid #000',
-                                                        padding: '1rem',
-                                                        boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
-                                                    }}>
-                                                        <div style={{ fontWeight: 900, textTransform: 'uppercase', fontSize: '0.8rem', marginBottom: '0.5rem', opacity: 0.5 }}>
-                                                            {rel.relation}
-                                                        </div>
-                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                                                            {rel.entry.map(e => (
-                                                                <a
-                                                                    key={e.mal_id}
-                                                                    href={`/work/${e.mal_id}?type=${e.type}`}
-                                                                    style={{
-                                                                        textDecoration: 'none',
-                                                                        color: '#000',
-                                                                        fontWeight: 700,
-                                                                        fontSize: '0.95rem',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        gap: '0.5rem'
-                                                                    }}
-                                                                    onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
-                                                                    onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
-                                                                >
-                                                                    • {e.name}
-                                                                    <span style={{
-                                                                        fontSize: '0.7rem',
-                                                                        background: '#000',
-                                                                        color: '#fff',
-                                                                        padding: '2px 6px',
-                                                                        borderRadius: '4px'
-                                                                    }}>
-                                                                        {e.type.toUpperCase()}
-                                                                    </span>
-                                                                </a>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
+                                    {/* Univers Etendu */}
+                                    {relations.length > 0 && (() => {
+                                        const MAX_VISIBLE = 5;
 
-                                    {/* STATISTICS SECTION */}
-                                    {statistics && (
-                                        <div style={{ marginTop: '2rem' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>
-                                                <BarChart size={24} strokeWidth={2.5} />
-                                                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', margin: 0 }}>STATISTIQUES</h3>
-                                            </div>
+                                        return (
+                                            <div style={{ marginTop: '2rem' }}>
+                                                <h3 className={styles.synopsisTitle} style={{ marginBottom: '1rem', borderTop: '2px solid #EEE', paddingTop: '1rem' }}>UNIVERS ÉTENDU</h3>
+                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                                                    {relations.map((rel, index) => {
+                                                        const isExpanded = expandedRelations[index];
+                                                        const entries = rel.entry;
+                                                        const visibleEntries = isExpanded ? entries : entries.slice(0, MAX_VISIBLE);
+                                                        const hasMore = entries.length > MAX_VISIBLE;
 
-                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-                                                {/* Status Distribution */}
-                                                <div style={{ border: '2px solid #000', padding: '1rem', background: '#fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.1)' }}>
-                                                    <h4 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>DANS LES BIBLIOTHÈQUES</h4>
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                                        {[
-                                                            { label: 'En cours', value: statistics.watching, color: '#2ecc71' },
-                                                            { label: 'Terminé', value: statistics.completed, color: '#3498db' },
-                                                            { label: 'En pause', value: statistics.on_hold, color: '#f1c40f' },
-                                                            { label: 'Abandonné', value: statistics.dropped, color: '#e74c3c' },
-                                                            { label: 'À voir', value: statistics.plan_to_watch, color: '#95a5a6' }
-                                                        ].map(stat => (
-                                                            <div key={stat.label}>
-                                                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 600, marginBottom: '2px' }}>
-                                                                    <span>{stat.label}</span>
-                                                                    <span>{stat.value.toLocaleString()}</span>
+                                                        return (
+                                                            <div key={index} style={{
+                                                                background: '#fff',
+                                                                border: '2px solid #000',
+                                                                boxShadow: '3px 3px 0 #000',
+                                                                padding: '0.75rem',
+                                                                flex: '1 1 250px',
+                                                                maxWidth: '400px',
+                                                                display: 'flex',
+                                                                flexDirection: 'column',
+                                                                gap: '0.5rem'
+                                                            }}>
+                                                                <div style={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', background: '#000', color: '#fff', padding: '0.25rem 0.5rem', alignSelf: 'flex-start' }}>
+                                                                    {rel.relation}
                                                                 </div>
-                                                                <div style={{ height: '8px', background: '#eee', borderRadius: '4px', overflow: 'hidden' }}>
-                                                                    <div style={{
-                                                                        height: '100%',
-                                                                        width: `${(stat.value / statistics.total) * 100}%`,
-                                                                        background: stat.color
-                                                                    }} />
+                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                                                    {visibleEntries.map((entry: any) => (
+                                                                        <Link to={`/work/${entry.mal_id}`} key={entry.mal_id} style={{
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            gap: '0.5rem',
+                                                                            textDecoration: 'none',
+                                                                            color: '#000',
+                                                                            fontWeight: 600,
+                                                                            padding: '0.2rem',
+                                                                            fontSize: '0.9rem',
+                                                                            transition: 'background 0.2s'
+                                                                        }}
+                                                                            onMouseEnter={(e) => e.currentTarget.style.background = '#f0f0f0'}
+                                                                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                                                        >
+                                                                            <div style={{ width: '5px', height: '5px', background: '#000', borderRadius: '50%', flexShrink: 0 }} />
+                                                                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.name} ({entry.type})</span>
+                                                                        </Link>
+                                                                    ))}
+                                                                    {hasMore && (
+                                                                        <button
+                                                                            onClick={() => setExpandedRelations(prev => ({ ...prev, [index]: !prev[index] }))}
+                                                                            style={{
+                                                                                background: 'none',
+                                                                                border: '1px dashed #000',
+                                                                                padding: '0.25rem 0.5rem',
+                                                                                cursor: 'pointer',
+                                                                                fontSize: '0.75rem',
+                                                                                fontWeight: 700,
+                                                                                marginTop: '0.25rem'
+                                                                            }}
+                                                                        >
+                                                                            {isExpanded ? '▲ Réduire' : `▼ Voir ${entries.length - MAX_VISIBLE} de plus`}
+                                                                        </button>
+                                                                    )}
                                                                 </div>
                                                             </div>
-                                                        ))}
-                                                    </div>
+                                                        );
+                                                    })}
                                                 </div>
-
-                                                {/* Score Distribution (if available) */}
-                                                {statistics.scores && (
-                                                    <div style={{ border: '2px solid #000', padding: '1rem', background: '#fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.1)' }}>
-                                                        <h4 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>NOTES DES MEMBRES</h4>
-                                                        <div style={{ display: 'flex', alignItems: 'flex-end', height: '150px', gap: '2px' }}>
-                                                            {statistics.scores.sort((a, b) => a.score - b.score).map((score) => (
-                                                                <div key={score.score} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                                                    <div style={{
-                                                                        width: '100%',
-                                                                        background: '#000',
-                                                                        height: `${score.percentage}%`,
-                                                                        minHeight: '2px', // Ensure visibility
-                                                                        position: 'relative',
-                                                                        transition: 'height 0.3s ease'
-                                                                    }} title={`${score.percentage}%`}></div>
-                                                                    <span style={{ fontSize: '0.7rem', fontWeight: 700, marginTop: '4px' }}>{score.score}</span>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
                                             </div>
-                                        </div>
-                                    )}
+                                        );
+                                    })()}
+
+
 
                                 </div>
 
@@ -1157,18 +1194,7 @@ export default function WorkDetails() {
                                                 <button
                                                     key={s}
                                                     onClick={() => updateStatus(work.id, s as any)}
-                                                    style={{
-                                                        padding: '0.5rem 1rem',
-                                                        border: '2px solid #000',
-                                                        background: work.status === s ? '#000' : '#fff',
-                                                        color: work.status === s ? '#fff' : '#000',
-                                                        fontWeight: 900,
-                                                        textTransform: 'uppercase',
-                                                        cursor: 'pointer',
-                                                        transform: work.status === s ? 'translateY(-2px)' : 'none',
-                                                        boxShadow: work.status === s ? '4px 4px 0 rgba(0,0,0,0.2)' : 'none',
-                                                        transition: 'all 0.2s'
-                                                    }}
+                                                    className={`${styles.statusButton} ${work.status === s ? styles.statusButtonActive : ''}`}
                                                 >
                                                     {statusToFrench(s)}
                                                 </button>
@@ -1409,6 +1435,207 @@ export default function WorkDetails() {
                             </>
                         )}
 
+                        {activeTab === 'stats' && (
+                            <div className="animate-fade-in">
+                                {(!statistics && staff.length === 0) ? (
+                                    <div style={{ padding: '3rem', textAlign: 'center', opacity: 0.6, fontStyle: 'italic', border: '2px dashed #000' }}>
+                                        Aucune statistique ou information de staff disponible pour cette œuvre.
+                                    </div>
+                                ) : (
+                                    <>
+
+                                        {/* STAFF SECTION (Moved here) */}
+                                        {staff.length > 0 && (
+                                            <div style={{ marginBottom: '2rem' }}>
+                                                <h3 className={styles.sectionTitle}>STAFF (PRINCIPAL)</h3>
+                                                <div style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', padding: '1rem 0' }} className="scrollbar-hide">
+                                                    {staff
+                                                        .filter(s => s.positions.some(p => p.includes('Director') || p === 'Character Design' || p === 'Music' || p === 'Series Composition'))
+                                                        .filter((s, index, self) => index === self.findIndex((t) => t.person.mal_id === s.person.mal_id))
+                                                        .map((s) => (
+                                                            <div key={s.person.mal_id} style={{ minWidth: '120px', maxWidth: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                                                                <div style={{ width: '90px', height: '90px', borderRadius: '50%', overflow: 'hidden', border: '3px solid #000', marginBottom: '0.5rem', boxShadow: '3px 3px 0 0px #000' }}>
+                                                                    {s.person.images.jpg.image_url ? (
+                                                                        <img src={s.person.images.jpg.image_url} alt={s.person.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                                    ) : (
+                                                                        <div style={{ width: '100%', height: '100%', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 900 }}>?</div>
+                                                                    )}
+                                                                </div>
+                                                                <span style={{ fontWeight: 800, fontSize: '0.9rem', lineHeight: 1.2, width: '100%', whiteSpace: 'normal' }}>{s.person.name}</span>
+                                                                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#666', marginTop: '0.2rem' }}>
+                                                                    {s.positions.filter(p => p.includes('Director') || p === 'Character Design' || p === 'Music' || p === 'Series Composition').join(', ')}
+                                                                </span>
+                                                            </div>
+                                                        ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* STATISTICS SECTION (Moved here) */}
+                                        {statistics && (
+                                            <div style={{ marginTop: '2rem' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>
+                                                    <BarChart size={24} strokeWidth={2.5} />
+                                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', margin: 0 }}>STATISTIQUES</h3>
+                                                </div>
+
+                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                                                    {/* Status Distribution */}
+                                                    <div style={{ border: '2px solid #000', padding: '1rem', background: '#fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.1)' }}>
+                                                        <h4 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>DANS LES BIBLIOTHÈQUES</h4>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                                            {[
+                                                                { label: 'En cours', value: statistics.watching, color: '#2ecc71' },
+                                                                { label: 'Terminé', value: statistics.completed, color: '#3498db' },
+                                                                { label: 'En pause', value: statistics.on_hold, color: '#f1c40f' },
+                                                                { label: 'Abandonné', value: statistics.dropped, color: '#e74c3c' },
+                                                                { label: 'À voir', value: statistics.plan_to_watch, color: '#95a5a6' }
+                                                            ].map(stat => (
+                                                                <div key={stat.label}>
+                                                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 600, marginBottom: '2px' }}>
+                                                                        <span>{stat.label}</span>
+                                                                        <span>{stat.value.toLocaleString()}</span>
+                                                                    </div>
+                                                                    <div style={{ height: '8px', background: '#eee', borderRadius: '4px', overflow: 'hidden' }}>
+                                                                        <div style={{
+                                                                            height: '100%',
+                                                                            width: `${(stat.value / statistics.total) * 100}%`,
+                                                                            background: stat.color
+                                                                        }} />
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Score Distribution */}
+                                                    {statistics.scores && statistics.scores.length > 0 && (
+                                                        <div style={{ border: '2px solid #000', padding: '1rem', background: '#fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.1)' }}>
+                                                            <h4 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>NOTES DES MEMBRES</h4>
+                                                            <div style={{ display: 'flex', alignItems: 'flex-end', height: '150px', gap: '2px' }}>
+                                                                {statistics.scores.sort((a, b) => a.score - b.score).map((score) => (
+                                                                    <div key={score.score} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                                                        <div style={{
+                                                                            width: '100%',
+                                                                            background: '#000',
+                                                                            height: `${score.percentage}%`,
+                                                                            minHeight: '2px',
+                                                                            position: 'relative',
+                                                                            transition: 'height 0.3s ease'
+                                                                        }} title={`${score.percentage}%`}></div>
+                                                                        <span style={{ fontSize: '0.7rem', fontWeight: 700, marginTop: '4px' }}>{score.score}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        )}
+
+
+
+                        {activeTab === 'reviews' as any && (
+                            <div className="animate-fade-in">
+                                <h2 className={styles.sectionTitle} style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <Star size={24} fill="#000" /> AVIS DE LA COMMUNAUTÉ (MyAnimeList)
+                                </h2>
+
+                                {reviews.length > 0 ? (
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem', alignContent: 'start' }}>
+                                        {reviews.map((review) => (
+                                            <div key={review.mal_id} style={{
+                                                background: '#fff',
+                                                border: '3px solid #000',
+                                                boxShadow: '6px 6px 0 #000',
+                                                padding: '1.5rem',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: '1rem'
+                                            }}>
+                                                {/* Header: User & Score */}
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #eee', paddingBottom: '1rem' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                                            <img src={review.user.images.jpg.image_url} alt={review.user.username} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                                onError={(e) => { (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.user.username}`; }}
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>{review.user.username}</div>
+                                                            <div style={{ fontSize: '0.7rem', opacity: 0.6, fontWeight: 600 }}>{new Date(review.date).toLocaleDateString()}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div style={{
+                                                        background: '#000',
+                                                        color: '#fff',
+                                                        padding: '0.25rem 0.5rem',
+                                                        fontWeight: 900,
+                                                        fontSize: '1.1rem',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '0.25rem'
+                                                    }}>
+                                                        <Star size={14} fill="#fff" /> {review.score}
+                                                    </div>
+                                                </div>
+
+                                                {/* Tags */}
+                                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                    {review.tags.map(tag => (
+                                                        <span key={tag} style={{
+                                                            fontSize: '0.7rem',
+                                                            fontWeight: 700,
+                                                            border: '1px solid #000',
+                                                            padding: '2px 6px',
+                                                            textTransform: 'uppercase',
+                                                            background: tag.toLowerCase().includes('recommended') ? '#dcfce7' : tag.toLowerCase().includes('mixed') ? '#fef9c3' : '#fff'
+                                                        }}>
+                                                            {tag}
+                                                        </span>
+                                                    ))}
+                                                </div>
+
+                                                {/* Review Content */}
+                                                <div style={{ fontSize: '0.9rem', lineHeight: 1.6, maxHeight: '200px', overflowY: 'auto', paddingRight: '0.5rem' }} className="scrollbar-thin">
+                                                    {review.review}
+                                                </div>
+
+                                                {/* Footer: Read More */}
+                                                <div style={{ marginTop: 'auto', paddingTop: '1rem' }}>
+                                                    <a
+                                                        href={review.url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        style={{
+                                                            display: 'inline-flex',
+                                                            alignItems: 'center',
+                                                            gap: '0.25rem',
+                                                            fontWeight: 800,
+                                                            color: '#000',
+                                                            textDecoration: 'none',
+                                                            fontSize: '0.85rem'
+                                                        }}
+                                                    >
+                                                        LIRE L'AVIS COMPLET <ArrowLeft size={14} style={{ transform: 'rotate(180deg)' }} />
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div style={{ padding: '3rem', textAlign: 'center', border: '2px dashed #000', opacity: 0.7 }}>
+                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem' }}>AUCUN AVIS TROUVÉ</h3>
+                                        <p>Soyez le premier à donner votre avis dans la section commentaires ci-dessous !</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         {activeTab === 'gallery' && (
                             <div className="animate-fade-in">
                                 <h2 className={styles.sectionTitle} style={{ marginBottom: '1.5rem' }}>GALERIE OFFICIELLE</h2>
@@ -1448,202 +1675,215 @@ export default function WorkDetails() {
                             </div>
                         )}
 
-                        {activeTab === 'themes' && themes && (
+                        {activeTab === 'themes' && (
                             <div className="animate-fade-in">
-                                <h2 className={styles.sectionTitle} style={{ marginBottom: '1.5rem' }}>BANDES ORIGINALES</h2>
+                                {(themes && (themes.openings.length > 0 || themes.endings.length > 0)) ? (
+                                    <>
+                                        <h2 className={styles.sectionTitle} style={{ marginBottom: '1.5rem' }}>BANDES ORIGINALES</h2>
 
-                                <div style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                                    gap: '2rem'
-                                }}>
-                                    {/* Openings */}
-                                    <div style={{
-                                        background: '#fff',
-                                        border: '2px solid #000',
-                                        boxShadow: '4px 4px 0 #000',
-                                        padding: '1.5rem'
-                                    }}>
-                                        <h3 style={{
-                                            fontFamily: 'var(--font-heading)',
-                                            fontSize: '1.25rem',
-                                            marginBottom: '1rem',
-                                            borderBottom: '4px solid #000',
-                                            paddingBottom: '0.5rem',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.5rem'
+                                        <div style={{
+                                            display: 'grid',
+                                            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                                            gap: '2rem'
                                         }}>
-                                            <Music size={24} /> OPENINGS ({themes.openings.length})
-                                        </h3>
-                                        <div style={{ maxHeight: '500px', overflowY: 'auto' }} className="scrollbar-hide">
-                                            {themes.openings.length > 0 ? (
-                                                <ul style={{ listStyle: 'none', padding: 0 }}>
-                                                    {themes.openings.map((theme, idx) => (
-                                                        <li key={idx} style={{ marginBottom: '0.75rem', borderBottom: '1px dashed #ccc', paddingBottom: '0.75rem' }}>
-                                                            <a
-                                                                href={`https://www.youtube.com/results?search_query=${encodeURIComponent(theme + ' ' + work.title)}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                style={{
-                                                                    textDecoration: 'none',
-                                                                    color: '#000',
-                                                                    display: 'flex',
-                                                                    alignItems: 'flex-start',
-                                                                    gap: '0.75rem'
-                                                                }}
-                                                                onMouseEnter={(e) => e.currentTarget.style.color = '#555'}
-                                                                onMouseLeave={(e) => e.currentTarget.style.color = '#000'}
-                                                            >
-                                                                <span style={{
-                                                                    background: '#000',
-                                                                    color: '#fff',
-                                                                    fontFamily: 'var(--font-heading)',
-                                                                    padding: '2px 6px',
-                                                                    fontSize: '0.8rem',
-                                                                    height: 'fit-content'
-                                                                }}>#{idx + 1}</span>
-                                                                <span style={{ fontWeight: 600, lineHeight: 1.4 }}>{theme} ↗</span>
-                                                            </a>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ) : <p style={{ opacity: 0.5, fontStyle: 'italic' }}>Aucun opening trouvé.</p>}
-                                        </div>
-                                    </div>
+                                            {/* Openings */}
+                                            <div style={{
+                                                background: '#fff',
+                                                border: '2px solid #000',
+                                                boxShadow: '4px 4px 0 #000',
+                                                padding: '1.5rem'
+                                            }}>
+                                                <h3 style={{
+                                                    fontFamily: 'var(--font-heading)',
+                                                    fontSize: '1.25rem',
+                                                    marginBottom: '1rem',
+                                                    borderBottom: '4px solid #000',
+                                                    paddingBottom: '0.5rem',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.5rem'
+                                                }}>
+                                                    <Music size={24} /> OPENINGS ({themes.openings.length})
+                                                </h3>
+                                                <div style={{ maxHeight: '500px', overflowY: 'auto' }} className="scrollbar-hide">
+                                                    {themes.openings.length > 0 ? (
+                                                        <ul style={{ listStyle: 'none', padding: 0 }}>
+                                                            {themes.openings.map((theme, idx) => (
+                                                                <li key={idx} style={{ marginBottom: '0.75rem', borderBottom: '1px dashed #ccc', paddingBottom: '0.75rem' }}>
+                                                                    <a
+                                                                        href={`https://www.youtube.com/results?search_query=${encodeURIComponent(theme + ' ' + work.title)}`}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        style={{
+                                                                            textDecoration: 'none',
+                                                                            color: '#000',
+                                                                            display: 'flex',
+                                                                            alignItems: 'flex-start',
+                                                                            gap: '0.75rem'
+                                                                        }}
+                                                                        onMouseEnter={(e) => e.currentTarget.style.color = '#555'}
+                                                                        onMouseLeave={(e) => e.currentTarget.style.color = '#000'}
+                                                                    >
+                                                                        <span style={{
+                                                                            background: '#000',
+                                                                            color: '#fff',
+                                                                            fontFamily: 'var(--font-heading)',
+                                                                            padding: '2px 6px',
+                                                                            fontSize: '0.8rem',
+                                                                            height: 'fit-content'
+                                                                        }}>#{idx + 1}</span>
+                                                                        <span style={{ fontWeight: 600, lineHeight: 1.4 }}>{theme} ↗</span>
+                                                                    </a>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    ) : <p style={{ opacity: 0.5, fontStyle: 'italic' }}>Aucun opening trouvé.</p>}
+                                                </div>
+                                            </div>
 
-                                    {/* Endings */}
-                                    <div style={{
-                                        background: '#fff',
-                                        border: '2px solid #000',
-                                        boxShadow: '4px 4px 0 #000',
-                                        padding: '1.5rem'
-                                    }}>
-                                        <h3 style={{
-                                            fontFamily: 'var(--font-heading)',
-                                            fontSize: '1.25rem',
-                                            marginBottom: '1rem',
-                                            borderBottom: '4px solid #000',
-                                            paddingBottom: '0.5rem',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.5rem'
-                                        }}>
-                                            <Disc size={24} /> ENDINGS ({themes.endings.length})
-                                        </h3>
-                                        <div style={{ maxHeight: '500px', overflowY: 'auto' }} className="scrollbar-hide">
-                                            {themes.endings.length > 0 ? (
-                                                <ul style={{ listStyle: 'none', padding: 0 }}>
-                                                    {themes.endings.map((theme, idx) => (
-                                                        <li key={idx} style={{ marginBottom: '0.75rem', borderBottom: '1px dashed #ccc', paddingBottom: '0.75rem' }}>
-                                                            <a
-                                                                href={`https://www.youtube.com/results?search_query=${encodeURIComponent(theme + ' ' + work.title)}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                style={{
-                                                                    textDecoration: 'none',
-                                                                    color: '#000',
-                                                                    display: 'flex',
-                                                                    alignItems: 'flex-start',
-                                                                    gap: '0.75rem'
-                                                                }}
-                                                                onMouseEnter={(e) => e.currentTarget.style.color = '#555'}
-                                                                onMouseLeave={(e) => e.currentTarget.style.color = '#000'}
-                                                            >
-                                                                <span style={{
-                                                                    background: '#000',
-                                                                    color: '#fff',
-                                                                    fontFamily: 'var(--font-heading)',
-                                                                    padding: '2px 6px',
-                                                                    fontSize: '0.8rem',
-                                                                    height: 'fit-content'
-                                                                }}>#{idx + 1}</span>
-                                                                <span style={{ fontWeight: 600, lineHeight: 1.4 }}>{theme} ↗</span>
-                                                            </a>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ) : <p style={{ opacity: 0.5, fontStyle: 'italic' }}>Aucun ending trouvé.</p>}
+                                            {/* Endings */}
+                                            <div style={{
+                                                background: '#fff',
+                                                border: '2px solid #000',
+                                                boxShadow: '4px 4px 0 #000',
+                                                padding: '1.5rem'
+                                            }}>
+                                                <h3 style={{
+                                                    fontFamily: 'var(--font-heading)',
+                                                    fontSize: '1.25rem',
+                                                    marginBottom: '1rem',
+                                                    borderBottom: '4px solid #000',
+                                                    paddingBottom: '0.5rem',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.5rem'
+                                                }}>
+                                                    <Disc size={24} /> ENDINGS ({themes.endings.length})
+                                                </h3>
+                                                <div style={{ maxHeight: '500px', overflowY: 'auto' }} className="scrollbar-hide">
+                                                    {themes.endings.length > 0 ? (
+                                                        <ul style={{ listStyle: 'none', padding: 0 }}>
+                                                            {themes.endings.map((theme, idx) => (
+                                                                <li key={idx} style={{ marginBottom: '0.75rem', borderBottom: '1px dashed #ccc', paddingBottom: '0.75rem' }}>
+                                                                    <a
+                                                                        href={`https://www.youtube.com/results?search_query=${encodeURIComponent(theme + ' ' + work.title)}`}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        style={{
+                                                                            textDecoration: 'none',
+                                                                            color: '#000',
+                                                                            display: 'flex',
+                                                                            alignItems: 'flex-start',
+                                                                            gap: '0.75rem'
+                                                                        }}
+                                                                        onMouseEnter={(e) => e.currentTarget.style.color = '#555'}
+                                                                        onMouseLeave={(e) => e.currentTarget.style.color = '#000'}
+                                                                    >
+                                                                        <span style={{
+                                                                            background: '#000',
+                                                                            color: '#fff',
+                                                                            fontFamily: 'var(--font-heading)',
+                                                                            padding: '2px 6px',
+                                                                            fontSize: '0.8rem',
+                                                                            height: 'fit-content'
+                                                                        }}>#{idx + 1}</span>
+                                                                        <span style={{ fontWeight: 600, lineHeight: 1.4 }}>{theme} ↗</span>
+                                                                    </a>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    ) : <p style={{ opacity: 0.5, fontStyle: 'italic' }}>Aucun ending trouvé.</p>}
+                                                </div>
+                                            </div>
                                         </div>
+
+                                    </>
+                                ) : (
+                                    <div style={{ padding: '3rem', textAlign: 'center', opacity: 0.6, fontStyle: 'italic', border: '2px dashed #000' }}>
+                                        Aucune musique (opening/ending) disponible.
                                     </div>
-                                </div>
+                                )}
+
+
                             </div>
                         )}
                     </div>
                 </div>
 
                 {/* RECOMMENDATIONS SECTION (Outside infoSection for full width or bottom) */}
-                {recommendations.length > 0 && (
-                    <div className="manga-panel" style={{ marginTop: '3rem', padding: '2rem' }}>
-                        <h2 style={{
-                            fontFamily: 'var(--font-heading)',
-                            fontSize: '2rem',
-                            marginBottom: '1.5rem',
-                            textTransform: 'uppercase',
-                            textAlign: 'center'
-                        }}>
-                            VOUS AIMEREZ AUSSI
-                        </h2>
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-                            gap: '1.5rem'
-                        }}>
-                            {recommendations.map((rec) => (
-                                <a
-                                    key={rec.entry.mal_id}
-                                    href={`/work/${rec.entry.mal_id}?type=${work.type}`}
-                                    style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
-                                >
-                                    <div style={{
-                                        position: 'relative',
-                                        marginBottom: '0.75rem',
-                                        border: '3px solid #000',
-                                        boxShadow: '6px 6px 0 #000',
-                                        transition: 'transform 0.2s',
-                                        background: '#000'
-                                    }}
-                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translate(-4px, -4px)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translate(0, 0)'}
+                {
+                    recommendations.length > 0 && (
+                        <div className="manga-panel" style={{ marginTop: '3rem', padding: '2rem' }}>
+                            <h2 style={{
+                                fontFamily: 'var(--font-heading)',
+                                fontSize: '2rem',
+                                marginBottom: '1.5rem',
+                                textTransform: 'uppercase',
+                                textAlign: 'center'
+                            }}>
+                                VOUS AIMEREZ AUSSI
+                            </h2>
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+                                gap: '1.5rem'
+                            }}>
+                                {recommendations.map((rec) => (
+                                    <a
+                                        key={rec.entry.mal_id}
+                                        href={`/work/${rec.entry.mal_id}?type=${work.type}`}
+                                        style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
                                     >
-                                        <img
-                                            src={rec.entry.images.jpg.large_image_url}
-                                            alt={rec.entry.title}
-                                            style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block' }}
-                                        />
                                         <div style={{
-                                            position: 'absolute',
-                                            bottom: 0,
-                                            left: 0,
-                                            right: 0,
-                                            background: '#000',
-                                            color: '#fff',
-                                            padding: '4px 8px',
-                                            fontSize: '0.7rem',
-                                            fontWeight: 800,
-                                            textAlign: 'center'
-                                        }}>
-                                            {rec.votes} VOTES
+                                            position: 'relative',
+                                            marginBottom: '0.75rem',
+                                            border: '3px solid #000',
+                                            boxShadow: '6px 6px 0 #000',
+                                            transition: 'transform 0.2s',
+                                            background: '#000'
+                                        }}
+                                            onMouseEnter={(e) => e.currentTarget.style.transform = 'translate(-4px, -4px)'}
+                                            onMouseLeave={(e) => e.currentTarget.style.transform = 'translate(0, 0)'}
+                                        >
+                                            <img
+                                                src={rec.entry.images.jpg.large_image_url}
+                                                alt={rec.entry.title}
+                                                style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block' }}
+                                            />
+                                            <div style={{
+                                                position: 'absolute',
+                                                bottom: 0,
+                                                left: 0,
+                                                right: 0,
+                                                background: '#000',
+                                                color: '#fff',
+                                                padding: '4px 8px',
+                                                fontSize: '0.7rem',
+                                                fontWeight: 800,
+                                                textAlign: 'center'
+                                            }}>
+                                                {rec.votes} VOTES
+                                            </div>
                                         </div>
-                                    </div>
-                                    <h4 style={{
-                                        fontSize: '0.9rem',
-                                        fontWeight: 800,
-                                        lineHeight: 1.3,
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        display: '-webkit-box',
-                                        WebkitLineClamp: 2,
-                                        WebkitBoxOrient: 'vertical',
-                                        textTransform: 'uppercase'
-                                    }}>
-                                        {rec.entry.title}
-                                    </h4>
-                                </a>
-                            ))}
+                                        <h4 style={{
+                                            fontSize: '0.9rem',
+                                            fontWeight: 800,
+                                            lineHeight: 1.3,
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 2,
+                                            WebkitBoxOrient: 'vertical',
+                                            textTransform: 'uppercase'
+                                        }}>
+                                            {rec.entry.title}
+                                        </h4>
+                                    </a>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )
+                }
 
                 {/* Delete Confirmation Modal */}
                 <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} title="SUPPRESSION">
@@ -1673,7 +1913,7 @@ export default function WorkDetails() {
                         </div>
                     </div>
                 </Modal>
-            </div>
+            </div >
         </Layout >
     );
 }

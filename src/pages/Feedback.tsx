@@ -97,26 +97,29 @@ export default function Feedback() {
 
     return (
         <Layout>
-            <div className="container" style={{ maxWidth: '800px', paddingTop: '2rem', paddingBottom: '4rem' }}>
+            <div className="container" style={{ maxWidth: '800px', paddingTop: '1.5rem', paddingBottom: '4rem', paddingLeft: '1rem', paddingRight: '1rem', boxSizing: 'border-box' }}>
                 <h1 style={{
                     fontFamily: 'var(--font-heading)',
-                    fontSize: '2.5rem',
+                    fontSize: 'clamp(1.5rem, 5vw, 2.5rem)',
                     marginBottom: '0.5rem',
                     textAlign: 'center'
                 }}>
                     AIDEZ-NOUS À PROGRESSER
                 </h1>
-                <p style={{ textAlign: 'center', marginBottom: '3rem', opacity: 0.7, maxWidth: '600px', margin: '0 auto 3rem auto' }}>
+                <p style={{ textAlign: 'center', marginBottom: '2rem', opacity: 0.7, maxWidth: '600px', margin: '0 auto 2rem auto', fontSize: 'clamp(0.9rem, 2.5vw, 1rem)' }}>
                     Bug trouvé ? Idée de génie ? Ou juste envie de dire bonjour ?<br />
                     Votre avis compte énormément pour l'évolution de la plateforme.
                 </p>
 
                 <div style={{
                     background: '#fff',
-                    border: '3px solid #000',
-                    boxShadow: '10px 10px 0 #000',
-                    padding: '2rem',
-                    position: 'relative'
+                    border: '2px solid #000',
+                    boxShadow: '6px 6px 0 #000',
+                    padding: 'clamp(1rem, 4vw, 2rem)',
+                    position: 'relative',
+                    maxWidth: '100%',
+                    boxSizing: 'border-box',
+                    overflow: 'hidden'
                 }}>
                     {/* Corner accents */}
                     <div style={{ position: 'absolute', top: -6, left: -6, width: 12, height: 12, background: '#000' }} />
@@ -131,24 +134,21 @@ export default function Feedback() {
                             <label style={{ display: 'block', fontWeight: 900, marginBottom: '1rem', textTransform: 'uppercase' }}>
                                 Votre Note Global
                             </label>
-                            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.25rem', flexWrap: 'wrap' }}>
                                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
                                     <button
                                         key={star}
                                         type="button"
                                         onClick={() => setRating(star)}
-                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                                         style={{
                                             background: 'none',
                                             border: 'none',
                                             cursor: 'pointer',
-                                            padding: 0,
-                                            transition: 'transform 0.2s',
+                                            padding: '0.25rem',
                                             opacity: rating >= star ? 1 : 0.3
                                         }}
                                     >
-                                        <Star fill={rating >= star ? '#000' : 'none'} color="#000" size={32} />
+                                        <Star fill={rating >= star ? '#000' : 'none'} color="#000" size={24} />
                                     </button>
                                 ))}
                             </div>
@@ -162,7 +162,7 @@ export default function Feedback() {
                             <label style={{ display: 'block', fontWeight: 900, marginBottom: '1rem', textTransform: 'uppercase' }}>
                                 C'est à propos de quoi ?
                             </label>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '0.75rem' }}>
                                 <button
                                     type="button"
                                     onClick={() => setCategory('bug')}

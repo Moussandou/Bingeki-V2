@@ -4,32 +4,53 @@ export function LoadingScreen() {
     return (
         <div style={{
             display: 'flex',
+            flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
             height: '100vh',
             width: '100vw',
-            background: '#050505'
+            background: '#fff',
+            color: '#000',
+            gap: '2rem'
         }}>
-            <motion.div
-                animate={{
-                    scale: [1, 1.2, 1],
-                    rotate: [0, 180, 360],
-                    borderRadius: ["20%", "50%", "20%"]
-                }}
-                transition={{
-                    duration: 2,
-                    ease: "easeInOut",
-                    times: [0, 0.5, 1],
-                    repeat: Infinity,
-                    repeatDelay: 0.5
-                }}
+            {/* Brutalist Loader */}
+            <div style={{
+                position: 'relative',
+                width: '80px',
+                height: '80px',
+            }}>
+                <motion.div
+                    animate={{
+                        rotate: 360,
+                    }}
+                    transition={{
+                        duration: 1.5,
+                        ease: "linear",
+                        repeat: Infinity,
+                    }}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        border: '8px solid #000',
+                        borderTopColor: 'transparent',
+                        borderRadius: '50%',
+                    }}
+                />
+            </div>
+
+            <motion.h1
+                animate={{ opacity: [1, 0.5, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
                 style={{
-                    width: '60px',
-                    height: '60px',
-                    background: 'var(--gradient-primary)',
-                    boxShadow: '0 0 20px var(--color-primary-glow)'
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: '2rem',
+                    fontWeight: 900,
+                    letterSpacing: '2px',
+                    textTransform: 'uppercase'
                 }}
-            />
+            >
+                CHARGEMENT
+            </motion.h1>
         </div>
     );
 }

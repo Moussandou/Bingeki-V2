@@ -1,143 +1,60 @@
 import { Layout } from '@/components/layout/Layout';
 import { changelogData } from '@/data/changelog';
 import { Calendar, CheckCircle, Tag, GitCommit } from 'lucide-react';
+import styles from './Changelog.module.css';
 
 export default function Changelog() {
     return (
         <Layout>
-            <div className="container" style={{ padding: '2rem 1rem', maxWidth: '800px' }}>
+            <div className={styles.container}>
 
                 {/* Header */}
-                <div style={{
-                    textAlign: 'center',
-                    marginBottom: '4rem',
-                    position: 'relative'
-                }}>
-                    <h1 style={{
-                        fontSize: '3rem',
-                        fontFamily: 'var(--font-heading)',
-                        textTransform: 'uppercase',
-                        marginBottom: '1rem',
-                        position: 'relative',
-                        display: 'inline-block'
-                    }}>
+                <div className={styles.header}>
+                    <h1 className={styles.title}>
                         Mises à Jour
-                        <div style={{
-                            position: 'absolute',
-                            bottom: '-10px',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            width: '60%',
-                            height: '4px',
-                            background: '#000'
-                        }} />
+                        <div className={styles.titleUnderline} />
                     </h1>
-                    <p style={{ opacity: 0.7, fontWeight: 500 }}>
+                    <p className={styles.subtitle}>
                         L'historique des évolutions de la plateforme Bingeki.
                     </p>
                 </div>
 
                 {/* Timeline */}
-                <div style={{ position: 'relative', paddingLeft: '20px' }}>
+                <div className={styles.timelineContainer}>
                     {/* Vertical Line */}
-                    <div style={{
-                        position: 'absolute',
-                        top: 0,
-                        bottom: 0,
-                        left: '19px', // Center of the timeline circles
-                        width: '4px',
-                        background: '#000'
-                    }} />
+                    <div className={styles.timelineLine} />
 
                     {changelogData.map((entry, index) => (
-                        <div key={index} style={{
-                            marginBottom: '4rem',
-                            position: 'relative',
-                            paddingLeft: '3rem'
-                        }}>
+                        <div key={index} className={styles.timelineEntry}>
                             {/* Timeline Node */}
-                            <div style={{
-                                position: 'absolute',
-                                left: 0,
-                                top: '0',
-                                width: '42px',
-                                height: '42px',
-                                background: '#fff',
-                                border: '4px solid #000',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                zIndex: 10
-                            }}>
+                            <div className={styles.timelineNode}>
                                 <GitCommit size={20} />
                             </div>
 
                             {/* Content Card */}
-                            <div style={{
-                                background: '#fff',
-                                border: '3px solid #000',
-                                boxShadow: '6px 6px 0 rgba(0,0,0,1)',
-                                padding: '2rem',
-                                position: 'relative'
-                            }}>
+                            <div className={styles.contentCard}>
                                 {/* Header: Version & Date */}
-                                <div style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    marginBottom: '1rem',
-                                    flexWrap: 'wrap',
-                                    gap: '1rem',
-                                    borderBottom: '2px solid #eee',
-                                    paddingBottom: '1rem'
-                                }}>
-                                    <div style={{
-                                        background: '#000',
-                                        color: '#fff',
-                                        padding: '0.25rem 0.75rem',
-                                        fontWeight: 900,
-                                        fontFamily: 'var(--font-heading)',
-                                        fontSize: '1.2rem',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem'
-                                    }}>
+                                <div className={styles.cardHeader}>
+                                    <div className={styles.versionTag}>
                                         <Tag size={16} /> {entry.version}
                                     </div>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        fontWeight: 700,
-                                        opacity: 0.6
-                                    }}>
+                                    <div className={styles.dateTag}>
                                         <Calendar size={16} /> {entry.date}
                                     </div>
                                 </div>
 
                                 {/* Title & Description */}
-                                <h2 style={{
-                                    fontFamily: 'var(--font-heading)',
-                                    textTransform: 'uppercase',
-                                    fontSize: '1.8rem',
-                                    marginBottom: '0.5rem'
-                                }}>
+                                <h2 className={styles.entryTitle}>
                                     {entry.title}
                                 </h2>
-                                <p style={{ marginBottom: '1.5rem', lineHeight: '1.6', opacity: 0.8 }}>
+                                <p className={styles.entryDescription}>
                                     {entry.description}
                                 </p>
 
                                 {/* Changes List */}
-                                <ul style={{ listStyle: 'none', padding: 0 }}>
+                                <ul className={styles.changesList}>
                                     {entry.changes.map((change, i) => (
-                                        <li key={i} style={{
-                                            marginBottom: '0.75rem',
-                                            display: 'flex',
-                                            alignItems: 'flex-start',
-                                            gap: '0.75rem'
-                                        }}>
+                                        <li key={i} className={styles.changeItem}>
                                             <div style={{ marginTop: '3px' }}>
                                                 <CheckCircle size={18} fill="#000" color="#fff" strokeWidth={3} />
                                             </div>
@@ -151,16 +68,8 @@ export default function Changelog() {
                 </div>
 
                 {/* End Marker */}
-                <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                    <div style={{
-                        display: 'inline-block',
-                        background: '#000',
-                        color: '#fff',
-                        padding: '0.5rem 2rem',
-                        fontWeight: 900,
-                        fontFamily: 'var(--font-heading)',
-                        transform: 'rotate(-2deg)'
-                    }}>
+                <div className={styles.endMarkerContainer}>
+                    <div className={styles.endMarker}>
                         LA SUITE AU PROCHAIN ÉPISODE
                     </div>
                 </div>
