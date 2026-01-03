@@ -463,15 +463,28 @@ export default function WorkDetails() {
         }
     }, [work?.id, work?.type, work?.totalChapters, activeTab, episodesPage]);
 
+    const [commentError, setCommentError] = useState<string | null>(null);
+
     // Load comments and friends reading when work changes
     useEffect(() => {
         if (work?.id) {
             // Load comments
             setIsLoadingComments(true);
-            getCommentsWithReplies(Number(work.id)).then(data => {
-                setComments(data);
-                setIsLoadingComments(false);
-            });
+            setCommentError(null); // Reset error
+            getCommentsWithReplies(Number(work.id))
+                .then(data => {
+                    setComments(data);
+                    setIsLoadingComments(false);
+                })
+                .catch(err => {
+                    console.error("Error loading comments:", err);
+                    setIsLoadingComments(false);
+                    if (err.code === 'permission-denied' || err.message?.includes('Missing or insufficient permissions')) {
+                        setCommentError("Vous n'avez pas la permission de voir les commentaires (Règles Firestore).");
+                    } else {
+                        setCommentError("Impossible de charger les commentaires.");
+                    }
+                });
 
             // Load friends reading this work
             if (user) {
@@ -1386,10 +1399,30 @@ export default function WorkDetails() {
                                                 <p style={{ opacity: 0.6, fontStyle: 'italic', marginBottom: '1rem' }}>Connectez-vous pour commenter</p>
                                             )}
 
+                                            {/* Error State */}
+                                            {commentError && (
+                                                <div style={{
+                                                    background: '#fee2e2',
+                                                    border: '2px solid #ef4444',
+                                                    padding: '1rem',
+                                                    marginBottom: '1rem',
+                                                    borderRadius: '4px',
+                                                    color: '#b91c1c',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.5rem'
+                                                }}>
+                                                    <AlertTriangle size={20} />
+                                                    <div>
+                                                        <strong>Erreur de chargement :</strong> {commentError}
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             {/* Comments list */}
                                             {isLoadingComments ? (
                                                 <p style={{ textAlign: 'center', opacity: 0.6 }}>Chargement des commentaires...</p>
-                                            ) : comments.length === 0 ? (
+                                            ) : comments.length === 0 && !commentError ? (
                                                 <p style={{ textAlign: 'center', opacity: 0.6, padding: '2rem' }}>Aucun commentaire. Soyez le premier !</p>
                                             ) : (
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -1494,12 +1527,12 @@ export default function WorkDetails() {
                                                                 <div key={stat.label}>
                                                                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 600, marginBottom: '2px' }}>
                                                                         <span>{stat.label}</span>
-                                                                        <span>{stat.value.toLocaleString()}</span>
+                                                                        <span>{(stat.value || 0).toLocaleString()}</span>
                                                                     </div>
                                                                     <div style={{ height: '8px', background: '#eee', borderRadius: '4px', overflow: 'hidden' }}>
                                                                         <div style={{
                                                                             height: '100%',
-                                                                            width: `${(stat.value / statistics.total) * 100}%`,
+                                                                            width: `${((stat.value || 0) / (statistics.total || 1)) * 100}%`,
                                                                             background: stat.color
                                                                         }} />
                                                                     </div>

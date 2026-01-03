@@ -64,6 +64,7 @@
 .chartContainer {
     height: 220px;
     width: 100%;
+    min-height: 220px;
     position: relative;
     overflow: hidden;
     /* Prevent potential overflow causing recalc issues */
