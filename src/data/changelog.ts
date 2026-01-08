@@ -8,6 +8,17 @@ export interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
     {
+        version: 'v2.9',
+        date: '03 Janvier 2026',
+        title: 'Trailer & UI Polish',
+        description: 'Correction critique du lecteur de bande-annonce et optimisation de l\'interface.',
+        changes: [
+            'Fix : Le bouton "Fermer" du trailer est maintenant toujours visible (Z-Index fix).',
+            'Tech : Utilisation de React Portals pour les modales plein écran.',
+            'UI : Amélioration du contraste des boutons d\'interaction.'
+        ]
+    },
+    {
         version: 'v2.8',
         date: '03 Janvier 2026',
         title: 'Showcase & Accessibilité',

@@ -36,6 +36,7 @@ const Schedule = lazy(() => import('@/pages/Schedule'));
 const CharacterDetails = lazy(() => import('@/pages/CharacterDetails'));
 const PersonDetails = lazy(() => import('@/pages/PersonDetails'));
 const Credits = lazy(() => import('@/pages/Credits'));
+const Assets = lazy(() => import('@/pages/AssetsPage'));
 
 function App() {
   const { setUser, setLoading, user } = useAuthStore();
@@ -185,6 +186,7 @@ function App() {
                 <Credits />
               </Suspense>
             } />
+            <Route path="/assets" element={<Assets />} />
           </Routes>
         </Suspense>
       </BrowserRouter>
