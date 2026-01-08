@@ -1,9 +1,10 @@
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
+import { createPortal } from 'react-dom';
 import { useLibraryStore } from '@/store/libraryStore';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal'; // Import Modal
-import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff, Reply, Video, Calendar, BarChart, Music, Disc } from 'lucide-react';
+import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff, Reply, Video, Calendar, BarChart, Music, Disc, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { statusToFrench } from '@/utils/statusTranslation';
 import { useGamificationStore } from '@/store/gamificationStore';
@@ -223,6 +224,16 @@ export default function WorkDetails() {
     const typeParam = searchParams.get('type') as 'anime' | 'manga' | null;
     const [fetchedWork, setFetchedWork] = useState<any | null>(null);
     const [isFetchingDetails, setIsFetchingDetails] = useState(false);
+
+    const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+
+    // Expandable sections state
+    const [isCastingExpanded, setIsCastingExpanded] = useState(false);
+    const [isStaffExpanded, setIsStaffExpanded] = useState(false);
+    const [isTrailerOpen, setIsTrailerOpen] = useState(false);
+
+
+    // const castingScrollRef = useRef<HTMLDivElement>(null); // Removed as we switched to grid
 
     const libraryWork = getWork(Number(id));
 
@@ -928,106 +939,273 @@ export default function WorkDetails() {
                                         )}
                                     </div>
 
-                                    {/* Trailer */}
-                                    {work.trailer && work.trailer.embed_url && (
-                                        <div style={{ width: '100%', marginTop: '1rem' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                                                <Video size={20} strokeWidth={2.5} />
-                                                <h3 className={styles.synopsisTitle} style={{ marginBottom: 0 }}>BANDE-ANNONCE</h3>
+                                    {/* Trailer - Theater Mode */}
+                                    {work.trailer && work.trailer.embed_url && (() => {
+                                        const trailerThumbnail = work.trailer.images?.maximum_image_url
+                                            || work.trailer.images?.large_image_url
+                                            || work.trailer.images?.medium_image_url
+                                            || work.trailer.images?.small_image_url
+                                            || (work.trailer.youtube_id ? `https://img.youtube.com/vi/${work.trailer.youtube_id}/maxresdefault.jpg` : null)
+                                            || (work.trailer.youtube_id ? `https://img.youtube.com/vi/${work.trailer.youtube_id}/hqdefault.jpg` : null);
+
+                                        return (
+                                            <div style={{ width: '100%', marginTop: '1rem' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                                                    <Video size={20} strokeWidth={2.5} />
+                                                    <h3 className={styles.synopsisTitle} style={{ marginBottom: 0 }}>BANDE-ANNONCE</h3>
+                                                </div>
+
+                                                {/* Theater Mode Trigger Card */}
+                                                <div
+                                                    onClick={() => setIsTrailerOpen(true)}
+                                                    style={{
+                                                        position: 'relative',
+                                                        width: '100%',
+                                                        height: '200px',
+                                                        background: '#000',
+                                                        backgroundImage: trailerThumbnail ? `url(${trailerThumbnail})` : 'none',
+                                                        backgroundSize: 'cover',
+                                                        backgroundPosition: 'center',
+                                                        border: '4px solid #000',
+                                                        boxShadow: '8px 8px 0 rgba(0,0,0,1)',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        overflow: 'hidden',
+                                                        transition: 'all 0.2s ease'
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        e.currentTarget.style.transform = 'translate(-2px, -2px)';
+                                                        e.currentTarget.style.boxShadow = '10px 10px 0 rgba(0,0,0,1)';
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.transform = 'translate(0, 0)';
+                                                        e.currentTarget.style.boxShadow = '8px 8px 0 rgba(0,0,0,1)';
+                                                    }}
+                                                >
+                                                    <div style={{
+                                                        position: 'absolute',
+                                                        top: 0, left: 0, right: 0, bottom: 0,
+                                                        background: 'rgba(0,0,0,0.4)',
+                                                        transition: 'background 0.2s'
+                                                    }} />
+
+                                                    <div style={{
+                                                        position: 'relative',
+                                                        zIndex: 2,
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        alignItems: 'center',
+                                                    }}>
+                                                        <div style={{
+                                                            width: '80px',
+                                                            height: '80px',
+                                                            borderRadius: '50%',
+                                                            background: 'rgba(255, 255, 255, 0.9)',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            border: '4px solid #000',
+                                                            backdropFilter: 'blur(4px)',
+                                                            boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+                                                        }}>
+                                                            <div style={{
+                                                                width: 0,
+                                                                height: 0,
+                                                                borderTop: '12px solid transparent',
+                                                                borderBottom: '12px solid transparent',
+                                                                borderLeft: '20px solid #000',
+                                                                marginLeft: '6px'
+                                                            }} />
+                                                        </div>
+                                                        <span style={{
+                                                            color: '#fff',
+                                                            fontFamily: 'var(--font-heading)',
+                                                            fontSize: '1.5rem',
+                                                            textTransform: 'uppercase',
+                                                            letterSpacing: '2px',
+                                                            textShadow: '3px 3px 0 #000',
+                                                            textAlign: 'center',
+                                                            padding: '0 1rem'
+                                                        }}>
+                                                            REGARDER LA BANDE-ANNONCE
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Full Screen Trailer Modal (Portal) */}
+                                                {isTrailerOpen && createPortal(
+                                                    <div
+                                                        style={{
+                                                            position: 'fixed',
+                                                            top: 0, left: 0, right: 0, bottom: 0,
+                                                            background: 'rgba(0,0,0,0.95)',
+                                                            zIndex: 99999,
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center'
+                                                        }}
+                                                        onClick={() => setIsTrailerOpen(false)}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                width: '80%',
+                                                                maxWidth: '1000px',
+                                                                aspectRatio: '16/9',
+                                                                background: '#000',
+                                                                border: '2px solid #333',
+                                                                boxShadow: '0 0 50px rgba(0,0,0,0.8)',
+                                                                position: 'relative'
+                                                            }}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            <iframe
+                                                                src={`${work.trailer.embed_url}?autoplay=1`}
+                                                                title="Full Screen Trailer"
+                                                                frameBorder="0"
+                                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                                allowFullScreen
+                                                                style={{ width: '100%', height: '100%' }}
+                                                            />
+                                                        </div>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setIsTrailerOpen(false);
+                                                            }}
+                                                            style={{
+                                                                position: 'absolute',
+                                                                top: '30px',
+                                                                right: '30px',
+                                                                zIndex: 100000,
+                                                                background: '#000',
+                                                                border: '2px solid #fff',
+                                                                color: '#fff',
+                                                                cursor: 'pointer',
+                                                                padding: '0.5rem 1rem',
+                                                                borderRadius: '50px',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '0.5rem',
+                                                                boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
+                                                                transition: 'all 0.2s ease'
+                                                            }}
+                                                            onMouseEnter={(e) => {
+                                                                e.currentTarget.style.background = '#333';
+                                                                e.currentTarget.style.transform = 'scale(1.05)';
+                                                            }}
+                                                            onMouseLeave={(e) => {
+                                                                e.currentTarget.style.background = '#000';
+                                                                e.currentTarget.style.transform = 'scale(1)';
+                                                            }}
+                                                        >
+                                                            <span style={{ fontWeight: 700, fontSize: '0.9rem', letterSpacing: '1px' }}>FERMER</span>
+                                                            <X size={24} strokeWidth={2.5} />
+                                                        </button>
+                                                    </div>,
+                                                    document.body
+                                                )}
                                             </div>
-                                            <div style={{
-                                                position: 'relative',
-                                                overflow: 'hidden',
-                                                paddingBottom: '56.25%',
-                                                height: 0,
-                                                background: '#000',
-                                                border: '4px solid #000',
-                                                boxShadow: '8px 8px 0 rgba(0,0,0,1)'
-                                            }}>
-                                                <iframe
-                                                    src={`${work.trailer.embed_url}?autoplay=0`}
-                                                    title="Trailer"
-                                                    frameBorder="0"
-                                                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                    allowFullScreen
-                                                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
+                                        )
+                                    })()}
 
                                     {/* CASTING SECTION */}
                                     {characters.length > 0 && (
                                         <div style={{ marginTop: '1rem' }}>
                                             <h3 className={styles.synopsisTitle} style={{ marginBottom: '1rem' }}>CASTING</h3>
-                                            <div className={`scrollbar-hide ${styles.castingContainer}`}>
-                                                {characters.filter(c => c.character.images?.jpg?.image_url).map((c) => {
-                                                    const jpVa = c.voice_actors?.find((va: any) => va.language === 'Japanese');
-                                                    return (
-                                                        <div key={c.character.mal_id} className={styles.castingItem}>
-                                                            {/* Character Image - Clickable */}
-                                                            <div
-                                                                onClick={() => navigate(`/character/${c.character.mal_id}`)}
-                                                                style={{
-                                                                    width: '100px',
-                                                                    height: '100px',
-                                                                    borderRadius: '50%',
-                                                                    border: '3px solid #000',
-                                                                    overflow: 'hidden',
-                                                                    marginBottom: '0.5rem',
-                                                                    background: '#f0f0f0',
-                                                                    cursor: 'pointer',
-                                                                    transition: 'transform 0.2s'
-                                                                }}
-                                                                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                                                                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                                            >
-                                                                <img
-                                                                    src={c.character.images.jpg.image_url}
-                                                                    alt={c.character.name}
-                                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                                />
-                                                            </div>
-                                                            <div
-                                                                onClick={() => navigate(`/character/${c.character.mal_id}`)}
-                                                                style={{ fontSize: '0.8rem', fontWeight: 800, textAlign: 'center', lineHeight: 1.2, marginBottom: '4px', cursor: 'pointer' }}
-                                                            >
-                                                                {c.character.name}
-                                                            </div>
-                                                            <div style={{ fontSize: '0.7rem', opacity: 0.6, textAlign: 'center', fontWeight: 600, marginBottom: '0.5rem' }}>
-                                                                {c.role}
-                                                            </div>
 
-                                                            {/* Seiyuu Info - Clickable */}
-                                                            {jpVa && (
+                                            <div style={{
+                                                display: 'flex',
+                                                flexWrap: 'wrap',
+                                                gap: '1rem',
+                                                justifyContent: 'center'
+                                            }}>
+                                                {characters
+                                                    .filter(c => c.character.images?.jpg?.image_url)
+                                                    .slice(0, isCastingExpanded ? undefined : 12)
+                                                    .map((c) => {
+                                                        const jpVa = c.voice_actors?.find((va: any) => va.language === 'Japanese');
+                                                        return (
+                                                            <div key={c.character.mal_id} className={styles.castingItem} style={{ flex: '1 1 100px', maxWidth: '120px' }}>
+                                                                {/* Character Image - Clickable */}
                                                                 <div
-                                                                    onClick={() => navigate(`/person/${jpVa.person.mal_id}`)}
+                                                                    onClick={() => navigate(`/character/${c.character.mal_id}`)}
                                                                     style={{
-                                                                        display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 'auto',
-                                                                        borderTop: '1px dashed #ccc', paddingTop: '4px', width: '100%', cursor: 'pointer'
-                                                                    }}
-                                                                    onMouseOver={(e) => e.currentTarget.style.opacity = '0.8'}
-                                                                    onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
-                                                                >
-                                                                    <div style={{
-                                                                        width: '40px',
-                                                                        height: '40px',
+                                                                        width: '100px',
+                                                                        height: '100px',
                                                                         borderRadius: '50%',
+                                                                        border: '3px solid #000',
                                                                         overflow: 'hidden',
-                                                                        border: '2px solid #555',
-                                                                        marginBottom: '2px'
-                                                                    }}>
-                                                                        <img src={jpVa.person.images.jpg.image_url} alt={jpVa.person.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                                    </div>
-                                                                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#555', textAlign: 'center', lineHeight: 1.1 }}>
-                                                                        {jpVa.person.name}
-                                                                    </div>
+                                                                        marginBottom: '0.5rem',
+                                                                        background: '#f0f0f0',
+                                                                        cursor: 'pointer',
+                                                                        transition: 'transform 0.2s',
+                                                                        margin: '0 auto'
+                                                                    }}
+                                                                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                                                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                                                >
+                                                                    <img
+                                                                        src={c.character.images.jpg.image_url}
+                                                                        alt={c.character.name}
+                                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                                    />
                                                                 </div>
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })}
+                                                                <div
+                                                                    onClick={() => navigate(`/character/${c.character.mal_id}`)}
+                                                                    style={{ fontSize: '0.8rem', fontWeight: 800, textAlign: 'center', lineHeight: 1.2, marginBottom: '4px', cursor: 'pointer' }}
+                                                                >
+                                                                    {c.character.name}
+                                                                </div>
+                                                                <div style={{ fontSize: '0.7rem', opacity: 0.6, textAlign: 'center', fontWeight: 600, marginBottom: '0.5rem' }}>
+                                                                    {c.role}
+                                                                </div>
+
+                                                                {/* Seiyuu Info - Clickable */}
+                                                                {jpVa && (
+                                                                    <div
+                                                                        onClick={() => navigate(`/person/${jpVa.person.mal_id}`)}
+                                                                        style={{
+                                                                            display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 'auto',
+                                                                            borderTop: '1px dashed #ccc', paddingTop: '4px', width: '100%', cursor: 'pointer'
+                                                                        }}
+                                                                        onMouseOver={(e) => e.currentTarget.style.opacity = '0.8'}
+                                                                        onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
+                                                                    >
+                                                                        <div style={{
+                                                                            width: '40px',
+                                                                            height: '40px',
+                                                                            borderRadius: '50%',
+                                                                            overflow: 'hidden',
+                                                                            border: '2px solid #555',
+                                                                            marginBottom: '2px'
+                                                                        }}>
+                                                                            <img src={jpVa.person.images.jpg.image_url} alt={jpVa.person.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                                        </div>
+                                                                        <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#555', textAlign: 'center', lineHeight: 1.1 }}>
+                                                                            {jpVa.person.name}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
                                             </div>
+
+                                            {/* Show More / Show Less Button */}
+                                            {characters.length > 12 && (
+                                                <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                                                    <Button
+                                                        onClick={() => setIsCastingExpanded(!isCastingExpanded)}
+                                                        variant="ghost"
+                                                        style={{ border: '1px dashed #000' }}
+                                                    >
+                                                        {isCastingExpanded ? 'VOIR MOINS' : `VOIR PLUS (${characters.length - 12})`}
+                                                    </Button>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 
@@ -1477,14 +1655,22 @@ export default function WorkDetails() {
                                 ) : (
                                     <>
 
+
+
                                         {/* STAFF SECTION (Moved here) */}
                                         {staff.length > 0 && (
                                             <div style={{ marginBottom: '2rem' }}>
                                                 <h3 className={styles.sectionTitle}>STAFF (PRINCIPAL)</h3>
-                                                <div style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', padding: '1rem 0' }} className="scrollbar-hide">
+                                                <div style={{
+                                                    display: 'flex',
+                                                    flexWrap: 'wrap',
+                                                    gap: '1.5rem',
+                                                    justifyContent: 'center'
+                                                }}>
                                                     {staff
                                                         .filter(s => s.positions.some(p => p.includes('Director') || p === 'Character Design' || p === 'Music' || p === 'Series Composition'))
                                                         .filter((s, index, self) => index === self.findIndex((t) => t.person.mal_id === s.person.mal_id))
+                                                        .slice(0, isStaffExpanded ? undefined : 6)
                                                         .map((s) => (
                                                             <div key={s.person.mal_id} style={{ minWidth: '120px', maxWidth: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
                                                                 <div style={{ width: '90px', height: '90px', borderRadius: '50%', overflow: 'hidden', border: '3px solid #000', marginBottom: '0.5rem', boxShadow: '3px 3px 0 0px #000' }}>
@@ -1501,6 +1687,19 @@ export default function WorkDetails() {
                                                             </div>
                                                         ))}
                                                 </div>
+
+                                                {/* Show More Staff Button */}
+                                                {staff.filter(s => s.positions.some(p => p.includes('Director') || p === 'Character Design' || p === 'Music' || p === 'Series Composition')).length > 6 && (
+                                                    <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                                                        <Button
+                                                            onClick={() => setIsStaffExpanded(!isStaffExpanded)}
+                                                            variant="ghost"
+                                                            style={{ border: '1px dashed #000' }}
+                                                        >
+                                                            {isStaffExpanded ? 'VOIR MOINS' : 'VOIR PLUS'}
+                                                        </Button>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
 
@@ -1690,7 +1889,7 @@ export default function WorkDetails() {
                                             }}
                                                 onMouseEnter={(e) => e.currentTarget.style.transform = 'translate(-2px, -2px)'}
                                                 onMouseLeave={(e) => e.currentTarget.style.transform = 'translate(0, 0)'}
-                                                onClick={() => window.open(pic.jpg.large_image_url, '_blank')}
+                                                onClick={() => setSelectedImageIndex(idx)}
                                             >
                                                 <img
                                                     src={pic.jpg.large_image_url}
@@ -1946,6 +2145,117 @@ export default function WorkDetails() {
                         </div>
                     </div>
                 </Modal>
+
+                {/* GALLERY LIGHTBOX */}
+                {
+                    selectedImageIndex !== null && pictures.length > 0 && (
+                        <div
+                            style={{
+                                position: 'fixed',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                zIndex: 1000,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: '2rem'
+                            }}
+                            onClick={() => setSelectedImageIndex(null)}
+                        >
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedImageIndex(null);
+                                }}
+                                style={{
+                                    position: 'absolute',
+                                    top: '20px',
+                                    right: '20px',
+                                    background: 'none',
+                                    border: 'none',
+                                    color: '#fff',
+                                    cursor: 'pointer',
+                                    zIndex: 1001
+                                }}
+                            >
+                                <X size={40} />
+                            </button>
+
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedImageIndex((prev) => (prev === 0 || prev === null ? pictures.length - 1 : prev - 1));
+                                }}
+                                style={{
+                                    position: 'absolute',
+                                    left: '20px',
+                                    background: '#fff',
+                                    border: 'none',
+                                    borderRadius: '50%',
+                                    width: '50px',
+                                    height: '50px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    zIndex: 1001,
+                                    boxShadow: '0 0 10px rgba(0,0,0,0.5)'
+                                }}
+                            >
+                                <ArrowLeft size={30} color="#000" />
+                            </button>
+
+                            <img
+                                src={pictures[selectedImageIndex].jpg.large_image_url}
+                                alt="Gallery Fullscreen"
+                                style={{
+                                    maxWidth: '100%',
+                                    maxHeight: '100%',
+                                    objectFit: 'contain',
+                                    boxShadow: '0 0 20px rgba(0,0,0,0.5)'
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                            />
+
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedImageIndex((prev) => (prev === pictures.length - 1 || prev === null ? 0 : prev + 1));
+                                }}
+                                style={{
+                                    position: 'absolute',
+                                    right: '20px',
+                                    background: '#fff',
+                                    border: 'none',
+                                    borderRadius: '50%',
+                                    width: '50px',
+                                    height: '50px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    zIndex: 1001,
+                                    boxShadow: '0 0 10px rgba(0,0,0,0.5)'
+                                }}
+                            >
+                                <ArrowLeft size={30} color="#000" style={{ transform: 'rotate(180deg)' }} />
+                            </button>
+
+                            <div style={{
+                                position: 'absolute',
+                                bottom: '20px',
+                                color: '#fff',
+                                fontWeight: 900,
+                                fontSize: '1.2rem'
+                            }}>
+                                {selectedImageIndex + 1} / {pictures.length}
+                            </div>
+                        </div>
+                    )
+                }
             </div >
         </Layout >
     );
