@@ -135,11 +135,11 @@ export function Footer() {
                                 display: 'inline-block',
                                 background: '#fff',
                                 color: '#fff',
-                                padding: '0.5rem 1rem',
+                                padding: '0.8rem 3rem', // Increased padding
                                 fontWeight: 900,
                                 fontSize: '1rem',
                                 textDecoration: 'none',
-                                clipPath: 'polygon(5% 0, 100% 0, 95% 100%, 0% 100%)',
+                                clipPath: 'polygon(3% 0, 100% 0, 97% 100%, 0% 100%)', // Reduced skew
                                 transition: 'transform 0.2s',
                                 border: '3px solid #000',
                                 letterSpacing: '1px'

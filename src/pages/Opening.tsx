@@ -718,11 +718,11 @@ export default function Opening() {
                                     display: 'inline-block',
                                     background: '#fff',
                                     color: '#fff',
-                                    padding: '1rem 1.5rem',
+                                    padding: '1rem 4rem', // Increased horizontal padding
                                     fontWeight: 900,
                                     fontSize: '1.1rem',
                                     textDecoration: 'none',
-                                    clipPath: 'polygon(5% 0, 100% 0, 95% 100%, 0% 100%)',
+                                    clipPath: 'polygon(3% 0, 100% 0, 97% 100%, 0% 100%)', // Reduced skew 5% -> 3%
                                     border: '4px solid #000',
                                     letterSpacing: '2px',
                                     boxShadow: '6px 6px 0 rgba(0,0,0,0.2)',
@@ -730,10 +730,10 @@ export default function Opening() {
                                 }}
                             >
                                 <img
-                                    src="/Support me 2.gif"
+                                    src="/Ko-fi logo.gif" // Switched to preferred logo
                                     alt="Support me on Ko-fi"
                                     style={{
-                                        height: '50px',
+                                        height: '40px', // Adjusted height
                                         display: 'block'
                                     }}
                                 />
