@@ -133,9 +133,9 @@ export function Footer() {
                             rel="noopener noreferrer"
                             style={{
                                 display: 'inline-block',
-                                background: '#000',
+                                background: '#fff',
                                 color: '#fff',
-                                padding: '1rem 2.5rem',
+                                padding: '0.5rem 1rem',
                                 fontWeight: 900,
                                 fontSize: '1rem',
                                 textDecoration: 'none',
@@ -147,7 +147,15 @@ export function Footer() {
                             onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)'}
                             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1) translateY(0)'}
                         >
-                            ☕ OFFRIR UN CAFÉ
+                            <img
+                                src="/Ko-fi logo.gif"
+                                alt="Support me on Ko-fi"
+                                style={{
+                                    height: '36px',
+                                    display: 'block',
+                                    margin: '0 auto'
+                                }}
+                            />
                         </a>
                         <p style={{ fontSize: '0.75rem', marginTop: '1rem', color: '#000', opacity: 0.7, fontWeight: 600 }}>
                             Chaque contribution aide à ajouter de nouvelles fonctionnalités !

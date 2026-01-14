@@ -4,6 +4,7 @@
 ![CI Status](https://github.com/Moussandou/Bingeki-V2/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/github/license/Moussandou/Bingeki-V2)
 ![Version](https://img.shields.io/badge/version-2.6-blue)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/H2H41S9PFY)
 
 **Bingeki** est une application web PWA de suivi de mangas et d'animes, transformant votre consommation de médias en une véritable aventure RPG.
 
