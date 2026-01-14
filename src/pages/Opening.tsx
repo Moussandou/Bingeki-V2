@@ -716,9 +716,9 @@ export default function Opening() {
                                 whileTap={{ scale: 0.98 }}
                                 style={{
                                     display: 'inline-block',
-                                    background: '#000',
+                                    background: '#fff',
                                     color: '#fff',
-                                    padding: '1.25rem 3rem',
+                                    padding: '1rem 1.5rem',
                                     fontWeight: 900,
                                     fontSize: '1.1rem',
                                     textDecoration: 'none',
@@ -729,7 +729,14 @@ export default function Opening() {
                                     fontFamily: 'var(--font-heading)'
                                 }}
                             >
-                                ☕ OFFRIR UN CAFÉ
+                                <img
+                                    src="/Support me 2.gif"
+                                    alt="Support me on Ko-fi"
+                                    style={{
+                                        height: '50px',
+                                        display: 'block'
+                                    }}
+                                />
                             </motion.a>
 
                             <div style={{
