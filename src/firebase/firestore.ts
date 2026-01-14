@@ -49,6 +49,9 @@ export interface UserProfile {
     favoriteManga?: string;
     top3Favorites?: string[];
     featuredBadge?: string;
+    isAdmin?: boolean;
+    isBanned?: boolean;
+    createdAt?: number; // Added for new user stats
 }
 
 // Save user profile to Firestore
@@ -935,6 +938,100 @@ export async function deleteUserData(userId: string): Promise<void> {
         console.log('[Firestore] All user data deleted for:', userId);
     } catch (error) {
         console.error('[Firestore] Error deleting user data:', error);
+        throw error;
+    }
+}
+
+// ==================== ADMIN DASHBOARD FUNCTIONS ====================
+
+// Get system stats for dashboard
+export async function getAdminStats(): Promise<{
+    totalUsers: number;
+    totalFeedback: number;
+    newUsersToday: number;
+    pendingFeedback: number;
+}> {
+    try {
+        const usersSnap = await getDocs(collection(db, 'users'));
+        const feedbackSnap = await getDocs(collection(db, 'feedback'));
+
+        const now = new Date();
+        const startOfDay = new Date(now.setHours(0, 0, 0, 0)).getTime();
+
+        const newUsersToday = usersSnap.docs.filter(doc => {
+            const data = doc.data() as UserProfile;
+            // Use lastLogin as proxy if createdAt missing, but ideally we use createdAt
+            const joinDate = data.createdAt || data.lastLogin || 0;
+            return joinDate > startOfDay;
+        }).length;
+
+        const pendingFeedback = feedbackSnap.docs.filter(doc => {
+            const data = doc.data() as any;
+            return !data.status || data.status === 'open';
+        }).length;
+
+        return {
+            totalUsers: usersSnap.size,
+            totalFeedback: feedbackSnap.size,
+            newUsersToday,
+            pendingFeedback
+        };
+    } catch (error) {
+        console.error('[Firestore] Error getting admin stats:', error);
+        return { totalUsers: 0, totalFeedback: 0, newUsersToday: 0, pendingFeedback: 0 };
+    }
+}
+
+// Get all users for admin table
+export async function getAllUsers(): Promise<UserProfile[]> {
+    try {
+        const q = query(collection(db, 'users'), orderBy('lastLogin', 'desc'), limit(50));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as UserProfile));
+    } catch (error) {
+        console.error('[Firestore] Error getting all users:', error);
+        return [];
+    }
+}
+
+// Toggle User Ban Status
+export async function toggleUserBan(uid: string, isBanned: boolean): Promise<void> {
+    try {
+        await updateDoc(doc(db, 'users', uid), { isBanned });
+        console.log(`[Firestore] User ${uid} ban status set to ${isBanned}`);
+    } catch (error) {
+        console.error('[Firestore] Error toggling user ban:', error);
+        throw error;
+    }
+}
+
+// Toggle User Admin Status
+export async function toggleUserAdmin(uid: string, isAdmin: boolean): Promise<void> {
+    try {
+        await updateDoc(doc(db, 'users', uid), { isAdmin });
+        console.log(`[Firestore] User ${uid} admin status set to ${isAdmin}`);
+    } catch (error) {
+        console.error('[Firestore] Error toggling user admin:', error);
+        throw error;
+    }
+}
+
+// Update Feedback Status
+export async function updateFeedbackStatus(id: string, status: 'resolved' | 'open'): Promise<void> {
+    try {
+        await updateDoc(doc(db, 'feedback', id), { status });
+    } catch (error) {
+        console.error('[Firestore] Error updating feedback status:', error);
+        throw error;
+    }
+}
+
+// Delete Feedback
+export async function deleteFeedback(id: string): Promise<void> {
+    try {
+        await deleteDoc(doc(db, 'feedback', id));
+    } catch (error) {
+        console.error('[Firestore] Error deleting feedback:', error);
         throw error;
     }
 }
