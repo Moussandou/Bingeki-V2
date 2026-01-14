@@ -21,12 +21,22 @@ export default function AdminDashboard() {
     useEffect(() => {
         const load = async () => {
             try {
-                const [statsData, usersData] = await Promise.all([
+                const results = await Promise.allSettled([
                     getAdminStats(),
                     getAllUsers()
                 ]);
-                setStats(statsData);
-                setRecentUsers(usersData.slice(0, 5));
+
+                if (results[0].status === 'fulfilled') {
+                    setStats(results[0].value);
+                } else {
+                    console.error("Failed to load stats:", results[0].reason);
+                }
+
+                if (results[1].status === 'fulfilled') {
+                    setRecentUsers(results[1].value.slice(0, 5));
+                } else {
+                    console.error("Failed to load users:", results[1].reason);
+                }
             } catch (e) {
                 console.error("Dashboard load failed", e);
             } finally {

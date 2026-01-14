@@ -14,12 +14,15 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    // Hardcoded Super Admin (Moussandou) to prevent lockout
+    function isSuperAdmin() {
+      return request.auth.uid == "N6VKzrkIghaMEYmSM74yaVgLYqa2";
+    }
+
     // Check if the user is an Admin
-    // We check the 'isAdmin' field on the user's profile document.
-    // WARNING: Initial bootstrapping requires manual console edit or a temporary rule.
     function isAdmin() {
-      return isAuthenticated() && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      return isSuperAdmin() || (isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
     }
 
     // ==================== USERS COLLECTION ====================
