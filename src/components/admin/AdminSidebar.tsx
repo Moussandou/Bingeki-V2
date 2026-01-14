@@ -2,9 +2,11 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Users, MessageSquare, ShieldAlert, LogOut, Home } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { auth } from '@/firebase/config';
+import { useState } from 'react';
 
 export function AdminSidebar() {
     const { logout } = useAuthStore();
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const handleLogout = async () => {
         try {
@@ -23,90 +25,124 @@ export function AdminSidebar() {
     ];
 
     return (
-        <aside style={{
-            width: '280px',
-            background: '#000',
-            color: '#fff',
-            height: '100vh',
-            position: 'fixed',
-            left: 0,
-            top: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            borderRight: '4px solid #fff',
-            zIndex: 100
-        }}>
+        <aside
+            onMouseEnter={() => setIsExpanded(true)}
+            onMouseLeave={() => setIsExpanded(false)}
+            style={{
+                width: isExpanded ? '260px' : '80px',
+                background: '#fff',
+                color: '#000',
+                height: '100vh',
+                position: 'fixed',
+                left: 0,
+                top: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                borderRight: '3px solid #000',
+                transition: 'width 0.3s cubic-bezier(0.19, 1, 0.22, 1)',
+                zIndex: 100,
+                boxShadow: isExpanded ? '10px 0 30px rgba(0,0,0,0.1)' : 'none',
+                overflow: 'hidden'
+            }}
+        >
             {/* Header */}
             <div style={{
-                padding: '2rem',
-                borderBottom: '4px solid #fff'
+                padding: '1.5rem 0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: isExpanded ? 'flex-start' : 'center',
+                paddingLeft: isExpanded ? '2rem' : '0',
+                borderBottom: '3px solid #000',
+                height: '80px',
+                background: '#000',
+                color: '#fff',
+                whiteSpace: 'nowrap'
             }}>
-                <h1 style={{
+                <div style={{
                     fontFamily: 'var(--font-heading)',
                     fontSize: '1.5rem',
-                    margin: 0,
+                    fontWeight: 900,
                     textTransform: 'uppercase',
-                    letterSpacing: '2px',
-                    lineHeight: 1
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
                 }}>
-                    Bingeki<br />
-                    <span style={{ color: '#ef4444' }}>Admin</span>
-                </h1>
+                    <span style={{
+                        background: '#ef4444',
+                        padding: '0.25rem 0.5rem',
+                        display: isExpanded ? 'block' : 'none'
+                    }}>ADMIN</span>
+                    <span style={{ display: isExpanded ? 'block' : 'none' }}>PANEL</span>
+                    <span style={{ display: !isExpanded ? 'block' : 'none', color: '#ef4444' }}>A</span>
+                </div>
             </div>
 
             {/* Navigation */}
-            <nav style={{ flex: 1, padding: '2rem 0' }}>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    {navItems.map((item) => (
-                        <li key={item.to}>
-                            <NavLink
-                                to={item.to}
-                                end={item.end}
-                                style={({ isActive }) => ({
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '1rem',
-                                    padding: '1rem 2rem',
-                                    color: isActive ? '#000' : '#fff',
-                                    background: isActive ? '#fff' : 'transparent',
-                                    textDecoration: 'none',
-                                    fontFamily: 'var(--font-heading)',
-                                    textTransform: 'uppercase',
-                                    fontSize: '1rem',
-                                    fontWeight: 900,
-                                    letterSpacing: '1px',
-                                    transition: 'all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-                                })}
-                            >
-                                <item.icon size={20} strokeWidth={3} />
-                                {item.label}
-                            </NavLink>
-                        </li>
-                    ))}
-                </ul>
+            <nav style={{ flex: 1, padding: '2rem 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {navItems.map((item) => (
+                    <NavLink
+                        key={item.to}
+                        to={item.to}
+                        end={item.end}
+                        title={!isExpanded ? item.label : ''}
+                        style={({ isActive }) => ({
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '1.5rem',
+                            padding: '1rem 0',
+                            paddingLeft: isExpanded ? '2rem' : '0',
+                            justifyContent: isExpanded ? 'flex-start' : 'center',
+                            color: isActive ? '#fff' : '#000',
+                            background: isActive ? '#000' : 'transparent',
+                            textDecoration: 'none',
+                            fontFamily: 'var(--font-heading)',
+                            textTransform: 'uppercase',
+                            fontSize: '1rem',
+                            fontWeight: 900,
+                            letterSpacing: '1px',
+                            transition: 'all 0.2s ease',
+                            borderTop: isActive ? '2px solid #000' : '2px solid transparent',
+                            borderBottom: isActive ? '2px solid #000' : '2px solid transparent',
+                            margin: isActive && isExpanded ? '0 -2px' : '0',
+                            position: 'relative'
+                        })}
+                    >
+                        <item.icon size={24} strokeWidth={2.5} />
+                        <span style={{
+                            opacity: isExpanded ? 1 : 0,
+                            transform: isExpanded ? 'translateX(0)' : 'translateX(10px)',
+                            transition: 'all 0.3s ease',
+                            whiteSpace: 'nowrap'
+                        }}>
+                            {item.label}
+                        </span>
+                    </NavLink>
+                ))}
             </nav>
 
             {/* Footer Actions */}
             <div style={{
                 padding: '1rem',
-                borderTop: '4px solid #fff',
+                borderTop: '3px solid #000',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '0.5rem'
+                gap: '0.5rem',
+                background: '#f5f5f5'
             }}>
                 <NavLink to="/" style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.75rem',
-                    padding: '0.75rem 1rem',
-                    color: '#fff',
+                    gap: '1rem',
+                    padding: '0.75rem',
+                    justifyContent: isExpanded ? 'flex-start' : 'center',
+                    color: '#000',
                     textDecoration: 'none',
                     fontWeight: 700,
-                    border: '2px solid transparent',
-                    transition: 'border-color 0.2s'
+                    transition: 'color 0.2s',
+                    fontFamily: 'monospace'
                 }}>
-                    <Home size={18} />
-                    Retour au site
+                    <Home size={20} />
+                    <span style={{ display: isExpanded ? 'block' : 'none' }}>Retour au site</span>
                 </NavLink>
 
                 <button
@@ -114,20 +150,24 @@ export function AdminSidebar() {
                     style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '0.75rem',
-                        padding: '0.75rem 1rem',
+                        gap: '1rem',
+                        padding: '0.75rem',
+                        justifyContent: isExpanded ? 'flex-start' : 'center',
                         background: '#ef4444',
                         color: '#fff',
-                        border: 'none',
-                        clipPath: 'polygon(5% 0, 100% 0, 95% 100%, 0% 100%)',
+                        border: '2px solid #000',
                         fontFamily: 'var(--font-heading)',
                         fontWeight: 900,
                         textTransform: 'uppercase',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        boxShadow: '4px 4px 0 #000',
+                        transition: 'transform 0.1s'
                     }}
+                    onMouseDown={e => e.currentTarget.style.transform = 'translate(2px, 2px)'}
+                    onMouseUp={e => e.currentTarget.style.transform = 'translate(0, 0)'}
                 >
-                    <LogOut size={18} strokeWidth={3} />
-                    Déconnexion
+                    <LogOut size={20} />
+                    <span style={{ display: isExpanded ? 'block' : 'none' }}>Exit</span>
                 </button>
             </div>
         </aside>
