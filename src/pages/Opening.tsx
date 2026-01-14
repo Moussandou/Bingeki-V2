@@ -625,6 +625,137 @@ export default function Opening() {
                     </div>
                 </section>
 
+                {/* SECTION 6: TIPS FOR DEVS */}
+                <section className={styles.featureSection} style={{
+                    background: 'var(--color-primary)',
+                    padding: '4rem 0',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
+                    <div className={styles.sfx} style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        fontSize: 'min(15rem, 25vw)',
+                        color: '#000',
+                        opacity: 0.05,
+                        fontWeight: 900,
+                        lineHeight: 1,
+                        pointerEvents: 'none'
+                    }}>
+                        SUPPORT
+                    </div>
+
+                    <div style={{
+                        maxWidth: '800px',
+                        margin: '0 auto',
+                        textAlign: 'center',
+                        position: 'relative',
+                        zIndex: 1,
+                        padding: '0 1rem'
+                    }}>
+                        <motion.div
+                            initial={{ y: 30, opacity: 0 }}
+                            whileInView={{ y: 0, opacity: 1 }}
+                            viewport={{ once: true, amount: 0.5 }}
+                            transition={{ duration: 0.6 }}
+                        >
+                            <div style={{
+                                background: '#000',
+                                color: '#fff',
+                                padding: '0.75rem 3rem',
+                                fontFamily: 'var(--font-heading)',
+                                fontWeight: 900,
+                                fontSize: '1.5rem',
+                                letterSpacing: '3px',
+                                display: 'inline-block',
+                                marginBottom: '2rem',
+                                clipPath: 'polygon(3% 0, 100% 0, 97% 100%, 0% 100%)'
+                            }}>
+                                TIPS FOR DEVS
+                            </div>
+
+                            <h2 style={{
+                                fontSize: 'min(2.5rem, 8vw)',
+                                fontWeight: 900,
+                                marginBottom: '1.5rem',
+                                fontFamily: 'var(--font-heading)',
+                                lineHeight: 1.2,
+                                color: '#000'
+                            }}>
+                                SOUTENEZ LE PROJET
+                            </h2>
+
+                            <p style={{
+                                fontSize: '1.1rem',
+                                marginBottom: '1rem',
+                                fontWeight: 700,
+                                color: '#000'
+                            }}>
+                                Bingeki est développé avec ❤️ en open-source
+                            </p>
+
+                            <p style={{
+                                fontSize: '1rem',
+                                marginBottom: '2.5rem',
+                                opacity: 0.85,
+                                lineHeight: 1.6,
+                                maxWidth: '600px',
+                                margin: '0 auto 2.5rem',
+                                color: '#000'
+                            }}>
+                                Si Bingeki enrichit votre expérience manga/anime, aidez à financer le développement de nouvelles fonctionnalités. Chaque café compte ! ☕
+                            </p>
+
+                            <motion.a
+                                href="https://ko-fi.com/moussandou"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                whileHover={{ scale: 1.05, y: -3 }}
+                                whileTap={{ scale: 0.98 }}
+                                style={{
+                                    display: 'inline-block',
+                                    background: '#000',
+                                    color: '#fff',
+                                    padding: '1.25rem 3rem',
+                                    fontWeight: 900,
+                                    fontSize: '1.1rem',
+                                    textDecoration: 'none',
+                                    clipPath: 'polygon(5% 0, 100% 0, 95% 100%, 0% 100%)',
+                                    border: '4px solid #000',
+                                    letterSpacing: '2px',
+                                    boxShadow: '6px 6px 0 rgba(0,0,0,0.2)',
+                                    fontFamily: 'var(--font-heading)'
+                                }}
+                            >
+                                ☕ OFFRIR UN CAFÉ
+                            </motion.a>
+
+                            <div style={{
+                                marginTop: '2rem',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                gap: '2rem',
+                                flexWrap: 'wrap',
+                                fontSize: '0.9rem',
+                                fontWeight: 700,
+                                color: '#000'
+                            }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <Check size={18} /> Nouvelles features
+                                </span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <Check size={18} /> Serveurs performants
+                                </span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <Check size={18} /> Support premium
+                                </span>
+                            </div>
+                        </motion.div>
+                    </div>
+                </section>
+
                 {/* FINAL CTA */}
                 <section className={styles.ctaSection}>
                     <motion.div
