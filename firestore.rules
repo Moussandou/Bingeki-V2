@@ -2,51 +2,64 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper: User is authenticated and is the owner of the document path
-    function isOwner(userId) {
-      return request.auth != null && request.auth.uid == userId;
-    }
+    // ==================== HELPER FUNCTIONS ====================
 
-    // Helper: User is authenticated
+    // User is authenticated
     function isAuthenticated() {
       return request.auth != null;
     }
 
+    // User matches the requested document ID
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Check if the user is an Admin
+    // We check the 'isAdmin' field on the user's profile document.
+    // WARNING: Initial bootstrapping requires manual console edit or a temporary rule.
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    // ==================== USERS COLLECTION ====================
+
     match /users/{userId} {
-      // Public Read: Allows Search and Leaderboard
+      // Public Read: Allows Search, Leaderboards, and Admin lists
       allow read: if isAuthenticated();
       
-      // Write: Only owner can modify their root profile (XP, Level, Email, etc.)
-      allow write: if isOwner(userId);
+      // Write:
+      // 1. Owner can update their profile (bio, theme, etc.)
+      // 2. Admin can update ANY profile (for Ban/Promote actions)
+      // 3. Prevent Owner from modifying their own 'isAdmin' or 'isBanned' flags
+      allow update: if (isOwner(userId) && 
+                        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned'])) 
+                    || isAdmin();
 
+      // Create: Allow new users to be created by themselves
+      allow create: if isOwner(userId);
+      
       // --- Subcollection: Data (Library & Gamification) ---
-      // Read: Allowed for all authenticated users (needed for Social features like "Friends reading this")
-      // Write: Only owner
       match /data/{document=**} {
         allow read: if isAuthenticated();
-        allow write: if isOwner(userId);
+        allow write: if isOwner(userId) || isAdmin();
       }
 
       // --- Subcollection: Friends ---
       match /friends/{friendId} {
-        // 1. Owner Access: The user can see their own friends list, remove friends, etc.
         allow read, write: if isOwner(userId);
-
-        // 2. Cross-User Access (Social Graph):
-        // Allow ANOTHER user (friendId) to write into THIS user's (userId) friend list
-        // IF the document ID matches their own UID.
-        // This covers:
-        // - Sending Request: User A writes to /users/B/friends/A
-        // - Accepting Request: User A updates /users/B/friends/A
-        allow create, update: if request.auth != null && request.auth.uid == friendId;
+        allow create, update: if isAuthenticated() && request.auth.uid == friendId;
       }
     }
+
     // ==================== FEATURES ====================
 
     // FEEDBACK
     match /feedback/{feedbackId} {
+      // Anyone can create feedback
       allow create: if true;
-      allow read: if request.auth.token.email == 'moussandou.m@gmail.com';
+      // Only Admins can read (Dashboard) or update/delete (Resolution)
+      allow read, update, delete: if isAdmin();
     }
 
     // WATCH PARTIES
@@ -57,8 +70,8 @@ service cloud.firestore {
 
     // ACTIVITY FEED
     match /activities/{activityId} {
-      allow create: if isAuthenticated(); // Users log their own activity
-      allow read: if isAuthenticated();  // Friends read activities
+      allow create: if isAuthenticated(); 
+      allow read: if isAuthenticated();
     }
 
     // COMMENTS
@@ -70,23 +83,19 @@ service cloud.firestore {
     // CHALLENGES
     match /challenges/{challengeId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated(); // Should be admin only ideally, but keeping open for alpha
+      allow create, update, delete: if isAdmin();
     }
+    
+    // ==================== LEGACY / ROOT ACCESS ====================
+    // Backup for root collections if used
 
-    // ==================== USER DATA (Root Collections Strategy) ====================
-    // Rules for when data is accessed via root collections (if any) AND explicit subcollection overrides
-    
-    // Explicitly handle the 'data' subcollection for libraries and gamification
-    // inside the /users/{userId} path is handled by the wildcard match /data/{document=**},
-    // but we can make it explicit to be safe.
-    
     match /libraries/{userId} {
-      allow read, write: if isOwner(userId);
+      allow read, write: if isOwner(userId) || isAdmin();
     }
 
     match /gamification/{userId} {
       allow read: if isAuthenticated();
-      allow write: if isOwner(userId);
+      allow write: if isOwner(userId) || isAdmin();
     }
   }
 }

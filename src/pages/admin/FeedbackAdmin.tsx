@@ -1,115 +1,151 @@
 import { useState, useEffect } from 'react';
-import { Star, Mail, Trash2 } from 'lucide-react';
-import { getAllFeedback, type FeedbackData } from '@/firebase/firestore';
+import { Star, Mail, Trash2, CheckCircle, AlertCircle, MessageSquare } from 'lucide-react';
+import { Card } from '@/components/ui/Card';
+import { getAllFeedback, deleteFeedback, updateFeedbackStatus, type FeedbackData } from '@/firebase/firestore';
 
 export default function AdminFeedback() {
     const [feedbacks, setFeedbacks] = useState<FeedbackData[]>([]);
-
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchFeedback = async () => {
-            // For now we mock logic or fetch real if available
-            // But let's assume we want to use the real one if permissions allowed
-            // Or fallback to mock for UI dev
-            try {
-                const data = await getAllFeedback();
-                setFeedbacks(data);
-            } catch (e) {
-                console.error("Failed to load feedback", e);
-            }
-        };
-        fetchFeedback();
+        loadFeedback();
     }, []);
 
-    const handleDelete = (id: string) => {
-        // Mock delete
-        setFeedbacks(prev => prev.filter(f => f.id !== id));
+    const loadFeedback = async () => {
+        setLoading(true);
+        try {
+            const data = await getAllFeedback();
+            setFeedbacks(data);
+        } catch (e) {
+            console.error("Failed to load feedback", e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        if (window.confirm("Supprimer ce feedback définitivement ?")) {
+            try {
+                await deleteFeedback(id);
+                setFeedbacks(prev => prev.filter(f => f.id !== id));
+            } catch (e) {
+                alert("Erreur lors de la suppression");
+            }
+        }
+    };
+
+    const handleToggleStatus = async (id: string, currentStatus: string | undefined) => {
+        const newStatus = currentStatus === 'resolved' ? 'open' : 'resolved';
+        try {
+            await updateFeedbackStatus(id, newStatus);
+            setFeedbacks(prev => prev.map(f => f.id === id ? { ...f, status: newStatus } : f));
+        } catch (e) {
+            alert("Erreur lors de la mise à jour du statut");
+        }
+    };
+
+    const getCategoryColor = (category: string) => {
+        switch (category) {
+            case 'bug': return 'bg-red-500';
+            case 'feature': return 'bg-blue-500';
+            default: return 'bg-gray-500';
+        }
     };
 
     return (
-        <div>
-            <h1 style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '2.5rem',
-                textTransform: 'uppercase',
-                marginBottom: '2rem'
-            }}>
-                Feedback Center
-            </h1>
+        <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="font-heading text-4xl uppercase">Feedback Center</h1>
+                    <p className="border-l-2 border-black pl-2 text-gray-500 italic">
+                        {feedbacks.filter(f => (f as any).status !== 'resolved').length} tickets en attente
+                    </p>
+                </div>
+                <button onClick={loadFeedback} className="font-mono text-sm underline hover:text-primary">
+                    Rafraîchir
+                </button>
+            </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {feedbacks.map((item) => (
-                    <div key={item.id} style={{
-                        background: '#fff',
-                        border: '3px solid #000',
-                        padding: '1.5rem',
-                        boxShadow: '6px 6px 0 rgba(0,0,0,0.1)',
-                        position: 'relative'
-                    }}>
-                        {/* Status Badge */}
-                        <div style={{
-                            position: 'absolute',
-                            top: '-10px',
-                            right: '20px',
-                            background: item.category === 'bug' ? '#ef4444' : '#3b82f6',
-                            color: '#fff',
-                            padding: '0.25rem 0.75rem',
-                            border: '2px solid #000',
-                            fontWeight: 900,
-                            fontSize: '0.8rem',
-                            textTransform: 'uppercase'
-                        }}>
-                            {item.category}
-                        </div>
-
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                            <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>
-                                {item.userName || 'Anonyme'}
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                <Star size={16} fill="#000" />
-                                <span style={{ fontWeight: 900 }}>{item.rating}/10</span>
-                            </div>
-                        </div>
-
-                        <p style={{ fontSize: '1rem', lineHeight: 1.6, marginBottom: '1.5rem', color: '#444' }}>
-                            {item.message}
-                        </p>
-
-                        <div style={{
-                            display: 'flex',
-                            gap: '1rem',
-                            borderTop: '1px solid #eee',
-                            paddingTop: '1rem'
-                        }}>
-                            {item.contactEmail && (
-                                <a href={`mailto:${item.contactEmail}`} style={{
-                                    display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                    padding: '0.5rem 1rem',
-                                    background: '#000', color: '#fff',
-                                    textDecoration: 'none',
-                                    fontWeight: 700,
-                                    fontSize: '0.9rem'
-                                }}>
-                                    <Mail size={16} />
-                                    Répondre
-                                </a>
-                            )}
-                            <button onClick={() => handleDelete(item.id)} style={{
-                                display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                padding: '0.5rem 1rem',
-                                background: 'transparent', color: '#ef4444',
-                                border: '2px solid #ef4444',
-                                fontWeight: 700,
-                                cursor: 'pointer',
-                                fontSize: '0.9rem'
-                            }}>
-                                <Trash2 size={16} />
-                                Supprimer
-                            </button>
-                        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {loading ? (
+                    <p>Chargement des messages...</p>
+                ) : feedbacks.length === 0 ? (
+                    <div className="col-span-full text-center py-12 text-gray-500">
+                        Aucun message pour le moment.
                     </div>
-                ))}
+                ) : (
+                    feedbacks.map((item) => (
+                        <Card
+                            key={item.id}
+                            variant="manga"
+                            className={`p-6 flex flex-col justify-between h-auto min-h-[250px] relative group ${(item as any).status === 'resolved' ? 'opacity-75 grayscale hover:grayscale-0 hover:opacity-100 transition-all' : ''}`}
+                        >
+                            {/* Badges */}
+                            <div className="absolute -top-3 -right-3 flex gap-2">
+                                <div className={`${getCategoryColor(item.category)} text-white px-3 py-1 border-2 border-black font-black uppercase text-xs shadow-[2px_2px_0_#000]`}>
+                                    {item.category}
+                                </div>
+                                {(item as any).status === 'resolved' && (
+                                    <div className="bg-green-500 text-white px-3 py-1 border-2 border-black font-black uppercase text-xs shadow-[2px_2px_0_#000] flex items-center gap-1">
+                                        <CheckCircle size={12} strokeWidth={3} /> Résolu
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Content */}
+                            <div>
+                                <div className="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h3 className="font-heading text-lg leading-tight uppercase">
+                                            {item.userName || 'Anonyme'}
+                                        </h3>
+                                        <span className="text-xs text-gray-400 font-mono">
+                                            {new Date(item.timestamp).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-1 bg-black text-white px-2 py-1 font-bold text-sm">
+                                        <Star size={12} fill="currentColor" /> {item.rating}/10
+                                    </div>
+                                </div>
+
+                                <div className="relative mb-6">
+                                    <MessageSquare size={48} className="absolute -top-2 -left-2 opacity-5 text-black" />
+                                    <p className="text-gray-700 leading-relaxed font-medium relative z-10">
+                                        "{item.message}"
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex items-center justify-between pt-4 border-t-2 border-gray-100 mt-auto gap-2">
+                                {item.contactEmail ? (
+                                    <a href={`mailto:${item.contactEmail}`} className="flex items-center gap-2 text-xs font-bold uppercase hover:bg-black hover:text-white px-2 py-1 transition-colors rounded-sm" title={item.contactEmail}>
+                                        <Mail size={14} /> Répondre
+                                    </a>
+                                ) : (
+                                    <span className="text-xs text-gray-400 italic">Pas d'email</span>
+                                )}
+
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handleToggleStatus(item.id, (item as any).status)}
+                                        className={`p-2 border-2 border-black transition-transform hover:-translate-y-1 ${(item as any).status === 'resolved' ? 'bg-yellow-400' : 'bg-green-400'}`}
+                                        title={(item as any).status === 'resolved' ? "Rouvrir" : "Marquer comme résolu"}
+                                    >
+                                        {(item as any).status === 'resolved' ? <AlertCircle size={16} /> : <CheckCircle size={16} />}
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(item.id)}
+                                        className="p-2 border-2 border-black bg-white hover:bg-red-500 hover:text-white transition-colors"
+                                        title="Supprimer"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            </div>
+                        </Card>
+                    ))
+                )}
             </div>
         </div>
     );
