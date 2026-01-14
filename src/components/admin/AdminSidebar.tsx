@@ -109,10 +109,11 @@ export function AdminSidebar() {
                     >
                         <item.icon size={24} strokeWidth={2.5} />
                         <span style={{
+                            display: isExpanded ? 'block' : 'none',
+                            whiteSpace: 'nowrap',
                             opacity: isExpanded ? 1 : 0,
                             transform: isExpanded ? 'translateX(0)' : 'translateX(10px)',
-                            transition: 'all 0.3s ease',
-                            whiteSpace: 'nowrap'
+                            transition: 'all 0.3s ease'
                         }}>
                             {item.label}
                         </span>

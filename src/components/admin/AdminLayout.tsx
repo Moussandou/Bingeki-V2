@@ -14,7 +14,7 @@ export function AdminLayout() {
 
             <main style={{
                 flex: 1,
-                marginLeft: '280px', // Matches sidebar width
+                marginLeft: '80px', // Matches collapsed sidebar width
                 padding: '3rem',
                 overflowY: 'auto'
             }}>
