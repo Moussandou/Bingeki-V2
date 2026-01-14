@@ -15,6 +15,7 @@ import {
   saveGamificationToFirestore,
   saveUserProfileToFirestore
 } from '@/firebase/firestore';
+import { mergeLibraryData, mergeGamificationData } from '@/utils/dataProtection';
 import { ToastProvider } from '@/context/ToastContext';
 
 // Lazy load pages
@@ -59,28 +60,36 @@ function App() {
       setUser(firebaseUser);
 
       if (firebaseUser) {
-        // Clear local stores first to avoid data bleed between accounts
-        useLibraryStore.getState().resetStore();
-        useGamificationStore.getState().resetStore();
+        // DON'T clear stores - we'll merge instead to avoid data loss
+        // Get current local state before loading cloud
+        const localLibrary = useLibraryStore.getState().works;
+        const localGamification = useGamificationStore.getState();
 
         // Sync user profile (email, name, photo)
         await saveUserProfileToFirestore(firebaseUser);
 
-        // User logged in - sync with Firestore
+        // Load cloud data
         const cloudLibrary = await loadLibraryFromFirestore(firebaseUser.uid);
         const cloudGamification = await loadGamificationFromFirestore(firebaseUser.uid);
 
-        if (cloudLibrary) {
-          // Cloud data exists - load it into Zustand
-          useLibraryStore.setState({ works: cloudLibrary });
-        }
+        // Smart merge: combine local and cloud data safely
+        const mergedLibrary = mergeLibraryData(localLibrary, cloudLibrary);
+        const mergedGamification = mergeGamificationData(
+          {
+            ...localGamification,
+            badges: localGamification.badges || []
+          },
+          cloudGamification
+        );
 
-        if (cloudGamification) {
-          // Cloud data exists - load it
-          useGamificationStore.setState(cloudGamification);
-          // Force sync to main user doc (ensures new fields like badges, stats are on root doc)
-          await saveGamificationToFirestore(firebaseUser.uid, cloudGamification);
-        }
+        // Update stores with merged data
+        useLibraryStore.setState({ works: mergedLibrary });
+        useGamificationStore.setState(mergedGamification);
+
+        console.log('[App] Data merged successfully:', {
+          libraryCount: mergedLibrary.length,
+          level: mergedGamification.level
+        });
       } else {
         // User logged out - clear local stores
         useLibraryStore.getState().resetStore();
@@ -93,14 +102,14 @@ function App() {
     return () => unsubscribe();
   }, [setUser, setLoading]);
 
-  // Auto-save to Firestore when data changes (debounced via separate effect)
+  // Auto-save to Firestore when data changes (debounced)
   useEffect(() => {
     if (!user) return;
 
     // Save library changes to Firestore
     const timeout = setTimeout(() => {
       saveLibraryToFirestore(user.uid, libraryWorks);
-    }, 2000); // Debounce 2 seconds
+    }, 3000); // Increased to 3s to reduce save conflicts
 
     return () => clearTimeout(timeout);
   }, [libraryWorks, user]);
@@ -111,7 +120,7 @@ function App() {
     // Save gamification changes to Firestore
     const timeout = setTimeout(() => {
       saveGamificationToFirestore(user.uid, gamificationState);
-    }, 2000); // Debounce 2 seconds
+    }, 3000); // Increased to 3s to reduce save conflicts
 
     return () => clearTimeout(timeout);
   }, [gamificationState, user]);

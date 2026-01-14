@@ -5,11 +5,13 @@ import type { Badge } from '@/types/badge';
 import type { ActivityEvent } from '@/types/activity';
 import type { Comment, CommentWithReplies } from '@/types/comment';
 import type { Challenge } from '@/types/challenge';
+import { mergeGamificationData, mergeLibraryData, validateGamificationWrite, logDataBackup } from '@/utils/dataProtection';
 
 // Types for Firestore data
 interface LibraryData {
     works: Work[];
     lastUpdated: number;
+    version?: number;
 }
 
 interface GamificationData {
@@ -23,6 +25,7 @@ interface GamificationData {
     totalWorksAdded: number;
     totalWorksCompleted: number;
     lastUpdated: number;
+    version?: number;
 }
 
 export interface UserProfile {
@@ -82,15 +85,29 @@ export async function saveUserProfileToFirestore(user: Partial<UserProfile>): Pr
     }
 }
 
-// Save library data to Firestore
+// Save library data to Firestore (with safe merge)
 export async function saveLibraryToFirestore(userId: string, works: Work[]): Promise<void> {
     try {
         const docRef = doc(db, 'users', userId, 'data', 'library');
+
+        // Load existing data
+        const existingDoc = await getDoc(docRef);
+        const existing = existingDoc.exists() ? existingDoc.data() as LibraryData : null;
+
+        // Create backup
+        if (existing) {
+            logDataBackup(userId, 'library', existing);
+        }
+
+        // Merge with existing data
+        const mergedWorks = mergeLibraryData(works, existing?.works || null);
+
         await setDoc(docRef, {
-            works,
-            lastUpdated: Date.now()
+            works: mergedWorks,
+            lastUpdated: Date.now(),
+            version: (existing?.version || 0) + 1
         } as LibraryData);
-        console.log('[Firestore] Library saved');
+        console.log('[Firestore] Library saved safely');
     } catch (error: any) {
         console.error('[Firestore] Error saving library:', error);
         if (error.code === 'permission-denied') {
@@ -117,32 +134,53 @@ export async function loadLibraryFromFirestore(userId: string): Promise<Work[] |
     }
 }
 
-// Save gamification data to Firestore
+// Save gamification data to Firestore (with validation and safe merge)
 export async function saveGamificationToFirestore(
     userId: string,
     data: Omit<GamificationData, 'lastUpdated'>
 ): Promise<void> {
     try {
-        // 1. Save detailed gamification data to sub-collection
         const docRef = doc(db, 'users', userId, 'data', 'gamification');
+
+        // 1. Load existing data first
+        const existingDoc = await getDoc(docRef);
+        const existing = existingDoc.exists() ? existingDoc.data() as GamificationData : null;
+
+        // 2. Validate write (prevent downgrades)
+        if (!validateGamificationWrite(data, existing)) {
+            console.warn('[Firestore] Gamification write blocked - would cause data downgrade');
+            // Use safe merge instead
+            const safeData = mergeGamificationData(data, existing);
+            data = safeData;
+        }
+
+        // 3. Create backup before write
+        if (existing) {
+            logDataBackup(userId, 'gamification', existing);
+        }
+
+        // 4. Merge with existing data for safety
+        const mergedData = mergeGamificationData(data, existing);
+
+        // 5. Save merged data to sub-collection
         await setDoc(docRef, {
-            ...data,
+            ...mergedData,
             lastUpdated: Date.now()
         });
 
-        // 2. Sync essential stats to root user document for Leaderboards & Profile Viewing
+        // 6. Sync essential stats to root user document for Leaderboards & Profile Viewing
         const userDocRef = doc(db, 'users', userId);
         await setDoc(userDocRef, {
-            xp: data.xp,
-            level: data.level,
-            streak: data.streak,
-            badges: data.badges,
-            totalChaptersRead: data.totalChaptersRead,
-            totalWorksAdded: data.totalWorksAdded,
-            totalWorksCompleted: data.totalWorksCompleted
+            xp: mergedData.xp,
+            level: mergedData.level,
+            streak: mergedData.streak,
+            badges: mergedData.badges,
+            totalChaptersRead: mergedData.totalChaptersRead,
+            totalWorksAdded: mergedData.totalWorksAdded,
+            totalWorksCompleted: mergedData.totalWorksCompleted
         }, { merge: true });
 
-        console.log('[Firestore] Gamification saved');
+        console.log('[Firestore] Gamification saved safely');
     } catch (error: any) {
         console.error('[Firestore] Error saving gamification:', error);
         if (error.code === 'permission-denied') {
