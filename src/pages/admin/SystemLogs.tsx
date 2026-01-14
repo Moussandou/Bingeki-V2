@@ -27,6 +27,7 @@ export default function AdminSystem() {
                 `[API] GET /api/v1/metacritic (200 OK)`,
                 `[USER] Session refresh token updated`
             ];
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const randomEvent = events[Math.floor(Math.random() * events.length)];
             if (Math.random() > 0.7) {
                 addLog(randomEvent);
@@ -43,9 +44,6 @@ export default function AdminSystem() {
     const handleBackup = () => {
         addLog("[BACKUP] Starting manual system backup...");
         try {
-            // Trigger local backup of critical stores (simulated via empty objects for now as we can't access store state directy here easily without hook)
-            // In real scenario we'd call a store action. 
-            // For now we use the utility to log a "System Checkpoint"
             logDataBackup('system', 'gamification', { source: 'manual_admin_trigger', time: Date.now() });
             setTimeout(() => addLog("[BACKUP] Backup completed successfully. Data synchronized."), 1000);
         } catch (e) {
@@ -61,27 +59,27 @@ export default function AdminSystem() {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', animation: 'fadeIn 0.5s ease' }}>
             <div>
-                <h1 className="font-heading text-4xl uppercase">Système & Logs</h1>
-                <p className="border-l-2 border-black pl-2 text-gray-500 font-mono">
+                <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', textTransform: 'uppercase' }}>Système & Logs</h1>
+                <p style={{ borderLeft: '2px solid black', paddingLeft: '0.5rem', color: '#6b7280', fontFamily: 'monospace' }}>
                     Monitoring temps réel et configuration
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
                 {/* Control Panel */}
-                <div className="space-y-6">
-                    <Card variant="manga" className="p-6 bg-white">
-                        <h2 className="font-heading text-xl uppercase border-b-2 border-black pb-2 mb-4 flex items-center gap-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    <Card variant="manga" style={{ padding: '1.5rem', backgroundColor: 'white' }}>
+                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', textTransform: 'uppercase', borderBottom: '2px solid black', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Server size={20} /> Configuration Serveur
                         </h2>
 
-                        <div className="space-y-6">
-                            <div className="flex items-center justify-between">
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <div>
-                                    <div className="font-bold uppercase">Mode Maintenance</div>
-                                    <div className="text-xs text-gray-500">Bloque l'accès sauf aux admins</div>
+                                    <div style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>Mode Maintenance</div>
+                                    <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Bloque l'accès sauf aux admins</div>
                                 </div>
                                 <Switch isOn={maintenanceMode} onToggle={() => {
                                     setMaintenanceMode(!maintenanceMode);
@@ -89,10 +87,10 @@ export default function AdminSystem() {
                                 }} />
                             </div>
 
-                            <div className="flex items-center justify-between">
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <div>
-                                    <div className="font-bold uppercase">Inscriptions</div>
-                                    <div className="text-xs text-gray-500">Autoriser les nouveaux membres</div>
+                                    <div style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>Inscriptions</div>
+                                    <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Autoriser les nouveaux membres</div>
                                 </div>
                                 <Switch isOn={registrationsOpen} onToggle={() => {
                                     setRegistrationsOpen(!registrationsOpen);
@@ -100,33 +98,55 @@ export default function AdminSystem() {
                                 }} />
                             </div>
 
-                            <button onClick={handlePurge} className="w-full py-3 border-2 border-black bg-red-100 hover:bg-red-500 hover:text-white transition-colors font-bold uppercase flex items-center justify-center gap-2">
+                            <button onClick={handlePurge} style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                border: '2px solid black',
+                                backgroundColor: '#fee2e2',
+                                color: 'black',
+                                transition: 'all 0.2s',
+                                fontWeight: 'bold',
+                                textTransform: 'uppercase',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                                cursor: 'pointer'
+                            }}>
                                 <AlertTriangle size={18} /> Purger Cache & Sessions
                             </button>
                         </div>
                     </Card>
 
-                    <Card variant="manga" className="p-6 bg-white">
-                        <h2 className="font-heading text-xl uppercase border-b-2 border-black pb-2 mb-4 flex items-center gap-2">
+                    <Card variant="manga" style={{ padding: '1.5rem', backgroundColor: 'white' }}>
+                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', textTransform: 'uppercase', borderBottom: '2px solid black', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Database size={20} /> Base de Données
                         </h2>
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <div className="flex justify-between text-sm font-bold">
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', fontWeight: 'bold' }}>
                                     <span>Firestore Usage</span>
                                     <span>2.4 MB / 1 GB</span>
                                 </div>
-                                <div className="h-4 border-2 border-black p-0.5">
-                                    <div className="h-full w-[2%] bg-green-500"></div>
+                                <div style={{ height: '1rem', border: '2px solid black', padding: '2px' }}>
+                                    <div style={{ height: '100%', width: '2%', backgroundColor: '#22c55e' }}></div>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2 text-green-600 font-mono text-sm border-2 border-green-200 bg-green-50 p-2">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#16a34a', fontFamily: 'monospace', fontSize: '0.875rem', border: '2px solid #bbf7d0', backgroundColor: '#f0fdf4', padding: '0.5rem' }}>
                                 <Shield size={16} />
                                 Data Shield Protocol v3.0 Active
                             </div>
 
-                            <button onClick={handleBackup} className="w-full py-3 bg-black text-white hover:bg-gray-800 transition-colors font-bold uppercase flex items-center justify-center gap-2">
+                            <button onClick={handleBackup} style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                backgroundColor: 'black',
+                                color: 'white',
+                                transition: 'background-color 0.2s',
+                                fontWeight: 'bold',
+                                textTransform: 'uppercase',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                                cursor: 'pointer',
+                                border: 'none'
+                            }}>
                                 <Save size={18} /> Lancer Backup Manuel
                             </button>
                         </div>
@@ -134,19 +154,28 @@ export default function AdminSystem() {
                 </div>
 
                 {/* Terminal */}
-                <Card variant="manga" className="p-0 bg-gray-900 text-green-400 font-mono text-sm h-[500px] flex flex-col shadow-[8px_8px_0_#000]">
-                    <div className="bg-gray-800 p-2 border-b border-gray-700 flex items-center gap-2">
-                        <Terminal size={14} className="text-gray-400" />
-                        <span className="text-gray-400 text-xs">system_root@bingeki-admin:~</span>
+                <Card variant="manga" style={{
+                    padding: 0,
+                    backgroundColor: '#111827',
+                    color: '#4ade80',
+                    fontFamily: 'monospace',
+                    fontSize: '0.875rem',
+                    height: '500px',
+                    display: 'flex', flexDirection: 'column',
+                    boxShadow: '8px 8px 0 #000'
+                }}>
+                    <div style={{ backgroundColor: '#1f2937', padding: '0.5rem', borderBottom: '1px solid #374151', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Terminal size={14} style={{ color: '#9ca3af' }} />
+                        <span style={{ color: '#9ca3af', fontSize: '0.75rem' }}>system_root@bingeki-admin:~</span>
                     </div>
-                    <div className="flex-1 overflow-y-auto p-4 space-y-1 font-mono text-xs md:text-sm">
+                    <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.75rem', lineHeight: '1.25rem' }}>
                         {logs.map((log, i) => (
-                            <div key={i} className="break-all border-l-2 border-transparent hover:border-green-500 hover:bg-white/5 pl-1 transition-colors">
-                                <span className="text-green-600 mr-2">{'>'}</span>
+                            <div key={i} style={{ wordBreak: 'break-all', display: 'flex' }}>
+                                <span style={{ color: '#16a34a', marginRight: '0.5rem' }}>{'>'}</span>
                                 {log}
                             </div>
                         ))}
-                        <div className="animate-pulse">_</div>
+                        <div style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}>_</div>
                     </div>
                 </Card>
             </div>
