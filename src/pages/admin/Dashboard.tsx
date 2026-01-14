@@ -3,6 +3,7 @@ import { Users, AlertCircle, TrendingUp, Activity, ExternalLink, Shield } from '
 import { Card } from '@/components/ui/Card';
 import { Link } from 'react-router-dom';
 import { getAdminStats, getAllUsers } from '@/firebase/firestore';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState({
@@ -14,9 +15,17 @@ export default function AdminDashboard() {
     const [recentUsers, setRecentUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    if (loading) {
-        return <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'monospace' }}>Chargement du dashboard...</div>;
-    }
+    // Mock data for the chart (since we don't have historical stats yet)
+    // In a real app, this would come from an aggregation collection
+    const chartData = [
+        { name: 'Lun', active: 400, new: 24, activities: 240 },
+        { name: 'Mar', active: 300, new: 13, activities: 198 },
+        { name: 'Mer', active: 200, new: 58, activities: 480 },
+        { name: 'Jeu', active: 278, new: 39, activities: 308 },
+        { name: 'Ven', active: 189, new: 48, activities: 400 },
+        { name: 'Sam', active: 239, new: 38, activities: 380 },
+        { name: 'Dim', active: 349, new: 43, activities: 430 },
+    ];
 
     useEffect(() => {
         const load = async () => {
@@ -46,11 +55,16 @@ export default function AdminDashboard() {
         load();
     }, []);
 
+    if (loading) {
+        return <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'monospace' }}>Chargement du dashboard...</div>;
+    }
+
     const containerStyle = {
         display: 'flex',
         flexDirection: 'column' as const,
         gap: '2rem',
-        animation: 'fadeIn 0.5s ease'
+        animation: 'fadeIn 0.5s ease',
+        paddingBottom: '2rem'
     };
 
     const headerStyle = {
@@ -150,6 +164,54 @@ export default function AdminDashboard() {
                 </Card>
             </div>
 
+            {/* Charts Section */}
+            <Card variant="manga" style={{ padding: '1.5rem', background: 'white' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Activity className="text-red-500" size={24} />
+                        <h3 style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontSize: '1.25rem' }}>Volume d'Activité</h3>
+                    </div>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#666', fontFamily: 'monospace' }}>DERNIERS 7 JOURS</div>
+                </div>
+                <div style={{ height: '300px', width: '100%' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                            <defs>
+                                <linearGradient id="colorActivity" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
+                                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e5e5" />
+                            <XAxis
+                                dataKey="name"
+                                axisLine={false}
+                                tickLine={false}
+                                tick={{ fontSize: 12, fontWeight: 'bold' }}
+                                dy={10}
+                            />
+                            <YAxis
+                                axisLine={false}
+                                tickLine={false}
+                                tick={{ fontSize: 12 }}
+                            />
+                            <Tooltip
+                                contentStyle={{ background: 'black', border: '2px solid white', color: 'white', fontFamily: 'var(--font-heading)' }}
+                                itemStyle={{ color: '#ef4444' }}
+                            />
+                            <Area
+                                type="monotone"
+                                dataKey="activities"
+                                stroke="#ef4444"
+                                strokeWidth={3}
+                                fillOpacity={1}
+                                fill="url(#colorActivity)"
+                            />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </div>
+            </Card>
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
                 {/* Recent Users */}
                 <div>
@@ -216,6 +278,20 @@ export default function AdminDashboard() {
                             }}>
                                 <AlertCircle size={32} />
                                 <span style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontWeight: 900 }}>Voir Feedback</span>
+                            </Card>
+                        </Link>
+                        <Link to="/admin/system" style={{ textDecoration: 'none', gridColumn: 'span 2' }}>
+                            <Card variant="manga" style={{
+                                padding: '1.5rem',
+                                textAlign: 'center',
+                                cursor: 'pointer',
+                                background: 'black',
+                                color: 'white',
+                                height: '100%',
+                                display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '1rem'
+                            }}>
+                                <Activity size={24} color="#ef4444" />
+                                <span style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontWeight: 900 }}>Live Console</span>
                             </Card>
                         </Link>
                     </div>
