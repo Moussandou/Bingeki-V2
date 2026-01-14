@@ -96,6 +96,65 @@ export function Footer() {
                     </a>
                 </div>
 
+                {/* Tips for Devs Section */}
+                <div style={{
+                    background: 'var(--color-primary)',
+                    border: '4px solid #000',
+                    padding: '2rem',
+                    marginBottom: '3rem',
+                    position: 'relative',
+                    boxShadow: '8px 8px 0 rgba(0,0,0,0.15)'
+                }}>
+                    <div style={{
+                        position: 'absolute',
+                        top: '-1rem',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: '#000',
+                        color: '#fff',
+                        padding: '0.5rem 2rem',
+                        fontFamily: 'var(--font-heading)',
+                        fontWeight: 900,
+                        fontSize: '0.9rem',
+                        letterSpacing: '2px'
+                    }}>
+                        TIPS FOR DEVS
+                    </div>
+                    <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
+                        <p style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: '1rem', color: '#000' }}>
+                            Ce projet est développé avec ❤️ en open-source
+                        </p>
+                        <p style={{ fontSize: '0.95rem', marginBottom: '1.5rem', color: '#000', opacity: 0.85 }}>
+                            Si Bingeki vous aide dans votre aventure manga/anime, soutenez le développement !
+                        </p>
+                        <a
+                            href="https://ko-fi.com/moussandou"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                display: 'inline-block',
+                                background: '#000',
+                                color: '#fff',
+                                padding: '1rem 2.5rem',
+                                fontWeight: 900,
+                                fontSize: '1rem',
+                                textDecoration: 'none',
+                                clipPath: 'polygon(5% 0, 100% 0, 95% 100%, 0% 100%)',
+                                transition: 'transform 0.2s',
+                                border: '3px solid #000',
+                                letterSpacing: '1px'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1) translateY(0)'}
+                        >
+                            ☕ OFFRIR UN CAFÉ
+                        </a>
+                        <p style={{ fontSize: '0.75rem', marginTop: '1rem', color: '#000', opacity: 0.7, fontWeight: 600 }}>
+                            Chaque contribution aide à ajouter de nouvelles fonctionnalités !
+                        </p>
+                    </div>
+                </div>
+
                 {/* Copyright & Legal */}
                 <div style={{ borderTop: '1px solid #eee', paddingTop: '2rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
                     <p style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.6, fontSize: '0.8rem', margin: 0 }}>
