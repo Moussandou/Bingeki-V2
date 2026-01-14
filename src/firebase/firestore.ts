@@ -3,6 +3,7 @@ import { db } from './config';
 import type { Work } from '@/store/libraryStore';
 import type { Badge } from '@/types/badge';
 import type { ActivityEvent } from '@/types/activity';
+export type { ActivityEvent };
 import type { Comment, CommentWithReplies } from '@/types/comment';
 import type { Challenge } from '@/types/challenge';
 import { mergeGamificationData, mergeLibraryData, validateGamificationWrite, logDataBackup } from '@/utils/dataProtection';
@@ -1032,6 +1033,65 @@ export async function deleteFeedback(id: string): Promise<void> {
         await deleteDoc(doc(db, 'feedback', id));
     } catch (error) {
         console.error('[Firestore] Error deleting feedback:', error);
+        throw error;
+    }
+}
+
+// ==================== ADMIN REAL-TIME CONSOLE ====================
+
+// Get all activities (for admin console)
+export async function getAllActivities(limitCount: number = 50): Promise<ActivityEvent[]> {
+    try {
+        const q = query(
+            collection(db, 'activities'),
+            orderBy('timestamp', 'desc'),
+            limit(limitCount)
+        );
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => doc.data() as ActivityEvent);
+    } catch (error) {
+        console.error('[Firestore] Error getting all activities:', error);
+        return [];
+    }
+}
+
+// ==================== GLOBAL CONFIG / ANNOUNCEMENTS ====================
+
+export interface GlobalConfig {
+    announcement: {
+        message: string;
+        active: boolean;
+        type: 'info' | 'warning' | 'alert';
+        lastUpdated: number;
+    };
+    maintenance: boolean;
+    registrationsOpen: boolean;
+}
+
+export async function getGlobalConfig(): Promise<GlobalConfig | null> {
+    try {
+        const docRef = doc(db, 'config', 'global');
+        const docSnap = await getDoc(docRef);
+        return docSnap.exists() ? docSnap.data() as GlobalConfig : null;
+    } catch (error) {
+        console.error('[Firestore] Error getting global config:', error);
+        return null;
+    }
+}
+
+export async function setGlobalAnnouncement(message: string, type: 'info' | 'warning' | 'alert', active: boolean): Promise<void> {
+    try {
+        await setDoc(doc(db, 'config', 'global'), {
+            announcement: {
+                message,
+                type,
+                active,
+                lastUpdated: Date.now()
+            }
+        }, { merge: true });
+        console.log('[Firestore] Announcement updated');
+    } catch (error) {
+        console.error('[Firestore] Error setting announcement:', error);
         throw error;
     }
 }
