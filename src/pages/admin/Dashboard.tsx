@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Users, AlertCircle, TrendingUp, Activity, ExternalLink, Shield } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Link } from 'react-router-dom';
-import { getAdminStats, getAllUsers } from '@/firebase/firestore';
+import { getAdminStats, getAllUsers, getSevenDayActivityStats } from '@/firebase/firestore';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function AdminDashboard() {
@@ -13,26 +13,16 @@ export default function AdminDashboard() {
         pendingFeedback: 0
     });
     const [recentUsers, setRecentUsers] = useState<any[]>([]);
+    const [chartData, setChartData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-
-    // Mock data for the chart (since we don't have historical stats yet)
-    // In a real app, this would come from an aggregation collection
-    const chartData = [
-        { name: 'Lun', active: 400, new: 24, activities: 240 },
-        { name: 'Mar', active: 300, new: 13, activities: 198 },
-        { name: 'Mer', active: 200, new: 58, activities: 480 },
-        { name: 'Jeu', active: 278, new: 39, activities: 308 },
-        { name: 'Ven', active: 189, new: 48, activities: 400 },
-        { name: 'Sam', active: 239, new: 38, activities: 380 },
-        { name: 'Dim', active: 349, new: 43, activities: 430 },
-    ];
 
     useEffect(() => {
         const load = async () => {
             try {
                 const results = await Promise.allSettled([
                     getAdminStats(),
-                    getAllUsers()
+                    getAllUsers(),
+                    getSevenDayActivityStats()
                 ]);
 
                 if (results[0].status === 'fulfilled') {
@@ -46,6 +36,13 @@ export default function AdminDashboard() {
                 } else {
                     console.error("Failed to load users:", results[1].reason);
                 }
+
+                if (results[2].status === 'fulfilled') {
+                    setChartData(results[2].value as any[]);
+                } else {
+                    console.error("Failed to load chart data:", results[2].reason);
+                }
+
             } catch (e) {
                 console.error("Dashboard load failed", e);
             } finally {

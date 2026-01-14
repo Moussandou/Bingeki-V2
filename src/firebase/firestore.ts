@@ -1037,6 +1037,72 @@ export async function deleteFeedback(id: string): Promise<void> {
     }
 }
 
+// Stats Aggregation for Chart
+export async function getSevenDayActivityStats() {
+    try {
+        // Fetch last 500 activities to get a good sample size
+        const q = query(
+            collection(db, 'activities'),
+            orderBy('timestamp', 'desc'),
+            limit(500)
+        );
+        const snapshot = await getDocs(q);
+        const activities = snapshot.docs.map(doc => doc.data() as ActivityEvent);
+
+        // Group by day
+        const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+        const statsMap = new Map<string, { name: string, active: number, new: number, activities: number, index: number }>();
+
+        // Initialize last 7 days
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dayName = days[d.getDay()];
+            statsMap.set(dayName, { name: dayName, active: 0, new: 0, activities: 0, index: 6 - i });
+        }
+
+        activities.forEach(act => {
+            const date = new Date(act.timestamp);
+            const dayName = days[date.getDay()];
+
+            // Only count if it's within the last 7 days (the map initialized above handles this implicitly by key)
+            // But we need to handle the case where "Lun" appears multiple times if we fetched > 1 week data.
+            // A better way is to check if the date is > 7 days ago.
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+            if (date > sevenDaysAgo && statsMap.has(dayName)) {
+                const stat = statsMap.get(dayName)!;
+                stat.activities += 1;
+                // Heuristic: Unique users per day could be 'active', 'new' could be level 1 events
+                if (act.type === 'level_up' && act.newLevel === 1) {
+                    stat.new += 1;
+                }
+                // We don't have unique daily active users easily without set logic, simple increment for now
+                stat.active += 1;
+            }
+        });
+
+        // Convert to array and sort by logical order (today is last)
+        // Since we iterated 6..0, the map insertions might not be ordered if we just .values().
+        // But we added an index. Let's rely on the map initialization order or sort.
+        // Actually, let's just create the array based on the last 7 days logic again.
+        const result = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dayName = days[d.getDay()];
+            result.push(statsMap.get(dayName));
+        }
+
+        return result;
+
+    } catch (error) {
+        console.error('Error fetching chart stats:', error);
+        return [];
+    }
+}
+
 // ==================== ADMIN REAL-TIME CONSOLE ====================
 
 // Get all activities (for admin console)
