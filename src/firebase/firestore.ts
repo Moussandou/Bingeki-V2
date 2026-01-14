@@ -896,7 +896,7 @@ export interface FeedbackData {
     userAgent: string;
 }
 
-export async function submitFeedback(feedback: Omit<FeedbackData, 'timestamp'>): Promise<boolean> {
+export async function submitFeedback(feedback: Omit<FeedbackData, 'id' | 'timestamp'>): Promise<boolean> {
     try {
         const feedbackRef = await addDoc(collection(db, 'feedback'), {
             ...feedback,
