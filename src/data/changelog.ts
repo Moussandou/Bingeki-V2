@@ -8,6 +8,18 @@ export interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
     {
+        version: 'v3.0',
+        date: '14 Janvier 2026',
+        title: 'Data Shield & Support',
+        description: 'Une mise à jour critique pour la protection de vos données et le support du projet.',
+        changes: [
+            'Fix Critique : Système de protection des données (Anti-reset pour niveau/XP).',
+            'Nouveau : Section "Tips for Devs" avec intégration Ko-fi.',
+            'Tech : Backups automatiques et fusion intelligente des données cloud/local.',
+            'UI : Amélioration visuelle des boutons de support sur l\'accueil et le footer.'
+        ]
+    },
+    {
         version: 'v2.9',
         date: '03 Janvier 2026',
         title: 'Trailer & UI Polish',

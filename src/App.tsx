@@ -39,8 +39,18 @@ const PersonDetails = lazy(() => import('@/pages/PersonDetails'));
 const Credits = lazy(() => import('@/pages/Credits'));
 const Assets = lazy(() => import('@/pages/AssetsPage'));
 
+import { AdminLayout } from '@/components/admin/AdminLayout';
+import { RequireAdmin } from '@/components/admin/RequireAdmin';
+
+// Admin Components
+const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
+const AdminUsers = lazy(() => import('@/pages/admin/Users'));
+const AdminFeedback = lazy(() => import('@/pages/admin/FeedbackAdmin'));
+const AdminSystem = lazy(() => import('@/pages/admin/SystemLogs'));
+
 function App() {
   const { setUser, setLoading, user } = useAuthStore();
+
   const libraryWorks = useLibraryStore((s) => s.works);
   const gamificationState = useGamificationStore(useShallow((s) => ({
     level: s.level,
@@ -196,10 +206,22 @@ function App() {
               </Suspense>
             } />
             <Route path="/assets" element={<Assets />} />
+
+
+            < Route path="/admin" element={
+              <RequireAdmin>
+                <AdminLayout />
+              </RequireAdmin>
+            }>
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="feedback" element={<AdminFeedback />} />
+              <Route path="system" element={<AdminSystem />} />
+            </Route>
           </Routes>
         </Suspense>
       </BrowserRouter>
-    </ToastProvider>
+    </ToastProvider >
   )
 }
 

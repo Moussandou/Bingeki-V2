@@ -885,6 +885,7 @@ export async function leaveWatchParty(partyId: string, participantId: string): P
 // ==================== FEEDBACK SYSTEM ====================
 
 export interface FeedbackData {
+    id: string;
     rating: number; // 1-10
     category: 'bug' | 'feature' | 'general';
     message: string;
