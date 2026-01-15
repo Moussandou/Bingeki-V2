@@ -115,6 +115,16 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow create, update, delete: if isAdmin();
     }
+    
+    // ==================== GLOBAL CONFIGURATION ====================
+    
+    // GLOBAL CONFIG (for announcements, maintenance mode, etc.)
+    match /config/{configId} {
+      // Allow authenticated users to read global config (e.g., announcements)
+      allow read: if isAuthenticated();
+      // Only admins can update global config
+      allow write: if isAdmin();
+    }
 
     // TIER LISTS (NEW)
     match /tierLists/{tierListId} {
