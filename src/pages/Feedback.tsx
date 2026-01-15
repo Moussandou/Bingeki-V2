@@ -6,9 +6,11 @@ import { useToast } from '@/context/ToastContext';
 import { submitFeedback } from '@/firebase/firestore';
 import { Star, Send, Bug, Lightbulb, MessageSquare, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import styles from './Feedback.module.css';
 
 export default function Feedback() {
+    const { t } = useTranslation();
     const { user } = useAuthStore();
     const { addToast } = useToast();
     const navigate = useNavigate();
@@ -24,11 +26,11 @@ export default function Feedback() {
         e.preventDefault();
 
         if (rating === 0) {
-            addToast('Veuillez sélectionner une note', 'error');
+            addToast(t('feedback.toast_select_rating'), 'error');
             return;
         }
         if (!message.trim()) {
-            addToast('Veuillez écrire un message', 'error');
+            addToast(t('feedback.toast_write_message'), 'error');
             return;
         }
 
@@ -47,7 +49,7 @@ export default function Feedback() {
 
             if (success) {
                 setIsSuccess(true);
-                addToast('Merci pour votre retour !', 'success');
+                addToast(t('feedback.toast_success'), 'success');
                 // Reset form
                 setRating(0);
                 setMessage('');
@@ -56,11 +58,11 @@ export default function Feedback() {
                 // Redirect after delay
                 setTimeout(() => navigate('/'), 3000);
             } else {
-                addToast('Erreur lors de l\'envoi. Réessayez.', 'error');
+                addToast(t('feedback.toast_error'), 'error');
             }
         } catch (error) {
             console.error('Feedback error:', error);
-            addToast('Erreur inattendue.', 'error');
+            addToast(t('feedback.toast_unexpected'), 'error');
         } finally {
             setIsSubmitting(false);
         }
@@ -71,13 +73,13 @@ export default function Feedback() {
             <Layout>
                 <div className={styles.successContainer}>
                     <div className={styles.successIcon}>
-                        💌
+                        {t('feedback.success_icon')}
                     </div>
-                    <h1 className={styles.successTitle}>MERCI !</h1>
+                    <h1 className={styles.successTitle}>{t('feedback.success_title')}</h1>
                     <p className={styles.successMessage}>
-                        Votre avis a bien été reçu. C'est grâce à vous que Bingeki s'améliore !
+                        {t('feedback.success_message')}
                     </p>
-                    <Button onClick={() => navigate('/')}>Retour à l'accueil</Button>
+                    <Button onClick={() => navigate('/')}>{t('feedback.back_home')}</Button>
                 </div>
             </Layout>
         );
@@ -87,11 +89,11 @@ export default function Feedback() {
         <Layout>
             <div className={styles.container}>
                 <h1 className={styles.title}>
-                    AIDEZ-NOUS À PROGRESSER
+                    {t('feedback.title')}
                 </h1>
                 <p className={styles.subtitle}>
-                    Bug trouvé ? Idée de génie ? Ou juste envie de dire bonjour ?<br />
-                    Votre avis compte énormément pour l'évolution de la plateforme.
+                    {t('feedback.subtitle_1')}<br />
+                    {t('feedback.subtitle_2')}
                 </p>
 
                 <div className={styles.formCard}>
@@ -106,7 +108,7 @@ export default function Feedback() {
                         {/* Rating */}
                         <div style={{ textAlign: 'center' }}>
                             <label className={styles.sectionLabel}>
-                                Votre Note Globale
+                                {t('feedback.rating_label')}
                             </label>
                             <div className={styles.ratingContainer}>
                                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
@@ -129,7 +131,7 @@ export default function Feedback() {
                         {/* Category */}
                         <div>
                             <label className={styles.sectionLabel}>
-                                C'est à propos de quoi ?
+                                {t('feedback.category_label')}
                             </label>
                             <div className={styles.categoryGrid}>
                                 <button
@@ -138,7 +140,7 @@ export default function Feedback() {
                                     className={`${styles.categoryButton} ${styles.catBug} ${category === 'bug' ? styles.categoryActive : ''}`}
                                 >
                                     <Bug size={32} />
-                                    <span>UN BUG</span>
+                                    <span>{t('feedback.category_bug')}</span>
                                 </button>
                                 <button
                                     type="button"
@@ -146,7 +148,7 @@ export default function Feedback() {
                                     className={`${styles.categoryButton} ${styles.catIdea} ${category === 'feature' ? styles.categoryActive : ''}`}
                                 >
                                     <Lightbulb size={32} />
-                                    <span>UNE IDÉE</span>
+                                    <span>{t('feedback.category_idea')}</span>
                                 </button>
                                 <button
                                     type="button"
@@ -154,7 +156,7 @@ export default function Feedback() {
                                     className={`${styles.categoryButton} ${styles.catGeneral} ${category === 'general' ? styles.categoryActive : ''}`}
                                 >
                                     <MessageSquare size={32} />
-                                    <span>GÉNÉRAL</span>
+                                    <span>{t('feedback.category_general')}</span>
                                 </button>
                             </div>
                         </div>
@@ -162,12 +164,12 @@ export default function Feedback() {
                         {/* Message */}
                         <div>
                             <label className={styles.sectionLabel}>
-                                Votre Message
+                                {t('feedback.message_label')}
                             </label>
                             <textarea
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
-                                placeholder="Dites-nous tout..."
+                                placeholder={t('feedback.message_placeholder')}
                                 className={styles.textarea}
                             />
                         </div>
@@ -176,7 +178,7 @@ export default function Feedback() {
                         {!user && (
                             <div>
                                 <label className={styles.sectionLabel}>
-                                    Email (Optionnel)
+                                    {t('feedback.email_label')}
                                 </label>
                                 <div className={styles.inputWrapper}>
                                     <Mail className={styles.inputIcon} size={20} />
@@ -184,7 +186,7 @@ export default function Feedback() {
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="Pour vous recontacter si besoin..."
+                                        placeholder={t('feedback.email_placeholder')}
                                         className={styles.input}
                                     />
                                 </div>
@@ -199,7 +201,7 @@ export default function Feedback() {
                             disabled={isSubmitting}
                             icon={<Send size={20} />}
                         >
-                            {isSubmitting ? 'ENVOI...' : 'ENVOYER MON AVIS'}
+                            {isSubmitting ? t('feedback.submit_sending') : t('feedback.submit_btn')}
                         </Button>
 
                     </form>
@@ -208,3 +210,4 @@ export default function Feedback() {
         </Layout>
     );
 }
+

@@ -1,4 +1,5 @@
 import { Layout } from '@/components/layout/Layout';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Switch } from '@/components/ui/Switch';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -17,15 +18,17 @@ import { saveLibraryToFirestore, saveGamificationToFirestore, deleteUserData } f
 import { deleteUser } from 'firebase/auth';
 
 function SyncButton() {
+    const { t } = useTranslation();
     // ... existing SyncButton code ...
     const { works, updateWorkDetails } = useLibraryStore();
+
     const { addToast } = useToast();
     const [isSyncing, setIsSyncing] = useState(false);
     const [progress, setProgress] = useState(0);
 
     const handleSync = async () => {
         if (works.length === 0) {
-            addToast('Aucune œuvre à synchroniser', 'info');
+            addToast(t('settings.sync.no_works'), 'info');
             return;
         }
 
@@ -53,9 +56,9 @@ function SyncButton() {
                 }
                 setProgress(Math.round(((i + 1) / works.length) * 100));
             }
-            addToast(`Synchronisation terminée : ${updatedCount} mis à jour`, 'success');
+            addToast(t('settings.sync.complete', { count: updatedCount }), 'success');
         } catch (error) {
-            addToast('Erreur lors de la synchronisation', 'error');
+            addToast(t('settings.sync.error'), 'error');
             console.error(error);
         } finally {
             setIsSyncing(false);
@@ -81,7 +84,7 @@ function SyncButton() {
                 </>
             ) : (
                 <>
-                    <RefreshCw size={16} /> Synchroniser
+                    <RefreshCw size={16} /> {t('settings.sync.button')}
                 </>
             )}
         </Button>
@@ -89,6 +92,7 @@ function SyncButton() {
 }
 
 export default function Settings() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { addToast } = useToast();
     const [showConfirmReset, setShowConfirmReset] = useState(false);
@@ -142,12 +146,12 @@ export default function Settings() {
             // Clear localStorage
             localStorage.clear();
 
-            addToast('Toutes les données ont été réinitialisées !', 'success');
+            addToast(t('settings.toast.reset_success'), 'success');
 
             // Reload after a short delay to show the toast
             setTimeout(() => window.location.reload(), 1000);
         } catch (error) {
-            addToast('Erreur lors de la réinitialisation', 'error');
+            addToast(t('settings.toast.reset_error'), 'error');
             console.error(error);
         }
     };
@@ -158,9 +162,9 @@ export default function Settings() {
 
         try {
             await importData(file);
-            addToast('Données importées avec succès !', 'success');
+            addToast(t('settings.toast.import_success'), 'success');
         } catch (error) {
-            addToast('Échec de l\'importation', 'error');
+            addToast(t('settings.toast.import_error'), 'error');
         }
     };
 
@@ -181,21 +185,21 @@ export default function Settings() {
             useGamificationStore.getState().resetStore();
             localStorage.clear();
 
-            addToast('Compte supprimé. Sayonara.', 'success');
+            addToast(t('settings.toast.account_deleted'), 'success');
             navigate('/');
         } catch (error: any) {
             console.error('Delete account error:', error);
             if (error.code === 'auth/requires-recent-login') {
-                addToast('Veuillez vous reconnecter pour supprimer votre compte', 'error');
+                addToast(t('settings.toast.relogin_required'), 'error');
             } else {
-                addToast('Erreur lors de la suppression', 'error');
+                addToast(t('settings.toast.delete_error'), 'error');
             }
         }
     };
 
     const handleClearCache = () => {
         clearImageCache();
-        addToast('Cache nettoyé (simulation)', 'success');
+        addToast(t('settings.toast.cache_cleared'), 'success');
     };
 
     const COLORS = [
@@ -217,7 +221,7 @@ export default function Settings() {
                             <ArrowLeft size={20} />
                         </Button>
                         <h1 style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', color: '#000' }}>
-                            Paramètres
+                            {t('settings.title')}
                         </h1>
                     </div>
 
@@ -226,11 +230,11 @@ export default function Settings() {
                         {/* Personnalisation */}
                         <section>
                             <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>
-                                <Palette size={20} /> APPARENCE
+                                <Palette size={20} /> {t('settings.appearance.title')}
                             </h2>
                             <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
                                 <div style={{ marginBottom: '1.5rem' }}>
-                                    <p style={{ fontWeight: 700, marginBottom: '0.5rem' }}>Couleur d'accentuation</p>
+                                    <p style={{ fontWeight: 700, marginBottom: '0.5rem' }}>{t('settings.appearance.accent_color')}</p>
                                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                         {COLORS.map(c => (
                                             <button
@@ -253,16 +257,16 @@ export default function Settings() {
                                 </div>
                                 <div style={{ height: '1px', background: '#eee', margin: '1rem 0' }} />
                                 <Switch
-                                    label="Mode Spoiler"
+                                    label={t('settings.appearance.spoiler_mode')}
                                     isOn={spoilerMode}
                                     onToggle={() => {
                                         toggleSpoilerMode();
                                         // Feedback toast (state value is old value here, so inversion logic applies for message)
-                                        addToast(!spoilerMode ? 'Mode Spoiler activé' : 'Mode Spoiler désactivé', 'info');
+                                        addToast(!spoilerMode ? t('settings.appearance.spoiler_enabled') : t('settings.appearance.spoiler_disabled'), 'info');
                                     }}
                                 />
                                 <p style={{ fontSize: '0.85rem', opacity: 0.6, marginTop: '0.5rem' }}>
-                                    Floute les synopsis pour éviter les révélations.
+                                    {t('settings.appearance.spoiler_help')}
                                 </p>
                             </div>
                         </section>
@@ -270,23 +274,23 @@ export default function Settings() {
                         {/* Accessibilité & Audio */}
                         <section>
                             <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>
-                                <Volume2 size={20} /> PRÉFÉRENCES
+                                <Volume2 size={20} /> {t('settings.preferences.title')}
                             </h2>
                             <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 <Switch
-                                    label="Réduire les animations"
+                                    label={t('settings.preferences.reduce_motion')}
                                     isOn={reducedMotion}
                                     onToggle={toggleReducedMotion}
                                 />
                                 <div style={{ height: '1px', background: '#eee' }} />
                                 <Switch
-                                    label="Effets sonores (UI)"
+                                    label={t('settings.preferences.sound_effects')}
                                     isOn={soundEnabled}
                                     onToggle={toggleSound}
                                 />
                                 <div style={{ height: '1px', background: '#eee' }} />
                                 <Switch
-                                    label="Notifications"
+                                    label={t('settings.preferences.notifications')}
                                     isOn={notifications}
                                     onToggle={toggleNotifications}
                                 />
@@ -296,22 +300,22 @@ export default function Settings() {
                         {/* Stockage & Données */}
                         <section>
                             <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>
-                                <HardDrive size={20} /> GESTION DES DONNÉES
+                                <HardDrive size={20} /> {t('settings.data.title')}
                             </h2>
                             <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                                     <div>
-                                        <p style={{ fontWeight: 700 }}>Espace utilisé</p>
-                                        <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>{storageSize} MB stockés localement</p>
+                                        <p style={{ fontWeight: 700 }}>{t('settings.data.storage_used')}</p>
+                                        <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>{t('settings.data.storage_local', { size: storageSize })}</p>
                                     </div>
                                     <Button variant="outline" size="sm" onClick={handleClearCache}>
-                                        <Trash2 size={16} /> Nettoyer Cache
+                                        <Trash2 size={16} /> {t('settings.data.clear_cache')}
                                     </Button>
                                 </div>
 
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
                                     <Button variant="outline" onClick={exportData} icon={<Download size={18} />} style={{ justifyContent: 'center' }}>
-                                        Exporter Backup
+                                        {t('settings.data.export_backup')}
                                     </Button>
                                     <div style={{ position: 'relative' }}>
                                         <input
@@ -322,7 +326,7 @@ export default function Settings() {
                                             style={{ display: 'none' }}
                                         />
                                         <Button variant="outline" style={{ width: '100%', justifyContent: 'center' }} icon={<Upload size={18} />} onClick={handleImportClick}>
-                                            Importer Backup
+                                            {t('settings.data.import_backup')}
                                         </Button>
                                     </div>
                                 </div>
@@ -332,44 +336,44 @@ export default function Settings() {
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
-                                            <p style={{ fontWeight: 700 }}>Synchroniser la bibliothèque</p>
+                                            <p style={{ fontWeight: 700 }}>{t('settings.data.sync_library')}</p>
                                         </div>
                                         <SyncButton />
                                     </div>
                                     <div style={{ height: '1px', background: '#eee' }} />
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
-                                            <p style={{ fontWeight: 700, color: '#ef4444' }}>Zone de danger</p>
-                                            <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>Actions irréversibles</p>
+                                            <p style={{ fontWeight: 700, color: '#ef4444' }}>{t('settings.data.danger_zone')}</p>
+                                            <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>{t('settings.data.danger_desc')}</p>
                                         </div>
                                         {!showConfirmReset ? (
                                             <div style={{ display: 'flex', gap: '1rem' }}>
                                                 <Button variant="outline" size="sm" onClick={() => setShowConfirmReset(true)} style={{ borderColor: '#ef4444', color: '#ef4444' }}>
-                                                    <ShieldAlert size={16} /> Reset All
+                                                    <ShieldAlert size={16} /> {t('settings.data.reset_all')}
                                                 </Button>
                                                 <Button variant="outline" size="sm" onClick={() => setShowConfirmAccountDelete(true)} style={{ borderColor: '#ef4444', color: '#ef4444' }}>
-                                                    <Trash2 size={16} /> Supprimer Compte
+                                                    <Trash2 size={16} /> {t('settings.data.delete_account')}
                                                 </Button>
                                             </div>
                                         ) : showConfirmReset ? (
                                             <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                <span style={{ fontSize: '0.8rem', color: '#ef4444', alignSelf: 'center', fontWeight: 'bold' }}>Sûr ?</span>
-                                                <Button variant="ghost" size="sm" onClick={() => setShowConfirmReset(false)}>Non</Button>
-                                                <Button variant="primary" size="sm" onClick={resetAll} style={{ background: '#ef4444' }}>Oui, Reset</Button>
+                                                <span style={{ fontSize: '0.8rem', color: '#ef4444', alignSelf: 'center', fontWeight: 'bold' }}>{t('settings.data.confirm_sure')}</span>
+                                                <Button variant="ghost" size="sm" onClick={() => setShowConfirmReset(false)}>{t('settings.data.no')}</Button>
+                                                <Button variant="primary" size="sm" onClick={resetAll} style={{ background: '#ef4444' }}>{t('settings.data.yes_reset')}</Button>
                                             </div>
                                         ) : null}
 
                                         {/* Account Deletion Confirmation */}
                                         {showConfirmAccountDelete && (
                                             <div style={{ marginTop: '1rem', padding: '1rem', border: '2px solid #ef4444', background: '#fef2f2' }}>
-                                                <p style={{ fontWeight: 700, color: '#ef4444', marginBottom: '0.5rem' }}>SUPPRIMER DÉFINITIVEMENT ?</p>
+                                                <p style={{ fontWeight: 700, color: '#ef4444', marginBottom: '0.5rem' }}>{t('settings.data.delete_confirm_title')}</p>
                                                 <p style={{ fontSize: '0.85rem', marginBottom: '1rem' }}>
-                                                    Cette action supprimera votre compte, votre bibliothèque et toute votre progression. Impossible d'annuler.
+                                                    {t('settings.data.delete_confirm_desc')}
                                                 </p>
                                                 <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                                                    <Button variant="ghost" size="sm" onClick={() => setShowConfirmAccountDelete(false)}>Annuler</Button>
+                                                    <Button variant="ghost" size="sm" onClick={() => setShowConfirmAccountDelete(false)}>{t('settings.data.cancel')}</Button>
                                                     <Button variant="primary" size="sm" onClick={handleDeleteAccount} style={{ background: '#ef4444' }}>
-                                                        ADIEU
+                                                        {t('settings.data.goodbye')}
                                                     </Button>
                                                 </div>
                                             </div>
@@ -382,13 +386,13 @@ export default function Settings() {
                         {/* À propos */}
                         <section>
                             <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>
-                                <Info size={20} /> À PROPOS
+                                <Info size={20} /> {t('settings.about.title')}
                             </h2>
                             <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                                     <div>
                                         <h3 style={{ fontSize: '1.2rem', fontWeight: 900 }}>BINGEKI</h3>
-                                        <p style={{ opacity: 0.6, fontSize: '0.9rem' }}>Version 1.0.0 (Alpha)</p>
+                                        <p style={{ opacity: 0.6, fontSize: '0.9rem' }}>{t('settings.about.version')}</p>
                                     </div>
                                     <div style={{ display: 'flex', gap: '1rem' }}>
                                         <a href="https://github.com/Moussandou" target="_blank" rel="noopener noreferrer" style={{ opacity: 0.7, transition: 'opacity 0.2s' }}>
@@ -397,10 +401,10 @@ export default function Settings() {
                                     </div>
                                 </div>
                                 <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>
-                                    Développé avec ❤️ pour les fans d'anime et de manga.
+                                    {t('settings.about.made_with')}
                                 </p>
                                 <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>
-                                    Données fournies par l'API Jikan (MyAnimeList). Les images et titres appartiennent à leurs créateurs respectifs.
+                                    {t('settings.about.credits')}
                                 </p>
                             </div>
                         </section>

@@ -1,4 +1,5 @@
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/layout/Layout';
 import { createPortal } from 'react-dom';
 import { useLibraryStore } from '@/store/libraryStore';
@@ -6,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal'; // Import Modal
 import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff, Reply, Video, Calendar, BarChart, Music, Disc, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { statusToFrench } from '@/utils/statusTranslation';
+
 import { useGamificationStore } from '@/store/gamificationStore';
 import { useToast } from '@/context/ToastContext';
 import { ContentList, type ContentItem } from '@/components/ContentList';
@@ -41,7 +42,8 @@ function RecursiveComment({
     const isRevealed = revealedSpoilers.includes(comment.id);
     const timeDiff = Date.now() - comment.timestamp;
     const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-    const timeAgo = hours < 1 ? 'À l\'instant' : hours < 24 ? `Il y a ${hours}h` : `Il y a ${Math.floor(hours / 24)}j`;
+    const { t } = useTranslation();
+    const timeAgo = hours < 1 ? t('work_details.comments.time_now') : hours < 24 ? t('work_details.comments.time_hours', { hours }) : t('work_details.comments.time_days', { days: Math.floor(hours / 24) });
     const isReplying = replyingTo === comment.id;
 
     return (
@@ -86,7 +88,7 @@ function RecursiveComment({
                             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
                         }}
                     >
-                        <EyeOff size={14} /> SPOILER
+                        <EyeOff size={14} /> {t('work_details.comments.spoiler')}
                     </div>
                 ) : (
                     <p style={{ fontSize: '0.95rem', lineHeight: 1.5, fontWeight: 500 }}>{comment.text}</p>
@@ -136,7 +138,7 @@ function RecursiveComment({
                             }}
                         >
                             <Reply size={16} />
-                            RÉPONDRE
+                            {t('work_details.comments.reply')}
                         </button>
                     )}
                 </div>
@@ -149,7 +151,7 @@ function RecursiveComment({
                                 type="text"
                                 value={replyText}
                                 onChange={(e: any) => setReplyText(e.target.value)}
-                                placeholder={`Répondre à ${comment.userName}...`}
+                                placeholder={t('work_details.comments.reply_to', { name: comment.userName })}
                                 autoFocus
                                 style={{
                                     flex: 1,
@@ -213,6 +215,7 @@ function RecursiveComment({
 export default function WorkDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const { addToast } = useToast(); // Initialize hook
     const { getWork, addWork, updateStatus, updateWorkDetails, removeWork } = useLibraryStore(); // Add removeWork
     const { } = useGamificationStore(); // Removed unused destructuring
@@ -415,7 +418,7 @@ export default function WorkDetails() {
         // Use centralized utility for progress & XP logic
         const success = handleProgressUpdateWithXP(libraryWork.id, progress, work.totalChapters);
         if (success) {
-            addToast('Progression sauvegardée !', 'success');
+            addToast(t('work_details.progress.saved_toast'), 'success');
         }
 
         setIsEditing(false);
@@ -423,7 +426,7 @@ export default function WorkDetails() {
 
     const handleDelete = () => {
         removeWork(work.id);
-        addToast(`"${work.title}" a été supprimé`, 'error');
+        addToast(t('work_details.danger.deleted_toast', { title: work.title }), 'error');
         navigate('/library');
     };
 
@@ -491,9 +494,9 @@ export default function WorkDetails() {
                     console.error("Error loading comments:", err);
                     setIsLoadingComments(false);
                     if (err.code === 'permission-denied' || err.message?.includes('Missing or insufficient permissions')) {
-                        setCommentError("Vous n'avez pas la permission de voir les commentaires (Règles Firestore).");
+                        setCommentError(t('work_details.comments.permission_error'));
                     } else {
-                        setCommentError("Impossible de charger les commentaires.");
+                        setCommentError(t('work_details.comments.generic_error'));
                     }
                 });
 
@@ -511,7 +514,7 @@ export default function WorkDetails() {
             return (
                 <Layout>
                     <div className="container" style={{ textAlign: 'center', paddingTop: '4rem' }}>
-                        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem' }}>CHARGEMENT...</h1>
+                        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem' }}>{t('work_details.loading')}</h1>
                     </div>
                 </Layout>
             );
@@ -519,9 +522,9 @@ export default function WorkDetails() {
         return (
             <Layout>
                 <div className="container" style={{ textAlign: 'center', paddingTop: '4rem' }}>
-                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem' }}>ŒUVRE INTROUVABLE</h1>
-                    <p>Impossible de récupérer les détails. Vérifiez votre connexion ou l'ID.</p>
-                    <Button onClick={() => navigate('/discover')} style={{ marginTop: '1rem' }}>Retour</Button>
+                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem' }}>{t('work_details.not_found')}</h1>
+                    <p>{t('work_details.not_found_desc')}</p>
+                    <Button onClick={() => navigate('/discover')} style={{ marginTop: '1rem' }}>{t('work_details.back')}</Button>
                 </div>
             </Layout>
         );
@@ -550,18 +553,19 @@ export default function WorkDetails() {
             if (result) {
                 setNewComment('');
                 setIsSpoiler(false);
-                addToast('Commentaire ajouté !', 'success');
+                addToast(t('work_details.comments.added_toast'), 'success');
+
 
                 // Reload comments
                 const updated = await getCommentsWithReplies(Number(work.id));
                 console.log('[Comments] Reloaded comments:', updated.length);
                 setComments(updated);
             } else {
-                addToast('Erreur lors de l\'ajout du commentaire', 'error');
+                addToast(t('work_details.comments.error_toast'), 'error');
             }
         } catch (error) {
             console.error('[Comments] Submit error:', error);
-            addToast('Erreur lors de l\'ajout du commentaire', 'error');
+            addToast(t('work_details.comments.error_toast'), 'error');
         }
     };
 
@@ -593,13 +597,13 @@ export default function WorkDetails() {
             if (result) {
                 setReplyText('');
                 setReplyingTo(null);
-                addToast('Réponse ajoutée !', 'success');
+                addToast(t('work_details.comments.reply_added_toast'), 'success');
                 const updated = await getCommentsWithReplies(Number(work.id));
                 setComments(updated);
             }
         } catch (error) {
             console.error('[Comments] Reply error:', error);
-            addToast('Erreur lors de la réponse', 'error');
+            addToast(t('work_details.comments.reply_error_toast'), 'error');
         }
     };
 
@@ -641,7 +645,7 @@ export default function WorkDetails() {
                     icon={<ArrowLeft size={20} />}
                     className={styles.backButton}
                 >
-                    RETOUR
+                    {t('work_details.back')}
                 </Button>
 
                 <div className={`manga-panel ${styles.detailsPanel}`}>
@@ -667,14 +671,14 @@ export default function WorkDetails() {
                                 onClick={() => setActiveTab('info')}
                                 className={`${styles.tabButton} ${activeTab === 'info' ? styles.activeTab : ''}`}
                             >
-                                GÉNÉRAL
+                                {t('work_details.hero.general_tab')}
                             </button>
                             {(work.type) && (
                                 <button
                                     onClick={() => setActiveTab('episodes')}
                                     className={`${styles.tabButton} ${activeTab === 'episodes' ? styles.activeTab : ''}`}
                                 >
-                                    {['manga', 'novel', 'manhwa', 'manhua', 'doujinshi', 'oneshot', 'oel'].includes(work.type?.toLowerCase()) ? 'LISTE DES CHAPITRES' : 'LISTE DES ÉPISODES'}
+                                    {['manga', 'novel', 'manhwa', 'manhua', 'doujinshi', 'oneshot', 'oel'].includes(work.type?.toLowerCase()) ? t('work_details.tabs.chapters_list') : t('work_details.tabs.episodes_list')}
                                 </button>
                             )}
                             {!['manga', 'novel', 'manhwa', 'manhua', 'doujinshi', 'oneshot', 'oel'].includes(work.type?.toLowerCase() || '') && (
@@ -682,44 +686,44 @@ export default function WorkDetails() {
                                     className={`${styles.tabButton} ${activeTab === 'themes' ? styles.activeTab : ''}`}
                                     onClick={() => setActiveTab('themes')}
                                 >
-                                    MUSIQUES
+                                    {t('work_details.tabs.music')}
                                 </button>
                             )}
                             <button
                                 onClick={() => setActiveTab('reviews' as any)}
                                 className={`${styles.tabButton} ${activeTab === 'reviews' as any ? styles.activeTab : ''}`}
                             >
-                                AVIS
+                                {t('work_details.tabs.reviews')}
                             </button>
                             <button
                                 onClick={() => setActiveTab('gallery')}
                                 className={`${styles.tabButton} ${activeTab === 'gallery' ? styles.activeTab : ''}`}
                             >
-                                GALERIE
+                                {t('work_details.tabs.gallery')}
                             </button>
                             <button
                                 onClick={() => setActiveTab('stats')}
                                 className={`${styles.tabButton} ${activeTab === 'stats' ? styles.activeTab : ''}`}
                             >
-                                STATISTIQUES
+                                {t('work_details.tabs.stats')}
                             </button>
                         </div>
 
                         {activeTab === 'episodes' && (
                             work.type === 'manga' && (!work.totalChapters || work.totalChapters === 0) ? (
                                 <div style={{ textAlign: 'center', padding: '3rem', border: '2px dashed #000' }}>
-                                    <h3 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>NOMBRE DE CHAPITRES INCONNU</h3>
-                                    <p style={{ marginBottom: '1rem' }}>Veuillez définir le nombre total de chapitres dans l'onglet "Général" pour générer la liste.</p>
+                                    <h3 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>{t('work_details.chapters.unknown_count')}</h3>
+                                    <p style={{ marginBottom: '1rem' }}>{t('work_details.chapters.unknown_desc')}</p>
                                     <Button
                                         onClick={() => {
-                                            const newTotal = prompt("Entrez le nombre total de chapitres :", "0");
+                                            const newTotal = prompt(t('work_details.chapters.prompt'), "0");
                                             if (newTotal && !isNaN(Number(newTotal))) {
                                                 updateWorkDetails(work.id, { totalChapters: Number(newTotal) });
                                             }
                                         }}
                                         variant="manga"
                                     >
-                                        Définir le nombre de chapitres
+                                        {t('work_details.chapters.set_count')}
                                     </Button>
                                 </div>
                             ) : (
@@ -751,21 +755,21 @@ export default function WorkDetails() {
                                 <div className={styles.metaContainer}>
                                     <div className={styles.metaItem}>
                                         <Trophy size={20} />
-                                        <span>Score: {work.score || '?'}</span>
+                                        <span>{t('work_details.meta.score')}: {work.score || '?'}</span>
                                     </div>
                                     <div
                                         onClick={() => {
-                                            const newTotal = prompt("Entrez le nombre total:", work.totalChapters?.toString() || "");
+                                            const newTotal = prompt(t('work_details.chapters.prompt_total'), work.totalChapters?.toString() || "");
                                             if (newTotal && !isNaN(Number(newTotal))) {
                                                 updateWorkDetails(Number(work.id), { totalChapters: Number(newTotal) });
                                             }
                                         }}
                                         className={styles.metaItem}
                                         style={{ cursor: 'pointer', userSelect: 'none' }}
-                                        title="Cliquez pour modifier le total"
+                                        title={t('work_details.chapters.click_to_edit')}
                                     >
                                         <BookOpen size={20} />
-                                        <span>{work.totalChapters || '?'} {(work.type === 'Manga' || work.type === 'manga' || work.type === 'Manhwa' || work.type === 'Novel') ? 'Chaps' : 'Eps'}</span>
+                                        <span>{work.totalChapters || '?'} {(work.type === 'Manga' || work.type === 'manga' || work.type === 'Manhwa' || work.type === 'Novel') ? t('work_details.meta.chaps') : t('work_details.meta.eps')}</span>
                                     </div>
 
                                     {/* Minimalist Streaming Buttons */}
@@ -816,7 +820,7 @@ export default function WorkDetails() {
                                                             letterSpacing: '0.5px',
                                                             boxShadow: '2px 2px 0 rgba(0,0,0,0.2)',
                                                         }}
-                                                        title={`Regarder sur ${s.name}`}
+                                                        title={`${t('work_details.streaming.watch_on')} ${s.name}`}
                                                     >
                                                         {service.logo ? (
                                                             <img src={service.logo} alt={service.short} style={{ width: '22px', height: '22px', objectFit: 'contain' }} />
@@ -835,10 +839,10 @@ export default function WorkDetails() {
                                                     window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} episode ${nextEp} streaming vostfr`, '_blank');
                                                 }}
                                                 style={{ border: '2px solid #000', padding: '0.5rem 1rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center', height: '40px', gap: '0.5rem', fontWeight: 700 }}
-                                                title={`Recherche Google - Épisode ${(work.currentChapter || 0) + 1}`}
+                                                title={`${t('work_details.streaming.search_episode')} ${(work.currentChapter || 0) + 1}`}
                                             >
                                                 <Tv size={20} />
-                                                <span>REGARDER</span>
+                                                <span>{t('work_details.streaming.watch')}</span>
                                             </button>
                                         </div>
                                     ) : (
@@ -849,17 +853,17 @@ export default function WorkDetails() {
                                                 window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} chapitre ${nextChap} scan fr`, '_blank');
                                             }}
                                             style={{ border: '2px solid #22c55e', color: '#22c55e', padding: '0.5rem 1rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700 }}
-                                            title={`Lire - Chapitre ${(work.currentChapter || 0) + 1}`}
+                                            title={`${t('work_details.streaming.search_chapter')} ${(work.currentChapter || 0) + 1}`}
                                         >
                                             <FileText size={20} />
-                                            <span>LIRE</span>
+                                            <span>{t('work_details.streaming.read')}</span>
                                         </button>
                                     )}
                                 </div>
 
                                 {work.synopsis && (
                                     <div style={{ marginBottom: '2rem' }}>
-                                        <h3 className={styles.synopsisTitle}>SYNOPSIS</h3>
+                                        <h3 className={styles.synopsisTitle}>{t('work_details.synopsis.title')}</h3>
                                         <div
                                             onClick={() => setIsSynopsisExpanded(!isSynopsisExpanded)}
                                             style={{ cursor: 'pointer', position: 'relative' }}
@@ -895,7 +899,7 @@ export default function WorkDetails() {
                                                 padding: 0
                                             }}
                                         >
-                                            {isSynopsisExpanded ? 'Moins' : 'Lire la suite'}
+                                            {isSynopsisExpanded ? t('work_details.synopsis.show_less') : t('work_details.synopsis.show_more')}
                                         </button>
                                     </div>
                                 )}
@@ -908,7 +912,7 @@ export default function WorkDetails() {
                                         {work.season && (
                                             <div className={styles.infoCard}>
                                                 <div className={styles.infoLabel}>
-                                                    <Calendar size={14} strokeWidth={3} /> SAISON
+                                                    <Calendar size={14} strokeWidth={3} /> {t('work_details.info.season')}
                                                 </div>
                                                 <div className={styles.infoValue}>{work.season} {work.year}</div>
                                             </div>
@@ -916,7 +920,7 @@ export default function WorkDetails() {
                                         {work.studios && work.studios.length > 0 && (
                                             <div className={styles.infoCard}>
                                                 <div className={styles.infoLabel}>
-                                                    <Video size={14} strokeWidth={3} /> STUDIO
+                                                    <Video size={14} strokeWidth={3} /> {t('work_details.info.studio')}
                                                 </div>
                                                 <div className={styles.infoValue}>{work.studios[0].name}</div>
                                             </div>
@@ -924,7 +928,7 @@ export default function WorkDetails() {
                                         {work.rank && (
                                             <div className={styles.infoCard}>
                                                 <div className={styles.infoLabel}>
-                                                    <Trophy size={14} strokeWidth={3} /> RANG
+                                                    <Trophy size={14} strokeWidth={3} /> {t('work_details.info.rank')}
                                                 </div>
                                                 <div className={styles.infoValue}>#{work.rank}</div>
                                             </div>
@@ -932,7 +936,7 @@ export default function WorkDetails() {
                                         {work.popularity && (
                                             <div className={styles.infoCard}>
                                                 <div className={styles.infoLabel}>
-                                                    <BarChart size={14} strokeWidth={3} /> POPULARITÉ
+                                                    <BarChart size={14} strokeWidth={3} /> {t('work_details.info.popularity')}
                                                 </div>
                                                 <div className={styles.infoValue}>#{work.popularity}</div>
                                             </div>
@@ -952,7 +956,7 @@ export default function WorkDetails() {
                                             <div style={{ width: '100%', marginTop: '1rem' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                                                     <Video size={20} strokeWidth={2.5} />
-                                                    <h3 className={styles.synopsisTitle} style={{ marginBottom: 0 }}>BANDE-ANNONCE</h3>
+                                                    <h3 className={styles.synopsisTitle} style={{ marginBottom: 0 }}>{t('work_details.trailer.title')}</h3>
                                                 </div>
 
                                                 {/* Theater Mode Trigger Card */}
@@ -1029,7 +1033,7 @@ export default function WorkDetails() {
                                                             textAlign: 'center',
                                                             padding: '0 1rem'
                                                         }}>
-                                                            REGARDER LA BANDE-ANNONCE
+                                                            {t('work_details.trailer.watch')}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -1101,7 +1105,7 @@ export default function WorkDetails() {
                                                                 e.currentTarget.style.transform = 'scale(1)';
                                                             }}
                                                         >
-                                                            <span style={{ fontWeight: 700, fontSize: '0.9rem', letterSpacing: '1px' }}>FERMER</span>
+                                                            <span style={{ fontWeight: 700, fontSize: '0.9rem', letterSpacing: '1px' }}>{t('work_details.trailer.close')}</span>
                                                             <X size={24} strokeWidth={2.5} />
                                                         </button>
                                                     </div>,
@@ -1114,7 +1118,7 @@ export default function WorkDetails() {
                                     {/* CASTING SECTION */}
                                     {characters.length > 0 && (
                                         <div style={{ marginTop: '1rem' }}>
-                                            <h3 className={styles.synopsisTitle} style={{ marginBottom: '1rem' }}>CASTING</h3>
+                                            <h3 className={styles.synopsisTitle} style={{ marginBottom: '1rem' }}>{t('work_details.casting.title')}</h3>
 
                                             <div style={{
                                                 display: 'flex',
@@ -1202,7 +1206,7 @@ export default function WorkDetails() {
                                                         variant="ghost"
                                                         style={{ border: '1px dashed #000' }}
                                                     >
-                                                        {isCastingExpanded ? 'VOIR MOINS' : `VOIR PLUS (${characters.length - 12})`}
+                                                        {isCastingExpanded ? t('work_details.casting.show_less') : t('work_details.casting.show_more', { count: characters.length - 12 })}
                                                     </Button>
                                                 </div>
                                             )}
@@ -1215,7 +1219,7 @@ export default function WorkDetails() {
 
                                         return (
                                             <div style={{ marginTop: '2rem' }}>
-                                                <h3 className={styles.synopsisTitle} style={{ marginBottom: '1rem', borderTop: '2px solid #EEE', paddingTop: '1rem' }}>UNIVERS ÉTENDU</h3>
+                                                <h3 className={styles.synopsisTitle} style={{ marginBottom: '1rem', borderTop: '2px solid #EEE', paddingTop: '1rem' }}>{t('work_details.universe.title')}</h3>
                                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
                                                     {relations.map((rel, index) => {
                                                         const isExpanded = expandedRelations[index];
@@ -1271,7 +1275,7 @@ export default function WorkDetails() {
                                                                                 marginTop: '0.25rem'
                                                                             }}
                                                                         >
-                                                                            {isExpanded ? '▲ Réduire' : `▼ Voir ${entries.length - MAX_VISIBLE} de plus`}
+                                                                            {isExpanded ? t('work_details.universe.collapse') : t('work_details.universe.expand', { count: entries.length - MAX_VISIBLE })}
                                                                         </button>
                                                                     )}
                                                                 </div>
@@ -1290,13 +1294,13 @@ export default function WorkDetails() {
                                 <div style={{ marginBottom: '2rem' }}>
                                     {!libraryWork ? (
                                         <div style={{ padding: '2rem', background: '#f9f9f9', textAlign: 'center', border: '2px dashed #000' }}>
-                                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem' }}>INTÉRESSÉ ?</h3>
-                                            <p style={{ marginBottom: '1.5rem' }}>Ajoutez cette œuvre à votre bibliothèque pour suivre votre progression !</p>
+                                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem' }}>{t('work_details.library.interested_title')}</h3>
+                                            <p style={{ marginBottom: '1.5rem' }}>{t('work_details.library.interested_desc')}</p>
                                             <Button
                                                 onClick={() => {
                                                     if (user) {
                                                         addWork(fetchedWork);
-                                                        addToast('Ajouté à votre bibliothèque !', 'success');
+                                                        addToast(t('work_details.library.added_toast'), 'success');
                                                     } else {
                                                         navigate('/auth');
                                                     }
@@ -1305,12 +1309,12 @@ export default function WorkDetails() {
                                                 size="lg"
                                                 icon={<BookOpen size={20} />}
                                             >
-                                                {user ? 'AJOUTER À MA COLLECTION' : 'SE CONNECTER POUR AJOUTER'}
+                                                {user ? t('work_details.library.add_to_collection') : t('work_details.library.login_to_add')}
                                             </Button>
                                         </div>
                                     ) : (
                                         <>
-                                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>PROGRESSION</h3>
+                                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>{t('work_details.progress.title')}</h3>
                                             <div style={{ color: '#000' }}>
                                                 {isEditing ? (
                                                     <div className={styles.progressContainer}>
@@ -1321,7 +1325,7 @@ export default function WorkDetails() {
                                                             className={styles.progressInput}
                                                         />
                                                         <span style={{ fontSize: '1.5rem', fontWeight: 900 }}>/ {work.totalChapters || '?'}</span>
-                                                        <Button onClick={handleSave} variant="primary" icon={<Check size={20} />}>OK</Button>
+                                                        <Button onClick={handleSave} variant="primary" icon={<Check size={20} />}>{t('work_details.progress.ok')}</Button>
                                                     </div>
                                                 ) : (
                                                     <div className={styles.progressControls}>
@@ -1369,7 +1373,7 @@ export default function WorkDetails() {
                                                             onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 5)}
                                                             style={{ fontWeight: 700, border: '1px solid #ccc' }}
                                                         >+5</Button>
-                                                        <Button onClick={() => setIsEditing(true)} variant="manga" size="sm">Éditer</Button>
+                                                        <Button onClick={() => setIsEditing(true)} variant="manga" size="sm">{t('work_details.progress.edit')}</Button>
                                                     </div>
                                                 )}
                                             </div>
@@ -1379,7 +1383,7 @@ export default function WorkDetails() {
 
                                 {libraryWork && (
                                     <div style={{ marginBottom: '2rem' }}>
-                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>STATUT</h3>
+                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>{t('work_details.status.title')}</h3>
                                         <div className={styles.statusButtons}>
                                             {['reading', 'completed', 'plan_to_read', 'dropped'].map((s) => (
                                                 <button
@@ -1387,7 +1391,7 @@ export default function WorkDetails() {
                                                     onClick={() => updateStatus(work.id, s as any)}
                                                     className={`${styles.statusButton} ${work.status === s ? styles.statusButtonActive : ''}`}
                                                 >
-                                                    {statusToFrench(s)}
+                                                    {t(`work_details.status.${s}`)}
                                                 </button>
                                             ))}
                                         </div>
@@ -1398,7 +1402,7 @@ export default function WorkDetails() {
                                 {/* Rating Section */}
                                 {libraryWork && (
                                     <div style={{ marginBottom: '2rem' }}>
-                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>MA NOTE</h3>
+                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>{t('work_details.rating.title')}</h3>
                                         <div className={styles.ratingContainer}>
                                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
                                                 <button
@@ -1445,13 +1449,13 @@ export default function WorkDetails() {
                                                 userSelect: 'none'
                                             }}
                                         >
-                                            MES NOTES {isNotesExpanded ? '▼' : '►'}
+                                            {t('work_details.notes.title')} {isNotesExpanded ? '▼' : '►'}
                                         </h3>
                                         {isNotesExpanded && (
                                             <textarea
                                                 value={work.notes || ''}
                                                 onChange={(e) => updateWorkDetails(work.id, { notes: e.target.value })}
-                                                placeholder="Écrivez vos pensées ici..."
+                                                placeholder={t('work_details.notes.placeholder')}
                                                 className={styles.notesArea}
                                             />
                                         )}
@@ -1482,7 +1486,7 @@ export default function WorkDetails() {
                                         }}
                                     >
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            <MessageCircle size={24} /> COMMENTAIRES ({comments.length})
+                                            <MessageCircle size={24} /> {t('work_details.comments.title')} ({comments.length})
                                         </div>
                                         <span>{isCommentsExpanded ? '▼' : '►'}</span>
                                     </h3>
@@ -1500,7 +1504,7 @@ export default function WorkDetails() {
                                                     border: '1px solid #c7d2fe'
                                                 }}>
                                                     <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>
-                                                        👥 <strong>{friendsReading.count} ami{friendsReading.count > 1 ? 's' : ''}</strong> {work.type === 'anime' ? 'regarde' : 'lit'} aussi cette œuvre
+                                                        👥 <strong>{friendsReading.count} {t('work_details.comments.friends_count', { count: friendsReading.count })}</strong> {work.type === 'anime' ? t('work_details.comments.watching') : t('work_details.comments.reading')}
                                                     </p>
                                                     <div style={{ display: 'flex', gap: '-8px', marginTop: '0.5rem' }}>
                                                         {friendsReading.friends.slice(0, 5).map(f => (
@@ -1533,7 +1537,7 @@ export default function WorkDetails() {
                                                     <textarea
                                                         value={newComment}
                                                         onChange={(e) => setNewComment(e.target.value)}
-                                                        placeholder="Partagez votre avis..."
+                                                        placeholder={t('work_details.comments.placeholder')}
                                                         style={{
                                                             width: '100%',
                                                             minHeight: '100px',
@@ -1556,7 +1560,7 @@ export default function WorkDetails() {
                                                                 onChange={(e) => setIsSpoiler(e.target.checked)}
                                                                 style={{ accentColor: '#000', width: 16, height: 16 }}
                                                             />
-                                                            <EyeOff size={16} /> Contient des spoilers
+                                                            <EyeOff size={16} /> {t('work_details.comments.spoiler')}
                                                         </label>
                                                         <Button
                                                             onClick={handleSubmitComment}
@@ -1569,12 +1573,12 @@ export default function WorkDetails() {
                                                                 fontWeight: 900
                                                             }}
                                                         >
-                                                            PUBLIER
+                                                            {t('work_details.comments.submit')}
                                                         </Button>
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <p style={{ opacity: 0.6, fontStyle: 'italic', marginBottom: '1rem' }}>Connectez-vous pour commenter</p>
+                                                <p style={{ opacity: 0.6, fontStyle: 'italic', marginBottom: '1rem' }}>{t('work_details.comments.login_to_comment')}</p>
                                             )}
 
                                             {/* Error State */}
@@ -1592,16 +1596,16 @@ export default function WorkDetails() {
                                                 }}>
                                                     <AlertTriangle size={20} />
                                                     <div>
-                                                        <strong>Erreur de chargement :</strong> {commentError}
+                                                        <strong>{t('work_details.comments.error_loading')}</strong> {commentError}
                                                     </div>
                                                 </div>
                                             )}
 
                                             {/* Comments list */}
                                             {isLoadingComments ? (
-                                                <p style={{ textAlign: 'center', opacity: 0.6 }}>Chargement des commentaires...</p>
+                                                <p style={{ textAlign: 'center', opacity: 0.6 }}>{t('work_details.comments.loading')}</p>
                                             ) : comments.length === 0 && !commentError ? (
-                                                <p style={{ textAlign: 'center', opacity: 0.6, padding: '2rem' }}>Aucun commentaire. Soyez le premier !</p>
+                                                <p style={{ textAlign: 'center', opacity: 0.6, padding: '2rem' }}>{t('work_details.comments.no_comments')}</p>
                                             ) : (
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                                     {comments.map(comment => (
@@ -1639,7 +1643,7 @@ export default function WorkDetails() {
                                             }}
                                             icon={<Trash2 size={20} />}
                                         >
-                                            Supprimer de la bibliothèque
+                                            {t('work_details.danger.delete_button')}
                                         </Button>
                                     </div>
                                 )}
@@ -1650,7 +1654,7 @@ export default function WorkDetails() {
                             <div className="animate-fade-in">
                                 {(!statistics && staff.length === 0) ? (
                                     <div style={{ padding: '3rem', textAlign: 'center', opacity: 0.6, fontStyle: 'italic', border: '2px dashed #000' }}>
-                                        Aucune statistique ou information de staff disponible pour cette œuvre.
+                                        {t('work_details.stats.no_data')}
                                     </div>
                                 ) : (
                                     <>
@@ -1660,7 +1664,7 @@ export default function WorkDetails() {
                                         {/* STAFF SECTION (Moved here) */}
                                         {staff.length > 0 && (
                                             <div style={{ marginBottom: '2rem' }}>
-                                                <h3 className={styles.sectionTitle}>STAFF (PRINCIPAL)</h3>
+                                                <h3 className={styles.sectionTitle}>{t('work_details.stats.staff_title')}</h3>
                                                 <div style={{
                                                     display: 'flex',
                                                     flexWrap: 'wrap',
@@ -1696,7 +1700,7 @@ export default function WorkDetails() {
                                                             variant="ghost"
                                                             style={{ border: '1px dashed #000' }}
                                                         >
-                                                            {isStaffExpanded ? 'VOIR MOINS' : 'VOIR PLUS'}
+                                                            {isStaffExpanded ? t('work_details.stats.show_less') : t('work_details.stats.show_more')}
                                                         </Button>
                                                     </div>
                                                 )}
@@ -1708,20 +1712,20 @@ export default function WorkDetails() {
                                             <div style={{ marginTop: '2rem' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>
                                                     <BarChart size={24} strokeWidth={2.5} />
-                                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', margin: 0 }}>STATISTIQUES</h3>
+                                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', margin: 0 }}>{t('work_details.stats.title')}</h3>
                                                 </div>
 
                                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
                                                     {/* Status Distribution */}
                                                     <div style={{ border: '2px solid #000', padding: '1rem', background: '#fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.1)' }}>
-                                                        <h4 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>DANS LES BIBLIOTHÈQUES</h4>
+                                                        <h4 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>{t('work_details.stats.library_distribution')}</h4>
                                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                                             {[
-                                                                { label: 'En cours', value: statistics.watching, color: '#2ecc71' },
-                                                                { label: 'Terminé', value: statistics.completed, color: '#3498db' },
-                                                                { label: 'En pause', value: statistics.on_hold, color: '#f1c40f' },
-                                                                { label: 'Abandonné', value: statistics.dropped, color: '#e74c3c' },
-                                                                { label: 'À voir', value: statistics.plan_to_watch, color: '#95a5a6' }
+                                                                { label: t('work_details.status.watching'), value: statistics.watching, color: '#2ecc71' },
+                                                                { label: t('work_details.status.completed'), value: statistics.completed, color: '#3498db' },
+                                                                { label: t('work_details.status.on_hold'), value: statistics.on_hold, color: '#f1c40f' },
+                                                                { label: t('work_details.status.dropped'), value: statistics.dropped, color: '#e74c3c' },
+                                                                { label: t('work_details.status.plan_to_watch'), value: statistics.plan_to_watch, color: '#95a5a6' }
                                                             ].map(stat => (
                                                                 <div key={stat.label}>
                                                                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 600, marginBottom: '2px' }}>
@@ -1743,7 +1747,7 @@ export default function WorkDetails() {
                                                     {/* Score Distribution */}
                                                     {statistics.scores && statistics.scores.length > 0 && (
                                                         <div style={{ border: '2px solid #000', padding: '1rem', background: '#fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.1)' }}>
-                                                            <h4 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>NOTES DES MEMBRES</h4>
+                                                            <h4 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>{t('work_details.stats.score_distribution')}</h4>
                                                             <div style={{ display: 'flex', alignItems: 'flex-end', height: '150px', gap: '2px' }}>
                                                                 {statistics.scores.sort((a, b) => a.score - b.score).map((score) => (
                                                                     <div key={score.score} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -1774,7 +1778,7 @@ export default function WorkDetails() {
                         {activeTab === 'reviews' as any && (
                             <div className="animate-fade-in">
                                 <h2 className={styles.sectionTitle} style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Star size={24} fill="#000" /> AVIS DE LA COMMUNAUTÉ (MyAnimeList)
+                                    <Star size={24} fill="#000" /> {t('work_details.reviews.title')}
                                 </h2>
 
                                 {reviews.length > 0 ? (
@@ -1853,7 +1857,7 @@ export default function WorkDetails() {
                                                             fontSize: '0.85rem'
                                                         }}
                                                     >
-                                                        LIRE L'AVIS COMPLET <ArrowLeft size={14} style={{ transform: 'rotate(180deg)' }} />
+                                                        {t('work_details.reviews.read_full')} <ArrowLeft size={14} style={{ transform: 'rotate(180deg)' }} />
                                                     </a>
                                                 </div>
                                             </div>
@@ -1861,8 +1865,8 @@ export default function WorkDetails() {
                                     </div>
                                 ) : (
                                     <div style={{ padding: '3rem', textAlign: 'center', border: '2px dashed #000', opacity: 0.7 }}>
-                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem' }}>AUCUN AVIS TROUVÉ</h3>
-                                        <p>Soyez le premier à donner votre avis dans la section commentaires ci-dessous !</p>
+                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem' }}>{t('work_details.reviews.none_found')}</h3>
+                                        <p>{t('work_details.reviews.be_first')}</p>
                                     </div>
                                 )}
                             </div>
@@ -1870,7 +1874,7 @@ export default function WorkDetails() {
 
                         {activeTab === 'gallery' && (
                             <div className="animate-fade-in">
-                                <h2 className={styles.sectionTitle} style={{ marginBottom: '1.5rem' }}>GALERIE OFFICIELLE</h2>
+                                <h2 className={styles.sectionTitle} style={{ marginBottom: '1.5rem' }}>{t('work_details.gallery.title')}</h2>
                                 {pictures.length > 0 ? (
                                     <div style={{
                                         display: 'grid',
@@ -1901,7 +1905,7 @@ export default function WorkDetails() {
                                     </div>
                                 ) : (
                                     <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.6, fontStyle: 'italic' }}>
-                                        Aucune image disponible.
+                                        {t('work_details.gallery.no_images')}
                                     </div>
                                 )}
                             </div>
@@ -1911,7 +1915,7 @@ export default function WorkDetails() {
                             <div className="animate-fade-in">
                                 {(themes && (themes.openings.length > 0 || themes.endings.length > 0)) ? (
                                     <>
-                                        <h2 className={styles.sectionTitle} style={{ marginBottom: '1.5rem' }}>BANDES ORIGINALES</h2>
+                                        <h2 className={styles.sectionTitle} style={{ marginBottom: '1.5rem' }}>{t('work_details.themes.title')}</h2>
 
                                         <div style={{
                                             display: 'grid',
@@ -1935,7 +1939,7 @@ export default function WorkDetails() {
                                                     alignItems: 'center',
                                                     gap: '0.5rem'
                                                 }}>
-                                                    <Music size={24} /> OPENINGS ({themes.openings.length})
+                                                    <Music size={24} /> {t('work_details.themes.openings')} ({themes.openings.length})
                                                 </h3>
                                                 <div style={{ maxHeight: '500px', overflowY: 'auto' }} className="scrollbar-hide">
                                                     {themes.openings.length > 0 ? (
@@ -1969,7 +1973,7 @@ export default function WorkDetails() {
                                                                 </li>
                                                             ))}
                                                         </ul>
-                                                    ) : <p style={{ opacity: 0.5, fontStyle: 'italic' }}>Aucun opening trouvé.</p>}
+                                                    ) : <p style={{ opacity: 0.5, fontStyle: 'italic' }}>{t('work_details.themes.no_openings')}</p>}
                                                 </div>
                                             </div>
 
@@ -1990,7 +1994,7 @@ export default function WorkDetails() {
                                                     alignItems: 'center',
                                                     gap: '0.5rem'
                                                 }}>
-                                                    <Disc size={24} /> ENDINGS ({themes.endings.length})
+                                                    <Disc size={24} /> {t('work_details.themes.endings')} ({themes.endings.length})
                                                 </h3>
                                                 <div style={{ maxHeight: '500px', overflowY: 'auto' }} className="scrollbar-hide">
                                                     {themes.endings.length > 0 ? (
@@ -2024,7 +2028,7 @@ export default function WorkDetails() {
                                                                 </li>
                                                             ))}
                                                         </ul>
-                                                    ) : <p style={{ opacity: 0.5, fontStyle: 'italic' }}>Aucun ending trouvé.</p>}
+                                                    ) : <p style={{ opacity: 0.5, fontStyle: 'italic' }}>{t('work_details.themes.no_endings')}</p>}
                                                 </div>
                                             </div>
                                         </div>
@@ -2032,7 +2036,7 @@ export default function WorkDetails() {
                                     </>
                                 ) : (
                                     <div style={{ padding: '3rem', textAlign: 'center', opacity: 0.6, fontStyle: 'italic', border: '2px dashed #000' }}>
-                                        Aucune musique (opening/ending) disponible.
+                                        {t('work_details.themes.no_music')}
                                     </div>
                                 )}
 
@@ -2053,7 +2057,7 @@ export default function WorkDetails() {
                                 textTransform: 'uppercase',
                                 textAlign: 'center'
                             }}>
-                                VOUS AIMEREZ AUSSI
+                                {t('work_details.recommendations.title')}
                             </h2>
                             <div style={{
                                 display: 'grid',
@@ -2094,7 +2098,7 @@ export default function WorkDetails() {
                                                 fontWeight: 800,
                                                 textAlign: 'center'
                                             }}>
-                                                {rec.votes} VOTES
+                                                {rec.votes} {t('work_details.recommendations.votes')}
                                             </div>
                                         </div>
                                         <h4 style={{
@@ -2118,7 +2122,7 @@ export default function WorkDetails() {
                 }
 
                 {/* Delete Confirmation Modal */}
-                <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} title="SUPPRESSION">
+                <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} title={t('work_details.danger.modal_title')}>
                     <div style={{ textAlign: 'center', padding: '1rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
                             <div style={{ background: '#fee2e2', padding: '1rem', borderRadius: '50%', color: '#dc2626' }}>
@@ -2126,21 +2130,21 @@ export default function WorkDetails() {
                             </div>
                         </div>
                         <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem', color: '#000' }}>
-                            Supprimer "{work.title}" ?
+                            {t('work_details.danger.confirm_title', { title: work.title })}
                         </h3>
                         <p style={{ marginBottom: '2rem', opacity: 0.7 }}>
-                            Cette action est irréversible. Votre progression et vos notes seront perdues.
+                            {t('work_details.danger.confirm_desc')}
                         </p>
                         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                             <Button variant="ghost" onClick={() => setIsDeleteModalOpen(false)}>
-                                ANNULER
+                                {t('work_details.danger.cancel')}
                             </Button>
                             <Button
                                 variant="primary"
                                 onClick={handleDelete}
                                 style={{ background: '#dc2626', borderColor: '#b91c1c' }}
                             >
-                                SUPPRIMER
+                                {t('work_details.danger.confirm_delete')}
                             </Button>
                         </div>
                     </div>

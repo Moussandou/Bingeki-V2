@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { Star, Mail, Trash2, CheckCircle, AlertCircle, MessageSquare } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { getAllFeedback, deleteFeedback, updateFeedbackStatus, type FeedbackData } from '@/firebase/firestore';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminFeedback() {
+    const { t } = useTranslation();
     const [feedbacks, setFeedbacks] = useState<FeedbackData[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -24,12 +26,12 @@ export default function AdminFeedback() {
     };
 
     const handleDelete = async (id: string) => {
-        if (window.confirm("Supprimer ce feedback définitivement ?")) {
+        if (window.confirm(t('admin.feedback.confirm_delete'))) {
             try {
                 await deleteFeedback(id);
                 setFeedbacks(prev => prev.filter(f => f.id !== id));
             } catch (e) {
-                alert("Erreur lors de la suppression");
+                alert(t('admin.feedback.delete_error'));
             }
         }
     };
@@ -40,7 +42,7 @@ export default function AdminFeedback() {
             await updateFeedbackStatus(id, newStatus);
             setFeedbacks(prev => prev.map(f => f.id === id ? { ...f, status: newStatus } : f));
         } catch (e) {
-            alert("Erreur lors de la mise à jour du statut");
+            alert(t('admin.feedback.status_error'));
         }
     };
 
@@ -56,14 +58,14 @@ export default function AdminFeedback() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', animation: 'fadeIn 0.5s ease' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', textTransform: 'uppercase' }}>Feedback Center</h1>
+                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', textTransform: 'uppercase' }}>{t('admin.feedback.title')}</h1>
                     <p style={{
                         borderLeft: '2px solid black',
                         paddingLeft: '0.5rem',
                         color: '#666',
                         fontStyle: 'italic'
                     }}>
-                        {feedbacks.filter(f => (f as any).status !== 'resolved').length} tickets en attente
+                        {t('admin.feedback.tickets_pending', { count: feedbacks.filter(f => (f as any).status !== 'resolved').length })}
                     </p>
                 </div>
                 <button
@@ -78,7 +80,7 @@ export default function AdminFeedback() {
                     onMouseOver={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
                     onMouseOut={(e) => e.currentTarget.style.color = 'black'}
                 >
-                    Rafraîchir
+                    {t('admin.feedback.refresh')}
                 </button>
             </div>
 
@@ -88,10 +90,10 @@ export default function AdminFeedback() {
                 gap: '1.5rem'
             }}>
                 {loading ? (
-                    <p>Chargement des messages...</p>
+                    <p>{t('admin.feedback.loading')}</p>
                 ) : feedbacks.length === 0 ? (
                     <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem', color: '#666' }}>
-                        Aucun message pour le moment.
+                        {t('admin.feedback.no_messages')}
                     </div>
                 ) : (
                     feedbacks.map((item) => {
@@ -139,7 +141,7 @@ export default function AdminFeedback() {
                                             boxShadow: '2px 2px 0 #000',
                                             display: 'flex', alignItems: 'center', gap: '4px'
                                         }}>
-                                            <CheckCircle size={12} strokeWidth={3} /> Résolu
+                                            <CheckCircle size={12} strokeWidth={3} /> {t('admin.feedback.resolved')}
                                         </div>
                                     )}
                                 </div>
@@ -149,7 +151,7 @@ export default function AdminFeedback() {
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                                         <div>
                                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.125rem', lineHeight: 1.25, textTransform: 'uppercase' }}>
-                                                {item.userName || 'Anonyme'}
+                                                {item.userName || t('admin.feedback.anonymous')}
                                             </h3>
                                             <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontFamily: 'monospace' }}>
                                                 {new Date(item.timestamp).toLocaleDateString()}
@@ -177,10 +179,10 @@ export default function AdminFeedback() {
                                             padding: '0.25rem 0.5rem', borderRadius: '0.125rem',
                                             color: 'black', textDecoration: 'none'
                                         }} title={item.contactEmail}>
-                                            <Mail size={14} /> Répondre
+                                            <Mail size={14} /> {t('admin.feedback.reply')}
                                         </a>
                                     ) : (
-                                        <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontStyle: 'italic' }}>Pas d'email</span>
+                                        <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontStyle: 'italic' }}>{t('admin.feedback.no_email')}</span>
                                     )}
 
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -193,7 +195,7 @@ export default function AdminFeedback() {
                                                 cursor: 'pointer',
                                                 transition: 'transform 0.1s'
                                             }}
-                                            title={isResolved ? "Rouvrir" : "Marquer comme résolu"}
+                                            title={isResolved ? t('admin.feedback.reopen') : t('admin.feedback.mark_resolved')}
                                         >
                                             {isResolved ? <AlertCircle size={16} /> : <CheckCircle size={16} />}
                                         </button>
@@ -206,7 +208,7 @@ export default function AdminFeedback() {
                                                 cursor: 'pointer',
                                                 color: '#ef4444'
                                             }}
-                                            title="Supprimer"
+                                            title={t('admin.feedback.delete')}
                                         >
                                             <Trash2 size={16} />
                                         </button>

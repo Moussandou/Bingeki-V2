@@ -12,10 +12,12 @@ import { useNavigate } from 'react-router-dom';
 import { statusToFrench } from '@/utils/statusTranslation';
 import { useToast } from '@/context/ToastContext';
 import { exportData, importData } from '@/utils/storageUtils';
+import { useTranslation } from 'react-i18next';
 // Removed unused imports
 // Removed unused gamification store
 
 export default function Library() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { addToast } = useToast();
     const { works, removeWork } = useLibraryStore();
@@ -34,10 +36,10 @@ export default function Library() {
     const [sortOpen, setSortOpen] = useState(false);
 
     const sortOptions = [
-        { value: 'updated', label: 'Récents' },
-        { value: 'added', label: 'Ajoutés' },
-        { value: 'alphabetical', label: 'A-Z' },
-        { value: 'progress', label: 'Progression' }
+        { value: 'updated', label: t('library.sort.recent') },
+        { value: 'added', label: t('library.sort.added') },
+        { value: 'alphabetical', label: t('library.sort.alphabetical') },
+        { value: 'progress', label: t('library.sort.progress') }
     ];
 
     // Bulk Actions State
@@ -97,18 +99,18 @@ export default function Library() {
     };
 
     const handleBulkDelete = () => {
-        if (confirm(`Supprimer ${selectedWorks.size} œuvres ?`)) {
+        if (confirm(t('library.delete_confirm', { count: selectedWorks.size }))) {
             selectedWorks.forEach(id => removeWork(id));
             setSelectedWorks(new Set());
             setIsSelectionMode(false);
-            addToast(`${selectedWorks.size} œuvres supprimées`, 'success');
+            addToast(t('library.deleted_success', { count: selectedWorks.size }), 'success');
         }
     };
 
     const confirmDelete = () => {
         if (workToDelete) {
             removeWork(workToDelete.id);
-            addToast(`"${workToDelete.title}" a été supprimé`, 'error');
+            addToast(t('library.deleted_single', { title: workToDelete.title }), 'error');
             setWorkToDelete(null);
         }
     };
@@ -124,21 +126,21 @@ export default function Library() {
                             <div className={styles.statItem}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.6, marginBottom: '0.5rem' }}>
                                     <BookOpen size={18} />
-                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>Total</span>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>{t('library.total')}</span>
                                 </div>
                                 <span style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.total}</span>
                             </div>
                             <div className={styles.statItem}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.6, marginBottom: '0.5rem' }}>
                                     <CheckCircle size={18} />
-                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>Terminées</span>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>{t('library.completed')}</span>
                                 </div>
                                 <span style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.completed}</span>
                             </div>
                             <div className={styles.statItem} style={{ borderRight: 'none' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.6, marginBottom: '0.5rem' }}>
                                     <TrendingUp size={18} />
-                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>Progression</span>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>{t('library.progression')}</span>
                                 </div>
                                 <span style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{stats.avgProgress}%</span>
                             </div>
@@ -158,7 +160,7 @@ export default function Library() {
                                     whiteSpace: 'nowrap'
                                 }}
                             >
-                                AJOUTER UNE ŒUVRE
+                                {t('library.add_work')}
                             </Button>
                         </div>
                     </div>
@@ -170,7 +172,7 @@ export default function Library() {
                         <div className={styles.searchCard}>
                             <Search size={20} style={{ opacity: 0.4 }} />
                             <input
-                                placeholder="Rechercher..."
+                                placeholder={t('library.search')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className={styles.searchInput}
@@ -198,7 +200,7 @@ export default function Library() {
                                         transform: filterOpen ? 'translate(2px, 2px)' : 'none'
                                     }}
                                 >
-                                    FILTRES
+                                    {t('library.filters')}
                                 </Button>
                                 {filterOpen && (
                                     <Card variant="manga" style={{
@@ -214,34 +216,34 @@ export default function Library() {
                                         boxShadow: '6px 6px 0 #000'
                                     }}>
                                         <div style={{ marginBottom: '1rem' }}>
-                                            <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.9rem', marginBottom: '0.5rem', opacity: 0.7 }}>TYPE</h4>
+                                            <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.9rem', marginBottom: '0.5rem', opacity: 0.7 }}>{t('library.type')}</h4>
                                             <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                {['all', 'manga', 'anime'].map(t => (
+                                                {['all', 'manga', 'anime'].map(type => (
                                                     <button
-                                                        key={t}
-                                                        onClick={() => setFilterType(t as any)}
+                                                        key={type}
+                                                        onClick={() => setFilterType(type as any)}
                                                         style={{
                                                             padding: '0.5rem 1rem',
                                                             border: '2px solid #000',
-                                                            background: filterType === t ? '#000' : '#fff',
-                                                            color: filterType === t ? '#fff' : '#000',
+                                                            background: filterType === type ? '#000' : '#fff',
+                                                            color: filterType === type ? '#fff' : '#000',
                                                             fontWeight: 800,
                                                             textTransform: 'uppercase',
                                                             fontSize: '0.8rem',
                                                             cursor: 'pointer',
                                                             flex: 1,
-                                                            boxShadow: filterType === t ? 'none' : '2px 2px 0 #000',
-                                                            transform: filterType === t ? 'translate(2px, 2px)' : 'none',
+                                                            boxShadow: filterType === type ? 'none' : '2px 2px 0 #000',
+                                                            transform: filterType === type ? 'translate(2px, 2px)' : 'none',
                                                             transition: 'all 0.1s'
                                                         }}
                                                     >
-                                                        {t === 'all' ? 'TOUS' : t}
+                                                        {type === 'all' ? t('library.all') : type.toUpperCase()}
                                                     </button>
                                                 ))}
                                             </div>
                                         </div>
                                         <div>
-                                            <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.9rem', marginBottom: '0.5rem', opacity: 0.7 }}>STATUT</h4>
+                                            <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.9rem', marginBottom: '0.5rem', opacity: 0.7 }}>{t('library.status')}</h4>
                                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                                                 {['all', 'reading', 'completed', 'plan_to_read'].map(s => (
                                                     <button
@@ -261,7 +263,7 @@ export default function Library() {
                                                             transition: 'all 0.1s'
                                                         }}
                                                     >
-                                                        {s === 'all' ? 'TOUS' : s.replace(/_/g, ' ')}
+                                                        {s === 'all' ? t('library.all') : s.replace(/_/g, ' ')}
                                                     </button>
                                                 ))}
                                             </div>
@@ -342,21 +344,21 @@ export default function Library() {
                                 <button
                                     onClick={() => setViewMode('grid')}
                                     className={`${styles.controlButton} ${viewMode === 'grid' ? styles.controlButtonActive : ''}`}
-                                    title="Vue Grille"
+                                    title={t('library.view_grid')}
                                 >
                                     <Grid size={20} />
                                 </button>
                                 <button
                                     onClick={() => setViewMode('list')}
                                     className={`${styles.controlButton} ${viewMode === 'list' ? styles.controlButtonActive : ''}`}
-                                    title="Vue Liste"
+                                    title={t('library.view_list')}
                                 >
                                     <List size={20} />
                                 </button>
                                 <button
                                     onClick={exportData}
                                     className={styles.controlButton}
-                                    title="Exporter"
+                                    title={t('library.export')}
                                 >
                                     <Download size={20} />
                                 </button>
@@ -368,15 +370,15 @@ export default function Library() {
                                             const file = e.target.files?.[0];
                                             if (file) {
                                                 importData(file).then(() => {
-                                                    addToast('Données importées !', 'success');
-                                                }).catch(() => addToast('Erreur', 'error'));
+                                                    addToast(t('library.data_imported'), 'success');
+                                                }).catch(() => addToast(t('library.error'), 'error'));
                                             }
                                         }}
                                         style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', zIndex: 10 }}
                                     />
                                     <button
                                         className={styles.controlButton}
-                                        title="Importer"
+                                        title={t('library.import')}
                                     >
                                         <Upload size={20} />
                                     </button>
@@ -399,7 +401,7 @@ export default function Library() {
                                         borderColor: isSelectionMode ? 'var(--color-primary)' : '#000'
                                     }}
                                 >
-                                    {isSelectionMode ? 'ANNULER' : 'SÉLECTIONNER'}
+                                    {isSelectionMode ? t('library.cancel') : t('library.select')}
                                 </Button>
                             </div>
                         </div>
@@ -429,7 +431,7 @@ export default function Library() {
                     {filteredWorks.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '4rem', opacity: 0.5 }}>
                             <BookOpen size={48} style={{ marginBottom: '1rem' }} />
-                            <h3>Aucune œuvre trouvée</h3>
+                            <h3>{t('library.no_works')}</h3>
                         </div>
                     ) : (
                         <div className={viewMode === 'grid' ? styles.worksGrid : styles.worksList}>
@@ -529,7 +531,7 @@ export default function Library() {
                                                 </div>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.75rem' }}>
                                                     <span style={{ fontSize: '0.9rem', fontWeight: 800 }}>
-                                                        {work.type === 'anime' ? 'Ep.' : 'Ch.'} {work.currentChapter} / {work.totalChapters || '?'}
+                                                        {work.type === 'anime' ? t('library.episode') : t('library.chapter')} {work.currentChapter} / {work.totalChapters || '?'}
                                                     </span>
                                                     {work.rating && <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fbbf24' }}>★ {work.rating}</span>}
                                                 </div>
@@ -568,7 +570,7 @@ export default function Library() {
                                                     e.currentTarget.style.transform = 'scale(1)';
                                                     e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)';
                                                 }}
-                                                title="Supprimer l'oeuvre"
+                                                title={t('library.delete_work')}
                                             >
                                                 <Trash2 size={16} color="#dc2626" />
                                             </button>
@@ -606,7 +608,7 @@ export default function Library() {
                     />
 
                     {/* Delete Confirmation Modal */}
-                    <Modal isOpen={!!workToDelete} onClose={() => setWorkToDelete(null)} title="SUPPRESSION">
+                    <Modal isOpen={!!workToDelete} onClose={() => setWorkToDelete(null)} title={t('library.delete_title')}>
                         <div style={{ textAlign: 'center', padding: '1rem' }}>
                             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
                                 <div style={{ background: '#fee2e2', padding: '1rem', borderRadius: '50%', color: '#dc2626', border: '2px solid #dc2626' }}>
@@ -614,21 +616,21 @@ export default function Library() {
                                 </div>
                             </div>
                             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
-                                Supprimer "{workToDelete?.title}" ?
+                                {t('library.delete_question', { title: workToDelete?.title })}
                             </h3>
                             <p style={{ marginBottom: '2rem', opacity: 0.7 }}>
-                                Cette action est irréversible. Votre progression et vos notes seront perdues.
+                                {t('library.delete_warning')}
                             </p>
                             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                                 <Button variant="ghost" onClick={() => setWorkToDelete(null)}>
-                                    ANNULER
+                                    {t('library.cancel')}
                                 </Button>
                                 <Button
                                     variant="primary"
                                     onClick={confirmDelete}
                                     style={{ background: '#dc2626', borderColor: '#b91c1c' }}
                                 >
-                                    SUPPRIMER
+                                    {t('library.delete_btn')}
                                 </Button>
                             </div>
                         </div>

@@ -17,12 +17,14 @@ import { ACTIVITY_EMOJIS, ACTIVITY_LABELS } from '@/types/activity';
 import { getTopWorks } from '@/services/animeApi';
 import type { JikanResult } from '@/services/animeApi';
 import { Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { Card } from '@/components/ui/Card';
 import styles from './Dashboard.module.css';
 
 export default function Dashboard() {
+    const { t } = useTranslation();
     const { user } = useAuthStore();
     const { level, xp, xpToNextLevel, streak } = useGamificationStore();
     const { works } = useLibraryStore();
@@ -73,9 +75,9 @@ export default function Dashboard() {
     const formatTimeAgo = (timestamp: number) => {
         const diff = Date.now() - timestamp;
         const hours = Math.floor(diff / (1000 * 60 * 60));
-        if (hours < 1) return 'À l\'instant';
-        if (hours < 24) return `Il y a ${hours}h`;
-        return `Il y a ${Math.floor(hours / 24)}j`;
+        if (hours < 1) return t('dashboard.just_now');
+        if (hours < 24) return t('dashboard.hours_ago', { hours });
+        return t('dashboard.days_ago', { days: Math.floor(hours / 24) });
     };
 
     return (
@@ -103,7 +105,7 @@ export default function Dashboard() {
                                     margin: 0,
                                     lineHeight: 1
                                 }}>
-                                    {user?.displayName || 'Héros'}
+                                    {user?.displayName || t('dashboard.hero_default')}
                                 </h1>
                                 <span className="manga-title" style={{
                                     fontSize: '0.9rem',
@@ -112,7 +114,7 @@ export default function Dashboard() {
                                     border: '2px solid #000',
                                     boxShadow: '2px 2px 0 #000'
                                 }}>
-                                    RANK {calculateRank(level)}
+                                    {t('dashboard.rank')} {calculateRank(level)}
                                 </span>
                             </div>
 
@@ -126,10 +128,10 @@ export default function Dashboard() {
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             <Link to="/discover">
-                                <Button variant="manga" size="sm" icon={<Plus size={16} />}>Découvrir</Button>
+                                <Button variant="manga" size="sm" icon={<Plus size={16} />}>{t('dashboard.discover_btn')}</Button>
                             </Link>
                             <Link to="/profile">
-                                <Button variant="manga" size="sm">PROFIL</Button>
+                                <Button variant="manga" size="sm">{t('dashboard.profile_btn')}</Button>
                             </Link>
                         </div>
                     </motion.section>
@@ -140,7 +142,7 @@ export default function Dashboard() {
                         <div className={styles.statItem}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', opacity: 0.7 }}>
                                 <Target size={20} />
-                                <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>Objectif</span>
+                                <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>{t('dashboard.goal')}</span>
                             </div>
                             <div style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>
                                 {todayProgress}<span style={{ fontSize: '1rem', opacity: 0.4 }}>/{dailyGoal}</span>
@@ -154,24 +156,24 @@ export default function Dashboard() {
                         <div className={styles.statItem}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', opacity: 0.7 }}>
                                 <TrendingUp size={20} />
-                                <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>Hebdo</span>
+                                <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>{t('dashboard.weekly')}</span>
                             </div>
                             <div style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>
                                 {weeklyChapters}
                             </div>
-                            <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.25rem' }}>chapitres lus</p>
+                            <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.25rem' }}>{t('dashboard.chapters_read')}</p>
                         </div>
 
                         {/* Streak */}
                         <div className={styles.statItem} style={{ background: streak > 0 ? '#fff' : '#fef2f2' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', opacity: 0.7 }}>
                                 <Flame size={20} color={streak > 0 ? 'var(--color-primary)' : 'currentColor'} />
-                                <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>Série</span>
+                                <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>{t('dashboard.streak')}</span>
                             </div>
                             <div style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1, color: streak > 0 ? 'var(--color-primary)' : 'inherit' }}>
                                 {streak}
                             </div>
-                            <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.25rem' }}>jours</p>
+                            <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.25rem' }}>{t('dashboard.days')}</p>
                         </div>
                     </div>
 
@@ -244,10 +246,10 @@ export default function Dashboard() {
                                                     {lastUpdatedWork.title}
                                                 </h3>
                                                 <p style={{ opacity: 0.9, fontSize: '1rem', fontWeight: 600 }}>
-                                                    Chapitre {lastUpdatedWork.currentChapter} <span style={{ opacity: 0.6 }}>/ {lastUpdatedWork.totalChapters || '?'}</span>
+                                                    {t('dashboard.chapter')} {lastUpdatedWork.currentChapter} <span style={{ opacity: 0.6 }}>/ {lastUpdatedWork.totalChapters || '?'}</span>
                                                 </p>
                                                 <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-primary)', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.9rem' }}>
-                                                    <Play size={20} fill="currentColor" /> Continuer la lecture
+                                                    <Play size={20} fill="currentColor" /> {t('dashboard.continue_reading')}
                                                 </div>
                                             </div>
                                         </div>
@@ -259,19 +261,19 @@ export default function Dashboard() {
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                     <BookOpen size={20} />
-                                    <span style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase' }}>En cours</span>
+                                    <span style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase' }}>{t('dashboard.in_progress')}</span>
                                 </div>
                                 <Link to="/library">
-                                    <Button variant="ghost" size="sm" style={{ fontWeight: 800 }}>TOUT VOIR <ChevronRight size={16} /></Button>
+                                    <Button variant="ghost" size="sm" style={{ fontWeight: 800 }}>{t('dashboard.see_all')} <ChevronRight size={16} /></Button>
                                 </Link>
                             </div>
 
                             <div className={styles.progressGrid}>
                                 {inProgressWorks.length === 0 ? (
                                     <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem' }}>
-                                        <p style={{ marginBottom: '1rem', opacity: 0.7 }}>Aucune lecture en cours</p>
+                                        <p style={{ marginBottom: '1rem', opacity: 0.7 }}>{t('dashboard.no_reading')}</p>
                                         <Link to="/discover">
-                                            <Button variant="primary" icon={<Plus size={18} />}>DÉCOUVRIR</Button>
+                                            <Button variant="primary" icon={<Plus size={18} />}>{t('dashboard.discover')}</Button>
                                         </Link>
                                     </div>
                                 ) : (
@@ -325,7 +327,7 @@ export default function Dashboard() {
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
                                 <Users size={20} />
-                                <span style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase' }}>Activité amis</span>
+                                <span style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase' }}>{t('dashboard.friends_activity')}</span>
                             </div>
 
                             <div className="manga-panel" style={{
@@ -335,13 +337,13 @@ export default function Dashboard() {
                                 overflow: 'hidden'
                             }}>
                                 {isLoadingActivity ? (
-                                    <p style={{ textAlign: 'center', opacity: 0.6, padding: '2rem' }}>Chargement...</p>
+                                    <p style={{ textAlign: 'center', opacity: 0.6, padding: '2rem' }}>{t('dashboard.loading')}</p>
                                 ) : friendsActivity.length === 0 ? (
                                     <div style={{ textAlign: 'center', padding: '2rem' }}>
                                         <Users size={32} style={{ opacity: 0.3, marginBottom: '0.5rem' }} />
-                                        <p style={{ opacity: 0.6, fontSize: '0.9rem' }}>Pas encore d'activité</p>
+                                        <p style={{ opacity: 0.6, fontSize: '0.9rem' }}>{t('dashboard.no_activity')}</p>
                                         <Link to="/social">
-                                            <Button size="sm" variant="ghost" style={{ marginTop: '0.5rem' }}>Ajouter des amis</Button>
+                                            <Button size="sm" variant="ghost" style={{ marginTop: '0.5rem' }}>{t('dashboard.add_friends')}</Button>
                                         </Link>
                                     </div>
                                 ) : (
@@ -374,7 +376,7 @@ export default function Dashboard() {
                                             </div>
                                         ))}
                                         <Link to="/social" style={{ textAlign: 'center', padding: '0.75rem', borderTop: '1px solid #f5f5f5' }}>
-                                            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-primary)' }}>VOIR TOUTE L'ACTIVITÉ</span>
+                                            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-primary)' }}>{t('dashboard.see_all_activity')}</span>
                                         </Link>
                                     </div>
                                 )}
@@ -383,7 +385,7 @@ export default function Dashboard() {
                             {/* Recommendations Section */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
                                 <Star size={20} className="text-gradient" />
-                                <span style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase' }}>À DÉCOUVRIR</span>
+                                <span style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase' }}>{t('dashboard.to_discover')}</span>
                             </div>
 
                             <div className={styles.recGrid}>
@@ -426,11 +428,11 @@ export default function Dashboard() {
                                     </>
                                 ) : (
                                     <div className="manga-panel" style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem' }}>
-                                        <p style={{ opacity: 0.6 }}>Chargement...</p>
+                                        <p style={{ opacity: 0.6 }}>{t('dashboard.loading')}</p>
                                     </div>
                                 )}
                                 <Link to="/discover" style={{ gridColumn: '1/-1' }}>
-                                    <Button variant="ghost" size="sm" style={{ width: '100%' }}>VOIR PLUS DE SUGGESTIONS</Button>
+                                    <Button variant="ghost" size="sm" style={{ width: '100%' }}>{t('dashboard.see_more_suggestions')}</Button>
                                 </Link>
                             </div>
                         </div>

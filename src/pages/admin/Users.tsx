@@ -4,8 +4,10 @@ import { Card } from '@/components/ui/Card';
 import { Switch } from '@/components/ui/Switch';
 import { getAllUsers, toggleUserBan, toggleUserAdmin, type UserProfile } from '@/firebase/firestore';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminUsers() {
+    const { t } = useTranslation();
     const [users, setUsers] = useState<UserProfile[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
@@ -32,7 +34,8 @@ export default function AdminUsers() {
     );
 
     const handleBan = async (uid: string, currentStatus?: boolean) => {
-        if (!confirm(`Voulez-vous vraiment ${currentStatus ? 'débannir' : 'bannir'} cet utilisateur ?`)) return;
+        const action = currentStatus ? t('admin.users.action_unban') : t('admin.users.action_ban');
+        if (!confirm(t('admin.users.confirm_ban', { action }))) return;
 
         // Optimistic update
         setUsers(prev => prev.map(u => u.uid === uid ? { ...u, isBanned: !currentStatus } : u));
@@ -40,21 +43,22 @@ export default function AdminUsers() {
         try {
             await toggleUserBan(uid, !currentStatus);
         } catch (e) {
-            alert("Erreur lors de la mise à jour");
+            alert(t('admin.users.update_error'));
             // Revert
             setUsers(prev => prev.map(u => u.uid === uid ? { ...u, isBanned: currentStatus } : u));
         }
     };
 
     const handleAdmin = async (uid: string, currentStatus?: boolean) => {
-        if (!confirm(`ATTENTION: ${currentStatus ? 'Retirer' : 'Donner'} les droits administrateur ?`)) return;
+        const action = currentStatus ? t('admin.users.action_remove') : t('admin.users.action_give');
+        if (!confirm(t('admin.users.confirm_admin', { action }))) return;
 
         setUsers(prev => prev.map(u => u.uid === uid ? { ...u, isAdmin: !currentStatus } : u));
 
         try {
             await toggleUserAdmin(uid, !currentStatus);
         } catch (e) {
-            alert("Erreur lors de la mise à jour");
+            alert(t('admin.users.update_error'));
             setUsers(prev => prev.map(u => u.uid === uid ? { ...u, isAdmin: currentStatus } : u));
         }
     };
@@ -64,17 +68,17 @@ export default function AdminUsers() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
                     <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
-                        Gestion Utilisateurs
+                        {t('admin.users.title')}
                     </h1>
                     <p style={{ color: '#666', fontFamily: 'monospace' }}>
-                        {users.length} membres enregistrés
+                        {t('admin.users.members_count', { count: users.length })}
                     </p>
                 </div>
 
                 <div style={{ position: 'relative' }}>
                     <input
                         type="text"
-                        placeholder="Rechercher (Email, Pseudo...)"
+                        placeholder={t('admin.users.search_placeholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         style={{
@@ -92,7 +96,7 @@ export default function AdminUsers() {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
                 {loading ? (
-                    <p>Chargement...</p>
+                    <p>{t('admin.users.loading')}</p>
                 ) : filteredUsers.map(user => (
                     <Card key={user.uid} variant="manga" style={{
                         padding: '1.5rem',
@@ -115,14 +119,14 @@ export default function AdminUsers() {
                                 </div>
                                 <div>
                                     <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', lineHeight: 1 }}>
-                                        {user.displayName || 'Sans nom'}
+                                        {user.displayName || t('admin.users.no_name')}
                                     </h3>
                                     <div style={{ fontSize: '0.8rem', color: '#666' }}>{user.email}</div>
                                 </div>
                             </div>
                             {user.isAdmin && (
                                 <div style={{ background: 'black', color: 'white', padding: '0.25rem 0.5rem', fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    <Shield size={10} /> Admin
+                                    <Shield size={10} /> {t('admin.users.admin')}
                                 </div>
                             )}
                         </div>
@@ -131,21 +135,21 @@ export default function AdminUsers() {
                         <div style={{ display: 'flex', gap: '1rem', padding: '0.5rem 0', borderTop: '1px solid #eee', borderBottom: '1px solid #eee', marginBottom: '1rem', fontSize: '0.8rem', fontFamily: 'monospace' }}>
                             <div>LVL <b>{user.level || 1}</b></div>
                             <div>XP <b>{user.xp || 0}</b></div>
-                            <div>Ban <b>{user.isBanned ? 'OUI' : 'NON'}</b></div>
+                            <div>Ban <b>{user.isBanned ? t('admin.users.ban_yes') : t('admin.users.ban_no')}</b></div>
                         </div>
 
                         {/* Actions */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <span style={{ fontWeight: 'bold', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Ban size={16} /> Bannir
+                                    <Ban size={16} /> {t('admin.users.ban')}
                                 </span>
                                 <Switch isOn={!!user.isBanned} onToggle={() => handleBan(user.uid, user.isBanned)} />
                             </div>
 
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <span style={{ fontWeight: 'bold', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Shield size={16} /> Admin
+                                    <Shield size={16} /> {t('admin.users.admin')}
                                 </span>
                                 <Switch isOn={!!user.isAdmin} onToggle={() => handleAdmin(user.uid, user.isAdmin)} />
                             </div>
@@ -162,7 +166,7 @@ export default function AdminUsers() {
                                 fontSize: '0.9rem',
                                 display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem'
                             }}>
-                                <ExternalLink size={14} /> Voir Profil
+                                <ExternalLink size={14} /> {t('admin.users.view_profile')}
                             </Link>
                         </div>
                     </Card>

@@ -12,7 +12,10 @@ type CharacterFullData = JikanCharacterFull & {
     voices: JikanCharacterVoice[];
 };
 
+import { useTranslation } from 'react-i18next'; // Added import
+
 export default function CharacterDetails() {
+    const { t } = useTranslation();
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [character, setCharacter] = useState<CharacterFullData | null>(null);
@@ -43,10 +46,10 @@ export default function CharacterDetails() {
             <Layout>
                 <div className={styles.container}>
                     <Button variant="ghost" onClick={() => navigate(-1)} icon={<ArrowLeft size={20} />}>
-                        RETOUR
+                        {t('character_details.back')}
                     </Button>
                     <div style={{ textAlign: 'center', padding: '4rem', opacity: 0.6 }}>
-                        Personnage introuvable.
+                        {t('character_details.not_found')}
                     </div>
                 </div>
             </Layout>
@@ -60,7 +63,7 @@ export default function CharacterDetails() {
             <div className={styles.container}>
                 {/* Back Button */}
                 <Button variant="ghost" onClick={() => navigate(-1)} icon={<ArrowLeft size={20} />} className={styles.backButton}>
-                    RETOUR
+                    {t('character_details.back')}
                 </Button>
 
                 {/* Header */}
@@ -80,7 +83,7 @@ export default function CharacterDetails() {
                         <div className={styles.metaContainer}>
                             <div className={styles.metaItem}>
                                 <Heart size={16} fill="#e11d48" color="#e11d48" />
-                                <span>{character.favorites?.toLocaleString() || 0} favoris</span>
+                                <span>{character.favorites?.toLocaleString() || 0} {t('character_details.favorites')}</span>
                             </div>
                             {character.nicknames && character.nicknames.length > 0 && (
                                 <div className={styles.metaItem}>
@@ -165,7 +168,7 @@ export default function CharacterDetails() {
                     return (
                         <div className={styles.aboutSection}>
                             <h2 className={styles.sectionTitle}>
-                                <User size={20} /> FICHE D'IDENTITÉ
+                                <User size={20} /> {t('character_details.identity')}
                             </h2>
 
                             {/* Info tags */}
@@ -183,7 +186,7 @@ export default function CharacterDetails() {
                             {/* Full description */}
                             {description && (
                                 <div className={styles.biographySection}>
-                                    <h3 className={styles.biographyTitle}>BIOGRAPHIE</h3>
+                                    <h3 className={styles.biographyTitle}>{t('character_details.biography')}</h3>
                                     <p className={styles.biographyText}>{description}</p>
                                 </div>
                             )}
@@ -191,7 +194,7 @@ export default function CharacterDetails() {
                             {/* Source */}
                             {source && (
                                 <div className={styles.sourceTag}>
-                                    Source: {source}
+                                    {t('character_details.source')}: {source}
                                 </div>
                             )}
                         </div>
@@ -202,7 +205,7 @@ export default function CharacterDetails() {
                 {jpVoice && (
                     <div className={styles.voiceActorSection}>
                         <h2 className={styles.sectionTitle}>
-                            <Mic size={20} /> SEIYUU (DOUBLAGE JP)
+                            <Mic size={20} /> {t('character_details.seiyuu')}
                         </h2>
                         <div
                             className={styles.voiceActorCard}
@@ -225,7 +228,7 @@ export default function CharacterDetails() {
                 {/* Anime Appearances */}
                 {character.anime && character.anime.length > 0 && (
                     <div style={{ marginTop: '2rem' }}>
-                        <h2 className={styles.sectionTitle}>APPARITIONS ANIME</h2>
+                        <h2 className={styles.sectionTitle}>{t('character_details.anime_appearances')}</h2>
                         <div className={styles.grid}>
                             {character.anime.slice(0, 12).map((a) => (
                                 <div
@@ -249,7 +252,7 @@ export default function CharacterDetails() {
                 {/* Manga Appearances */}
                 {character.manga && character.manga.length > 0 && (
                     <div style={{ marginTop: '2rem' }}>
-                        <h2 className={styles.sectionTitle}>APPARITIONS MANGA</h2>
+                        <h2 className={styles.sectionTitle}>{t('character_details.manga_appearances')}</h2>
                         <div className={styles.grid}>
                             {character.manga.slice(0, 12).filter((m: any) => m.manga?.images?.jpg?.image_url).map((m: any) => (
                                 <div
