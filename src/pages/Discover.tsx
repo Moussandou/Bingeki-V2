@@ -48,13 +48,6 @@ export default function Discover() {
     const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
 
     const GENRES = [
-        { id: 1, label: t('discover.filters.genre') }, // "Action" likely specific, but kept simple for now or need dynamic? Actually GENRES array has hardcoded labels. 
-        // Wait, the user prompt said "Identifier les textes". "Action", "Adventure" etc are usually standard but t('discover.genres.action') would be better.
-        // Let's stick to the plan. I didn't add genre translations in i18n, only the label "Genre". 
-        // The GENRES list in Discover.tsx has hardcoded English labels that look like API IDs or standard names.
-        // For now I will translate the UI around it. The user expectation "Traduire les pages" usually implies content too if static.
-        // But for genre IDs usually comes from API or static list.
-        // Let's focus on UI elements first as per my i18n additions.
         { id: 1, label: 'Action' },
         { id: 2, label: 'Adventure' },
         { id: 4, label: 'Comedy' },

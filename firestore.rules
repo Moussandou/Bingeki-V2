@@ -43,10 +43,36 @@ service cloud.firestore {
       allow create: if isOwner(userId);
       
       // --- Subcollection: Data (Library & Gamification) ---
-      match /data/{document=**} {
+      
+      // 1. Gamification Data - STRICT SECURITY
+      match /data/gamification {
+        allow read: if isAuthenticated();
+        // Admins can do anything
+        allow write: if isAdmin();
+        
+        // Owner Update: Must validate stats don't jump unreasonably
+        allow update: if isOwner(userId) && 
+                      // Level check: Max +1 increase
+                      request.resource.data.level <= resource.data.level + 1 &&
+                      // XP check: Max +1000 increase (generous buffer)
+                      request.resource.data.xp <= resource.data.xp + 1000 &&
+                      // Streak check: Max +1 increase
+                      (request.resource.data.streak <= resource.data.streak + 1 || request.resource.data.streak == 1);
+        
+        // Owner Create: Must start reasonable
+        allow create: if isOwner(userId) && 
+                      request.resource.data.level == 1 &&
+                      request.resource.data.xp <= 500;
+      }
+
+      // 2. Library Data - Standard Access
+      match /data/library {
         allow read: if isAuthenticated();
         allow write: if isOwner(userId) || isAdmin();
       }
+
+      // 3. Other Data - Closed by default for security
+      // If you add more documents to /data/, add them explicitly above.
 
       // --- Subcollection: Friends ---
       match /friends/{friendId} {
@@ -73,7 +99,8 @@ service cloud.firestore {
 
     // ACTIVITY FEED
     match /activities/{activityId} {
-      allow create: if isAuthenticated(); 
+      // Security: Only allow creating activities for YOURSELF
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
       allow read: if isAuthenticated();
     }
 
@@ -88,17 +115,22 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow create, update, delete: if isAdmin();
     }
+
+    // TIER LISTS (NEW)
+    match /tierLists/{tierListId} {
+      // Public lists can be read by anyone (or just auth users, depending on requirement)
+      // Query requiring isPublic==true must match this rule if we use resource.data check
+      allow read: if true; // We filter by isPublic in query, but open read allows fetching specific public lists
+      
+      // Create: Authenticated users can create
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      
+      // Update/Delete: Only author can modify
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
     
     // ==================== LEGACY / ROOT ACCESS ====================
-    // Backup for root collections if used
-
-    match /libraries/{userId} {
-      allow read, write: if isOwner(userId) || isAdmin();
-    }
-
-    match /gamification/{userId} {
-      allow read: if isAuthenticated();
-      allow write: if isOwner(userId) || isAdmin();
-    }
+    // DELETED: Legacy root collections removed for security.
+    // All data must go through users/{userId}/data/ subcollections.
   }
 }

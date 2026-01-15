@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import {
     User, Book, Home, ChevronDown, Flame, Search,
@@ -7,7 +8,9 @@ import {
     Calendar,
     History as HistoryIcon,
     Settings,
-    MessageSquare
+    MessageSquare,
+    Menu, X,
+    MessageCircle
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
@@ -21,6 +24,7 @@ export function Header() {
     const location = useLocation();
     const navigate = useNavigate();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // I18n setup
     const { t, i18n } = useTranslation();
@@ -38,7 +42,7 @@ export function Header() {
                 <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
 
                     {/* Left: Logo */}
-                    <Link to="/" className={`${styles.logo} text - gradient`}>
+                    <Link to="/" className={`${styles.logo} text-gradient`}>
                         <img src="/logo.png" alt="Bingeki Logo" style={{ width: 50, height: 50, objectFit: 'contain' }} />
                         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
                             <span style={{ fontSize: '1.2rem', fontFamily: 'var(--font-heading)', letterSpacing: '-1px' }}>BINGEKI</span>
@@ -52,25 +56,52 @@ export function Header() {
                                 <Home size={18} />
                                 <span className="hidden-tablet">{t('header.dashboard')}</span>
                             </Link>
-                            <Link to="/library" className={`${styles.navLink} ${isActive('/library') ? styles.activeLink : ''} `}>
-                                <Book size={18} />
-                                <span className="hidden-tablet">{t('header.library')}</span>
-                            </Link>
                             <Link to="/discover" className={`${styles.navLink} ${isActive('/discover') ? styles.activeLink : ''} `}>
                                 <Search size={18} />
                                 <span className="hidden-tablet">{t('header.discover')}</span>
                             </Link>
-                            <Link to="/social" className={`${styles.navLink} ${isActive('/social') ? styles.activeLink : ''} `}>
-                                <MessageSquare size={18} />
-                                <span className="hidden-tablet">{t('header.community')}</span>
+                            <Link to="/library" className={`${styles.navLink} ${isActive('/library') ? styles.activeLink : ''} `}>
+                                <Book size={18} />
+                                <span className="hidden-tablet">{t('header.library')}</span>
                             </Link>
-                            <Link to="/schedule" className={`${styles.navLink} ${isActive('/schedule') ? styles.activeLink : ''} `}>
-                                <Calendar size={18} />
-                                <span className="hidden-tablet">{t('header.agenda')}</span>
-                            </Link>
-                            <Link to="/changelog" className={`${styles.navLink} ${isActive('/changelog') ? styles.activeLink : ''} `} title={t('header.news')}>
-                                <HistoryIcon size={18} />
-                            </Link>
+
+                            {/* More Dropdown */}
+                            <div className={styles.navLink} style={{ cursor: 'pointer', position: 'relative' }}
+                                onMouseEnter={() => document.getElementById('more-dropdown')?.style.setProperty('display', 'flex')}
+                                onMouseLeave={() => document.getElementById('more-dropdown')?.style.setProperty('display', 'none')}
+                            >
+                                <span className="hidden-tablet">{t('header.more')}</span>
+                                <ChevronDown size={14} />
+
+                                <div id="more-dropdown" style={{
+                                    display: 'none',
+                                    position: 'absolute',
+                                    top: '100%',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    background: '#fff',
+                                    border: '3px solid #000',
+                                    boxShadow: '4px 4px 0 rgba(0,0,0,1)',
+                                    padding: '0.5rem',
+                                    flexDirection: 'column',
+                                    gap: '0.5rem',
+                                    zIndex: 100,
+                                    minWidth: '180px'
+                                }}>
+                                    <Link to="/social" className={styles.dropdownItem} style={{ color: 'black', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
+                                        <MessageSquare size={16} /> {t('header.community')}
+                                    </Link>
+                                    <Link to="/schedule" className={styles.dropdownItem} style={{ color: 'black', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
+                                        <Calendar size={16} /> {t('header.agenda')}
+                                    </Link>
+                                    <Link to="/changelog" className={styles.dropdownItem} style={{ color: 'black', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
+                                        <HistoryIcon size={16} /> {t('header.news')}
+                                    </Link>
+                                    <Link to="/feedback" className={styles.dropdownItem} style={{ color: 'black', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
+                                        <MessageCircle size={16} /> {t('header.feedback')}
+                                    </Link>
+                                </div>
+                            </div>
                         </nav>
                     )}
 
@@ -94,6 +125,26 @@ export function Header() {
 
                     {/* Right: Stats & Actions */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+
+                        {/* Mobile Menu Button - Visible ONLY on Mobile */}
+                        {user && (
+                            <button
+                                className={styles.mobileHeaderAction}
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                style={{
+                                    background: isMobileMenuOpen ? '#000' : 'transparent',
+                                    color: isMobileMenuOpen ? '#fff' : '#000',
+                                    border: '2px solid #000',
+                                    borderRadius: '4px',
+                                    padding: '4px',
+                                    cursor: 'pointer',
+                                    zIndex: 201 // Above menu overlay
+                                }}
+                            >
+                                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                            </button>
+                        )}
+
 
                         {/* Language Switcher */}
                         <button
@@ -210,9 +261,39 @@ export function Header() {
                         )}
                     </div >
                 </div >
+
+                {/* Mobile Dropdown Menu (Animated) */}
+                <AnimatePresence>
+                    {isMobileMenuOpen && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                            className={styles.mobileMenuDropdown}
+                        >
+                            <Link to="/social" className={styles.mobileMenuItem} onClick={() => setIsMobileMenuOpen(false)}>
+                                <MessageSquare size={20} />
+                                <span>{t('header.community')}</span>
+                            </Link>
+                            <Link to="/schedule" className={styles.mobileMenuItem} onClick={() => setIsMobileMenuOpen(false)}>
+                                <Calendar size={20} />
+                                <span>{t('header.agenda')}</span>
+                            </Link>
+                            <Link to="/changelog" className={styles.mobileMenuItem} onClick={() => setIsMobileMenuOpen(false)}>
+                                <HistoryIcon size={20} />
+                                <span>{t('header.news')}</span>
+                            </Link>
+                            <Link to="/feedback" className={styles.mobileMenuItem} onClick={() => setIsMobileMenuOpen(false)}>
+                                <MessageCircle size={20} />
+                                <span>{t('header.feedback')}</span>
+                            </Link>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </header >
 
-            {/* Mobile Bottom Dock */}
+            {/* Mobile Bottom Dock - REDUCED to Core Items */}
             {
                 user && (
                     <nav className={styles.mobileNav}>
@@ -221,24 +302,14 @@ export function Header() {
                                 <Home size={22} />
                             </Button>
                         </Link>
-                        <Link to="/library">
-                            <Button variant={isActive('/library') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
-                                <Book size={22} />
-                            </Button>
-                        </Link>
                         <Link to="/discover">
                             <Button variant={isActive('/discover') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
                                 <Search size={22} />
                             </Button>
                         </Link>
-                        <Link to="/schedule">
-                            <Button variant={isActive('/schedule') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
-                                <Calendar size={22} />
-                            </Button>
-                        </Link>
-                        <Link to="/profile">
-                            <Button variant={isActive('/profile') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
-                                <User size={22} />
+                        <Link to="/library">
+                            <Button variant={isActive('/library') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
+                                <Book size={22} />
                             </Button>
                         </Link>
                     </nav>

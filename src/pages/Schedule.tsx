@@ -25,7 +25,8 @@ export default function Schedule() {
             setLoading(true);
             try {
                 const data = await getAnimeSchedule(selectedDay);
-                setAnimeList(data);
+                const uniqueData = Array.from(new Map(data.map(item => [item.mal_id, item])).values());
+                setAnimeList(uniqueData);
             } catch (error) {
                 console.error("Failed to fetch schedule", error);
             } finally {

@@ -1,16 +1,25 @@
 import { useState, useEffect } from 'react';
-import { Search, Shield, Ban, ExternalLink } from 'lucide-react';
+import { Search, Shield, Ban, ExternalLink, Edit, Eye } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Switch } from '@/components/ui/Switch';
-import { getAllUsers, toggleUserBan, toggleUserAdmin, type UserProfile } from '@/firebase/firestore';
+import { getAllUsers, toggleUserBan, toggleUserAdmin, adminUpdateUserGamification, type UserProfile } from '@/firebase/firestore';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Modal } from '@/components/ui/Modal';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 
 export default function AdminUsers() {
     const { t } = useTranslation();
     const [users, setUsers] = useState<UserProfile[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
+
+    // Modal State
+    const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+    const [modalType, setModalType] = useState<'level' | 'details' | null>(null);
+    const [editLevel, setEditLevel] = useState(1);
+    const [editXp, setEditXp] = useState(0);
 
     useEffect(() => {
         const load = async () => {
@@ -63,6 +72,31 @@ export default function AdminUsers() {
         }
     };
 
+    const openLevelModal = (user: UserProfile) => {
+        setSelectedUser(user);
+        setEditLevel(user.level || 1);
+        setEditXp(user.xp || 0);
+        setModalType('level');
+    };
+
+    const openDetailsModal = (user: UserProfile) => {
+        setSelectedUser(user);
+        setModalType('details');
+    };
+
+    const handleSaveLevel = async () => {
+        if (!selectedUser) return;
+        try {
+            await adminUpdateUserGamification(selectedUser.uid, Number(editLevel), Number(editXp));
+            setUsers(prev => prev.map(u => u.uid === selectedUser.uid ? { ...u, level: Number(editLevel), xp: Number(editXp) } : u));
+            setModalType(null);
+            alert("User stats updated successfully!");
+        } catch (e) {
+            console.error(e);
+            alert("Failed to update user stats.");
+        }
+    };
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', animation: 'fadeIn 0.5s ease' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
@@ -94,7 +128,7 @@ export default function AdminUsers() {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
                 {loading ? (
                     <p>{t('admin.users.loading')}</p>
                 ) : filteredUsers.map(user => (
@@ -154,8 +188,26 @@ export default function AdminUsers() {
                                 <Switch isOn={!!user.isAdmin} onToggle={() => handleAdmin(user.uid, user.isAdmin)} />
                             </div>
 
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => openLevelModal(user)}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}
+                                >
+                                    <Edit size={14} /> Edit Level
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => openDetailsModal(user)}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}
+                                >
+                                    <Eye size={14} /> Details
+                                </Button>
+                            </div>
+
                             <Link to={`/profile/${user.uid}`} style={{
-                                marginTop: '0.5rem',
                                 width: '100%',
                                 padding: '0.5rem',
                                 background: 'black',
@@ -172,6 +224,93 @@ export default function AdminUsers() {
                     </Card>
                 ))}
             </div>
+
+            {/* Level Edit Modal */}
+            <Modal isOpen={modalType === 'level'} onClose={() => setModalType(null)} title="Edit User Stats">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Level</label>
+                        <Input type="number" value={editLevel} onChange={(e) => setEditLevel(Number(e.target.value))} />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>XP</label>
+                        <Input type="number" value={editXp} onChange={(e) => setEditXp(Number(e.target.value))} />
+                    </div>
+                    <Button onClick={handleSaveLevel} style={{ width: '100%' }}>Save Changes</Button>
+                </div>
+            </Modal>
+
+            {/* User Details Modal */}
+            <Modal isOpen={modalType === 'details'} onClose={() => setModalType(null)} title="User Details">
+                {selectedUser && (
+                    <div style={{
+                        maxHeight: '70vh',
+                        overflowY: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '1rem'
+                    }}>
+                        {/* Basic Info */}
+                        <div style={{ background: '#fff', border: '2px solid #000', padding: '1rem' }}>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>BASIC INFO</h3>
+                            <table style={{ width: '100%', fontSize: '0.9rem', fontFamily: 'monospace' }}>
+                                <tbody>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>UID:</td><td style={{ wordBreak: 'break-all' }}>{selectedUser.uid}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Display Name:</td><td>{selectedUser.displayName || 'N/A'}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Email:</td><td>{selectedUser.email || 'N/A'}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Photo URL:</td><td style={{ wordBreak: 'break-all', fontSize: '0.75rem' }}>{selectedUser.photoURL || 'N/A'}</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Gamification */}
+                        <div style={{ background: '#fff', border: '2px solid #000', padding: '1rem' }}>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>GAMIFICATION</h3>
+                            <table style={{ width: '100%', fontSize: '0.9rem', fontFamily: 'monospace' }}>
+                                <tbody>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>Level:</td><td>{selectedUser.level || 1}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>XP:</td><td>{selectedUser.xp || 0}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Streak:</td><td>{selectedUser.streak || 0} days</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Last Login:</td><td>{selectedUser.lastLogin || 'N/A'}</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Admin Status */}
+                        <div style={{ background: '#fff', border: '2px solid #000', padding: '1rem' }}>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>PERMISSIONS</h3>
+                            <table style={{ width: '100%', fontSize: '0.9rem', fontFamily: 'monospace' }}>
+                                <tbody>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>Is Admin:</td><td>{selectedUser.isAdmin ? '✅ YES' : '❌ NO'}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Is Banned:</td><td>{selectedUser.isBanned ? '🚫 YES' : '✅ NO'}</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Profile Customization */}
+                        {(selectedUser as any).profileCustomization && (
+                            <div style={{ background: '#fff', border: '2px solid #000', padding: '1rem' }}>
+                                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>PROFILE CUSTOMIZATION</h3>
+                                <table style={{ width: '100%', fontSize: '0.9rem', fontFamily: 'monospace' }}>
+                                    <tbody>
+                                        <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>Banner:</td><td style={{ wordBreak: 'break-all', fontSize: '0.75rem' }}>{(selectedUser as any).profileCustomization.banner || 'N/A'}</td></tr>
+                                        <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Bio:</td><td>{(selectedUser as any).profileCustomization.bio || 'N/A'}</td></tr>
+                                        <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Colors:</td><td>{JSON.stringify((selectedUser as any).profileCustomization.colors || {})}</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+
+                        {/* Raw JSON (Collapsed) */}
+                        <details style={{ background: '#f5f5f5', border: '2px solid #000', padding: '1rem' }}>
+                            <summary style={{ fontFamily: 'var(--font-heading)', fontWeight: 'bold', cursor: 'pointer' }}>📄 VIEW RAW JSON</summary>
+                            <pre style={{ marginTop: '1rem', fontSize: '0.75rem', overflow: 'auto', background: '#fff', padding: '1rem', border: '1px solid #ccc' }}>
+                                {JSON.stringify(selectedUser, null, 2)}
+                            </pre>
+                        </details>
+                    </div>
+                )}
+            </Modal>
         </div>
     );
 }

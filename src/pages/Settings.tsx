@@ -203,11 +203,11 @@ export default function Settings() {
     };
 
     const COLORS = [
-        { name: 'Bingeki Red', value: '#FF2E63' },
-        { name: 'Cyan Future', value: '#08D9D6' },
-        { name: 'Toxic Green', value: '#10B981' },
-        { name: 'Sunny Yellow', value: '#F59E0B' },
-        { name: 'Royal Purple', value: '#8B5CF6' },
+        { name: t('settings.colors.red'), value: '#FF2E63' },
+        { name: t('settings.colors.cyan'), value: '#08D9D6' },
+        { name: t('settings.colors.green'), value: '#10B981' },
+        { name: t('settings.colors.yellow'), value: '#F59E0B' },
+        { name: t('settings.colors.purple'), value: '#8B5CF6' },
     ];
 
     return (

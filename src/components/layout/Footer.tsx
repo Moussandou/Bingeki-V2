@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Github, Linkedin, Globe, Briefcase } from 'lucide-react';
+import { Mail, MapPin, Github, Linkedin, Globe, Briefcase } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export function Footer() {
@@ -48,10 +48,7 @@ export function Footer() {
                         <Mail size={18} />
                         <a href="mailto:moussandou.m@gmail.com" style={{ color: '#000', textDecoration: 'none' }}>moussandou.m@gmail.com</a>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <Phone size={18} />
-                        <a href="tel:+33781633278" style={{ color: '#000', textDecoration: 'none' }}>07 81 63 32 78</a>
-                    </div>
+
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <a href="/feedback" style={{ color: '#000', textDecoration: 'none', fontWeight: 900, borderBottom: '2px solid #000' }}>
                             {t('footer.feedback')}

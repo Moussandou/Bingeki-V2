@@ -161,23 +161,29 @@ export default function Opening() {
     }, [qgMangaList.length]);
 
     // Typewriter Logic
+    const currentKey = placeholders[placeholderIndex];
+    const fullTextToType = t(currentKey); // Translate first!
+
     useEffect(() => {
-        const currentWord = placeholders[placeholderIndex];
         const typeSpeed = isDeleting ? 50 : 150;
 
         const timer = setTimeout(() => {
-            if (!isDeleting && placeholderText === currentWord) {
-                setTimeout(() => setIsDeleting(true), 3500); // Increased pause to let user see results
+            if (!isDeleting && placeholderText === fullTextToType) {
+                setTimeout(() => setIsDeleting(true), 3500);
             } else if (isDeleting && placeholderText === '') {
                 setIsDeleting(false);
                 setPlaceholderIndex((prev) => (prev + 1) % placeholders.length);
             } else {
-                setPlaceholderText(currentWord.substring(0, placeholderText.length + (isDeleting ? -1 : 1)));
+                // Determine next text based on fullTextToType
+                const nextText = isDeleting
+                    ? fullTextToType.substring(0, placeholderText.length - 1)
+                    : fullTextToType.substring(0, placeholderText.length + 1);
+                setPlaceholderText(nextText);
             }
         }, typeSpeed);
 
         return () => clearTimeout(timer);
-    }, [placeholderText, isDeleting, placeholderIndex, placeholders]);
+    }, [placeholderText, isDeleting, placeholderIndex, fullTextToType]);
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -195,11 +201,17 @@ export default function Opening() {
 
     // Data source for display
     const currentGenre = placeholders[placeholderIndex];
-    const displayResults = resultsByGenre[currentGenre] || [];
+    // We stick to the key for looking up results, even if we display translated text
+    const displayResults = resultsByGenre[t(currentKey)] || resultsByGenre[currentKey] || [];
+    // Fallback: try to find results by the translated key (e.g. "Shonen") or the raw key.
+    // Actually, resultsByGenre keys are 'Seinen', 'Shonen' etc. 
+    // We need to map the translation key back to the data key.
+    // Or just use the hardcoded genre names in resultsByGenre matching the translations.
+    // Let's check resultsByGenre keys: 'Seinen', 'Shonen', 'Romance', 'Horreur', 'Isekai'.
+    // The translation keys are '...genres.seinen' -> likely returns "Seinen".
 
-    // Determine if typing is finished (full word is displayed and not deleting yet)
-    // We add a small artificial delay check: results appear only when we are waiting at the full word
-    const isTypingFinished = !isDeleting && placeholderText === currentGenre;
+    // Determine if typing is finished
+    const isTypingFinished = !isDeleting && placeholderText === fullTextToType;
 
 
 
@@ -627,86 +639,40 @@ export default function Opening() {
                     </div>
                 </section>
 
+
                 {/* SECTION 6: TIPS FOR DEVS */}
-                <section className={styles.featureSection} style={{
-                    background: 'var(--color-primary)',
-                    padding: '4rem 0',
-                    position: 'relative',
-                    overflow: 'hidden'
-                }}>
+                <section className={`${styles.featureSection} ${styles.supportSection}`}>
                     <div className={styles.sfx} style={{
-                        position: 'absolute',
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         fontSize: 'min(15rem, 25vw)',
                         color: '#000',
-                        opacity: 0.05,
-                        fontWeight: 900,
-                        lineHeight: 1,
-                        pointerEvents: 'none'
+                        opacity: 0.05
                     }}>
                         {t('landing.features.support.sfx')}
                     </div>
 
-                    <div style={{
-                        maxWidth: '800px',
-                        margin: '0 auto',
-                        textAlign: 'center',
-                        position: 'relative',
-                        zIndex: 1,
-                        padding: '0 1rem'
-                    }}>
+                    <div className={styles.supportContent}>
                         <motion.div
                             initial={{ y: 30, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
                             viewport={{ once: true, amount: 0.5 }}
                             transition={{ duration: 0.6 }}
                         >
-                            <div style={{
-                                background: '#000',
-                                color: '#fff',
-                                padding: '0.75rem 3rem',
-                                fontFamily: 'var(--font-heading)',
-                                fontWeight: 900,
-                                fontSize: '1.5rem',
-                                letterSpacing: '3px',
-                                display: 'inline-block',
-                                marginBottom: '2rem',
-                                clipPath: 'polygon(3% 0, 100% 0, 97% 100%, 0% 100%)'
-                            }}>
+                            <div className={styles.supportTag}>
                                 {t('landing.features.support.tag')}
                             </div>
 
-                            <h2 style={{
-                                fontSize: 'min(2.5rem, 8vw)',
-                                fontWeight: 900,
-                                marginBottom: '1.5rem',
-                                fontFamily: 'var(--font-heading)',
-                                lineHeight: 1.2,
-                                color: '#000'
-                            }}>
+                            <h2 className={styles.supportTitle}>
                                 {t('landing.features.support.title')}
                             </h2>
 
-                            <p style={{
-                                fontSize: '1.1rem',
-                                marginBottom: '1rem',
-                                fontWeight: 700,
-                                color: '#000'
-                            }}>
+                            <p className={styles.supportDescPrimary}>
                                 {t('landing.features.support.description_1')}
                             </p>
 
-                            <p style={{
-                                fontSize: '1rem',
-                                marginBottom: '2.5rem',
-                                opacity: 0.85,
-                                lineHeight: 1.6,
-                                maxWidth: '600px',
-                                margin: '0 auto 2.5rem',
-                                color: '#000'
-                            }}>
+                            <p className={styles.supportDescSecondary}>
                                 {t('landing.features.support.description_2')}
                             </p>
 
@@ -714,50 +680,28 @@ export default function Opening() {
                                 href="https://ko-fi.com/moussandou"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                whileHover={{ scale: 1.05, y: -3 }}
+                                className={styles.kofiButton}
                                 whileTap={{ scale: 0.98 }}
-                                style={{
-                                    display: 'inline-block',
-                                    background: '#fff',
-                                    color: '#fff',
-                                    padding: '1rem 4rem', // Increased horizontal padding
-                                    fontWeight: 900,
-                                    fontSize: '1.1rem',
-                                    textDecoration: 'none',
-                                    clipPath: 'polygon(3% 0, 100% 0, 97% 100%, 0% 100%)', // Reduced skew 5% -> 3%
-                                    border: '4px solid #000',
-                                    letterSpacing: '2px',
-                                    boxShadow: '6px 6px 0 rgba(0,0,0,0.2)',
-                                    fontFamily: 'var(--font-heading)'
-                                }}
                             >
                                 <img
-                                    src="/Ko-fi logo.gif" // Switched to preferred logo
+                                    src="/Ko-fi logo.gif"
                                     alt="Support me on Ko-fi"
                                     style={{
-                                        height: '40px', // Adjusted height
-                                        display: 'block'
+                                        height: '40px',
+                                        display: 'block',
+                                        margin: '0 auto'
                                     }}
                                 />
                             </motion.a>
 
-                            <div style={{
-                                marginTop: '2rem',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                gap: '2rem',
-                                flexWrap: 'wrap',
-                                fontSize: '0.9rem',
-                                fontWeight: 700,
-                                color: '#000'
-                            }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <div className={styles.supportFeatures}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
                                     <Check size={18} /> {t('landing.features.support.features')}
                                 </span>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
                                     <Check size={18} /> {t('landing.features.support.servers')}
                                 </span>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
                                     <Check size={18} /> {t('landing.features.support.premium')}
                                 </span>
                             </div>

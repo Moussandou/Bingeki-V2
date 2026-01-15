@@ -181,7 +181,7 @@ export function validateGamificationWrite(
 ): boolean {
     if (!existing) return true; // No existing data, safe to write
 
-    // Check cumulative stats don't decrease
+    // 1. Check cumulative stats don't decrease
     const checks = [
         { name: 'level', newVal: newData.level, oldVal: existing.level },
         { name: 'totalChaptersRead', newVal: newData.totalChaptersRead, oldVal: existing.totalChaptersRead },
@@ -195,6 +195,23 @@ export function validateGamificationWrite(
                 console.warn(`[DataProtection] Validation failed: ${check.name} would decrease from ${check.oldVal} to ${check.newVal}`);
                 return false;
             }
+        }
+    }
+
+    // 2. SECURITY CHECK: Prevent massive jumps (Anti-Cheat)
+    if (newData.level && existing.level) {
+        // Max 1 level increase per save
+        if (newData.level > existing.level + 1) {
+            console.error(`[DataProtection] SECURITY: Prevented suspicious level jump (${existing.level} -> ${newData.level})`);
+            return false;
+        }
+    }
+
+    if (newData.xp && existing.xp) {
+        // Max 1000 XP increase per save (covers most generous rewards + backlog)
+        if (newData.xp > existing.xp + 1000) {
+            console.error(`[DataProtection] SECURITY: Prevented suspicious XP jump (+${newData.xp - existing.xp})`);
+            return false;
         }
     }
 

@@ -30,88 +30,7 @@
     display: none;
 }
 
-/* Desktop Leaderboard */
-.leaderboardPanel {
-    background: var(--color-surface);
-    border: 2px solid var(--color-border);
-    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
-}
-
-.leaderboardItem {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid #eee;
-    gap: 1rem;
-}
-
-.rank {
-    width: 40px;
-    font-size: 1.5rem;
-    font-weight: 900;
-    flex-shrink: 0;
-}
-
-.avatar {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 2px solid var(--color-border);
-    flex-shrink: 0;
-}
-
-.playerInfo {
-    flex: 1;
-    min-width: 0;
-    cursor: pointer;
-}
-
-.playerName {
-    font-weight: 700;
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.playerBadge {
-    font-size: 0.65rem;
-    padding: 0.15rem 0.4rem;
-    background: var(--color-text);
-    color: var(--color-surface);
-    border-radius: 3px;
-    font-weight: 700;
-}
-
-.playerLvl {
-    font-size: 0.8rem;
-    opacity: 0.6;
-}
-
-.playerStats {
-    font-weight: 900;
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    flex-shrink: 0;
-}
-
-.actions {
-    flex-shrink: 0;
-}
-
 /* ========== MOBILE ========== */
-/* Responsive Utilities */
-.mobileOnly {
-    display: none !important;
-}
-
-.desktopOnly {
-    display: block !important;
-}
-
 @media (max-width: 768px) {
     .container {
         padding: 0.5rem;
@@ -122,20 +41,5 @@
     .title {
         font-size: 1.5rem;
         padding-left: 0.5rem;
-    }
-
-    .mobileOnly {
-        display: block !important;
-    }
-
-    .desktopOnly {
-        display: none !important;
-    }
-
-    /* ... keep existing mobile overrides if any, but simplified ... */
-    .leaderboardPanel {
-        border: none;
-        box-shadow: none;
-        margin: 0;
     }
 }

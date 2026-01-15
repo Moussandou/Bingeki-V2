@@ -30,7 +30,7 @@ export function NenChart({ stats, themeColor = '#FF2E63' }: NenChartProps) {
     ];
 
     return (
-        <div style={{ width: '100%', height: '100%', minHeight: '180px', position: 'relative' }}>
+        <div style={{ width: '100%', height: '100%', minHeight: '180px', position: 'relative', minWidth: 0 }}>
             {/* Info button */}
             <button
                 onClick={() => setShowLegend(!showLegend)}

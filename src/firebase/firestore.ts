@@ -211,6 +211,34 @@ export async function loadGamificationFromFirestore(userId: string): Promise<Omi
     }
 }
 
+// ADMIN: Manually update user gamification stats
+export async function adminUpdateUserGamification(uid: string, level: number, xp: number): Promise<void> {
+    try {
+        // 1. Update root user doc (for leaderboards/UI)
+        const userDocRef = doc(db, 'users', uid);
+        await updateDoc(userDocRef, {
+            level,
+            xp
+        });
+
+        // 2. Update gamification subcollection (for data integrity)
+        const gamificationDocRef = doc(db, 'users', uid, 'data', 'gamification');
+
+        // Use setDoc with merge to ensure we don't overwrite other fields if they exist,
+        // or create the doc if it doesn't exist
+        await setDoc(gamificationDocRef, {
+            level,
+            xp,
+            lastUpdated: Date.now()
+        }, { merge: true });
+
+        console.log(`[Firestore] Admin updated gamification for ${uid}: Level ${level}, XP ${xp}`);
+    } catch (error) {
+        console.error('[Firestore] Error updating user gamification:', error);
+        throw error;
+    }
+}
+
 // Sync local data to Firestore (for first-time sync)
 export async function syncLocalDataToFirestore(
     userId: string,
@@ -1159,5 +1187,121 @@ export async function setGlobalAnnouncement(message: string, type: 'info' | 'war
     } catch (error) {
         console.error('[Firestore] Error setting announcement:', error);
         throw error;
+    }
+}
+// ==================== TIER LIST FUNCTIONS ====================
+
+export interface TierList {
+    id: string;
+    userId: string;
+    authorName: string;
+    authorPhoto?: string;
+    title: string;
+    description?: string;
+    category: 'anime' | 'manga' | 'characters';
+    likes: string[]; // Array of user IDs
+    createdAt: number;
+    isPublic: boolean;
+    tiers: {
+        id: string; // Unique ID for dnd-kit
+        label: string;
+        color: string;
+        items: {
+            id: number; // MAL ID
+            name: string;
+            image: string;
+        }[];
+    }[];
+}
+
+// Create a new tier list
+export async function createTierList(tierList: Omit<TierList, 'id'>): Promise<string> {
+    try {
+        const docRef = await addDoc(collection(db, 'tierLists'), {
+            ...tierList,
+            createdAt: Date.now()
+        });
+        console.log('[Firestore] Tier list created:', docRef.id);
+        return docRef.id;
+    } catch (error) {
+        console.error('[Firestore] Error creating tier list:', error);
+        throw error;
+    }
+}
+
+// Get a specific tier list
+export async function getTierListById(id: string): Promise<TierList | null> {
+    try {
+        const docRef = doc(db, 'tierLists', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return { id: docSnap.id, ...docSnap.data() } as TierList;
+        }
+        return null;
+    } catch (error) {
+        console.error('[Firestore] Error getting tier list:', error);
+        return null;
+    }
+}
+
+// Get public tier lists (feed)
+export async function getPublicTierLists(limitCount: number = 20): Promise<TierList[]> {
+    try {
+        const q = query(
+            collection(db, 'tierLists'),
+            where('isPublic', '==', true),
+            orderBy('createdAt', 'desc'),
+            limit(limitCount)
+        );
+        const querySnapshot = await getDocs(q);
+        const lists: TierList[] = [];
+        querySnapshot.forEach((doc) => {
+            lists.push({ id: doc.id, ...doc.data() } as TierList);
+        });
+        return lists;
+    } catch (error) {
+        console.error('[Firestore] Error getting public tier lists:', error);
+        return [];
+    }
+}
+
+// Get user's tier lists
+export async function getUserTierLists(userId: string): Promise<TierList[]> {
+    try {
+        const q = query(
+            collection(db, 'tierLists'),
+            where('userId', '==', userId),
+            orderBy('createdAt', 'desc')
+        );
+        const querySnapshot = await getDocs(q);
+        const lists: TierList[] = [];
+        querySnapshot.forEach((doc) => {
+            lists.push({ id: doc.id, ...doc.data() } as TierList);
+        });
+        return lists;
+    } catch (error) {
+        console.error('[Firestore] Error getting user tier lists:', error);
+        return [];
+    }
+}
+
+// Toggle like on a tier list
+export async function toggleTierListLike(listId: string, userId: string): Promise<void> {
+    try {
+        const listRef = doc(db, 'tierLists', listId);
+        const listSnap = await getDoc(listRef);
+
+        if (listSnap.exists()) {
+            const list = listSnap.data() as TierList;
+            const likes = list.likes || [];
+
+            if (likes.includes(userId)) {
+                await updateDoc(listRef, { likes: likes.filter(id => id !== userId) });
+            } else {
+                await updateDoc(listRef, { likes: [...likes, userId] });
+            }
+        }
+    } catch (error) {
+        console.error('[Firestore] Error toggling tier list like:', error);
     }
 }
