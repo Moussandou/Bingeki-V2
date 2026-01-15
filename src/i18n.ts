@@ -788,7 +788,11 @@ const resources = {
                         reply_added_toast: "Réponse ajoutée !",
                         reply_error_toast: "Erreur lors de la réponse",
                         show_less: "▲ Réduire",
-                        show_more: "▼ Voir {{count}} de plus"
+                        show_more: "▼ Voir {{count}} de plus",
+                        reading: "Vous et {{count}} ami(s) lisent aussi cette œuvre",
+                        watching: "Vous et {{count}} ami(s) regardez aussi cette œuvre",
+                        placeholder: "Partagez votre avis (sans spoil de préférence)...",
+                        submit: "PUBLIER"
                     },
                     danger: {
                         delete: "Supprimer de la bibliothèque",
@@ -1643,7 +1647,11 @@ const resources = {
                         reply_added_toast: "Reply added!",
                         reply_error_toast: "Error adding reply",
                         show_less: "▲ Collapse",
-                        show_more: "▼ See {{count}} more"
+                        show_more: "▼ See {{count}} more",
+                        reading: "You and {{count}} friend(s) are also reading this work",
+                        watching: "You and {{count}} friend(s) are also watching this work",
+                        placeholder: "Share your opinion (no spoilers please)...",
+                        submit: "SUBMIT"
                     },
                     danger: {
                         delete: "Remove from library",
