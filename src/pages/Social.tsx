@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 import { Trophy, Users, Search, UserPlus, Check, User, X, Activity, BookOpen, Flame, Clock, Swords, Tv } from 'lucide-react';
@@ -28,6 +29,7 @@ import styles from './Social.module.css';
 
 export default function Social() {
     const { user } = useAuthStore();
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { addToast } = useToast();
 
@@ -103,10 +105,11 @@ export default function Social() {
             );
             // Refresh to update UI
             loadData();
-            addToast(`Demande envoyée à ${targetUser.displayName} !`, 'success');
+            loadData();
+            addToast(t('social.friends.request_sent_toast', { name: targetUser.displayName }), 'success');
         } catch (error) {
             console.error("Failed to add friend", error);
-            addToast("Erreur lors de l'envoi de la demande.", 'error');
+            addToast(t('social.friends.request_error'), 'error');
         }
     };
 
@@ -152,10 +155,12 @@ export default function Social() {
             await rejectFriendRequest(user.uid, friendUid);
             // loadData(); // No need to reload entire data if we updated locally, but maybe good for consistency
             console.log("Friend request rejected successfully");
-            addToast("Demande refusée et supprimée.", 'info');
+            // loadData(); // No need to reload entire data if we updated locally, but maybe good for consistency
+            console.log("Friend request rejected successfully");
+            addToast(t('social.friends.reject_success'), 'info');
         } catch (error) {
             console.error("Failed to reject", error);
-            addToast("Erreur lors du refus de la demande. Veuillez réessayer.", 'error');
+            addToast(t('social.friends.reject_error'), 'error');
             loadData(); // Revert state on error handling
         }
     };
@@ -167,7 +172,7 @@ export default function Social() {
         <Layout>
             <div className={styles.container}>
                 <h1 className={styles.title}>
-                    SOCIAL
+                    {t('social.title')}
                 </h1>
 
                 {/* Tabs */}
@@ -178,7 +183,7 @@ export default function Social() {
                         icon={<Trophy size={20} />}
                         style={{ flexShrink: 0 }}
                     >
-                        CLASSEMENT
+                        {t('social.tabs.ranking')}
                     </Button>
                     <Button
                         variant={activeTab === 'activity' ? 'primary' : 'ghost'}
@@ -186,7 +191,7 @@ export default function Social() {
                         icon={<Activity size={20} />}
                         style={{ flexShrink: 0 }}
                     >
-                        ACTIVITÉ
+                        {t('social.tabs.activity')}
                     </Button>
                     <Button
                         variant={activeTab === 'challenges' ? 'primary' : 'ghost'}
@@ -194,7 +199,7 @@ export default function Social() {
                         icon={<Swords size={20} />}
                         style={{ flexShrink: 0 }}
                     >
-                        DÉFIS
+                        {t('social.tabs.challenges')}
                     </Button>
                     <Button
                         variant={activeTab === 'parties' ? 'primary' : 'ghost'}
@@ -202,7 +207,7 @@ export default function Social() {
                         icon={<Tv size={20} />}
                         style={{ flexShrink: 0 }}
                     >
-                        PARTIES
+                        {t('social.tabs.parties')}
                     </Button>
                     <Button
                         variant={activeTab === 'friends' ? 'primary' : 'ghost'}
@@ -210,7 +215,7 @@ export default function Social() {
                         icon={<Users size={20} />}
                         style={{ flexShrink: 0 }}
                     >
-                        AMIS
+                        {t('social.tabs.friends')}
                     </Button>
                 </div>
 
@@ -228,23 +233,23 @@ export default function Social() {
                 {activeTab === 'activity' && (
                     <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff' }}>
                         <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <Flame size={24} color="#ef4444" /> Activité de tes amis
+                            <Flame size={24} color="#ef4444" /> {t('social.activity.title')}
                         </h2>
                         {loading ? (
-                            <p style={{ textAlign: 'center', opacity: 0.6 }}>Chargement...</p>
+                            <p style={{ textAlign: 'center', opacity: 0.6 }}>{t('social.activity.loading')}</p>
                         ) : activities.length === 0 ? (
                             <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.6 }}>
-                                <p>Aucune activité récente de tes amis.</p>
-                                <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Ajoute des amis pour voir leur activité !</p>
+                                <p>{t('social.activity.no_activity')}</p>
+                                <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>{t('social.activity.add_friends_hint')}</p>
                             </div>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 {activities.map((activity) => {
                                     const timeDiff = Date.now() - activity.timestamp;
                                     const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-                                    const timeAgo = hours < 1 ? 'Il y a moins d\'une heure' :
-                                        hours < 24 ? `Il y a ${hours}h` :
-                                            `Il y a ${Math.floor(hours / 24)}j`;
+                                    const timeAgo = hours < 1 ? t('social.activity.time.less_than_hour') :
+                                        hours < 24 ? t('social.activity.time.hours_ago', { hours }) :
+                                            t('social.activity.time.days_ago', { days: Math.floor(hours / 24) });
 
                                     return (
                                         <div key={activity.id} style={{
@@ -299,25 +304,25 @@ export default function Social() {
                         {/* Leaderboard Filters */}
                         <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
                             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                                <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>Par :</span>
+                                <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{t('social.ranking.filter_by')}</span>
                                 <Button
                                     variant={leaderboardCategory === 'xp' ? 'manga' : 'ghost'}
                                     size="sm"
                                     onClick={() => setLeaderboardCategory('xp')}
                                     icon={<Trophy size={14} />}
-                                >XP</Button>
+                                >{t('social.ranking.xp')}</Button>
                                 <Button
                                     variant={leaderboardCategory === 'chapters' ? 'manga' : 'ghost'}
                                     size="sm"
                                     onClick={() => setLeaderboardCategory('chapters')}
                                     icon={<BookOpen size={14} />}
-                                >Chapitres</Button>
+                                >{t('social.ranking.chapters')}</Button>
                                 <Button
                                     variant={leaderboardCategory === 'streak' ? 'manga' : 'ghost'}
                                     size="sm"
                                     onClick={() => setLeaderboardCategory('streak')}
                                     icon={<Flame size={14} />}
-                                >Streak</Button>
+                                >{t('social.ranking.streak')}</Button>
                             </div>
                         </div>
 
@@ -372,7 +377,7 @@ export default function Social() {
                                                     overflow: 'hidden',
                                                     textOverflow: 'ellipsis'
                                                 }}>
-                                                    {player.displayName || 'Anonyme'}
+                                                    {player.displayName || t('social.ranking.anonymous')}
                                                 </span>
                                                 <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
                                                     Lvl {player.level || 1}
@@ -424,7 +429,7 @@ export default function Social() {
                                         </div>
                                         <div className={styles.playerInfo} onClick={() => navigate(`/profile/${player.uid}`)}>
                                             <div className={styles.playerName}>
-                                                {player.displayName || 'Anonyme'}
+                                                {player.displayName || t('social.ranking.anonymous')}
                                                 {player.featuredBadge && (
                                                     <span className={styles.playerBadge}>{player.featuredBadge}</span>
                                                 )}
@@ -444,7 +449,7 @@ export default function Social() {
                                                     </Button>
                                                 )}
                                                 {getFriendStatus(player.uid) === 'pending' && (
-                                                    <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>En attente</span>
+                                                    <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>{t('social.ranking.pending')}</span>
                                                 )}
                                                 {getFriendStatus(player.uid) === 'accepted' && (
                                                     <User size={16} style={{ opacity: 0.3 }} />
@@ -463,19 +468,19 @@ export default function Social() {
                     <div>
                         {/* Add Friend Section */}
                         <div className="manga-panel" style={{ padding: '1.5rem', marginBottom: '2rem', background: '#fff' }}>
-                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1rem' }}>AJOUTER UN AMI</h3>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1rem' }}>{t('social.friends.add_title')}</h3>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', border: '2px solid #000', padding: '0.5rem' }}>
                                     <Search size={20} style={{ marginRight: '0.5rem', opacity: 0.5 }} />
                                     <input
                                         type="email"
-                                        placeholder="Pseudo ou Email exact..."
+                                        placeholder={t('social.friends.search_placeholder')}
                                         value={searchEmail}
                                         onChange={(e) => setSearchEmail(e.target.value)}
                                         style={{ border: 'none', outline: 'none', width: '100%', fontSize: '1rem', fontFamily: 'inherit' }}
                                     />
                                 </div>
-                                <Button onClick={handleSearch} disabled={loading}>CHERCHER</Button>
+                                <Button onClick={handleSearch} disabled={loading}>{t('social.friends.search_btn')}</Button>
                             </div>
 
                             {/* Search Result */}
@@ -490,21 +495,21 @@ export default function Social() {
                                         </div>
                                     </div>
                                     {requestSent ? (
-                                        <Button variant="ghost" icon={<Check size={18} />}>DEMANDE ENVOYÉE</Button>
+                                        <Button variant="ghost" icon={<Check size={18} />}>{t('social.friends.request_sent')}</Button>
                                     ) : (
-                                        <Button variant="manga" onClick={handleSendRequest} icon={<UserPlus size={18} />}>AJOUTER</Button>
+                                        <Button variant="manga" onClick={handleSendRequest} icon={<UserPlus size={18} />}>{t('social.friends.add_btn')}</Button>
                                     )}
                                 </div>
                             )}
                             {searchResult === null && searchEmail && !loading && searchResult !== undefined && ( // Check if strictly null (not found) vs undefined (initial)
-                                <div style={{ marginTop: '0.5rem', color: 'red', fontWeight: 600 }}>Aucun utilisateur trouvé avec cet email.</div>
+                                <div style={{ marginTop: '0.5rem', color: 'red', fontWeight: 600 }}>{t('social.friends.not_found')}</div>
                             )}
                         </div>
 
                         {/* Requests List */}
                         {friends.filter(f => f.status === 'pending' && f.direction === 'incoming').length > 0 && (
                             <div style={{ marginBottom: '2rem' }}>
-                                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1rem' }}>DEMANDES REÇUES</h3>
+                                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1rem' }}>{t('social.friends.requests_title')}</h3>
                                 <div className="manga-panel" style={{ padding: 0 }}>
                                     {friends.filter(f => f.status === 'pending' && f.direction === 'incoming').map(friend => (
                                         <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -523,7 +528,7 @@ export default function Social() {
                                                 >
                                                     <X size={20} />
                                                 </Button>
-                                                <Button variant="primary" onClick={() => handleAccept(friend.uid)}>ACCEPTER</Button>
+                                                <Button variant="primary" onClick={() => handleAccept(friend.uid)}>{t('social.friends.accept')}</Button>
                                             </div>
                                         </div>
                                     ))}
@@ -535,7 +540,7 @@ export default function Social() {
                         <div className="manga-panel" style={{ padding: 0 }}>
                             {friends.filter(f => f.status === 'accepted').length === 0 ? (
                                 <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.6 }}>
-                                    Vous n'avez pas encore d'amis. Lancez une recherche !
+                                    {t('social.friends.no_friends')}
                                 </div>
                             ) : (
                                 friends.filter(f => f.status === 'accepted').map(friend => (

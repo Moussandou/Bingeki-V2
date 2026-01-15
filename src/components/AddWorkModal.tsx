@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -17,6 +18,7 @@ interface AddWorkModalProps {
 }
 
 export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps) {
+    const { t } = useTranslation();
     const [mode, setMode] = useState<'api' | 'manual'>('api');
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<JikanResult[]>([]);
@@ -176,7 +178,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
     const isAdded = (id: number) => works.some(w => w.id === id);
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="RECRUTER UNE ŒUVRE">
+        <Modal isOpen={isOpen} onClose={onClose} title={t('components.add_work_modal.title')}>
             {/* Manga Style Tabs */}
             <div style={{ display: 'flex', gap: '0', marginBottom: '1.5rem', border: '2px solid #000' }}>
                 <button
@@ -197,7 +199,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                     }}
                 >
                     <Globe size={18} />
-                    Recherche
+                    {t('components.add_work_modal.tab_search')}
                 </button>
                 <div style={{ width: '2px', background: '#000' }}></div>
                 <button
@@ -218,7 +220,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                     }}
                 >
                     <PenTool size={18} />
-                    Manuel
+                    {t('components.add_work_modal.tab_manual')}
                 </button>
             </div>
 
@@ -241,7 +243,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                         </select>
                         <div style={{ position: 'relative', flex: 1 }}>
                             <Input
-                                placeholder="Rechercher (ex: Naruto, Berserk...)"
+                                placeholder={t('components.add_work_modal.search_placeholder')}
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 style={{
@@ -306,7 +308,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                                                 {work.title}
                                             </h4>
                                             <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#666' }}>
-                                                {work.type} • {work.chapters || work.episodes || '?'} {type === 'manga' ? 'Chaps' : 'Éps'}
+                                                {work.type} • {work.chapters || work.episodes || '?'} {type === 'manga' ? t('components.add_work_modal.chapters_abbr') : t('components.add_work_modal.episodes_abbr')}
                                                 {work.score && ` • ★ ${work.score}`}
                                             </p>
                                         </div>
@@ -329,12 +331,12 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
 
                         {!loading && results.length === 0 && query.length > 2 && (
                             <div style={{ textAlign: 'center', padding: '2rem', fontStyle: 'italic', fontWeight: 'bold' }}>
-                                Auncune trace détectée...
+                                {t('components.add_work_modal.no_results')}
                             </div>
                         )}
                         {!loading && !query && (
                             <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.5, fontWeight: 'bold' }}>
-                                TAPEZ UN NOM POUR LANCER LA TRAQUE
+                                {t('components.add_work_modal.search_hint')}
                             </div>
                         )}
                     </div>
@@ -342,9 +344,9 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em' }}>TITRE</label>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em' }}>{t('components.add_work_modal.label_title')}</label>
                         <Input
-                            placeholder="Titre de l'œuvre..."
+                            placeholder={t('components.add_work_modal.title_placeholder')}
                             value={manualTitle}
                             onChange={(e) => setManualTitle(e.target.value)}
                             style={{ border: '2px solid #000', borderRadius: 0 }}
@@ -353,7 +355,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em' }}>TYPE</label>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em' }}>{t('components.add_work_modal.label_type')}</label>
                             <select
                                 value={type}
                                 onChange={(e) => setType(e.target.value as any)}
@@ -372,11 +374,11 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                         </div>
                         <div>
                             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em' }}>
-                                {type === 'manga' ? 'CHAPITRES' : 'ÉPISODES'}
+                                {type === 'manga' ? t('components.add_work_modal.label_chapters') : t('components.add_work_modal.label_episodes')}
                             </label>
                             <Input
                                 type="number"
-                                placeholder="Total..."
+                                placeholder={t('components.add_work_modal.total_placeholder')}
                                 value={manualTotal || ''}
                                 onChange={(e) => setManualTotal(parseInt(e.target.value) || 0)}
                                 style={{ border: '2px solid #000', borderRadius: 0 }}
@@ -385,7 +387,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em' }}>IMAGE (OPTIONNEL)</label>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em' }}>{t('components.add_work_modal.label_image')}</label>
 
                         {!manualImage ? (
                             <div
@@ -411,10 +413,10 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                                 />
                                 <Upload size={32} style={{ marginBottom: '0.5rem', opacity: 0.5 }} />
                                 <p style={{ fontWeight: 700, fontSize: '0.9rem' }}>
-                                    Glissez une image ou cliquez pour upload
+                                    {t('components.add_work_modal.drag_and_drop')}
                                 </p>
                                 <p style={{ fontSize: '0.8rem', opacity: 0.5, marginTop: '0.25rem' }}>
-                                    Ou collez une URL ci-dessous
+                                    {t('components.add_work_modal.or_paste_url')}
                                 </p>
                             </div>
                         ) : (
@@ -449,7 +451,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
 
                         {!manualImage && (
                             <Input
-                                placeholder="Ou URL de l'image..."
+                                placeholder={t('components.add_work_modal.url_placeholder')}
                                 value={manualImage}
                                 onChange={(e) => setManualImage(e.target.value)}
                                 style={{ border: '2px solid #000', borderRadius: 0, marginTop: '0.5rem' }}
@@ -463,7 +465,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                         disabled={!manualTitle.trim()}
                         style={{ marginTop: '1rem' }}
                     >
-                        AJOUTER L'ŒUVRE
+                        {t('components.add_work_modal.add_work')}
                     </Button>
                 </div>
             )}

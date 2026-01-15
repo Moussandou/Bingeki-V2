@@ -1,3 +1,4 @@
+import './i18n';
 import { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';

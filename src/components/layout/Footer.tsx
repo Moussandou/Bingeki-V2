@@ -1,6 +1,8 @@
 import { Mail, Phone, MapPin, Github, Linkedin, Globe, Briefcase } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function Footer() {
+    const { t } = useTranslation();
     return (
         <footer style={{
             marginTop: 'auto',
@@ -23,7 +25,7 @@ export function Footer() {
                 textTransform: 'uppercase',
                 clipPath: 'polygon(10% 0, 100% 0, 90% 100%, 0% 100%)'
             }}>
-                TO BE CONTINUED
+                {t('footer.tbc')}
             </div>
 
             <div className="container" style={{ textAlign: 'center', color: '#000' }}>
@@ -52,7 +54,7 @@ export function Footer() {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <a href="/feedback" style={{ color: '#000', textDecoration: 'none', fontWeight: 900, borderBottom: '2px solid #000' }}>
-                            DONNER MON AVIS
+                            {t('footer.feedback')}
                         </a>
                     </div>
                 </div>
@@ -118,14 +120,14 @@ export function Footer() {
                         fontSize: '0.9rem',
                         letterSpacing: '2px'
                     }}>
-                        TIPS FOR DEVS
+                        {t('landing.features.support.tag')}
                     </div>
                     <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
                         <p style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: '1rem', color: '#000' }}>
-                            Ce projet est développé avec ❤️ en open-source
+                            {t('landing.features.support.description_1')}
                         </p>
                         <p style={{ fontSize: '0.95rem', marginBottom: '1.5rem', color: '#000', opacity: 0.85 }}>
-                            Si Bingeki vous aide dans votre aventure manga/anime, soutenez le développement !
+                            {t('landing.features.support.description_2')}
                         </p>
                         <a
                             href="https://ko-fi.com/moussandou"
@@ -149,7 +151,7 @@ export function Footer() {
                         >
                             <img
                                 src="/Ko-fi logo.gif"
-                                alt="Support me on Ko-fi"
+                                alt={t('landing.features.support.kofi_alt')}
                                 style={{
                                     height: '36px',
                                     display: 'block',
@@ -158,7 +160,7 @@ export function Footer() {
                             />
                         </a>
                         <p style={{ fontSize: '0.75rem', marginTop: '1rem', color: '#000', opacity: 0.7, fontWeight: 600 }}>
-                            Chaque contribution aide à ajouter de nouvelles fonctionnalités !
+                            {t('footer.contribution_msg')}
                         </p>
                     </div>
                 </div>
@@ -166,17 +168,17 @@ export function Footer() {
                 {/* Copyright & Legal */}
                 <div style={{ borderTop: '1px solid #eee', paddingTop: '2rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
                     <p style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.6, fontSize: '0.8rem', margin: 0 }}>
-                        &copy; {new Date().getFullYear()} Bingeki Experience.
+                        &copy; {new Date().getFullYear()} {t('footer.copyright')}
                     </p>
                     <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
                         <a href="/changelog" style={{ color: '#000', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
-                            CHANGELOG
+                            {t('footer.changelog')}
                         </a>
                         <a href="/legal" style={{ color: '#000', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
-                            MENTIONS LÉGALES & RGPD
+                            {t('footer.legal')}
                         </a>
                         <a href="/credits" style={{ color: '#000', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
-                            CRÉDITS
+                            {t('footer.credits')}
                         </a>
                     </div>
                 </div>

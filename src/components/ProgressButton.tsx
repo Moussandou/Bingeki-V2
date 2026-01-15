@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Sword, Check } from 'lucide-react';
 import { useState } from 'react';
@@ -11,6 +12,7 @@ interface ProgressButtonProps {
 }
 
 export function ProgressButton({ current, total, onUpdate, label }: ProgressButtonProps) {
+    const { t } = useTranslation();
     const [animating, setAnimating] = useState(false);
 
     const handleClick = () => {
@@ -53,7 +55,7 @@ export function ProgressButton({ current, total, onUpdate, label }: ProgressButt
                 <span style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     {current >= total ? (
                         <>
-                            <Check size={20} /> Terminé
+                            <Check size={20} /> {t('components.progress_button.completed')}
                         </>
                     ) : (
                         <>

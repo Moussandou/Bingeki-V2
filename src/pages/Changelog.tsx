@@ -2,8 +2,10 @@ import { Layout } from '@/components/layout/Layout';
 import { changelogData } from '@/data/changelog';
 import { Calendar, Tag, GitCommit, Check } from 'lucide-react';
 import styles from './Changelog.module.css';
+import { useTranslation } from 'react-i18next';
 
 export default function Changelog() {
+    const { t } = useTranslation();
     const totalUpdates = changelogData.length;
     const latestVersion = changelogData[0]?.version || 'v0.0';
 
@@ -14,10 +16,10 @@ export default function Changelog() {
                 {/* Header */}
                 <div className={styles.header}>
                     <h1 className={styles.title}>
-                        JOURNAL DE BORD
+                        {t('changelog.title')}
                     </h1>
                     <p className={styles.subtitle}>
-                        L'historique des évolutions de la plateforme Bingeki.
+                        {t('changelog.subtitle')}
                     </p>
                 </div>
 
@@ -25,11 +27,11 @@ export default function Changelog() {
                 <div className={styles.statsContainer}>
                     <div className={styles.statCard}>
                         <span className={styles.statValue}>{totalUpdates}</span>
-                        <span className={styles.statLabel}>Mises à jour</span>
+                        <span className={styles.statLabel}>{t('changelog.updates')}</span>
                     </div>
                     <div className={styles.statCard} style={{ transform: 'rotate(2deg)', background: '#fff', color: '#000', border: '3px solid #000' }}>
                         <span className={styles.statValue}>{latestVersion}</span>
-                        <span className={styles.statLabel}>Version Actuelle</span>
+                        <span className={styles.statLabel}>{t('changelog.current_version')}</span>
                     </div>
                 </div>
 
@@ -66,7 +68,7 @@ export default function Changelog() {
                                                     marginLeft: '0.5rem',
                                                     transform: 'rotate(-5deg)'
                                                 }}>
-                                                    NEW
+                                                    {t('changelog.new')}
                                                 </span>
                                             )}
                                         </div>
@@ -103,7 +105,7 @@ export default function Changelog() {
                 {/* End Marker */}
                 <div className={styles.endMarkerContainer}>
                     <div className={styles.endMarker}>
-                        TO BE CONTINUED...
+                        {t('changelog.to_be_continued')}
                     </div>
                 </div>
 

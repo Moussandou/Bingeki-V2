@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface XPBarProps {
     current: number;
@@ -7,6 +8,7 @@ interface XPBarProps {
 }
 
 export function XPBar({ current, max, level }: XPBarProps) {
+    const { t } = useTranslation();
     const percent = Math.min((current / max) * 100, 100);
 
     return (
@@ -19,7 +21,7 @@ export function XPBar({ current, max, level }: XPBarProps) {
                     fontFamily: 'var(--font-heading)',
                     textTransform: 'uppercase'
                 }}>
-                    NIV {level}
+                    {t('components.xp_bar.level')} {level}
                 </span>
                 <span style={{ fontSize: '0.85rem', color: '#000', fontWeight: 700 }}>{current} / {max} XP</span>
             </div>

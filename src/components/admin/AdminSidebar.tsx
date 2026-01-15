@@ -3,10 +3,12 @@ import { LayoutDashboard, Users, MessageSquare, ShieldAlert, LogOut, Home } from
 import { useAuthStore } from '@/store/authStore';
 import { auth } from '@/firebase/config';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function AdminSidebar() {
     const { logout } = useAuthStore();
     const [isExpanded, setIsExpanded] = useState(false);
+    const { t } = useTranslation();
 
     const handleLogout = async () => {
         try {
@@ -18,10 +20,10 @@ export function AdminSidebar() {
     };
 
     const navItems = [
-        { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true },
-        { to: "/admin/users", icon: Users, label: "Utilisateurs" },
-        { to: "/admin/feedback", icon: MessageSquare, label: "Feedback" },
-        { to: "/admin/system", icon: ShieldAlert, label: "Système" },
+        { to: "/admin", icon: LayoutDashboard, label: t('admin.sidebar.dashboard'), end: true },
+        { to: "/admin/users", icon: Users, label: t('admin.sidebar.users') },
+        { to: "/admin/feedback", icon: MessageSquare, label: t('admin.sidebar.feedback') },
+        { to: "/admin/system", icon: ShieldAlert, label: t('admin.sidebar.system') },
     ];
 
     return (
@@ -143,7 +145,7 @@ export function AdminSidebar() {
                     fontFamily: 'monospace'
                 }}>
                     <Home size={20} />
-                    <span style={{ display: isExpanded ? 'block' : 'none' }}>Retour au site</span>
+                    <span style={{ display: isExpanded ? 'block' : 'none' }}>{t('admin.sidebar.back_to_site')}</span>
                 </NavLink>
 
                 <button
@@ -168,7 +170,7 @@ export function AdminSidebar() {
                     onMouseUp={e => e.currentTarget.style.transform = 'translate(0, 0)'}
                 >
                     <LogOut size={20} />
-                    <span style={{ display: isExpanded ? 'block' : 'none' }}>Exit</span>
+                    <span style={{ display: isExpanded ? 'block' : 'none' }}>{t('admin.sidebar.exit')}</span>
                 </button>
             </div>
         </aside>

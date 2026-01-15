@@ -1,5 +1,6 @@
 
 import { Layout } from '@/components/layout/Layout';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal'; // Assuming Modal exists, verified in previous steps
@@ -54,6 +55,9 @@ export default function Profile() {
 
     // Determine if we are viewing our own profile
     const isOwnProfile = !uid || (user && user.uid === uid);
+
+    // Translation
+    const { t } = useTranslation();
 
     // Load Profile Data logic
     useEffect(() => {
@@ -196,11 +200,11 @@ export default function Profile() {
             setExtendedProfile({ ...extendedProfile, ...profileData });
             setEditForm(prev => ({ ...prev, banner: bannerUrl, top3Favorites: cleanTop3 }));
 
-            addToast('Profil mis à jour avec succès !', 'success');
+            addToast(t('profile.toast.profile_updated'), 'success');
             setIsEditModalOpen(false);
         } catch (error) {
             console.error("Error saving profile:", error);
-            addToast('Erreur lors de la sauvegarde : ' + (error instanceof Error ? error.message : 'Inconnue'), 'error');
+            addToast(t('profile.toast.save_error') + (error instanceof Error ? error.message : 'Inconnue'), 'error');
         } finally {
             setIsSaving(false);
         }
@@ -212,7 +216,7 @@ export default function Profile() {
         navigate('/');
     };
 
-    if (loadingProfile && !user) return <div style={{ padding: '2rem' }}>Chargement du profil...</div>;
+    if (loadingProfile && !user) return <div style={{ padding: '2rem' }}>{t('profile.loading')}</div>;
 
     return (
         <Layout>
@@ -221,18 +225,18 @@ export default function Profile() {
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
                         <h1 className="text-outline" style={{ fontSize: 'clamp(1.5rem, 5vw, 3rem)', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', color: '#000', textShadow: '2px 2px 0 rgba(0,0,0,0.1)', wordBreak: 'break-word' }}>
-                            Fiche de Chasseur
+                            {t('profile.title')}
                         </h1>
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                             {isOwnProfile && (
                                 <>
-                                    <Button variant="primary" onClick={() => setIsEditModalOpen(true)} icon={<PenTool size={18} />}>EDITER</Button>
-                                    <Button variant="ghost" onClick={() => setShowGuide(true)} icon={<Info size={18} />}>GUIDE</Button>
+                                    <Button variant="primary" onClick={() => setIsEditModalOpen(true)} icon={<PenTool size={18} />}>{t('profile.edit')}</Button>
+                                    <Button variant="ghost" onClick={() => setShowGuide(true)} icon={<Info size={18} />}>{t('profile.guide')}</Button>
                                     <Button variant="manga" size="icon" onClick={() => navigate('/settings')}><Settings size={18} /></Button>
                                 </>
                             )}
                             {!isOwnProfile && (
-                                <Button variant="ghost" onClick={() => navigate(-1)}>RETOUR</Button>
+                                <Button variant="ghost" onClick={() => navigate(-1)}>{t('profile.back')}</Button>
                             )}
                         </div>
                     </div>
@@ -281,7 +285,7 @@ export default function Profile() {
                                     </div>
                                     <div>
                                         <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayTotalChapters}</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>Chapitres lus</p>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.chapters_read')}</p>
                                     </div>
                                 </div>
 
@@ -292,7 +296,7 @@ export default function Profile() {
                                     </div>
                                     <div>
                                         <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{isOwnProfile ? works.filter(w => w.status === 'reading').length : '-'}</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>En cours</p>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.in_progress')}</p>
                                     </div>
                                 </div>
 
@@ -303,7 +307,7 @@ export default function Profile() {
                                     </div>
                                     <div>
                                         <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayWorksCompleted}</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>Terminées</p>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.completed')}</p>
                                     </div>
                                 </div>
 
@@ -314,7 +318,7 @@ export default function Profile() {
                                     </div>
                                     <div>
                                         <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayTotalWorks}</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>Collection</p>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.collection')}</p>
                                     </div>
                                 </div>
 
@@ -325,7 +329,7 @@ export default function Profile() {
                                     </div>
                                     <div>
                                         <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayStats.badgeCount} / 16</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>Badges</p>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.badges')}</p>
                                     </div>
                                 </div>
 
@@ -336,7 +340,7 @@ export default function Profile() {
                                     </div>
                                     <div>
                                         <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayStats.xp}</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>XP Total</p>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.xp_total')}</p>
                                     </div>
                                 </div>
                             </div>
@@ -345,7 +349,7 @@ export default function Profile() {
                             {!isOwnProfile && commonWorks && commonWorks.count > 0 && (
                                 <div style={{ marginBottom: '2rem' }}>
                                     <h3 className="manga-title" style={{ fontSize: '1.2rem', marginBottom: '1rem', background: 'linear-gradient(135deg, #dbeafe, #ede9fe)', color: '#000', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Library size={20} /> {commonWorks.count} œuvre{commonWorks.count > 1 ? 's' : ''} en commun
+                                        <Library size={20} /> {t('profile.common_works', { count: commonWorks.count, context: commonWorks.count > 1 ? 'plural' : '' })}
                                     </h3>
                                     <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                                         {commonWorks.common.slice(0, 8).map(work => (
@@ -404,7 +408,7 @@ export default function Profile() {
                                 </div>
                             )}
 
-                            <h3 className="manga-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem', background: 'var(--color-secondary)', color: '#000' }}>Badges Récents</h3>
+                            <h3 className="manga-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem', background: 'var(--color-secondary)', color: '#000' }}>{t('profile.recent_badges')}</h3>
                             <div className="manga-panel" style={{ padding: '2rem', background: '#fff', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '2rem' }}>
                                 {displayBadges.map((badge: Badge) => (
                                     <motion.div
@@ -494,17 +498,17 @@ export default function Profile() {
                     </div>
 
                     {/* Edit Profile Modal */}
-                    <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="EDITER LA LICENSE">
+                    <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title={t('profile.edit_modal.title')}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxHeight: '70vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
 
                             {/* BANNER URL */}
                             <div>
-                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>BANNIÈRE / GIF (Lien URL)</label>
+                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>{t('profile.edit_modal.banner_label')}</label>
                                 <div style={{ marginBottom: '0.5rem', fontSize: '0.8rem', color: '#666' }}>
-                                    Copiez l&apos;adresse d&apos;une image (clic droit &gt; Copier l&apos;adresse de l&apos;image) et collez-la ici.
+                                    {t('profile.edit_modal.banner_help')}
                                 </div>
                                 <Input
-                                    placeholder="https://exemple.com/image.jpg"
+                                    placeholder={t('profile.edit_modal.banner_placeholder')}
                                     value={editForm.banner}
                                     onChange={(e) => setEditForm(prev => ({ ...prev, banner: e.target.value }))}
                                 />
@@ -528,18 +532,18 @@ export default function Profile() {
 
                             {/* COLORS */}
                             <div>
-                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>COULEURS</label>
+                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>{t('profile.edit_modal.colors')}</label>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
                                     <div>
-                                        <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>ACCENT</span>
+                                        <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>{t('profile.edit_modal.accent')}</span>
                                         <input type="color" value={editForm.themeColor} onChange={(e) => setEditForm(prev => ({ ...prev, themeColor: e.target.value }))} style={{ width: '100%', height: '40px', border: '2px solid #000' }} />
                                     </div>
                                     <div>
-                                        <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>FOND</span>
+                                        <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>{t('profile.edit_modal.background')}</span>
                                         <input type="color" value={editForm.cardBgColor} onChange={(e) => setEditForm(prev => ({ ...prev, cardBgColor: e.target.value }))} style={{ width: '100%', height: '40px', border: '2px solid #000' }} />
                                     </div>
                                     <div>
-                                        <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>BORDURE</span>
+                                        <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>{t('profile.edit_modal.border')}</span>
                                         <input type="color" value={editForm.borderColor} onChange={(e) => setEditForm(prev => ({ ...prev, borderColor: e.target.value }))} style={{ width: '100%', height: '40px', border: '2px solid #000' }} />
                                     </div>
                                 </div>
@@ -547,7 +551,7 @@ export default function Profile() {
 
                             {/* SELECTORS */}
                             <div>
-                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>TOP 3 FAVORIS</label>
+                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>{t('profile.edit_modal.top3')}</label>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                     {[0, 1, 2].map(index => (
                                         <select
@@ -564,7 +568,7 @@ export default function Profile() {
                                             }}
                                             style={{ width: '100%', padding: '0.75rem', border: '2px solid #000', fontWeight: 'bold' }}
                                         >
-                                            <option value="">Sélectionner un favori #{index + 1}</option>
+                                            <option value="">{t('profile.edit_modal.select_favorite', { index: index + 1 })}</option>
                                             {works.sort((a, b) => a.title.localeCompare(b.title)).map(w => (
                                                 <option key={w.id} value={w.id} disabled={editForm.top3Favorites.includes(String(w.id)) && editForm.top3Favorites[index] !== String(w.id)}>
                                                     {w.title}
@@ -576,13 +580,13 @@ export default function Profile() {
                             </div>
 
                             <div>
-                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>BADGE EN VEDETTE</label>
+                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>{t('profile.edit_modal.featured_badge')}</label>
                                 <select
                                     value={editForm.featuredBadge}
                                     onChange={(e) => setEditForm(prev => ({ ...prev, featuredBadge: e.target.value }))}
                                     style={{ width: '100%', padding: '0.75rem', border: '2px solid #000', fontWeight: 'bold' }}
                                 >
-                                    <option value="">Aucun</option>
+                                    <option value="">{t('profile.edit_modal.none')}</option>
                                     {badges.map(b => (
                                         <option key={b.id} value={b.id}>{b.name} ({b.rarity})</option>
                                     ))}
@@ -590,10 +594,10 @@ export default function Profile() {
                             </div>
 
                             <div>
-                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>BIO / CITATION</label>
+                                <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>{t('profile.edit_modal.bio')}</label>
                                 <textarea
                                     className="manga-input" // Assuming existence or using raw style
-                                    placeholder="Une phrase qui vous définit..."
+                                    placeholder={t('profile.edit_modal.bio_placeholder')}
                                     value={editForm.bio}
                                     onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
                                     rows={3}
@@ -609,49 +613,47 @@ export default function Profile() {
                             </div>
 
                             <Button variant="primary" onClick={handleSaveProfile} style={{ marginTop: '1rem' }}>
-                                ENREGISTRER
+                                {t('profile.edit_modal.save')}
                             </Button>
                         </div>
                     </Modal>
 
                     {/* Guide Modal (unchanged) */}
-                    <Modal isOpen={showGuide} onClose={() => setShowGuide(false)} title="Guide du Chasseur">
+                    <Modal isOpen={showGuide} onClose={() => setShowGuide(false)} title={t('profile.guide_modal.title')}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             <div style={{ display: 'flex', gap: '1rem' }}>
                                 <div style={{ background: '#000', color: '#fff', padding: '1rem', borderRadius: '4px', flex: 1 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                         <Trophy size={20} className="text-primary" />
-                                        <h4 style={{ fontSize: '1.2rem', fontWeight: 900 }}>EXPERIENCE (XP)</h4>
+                                        <h4 style={{ fontSize: '1.2rem', fontWeight: 900 }}>{t('profile.guide_modal.xp_title')}</h4>
                                     </div>
                                     <p style={{ fontSize: '0.9rem', opacity: 0.9 }}>
-                                        Gagnez de l'XP à chaque action sur Bingeki :
+                                        {t('profile.guide_modal.xp_desc')}
                                     </p>
                                     <ul style={{ fontSize: '0.85rem', marginTop: '0.5rem', paddingLeft: '1.2rem' }}>
-                                        <li>Lire un chapitre : <strong>+10 XP</strong></li>
-                                        <li>Ajouter une œuvre : <strong>+15 XP</strong></li>
-                                        <li>Terminer une œuvre : <strong>+50 XP</strong></li>
-                                        <li>Connexion quotidienne : <strong>+5 XP</strong></li>
+                                        <li>{t('profile.guide_modal.xp_read')} <strong>+10 XP</strong></li>
+                                        <li>{t('profile.guide_modal.xp_add')} <strong>+15 XP</strong></li>
+                                        <li>{t('profile.guide_modal.xp_complete')} <strong>+50 XP</strong></li>
+                                        <li>{t('profile.guide_modal.xp_daily')} <strong>+5 XP</strong></li>
                                     </ul>
                                 </div>
                                 <div style={{ background: '#fff', color: '#000', border: '2px solid #000', padding: '1rem', borderRadius: '4px', flex: 1 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                         <Flame size={20} color="var(--color-primary)" />
-                                        <h4 style={{ fontSize: '1.2rem', fontWeight: 900 }}>STREAK</h4>
+                                        <h4 style={{ fontSize: '1.2rem', fontWeight: 900 }}>{t('profile.guide_modal.streak_title')}</h4>
                                     </div>
                                     <p style={{ fontSize: '0.9rem' }}>
-                                        La flamme de votre passion ! 🔥
-                                        Connectez-vous chaque jour pour augmenter votre Streak.
+                                        {t('profile.guide_modal.streak_desc')}
                                     </p>
                                     <p style={{ fontSize: '0.85rem', marginTop: '0.5rem', fontStyle: 'italic' }}>
-                                        Attention : si vous ratez un jour, la flamme s'éteint et retombe à 0.
+                                        {t('profile.guide_modal.streak_warning')}
                                     </p>
                                 </div>
                             </div>
                             <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '4px', borderLeft: '4px solid var(--color-primary)' }}>
-                                <h4 style={{ fontSize: '1.1rem', fontWeight: 900, marginBottom: '0.5rem' }}>Gagner des Rangs</h4>
+                                <h4 style={{ fontSize: '1.1rem', fontWeight: 900, marginBottom: '0.5rem' }}>{t('profile.guide_modal.ranks_title')}</h4>
                                 <p style={{ fontSize: '0.9rem' }}>
-                                    En accumulant de l'XP, vous montez de niveau et de rang (F -&gt; S).
-                                    Débloquez des badges uniques pour montrer vos exploits sur votre profil !
+                                    {t('profile.guide_modal.ranks_desc')}
                                 </p>
                             </div>
                         </div>

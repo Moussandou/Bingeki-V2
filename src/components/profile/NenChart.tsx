@@ -1,6 +1,7 @@
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { useState } from 'react';
 import { Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface NenChartProps {
     stats: {
@@ -15,16 +16,17 @@ interface NenChartProps {
 }
 
 export function NenChart({ stats, themeColor = '#FF2E63' }: NenChartProps) {
+    const { t } = useTranslation();
     const [showLegend, setShowLegend] = useState(false);
 
     // Normalize data for the chart (0-100 scale)
     const data = [
-        { subject: 'Niveau', A: Math.min(stats.level * 2, 100), fullMark: 100 },
-        { subject: 'Passion', A: Math.min(stats.xp / 100, 100), fullMark: 100 },
-        { subject: 'Assiduité', A: Math.min(stats.streak, 100), fullMark: 100 },
-        { subject: 'Collection', A: Math.min(stats.totalWorksAdded / 2, 100), fullMark: 100 },
-        { subject: 'Lecture', A: Math.min(stats.totalChaptersRead / 10, 100), fullMark: 100 },
-        { subject: 'Complétion', A: Math.min(stats.totalWorksCompleted * 5, 100), fullMark: 100 },
+        { subject: t('stats.level'), A: Math.min(stats.level * 2, 100), fullMark: 100 },
+        { subject: t('stats.passion'), A: Math.min(stats.xp / 100, 100), fullMark: 100 },
+        { subject: t('stats.diligence'), A: Math.min(stats.streak, 100), fullMark: 100 },
+        { subject: t('stats.collection'), A: Math.min(stats.totalWorksAdded / 2, 100), fullMark: 100 },
+        { subject: t('stats.reading'), A: Math.min(stats.totalChaptersRead / 10, 100), fullMark: 100 },
+        { subject: t('stats.completion'), A: Math.min(stats.totalWorksCompleted * 5, 100), fullMark: 100 },
     ];
 
     return (
@@ -66,15 +68,15 @@ export function NenChart({ stats, themeColor = '#FF2E63' }: NenChartProps) {
                     border: '2px solid #000'
                 }}>
                     <div style={{ fontWeight: 900, marginBottom: '0.25rem', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>📊 CALCUL DES STATS</span>
+                        <span>📊 {t('stats.legend.title')}</span>
                         <button onClick={() => setShowLegend(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 900 }}>✕</button>
                     </div>
-                    <div><strong>Niveau</strong>: Level × 2 (max 100)</div>
-                    <div><strong>Passion</strong>: XP ÷ 100 (max 100)</div>
-                    <div><strong>Assiduité</strong>: Jours de streak (max 100)</div>
-                    <div><strong>Collection</strong>: Œuvres ÷ 2 (max 100)</div>
-                    <div><strong>Lecture</strong>: Chapitres ÷ 10 (max 100)</div>
-                    <div><strong>Complétion</strong>: Complétés × 5 (max 100)</div>
+                    <div><strong>{t('stats.level')}</strong>: {t('stats.legend.level')}</div>
+                    <div><strong>{t('stats.passion')}</strong>: {t('stats.legend.passion')}</div>
+                    <div><strong>{t('stats.diligence')}</strong>: {t('stats.legend.diligence')}</div>
+                    <div><strong>{t('stats.collection')}</strong>: {t('stats.legend.collection')}</div>
+                    <div><strong>{t('stats.reading')}</strong>: {t('stats.legend.reading')}</div>
+                    <div><strong>{t('stats.completion')}</strong>: {t('stats.legend.completion')}</div>
                 </div>
             )}
 
@@ -94,7 +96,7 @@ export function NenChart({ stats, themeColor = '#FF2E63' }: NenChartProps) {
                 </RadarChart>
             </ResponsiveContainer>
             <div style={{ position: 'absolute', bottom: -10, width: '100%', textAlign: 'center', fontSize: '0.6rem', opacity: 0.5, fontStyle: 'italic' }}>
-                GRAPH DU CHASSEUR
+                {t('stats.chart_title')}
             </div>
         </div>
     );

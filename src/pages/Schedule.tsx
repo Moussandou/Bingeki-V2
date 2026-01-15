@@ -5,22 +5,17 @@ import { getAnimeSchedule, type JikanResult } from '@/services/animeApi';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import styles from './Schedule.module.css';
 
-const DAYS = [
-    { value: 'monday', label: 'Lundi' },
-    { value: 'tuesday', label: 'Mardi' },
-    { value: 'wednesday', label: 'Mercredi' },
-    { value: 'thursday', label: 'Jeudi' },
-    { value: 'friday', label: 'Vendredi' },
-    { value: 'saturday', label: 'Samedi' },
-    { value: 'sunday', label: 'Dimanche' },
-];
+const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
 
 export default function Schedule() {
+    const { t } = useTranslation();
+
     // Determine current day (default to today)
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-    const [selectedDay, setSelectedDay] = useState(DAYS.find(d => d.value === today)?.value || 'monday');
+    const [selectedDay, setSelectedDay] = useState(DAY_KEYS.find(d => d === today) || 'monday');
     const [animeList, setAnimeList] = useState<JikanResult[]>([]);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -47,19 +42,19 @@ export default function Schedule() {
                 <div className={styles.header}>
                     <h1 className={styles.title}>
                         <Calendar style={{ verticalAlign: 'middle', marginRight: '1rem' }} size={40} />
-                        CALENDRIER DES SORTIES
+                        {t('schedule.title')}
                     </h1>
-                    <p style={{ opacity: 0.7 }}>Ne ratez jamais un épisode ! Les horaires sont basés sur la diffusion japonaise.</p>
+                    <p style={{ opacity: 0.7 }}>{t('schedule.subtitle')}</p>
                 </div>
 
                 <div className={styles.daysContainer}>
-                    {DAYS.map((day) => (
+                    {DAY_KEYS.map((day) => (
                         <button
-                            key={day.value}
-                            className={`${styles.dayButton} ${selectedDay === day.value ? styles.active : ''}`}
-                            onClick={() => setSelectedDay(day.value)}
+                            key={day}
+                            className={`${styles.dayButton} ${selectedDay === day ? styles.active : ''}`}
+                            onClick={() => setSelectedDay(day)}
                         >
-                            {day.label}
+                            {t(`schedule.days.${day}`)}
                         </button>
                     ))}
                 </div>
@@ -98,7 +93,7 @@ export default function Schedule() {
                                             fontSize: '0.8rem',
                                             fontWeight: 700
                                         }}>
-                                            {anime.broadcast?.time || 'Heure inconnue'}
+                                            {anime.broadcast?.time || t('schedule.unknown_time')}
                                         </div>
                                     </div>
                                     <div className={styles.content}>
@@ -112,7 +107,7 @@ export default function Schedule() {
                             ))
                         ) : (
                             <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', opacity: 0.6 }}>
-                                <p>Aucun anime trouvé pour ce jour... C'est calme ! 🍃</p>
+                                <p>{t('schedule.no_anime')}</p>
                             </div>
                         )}
                     </div>
@@ -121,3 +116,4 @@ export default function Schedule() {
         </Layout>
     );
 }
+

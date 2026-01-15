@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Trophy, Swords, Target, Flame, Plus, Users, BookOpen, Check, X, Ban } from 'lucide-react';
@@ -14,7 +15,6 @@ import {
     type Friend,
 } from '@/firebase/firestore';
 import type { Challenge, ChallengeParticipant } from '@/types/challenge';
-import { CHALLENGE_LABELS } from '@/types/challenge';
 import { useToast } from '@/context/ToastContext';
 
 interface ChallengesSectionProps {
@@ -22,6 +22,7 @@ interface ChallengesSectionProps {
 }
 
 export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProps) {
+    const { t } = useTranslation();
     const { user } = useAuthStore();
     const { works } = useLibraryStore();
     const { addToast } = useToast();
@@ -63,7 +64,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
 
     const handleCreateChallenge = async () => {
         if (!user || !newChallenge.title || newChallenge.selectedFriends.length === 0) {
-            addToast('Remplissez tous les champs et sélectionnez des amis', 'error');
+            addToast(t('components.challenges_section.toast_fill_fields'), 'error');
             return;
         }
 
@@ -103,7 +104,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
         };
 
         await createChallenge(challenge);
-        addToast('Défi créé !', 'success');
+        addToast(t('components.challenges_section.toast_created'), 'success');
         setIsCreateModalOpen(false);
         setNewChallenge({ title: '', type: 'race_to_finish', workId: 0, workTitle: '', workImage: '', selectedFriends: [] });
         loadData();
@@ -130,20 +131,20 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
     const handleAccept = async (challengeId: string) => {
         if (!user) return;
         await acceptChallengeInvitation(challengeId, user.uid);
-        addToast('Défi accepté !', 'success');
+        addToast(t('components.challenges_section.toast_accepted'), 'success');
         loadData();
     };
 
     const handleDecline = async (challengeId: string) => {
         if (!user) return;
         await declineChallengeInvitation(challengeId, user.uid);
-        addToast('Défi refusé', 'info');
+        addToast(t('components.challenges_section.toast_declined'), 'info');
         loadData();
     };
 
     const handleCancel = async (challengeId: string) => {
         await cancelChallenge(challengeId);
-        addToast('Défi annulé', 'info');
+        addToast(t('components.challenges_section.toast_cancelled'), 'info');
         loadData();
     };
 
@@ -160,10 +161,23 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
         }
     };
 
+    const getStatusLabel = (status: Challenge['status']) => {
+        switch (status) {
+            case 'active': return t('components.challenges_section.status_active');
+            case 'pending': return t('components.challenges_section.status_pending');
+            case 'completed': return t('components.challenges_section.status_completed');
+            default: return status;
+        }
+    };
+
+    const getChallengeTypeLabel = (type: Challenge['type']) => {
+        return t(`components.challenges_section.types.${type}`);
+    };
+
     if (!user) {
         return (
             <div className="manga-panel" style={{ padding: '2rem', textAlign: 'center', background: '#fff' }}>
-                <p style={{ opacity: 0.6 }}>Connectez-vous pour voir vos défis</p>
+                <p style={{ opacity: 0.6 }}>{t('components.challenges_section.login_required')}</p>
             </div>
         );
     }
@@ -172,20 +186,20 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Trophy size={24} /> MES DÉFIS
+                    <Trophy size={24} /> {t('components.challenges_section.title')}
                 </h2>
                 <Button onClick={() => setIsCreateModalOpen(true)} variant="manga" size="sm" icon={<Plus size={16} />}>
-                    NOUVEAU DÉFI
+                    {t('components.challenges_section.new_challenge')}
                 </Button>
             </div>
 
             {isLoading ? (
-                <p style={{ textAlign: 'center', opacity: 0.6 }}>Chargement...</p>
+                <p style={{ textAlign: 'center', opacity: 0.6 }}>{t('components.challenges_section.loading')}</p>
             ) : challenges.length === 0 ? (
                 <div className="manga-panel" style={{ padding: '2rem', textAlign: 'center', background: '#fff' }}>
                     <Trophy size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
-                    <p style={{ fontWeight: 600 }}>Aucun défi en cours</p>
-                    <p style={{ opacity: 0.6, fontSize: '0.9rem', marginTop: '0.5rem' }}>Créez un défi et affrontez vos amis !</p>
+                    <p style={{ fontWeight: 600 }}>{t('components.challenges_section.no_challenges')}</p>
+                    <p style={{ opacity: 0.6, fontSize: '0.9rem', marginTop: '0.5rem' }}>{t('components.challenges_section.no_challenges_hint')}</p>
                 </div>
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -197,7 +211,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                                         {getChallengeIcon(challenge.type)}
                                         <h3 style={{ fontWeight: 800, fontSize: '1.1rem' }}>{challenge.title}</h3>
                                     </div>
-                                    <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>{CHALLENGE_LABELS[challenge.type]}</p>
+                                    <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>{getChallengeTypeLabel(challenge.type)}</p>
                                     {challenge.workTitle && (
                                         <p style={{ fontSize: '0.85rem', color: 'var(--color-primary)', marginTop: '0.25rem' }}>
                                             📖 {challenge.workTitle}
@@ -213,7 +227,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                                     fontWeight: 700,
                                     textTransform: 'uppercase'
                                 }}>
-                                    {challenge.status === 'active' ? 'En cours' : challenge.status === 'pending' ? 'En attente' : 'Terminé'}
+                                    {getStatusLabel(challenge.status)}
                                 </span>
                             </div>
 
@@ -244,11 +258,11 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                                             </div>
                                             <div style={{ flex: 1 }}>
                                                 <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>
-                                                    {p.name} {p.id === user.uid && <span style={{ opacity: 0.5 }}>(Vous)</span>}
+                                                    {p.name} {p.id === user.uid && <span style={{ opacity: 0.5 }}>{t('components.challenges_section.you')}</span>}
                                                 </p>
                                             </div>
                                             <span style={{ fontWeight: 900, fontSize: '1.1rem' }}>
-                                                {p.progress} {challenge.type === 'streak_battle' ? 'jours' : 'ch.'}
+                                                {p.progress} {challenge.type === 'streak_battle' ? t('components.challenges_section.days') : t('components.challenges_section.chapters_abbr')}
                                             </span>
                                         </div>
                                     ))}
@@ -265,7 +279,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                                             onClick={() => handleAccept(challenge.id)}
                                             icon={<Check size={16} />}
                                         >
-                                            Accepter
+                                            {t('components.challenges_section.accept')}
                                         </Button>
                                         <Button
                                             size="sm"
@@ -273,7 +287,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                                             onClick={() => handleDecline(challenge.id)}
                                             icon={<X size={16} />}
                                         >
-                                            Refuser
+                                            {t('components.challenges_section.decline')}
                                         </Button>
                                     </>
                                 )}
@@ -286,7 +300,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                                         icon={<Ban size={16} />}
                                         style={{ color: '#ef4444' }}
                                     >
-                                        Annuler
+                                        {t('components.challenges_section.cancel')}
                                     </Button>
                                 )}
                             </div>
@@ -296,15 +310,15 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
             )}
 
             {/* Create Challenge Modal */}
-            <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="NOUVEAU DÉFI">
+            <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title={t('components.challenges_section.modal_title')}>
                 <div style={{ padding: '1rem' }}>
                     <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>Nom du défi</label>
+                        <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>{t('components.challenges_section.challenge_name')}</label>
                         <input
                             type="text"
                             value={newChallenge.title}
                             onChange={e => setNewChallenge(prev => ({ ...prev, title: e.target.value }))}
-                            placeholder="Ex: Qui finira One Piece en premier ?"
+                            placeholder={t('components.challenges_section.challenge_name_placeholder')}
                             style={{
                                 width: '100%',
                                 padding: '0.75rem',
@@ -316,7 +330,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                     </div>
 
                     <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>Type de défi</label>
+                        <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>{t('components.challenges_section.challenge_type')}</label>
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                             {(['race_to_finish', 'most_chapters', 'streak_battle'] as const).map(type => (
                                 <button
@@ -334,7 +348,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                                         gap: '0.5rem'
                                     }}
                                 >
-                                    {getChallengeIcon(type)} {CHALLENGE_LABELS[type]}
+                                    {getChallengeIcon(type)} {getChallengeTypeLabel(type)}
                                 </button>
                             ))}
                         </div>
@@ -343,10 +357,10 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                     <div style={{ marginBottom: '1.5rem' }}>
                         <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>
                             <BookOpen size={16} style={{ marginRight: '0.5rem' }} />
-                            Œuvre du défi
+                            {t('components.challenges_section.challenge_work')}
                         </label>
                         {works.length === 0 ? (
-                            <p style={{ opacity: 0.6, fontStyle: 'italic' }}>Ajoutez des œuvres à votre bibliothèque</p>
+                            <p style={{ opacity: 0.6, fontStyle: 'italic' }}>{t('components.challenges_section.add_works_hint')}</p>
                         ) : (
                             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', maxHeight: '200px', overflowY: 'auto' }}>
                                 {works.map(work => (
@@ -380,10 +394,10 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                     <div style={{ marginBottom: '1.5rem' }}>
                         <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>
                             <Users size={16} style={{ marginRight: '0.5rem' }} />
-                            Inviter des amis ({newChallenge.selectedFriends.length} sélectionnés)
+                            {t('components.challenges_section.invite_friends')} ({newChallenge.selectedFriends.length} {t('components.challenges_section.selected')})
                         </label>
                         {friends.length === 0 ? (
-                            <p style={{ opacity: 0.6, fontStyle: 'italic' }}>Vous n'avez pas encore d'amis</p>
+                            <p style={{ opacity: 0.6, fontStyle: 'italic' }}>{t('components.challenges_section.no_friends')}</p>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '200px', overflowY: 'auto' }}>
                                 {friends.map(friend => (
@@ -416,8 +430,8 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                     </div>
 
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                        <Button variant="ghost" onClick={() => setIsCreateModalOpen(false)}>Annuler</Button>
-                        <Button variant="manga" onClick={handleCreateChallenge}>Créer le défi</Button>
+                        <Button variant="ghost" onClick={() => setIsCreateModalOpen(false)}>{t('components.challenges_section.cancel_btn')}</Button>
+                        <Button variant="manga" onClick={handleCreateChallenge}>{t('components.challenges_section.create_btn')}</Button>
                     </div>
                 </div>
             </Modal>

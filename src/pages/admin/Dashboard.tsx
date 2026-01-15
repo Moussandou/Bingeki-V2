@@ -4,8 +4,10 @@ import { Card } from '@/components/ui/Card';
 import { Link } from 'react-router-dom';
 import { getAdminStats, getAllUsers, getSevenDayActivityStats } from '@/firebase/firestore';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminDashboard() {
+    const { t } = useTranslation();
     const [stats, setStats] = useState({
         totalUsers: 0,
         totalFeedback: 0,
@@ -53,7 +55,7 @@ export default function AdminDashboard() {
     }, []);
 
     if (loading) {
-        return <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'monospace' }}>Chargement du dashboard...</div>;
+        return <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'monospace' }}>{t('admin.dashboard.loading')}</div>;
     }
 
     const containerStyle = {
@@ -102,14 +104,14 @@ export default function AdminDashboard() {
         <div style={containerStyle}>
             {/* Header */}
             <div>
-                <h1 style={headerStyle}>Centre de Contrôle</h1>
+                <h1 style={headerStyle}>{t('admin.dashboard.title')}</h1>
                 <p style={{
                     borderLeft: '4px solid black',
                     paddingLeft: '1rem',
                     fontFamily: 'monospace',
                     color: '#666'
                 }}>
-                    Vue d'ensemble de l'activité sur Bingeki
+                    {t('admin.dashboard.subtitle')}
                 </p>
             </div>
 
@@ -118,7 +120,7 @@ export default function AdminDashboard() {
                 <Card variant="manga" style={statCardStyle}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                            <p style={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '0.9rem', color: '#666' }}>Utilisateurs</p>
+                            <p style={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '0.9rem', color: '#666' }}>{t('admin.dashboard.users_label')}</p>
                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', lineHeight: 1 }}>{stats.totalUsers}</h3>
                         </div>
                         <div style={{ background: 'black', color: 'white', padding: '0.5rem', borderRadius: '4px' }}>
@@ -126,14 +128,14 @@ export default function AdminDashboard() {
                         </div>
                     </div>
                     <div style={{ marginTop: '1rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.25rem', color: '#10b981', fontWeight: 'bold' }}>
-                        <TrendingUp size={14} /> +{stats.newUsersToday} aujourd'hui
+                        <TrendingUp size={14} /> +{stats.newUsersToday} {t('admin.dashboard.today')}
                     </div>
                 </Card>
 
                 <Card variant="manga" style={statCardStyle}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                            <p style={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '0.9rem', color: '#666' }}>Feedback</p>
+                            <p style={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '0.9rem', color: '#666' }}>{t('admin.dashboard.feedback_label')}</p>
                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', lineHeight: 1 }}>{stats.totalFeedback}</h3>
                         </div>
                         <div style={{ background: 'black', color: 'white', padding: '0.5rem', borderRadius: '4px' }}>
@@ -141,14 +143,14 @@ export default function AdminDashboard() {
                         </div>
                     </div>
                     <div style={{ marginTop: '1rem', fontSize: '0.9rem', fontWeight: 'bold', color: stats.pendingFeedback > 0 ? '#ef4444' : '#10b981' }}>
-                        {stats.pendingFeedback} tickets en attente
+                        {stats.pendingFeedback} {t('admin.dashboard.tickets_pending')}
                     </div>
                 </Card>
 
                 <Card variant="manga" style={statCardStyle}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                            <p style={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '0.9rem', color: '#666' }}>Système</p>
+                            <p style={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '0.9rem', color: '#666' }}>{t('admin.dashboard.system_label')}</p>
                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', lineHeight: 1 }}>OK</h3>
                         </div>
                         <div style={{ background: 'black', color: 'white', padding: '0.5rem', borderRadius: '4px' }}>
@@ -166,9 +168,9 @@ export default function AdminDashboard() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <Activity className="text-red-500" size={24} />
-                        <h3 style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontSize: '1.25rem' }}>Volume d'Activité</h3>
+                        <h3 style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontSize: '1.25rem' }}>{t('admin.dashboard.activity_volume')}</h3>
                     </div>
-                    <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#666', fontFamily: 'monospace' }}>DERNIERS 7 JOURS</div>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#666', fontFamily: 'monospace' }}>{t('admin.dashboard.last_7_days')}</div>
                 </div>
                 <div style={{ height: '300px', width: '100%' }}>
                     <ResponsiveContainer width="100%" height="100%">
@@ -213,7 +215,7 @@ export default function AdminDashboard() {
                 {/* Recent Users */}
                 <div>
                     <h2 style={sectionTitleStyle}>
-                        <Users size={24} /> Derniers Membres
+                        <Users size={24} /> {t('admin.dashboard.recent_members')}
                     </h2>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {recentUsers.map(user => (
@@ -230,7 +232,7 @@ export default function AdminDashboard() {
                                         {user.photoURL && <img src={user.photoURL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                                     </div>
                                     <div>
-                                        <div style={{ fontWeight: 'bold' }}>{user.displayName || 'Anonyme'}</div>
+                                        <div style={{ fontWeight: 'bold' }}>{user.displayName || t('admin.dashboard.anonymous')}</div>
                                         <div style={{ fontSize: '0.8rem', color: '#666' }}>{user.email}</div>
                                     </div>
                                 </div>
@@ -248,7 +250,7 @@ export default function AdminDashboard() {
                 {/* Quick Actions */}
                 <div>
                     <h2 style={sectionTitleStyle}>
-                        <Shield size={24} /> Actions Rapides
+                        <Shield size={24} /> {t('admin.dashboard.quick_actions')}
                     </h2>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                         <Link to="/admin/users" style={{ textDecoration: 'none' }}>
@@ -261,7 +263,7 @@ export default function AdminDashboard() {
                                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem'
                             }}>
                                 <Users size={32} />
-                                <span style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontWeight: 900 }}>Gérer Utilisateurs</span>
+                                <span style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontWeight: 900 }}>{t('admin.dashboard.manage_users')}</span>
                             </Card>
                         </Link>
                         <Link to="/admin/feedback" style={{ textDecoration: 'none' }}>
@@ -274,7 +276,7 @@ export default function AdminDashboard() {
                                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem'
                             }}>
                                 <AlertCircle size={32} />
-                                <span style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontWeight: 900 }}>Voir Feedback</span>
+                                <span style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontWeight: 900 }}>{t('admin.dashboard.view_feedback')}</span>
                             </Card>
                         </Link>
                         <Link to="/admin/system" style={{ textDecoration: 'none', gridColumn: 'span 2' }}>
@@ -288,7 +290,7 @@ export default function AdminDashboard() {
                                 display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '1rem'
                             }}>
                                 <Activity size={24} color="#ef4444" />
-                                <span style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontWeight: 900 }}>Live Console</span>
+                                <span style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontWeight: 900 }}>{t('admin.dashboard.live_console')}</span>
                             </Card>
                         </Link>
                     </div>

@@ -4,6 +4,7 @@ import { type UserProfile } from '@/firebase/firestore';
 import { BADGE_ICONS } from '@/utils/badges';
 import { NenChart } from './profile/NenChart';
 import styles from './HunterLicenseCard.module.css';
+import { useTranslation } from 'react-i18next';
 
 interface HunterLicenseCardProps {
     user: Partial<UserProfile> & { uid: string, photoURL?: string | null, displayName?: string | null };
@@ -25,6 +26,7 @@ interface HunterLicenseCardProps {
 }
 
 export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, featuredBadgeData, favoriteMangaData, top3FavoritesData }: HunterLicenseCardProps) {
+    const { t } = useTranslation();
     const borderColor = user.borderColor || '#000';
     const accentColor = user.themeColor || 'var(--color-primary)';
     const bgColor = user.cardBgColor || '#fff';
@@ -44,7 +46,7 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
 
             {/* Header Strip */}
             <div style={{ background: borderColor, color: '#fff', padding: '0.5rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
-                <span style={{ fontWeight: 900, letterSpacing: '2px' }}>HUNTER LICENSE</span>
+                <span style={{ fontWeight: 900, letterSpacing: '2px' }}>{t('hunter_license.title')}</span>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                     {/* Stars or Rank could go here */}
                 </div>
@@ -63,7 +65,7 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
 
                 {/* Name & ID */}
                 <h2 className={styles.name} style={{ color: textColor }}> {user.displayName || 'Chasseur'}</h2>
-                <p className={styles.idText}>ID: {user.uid.slice(0, 8).toUpperCase()}</p>
+                <p className={styles.idText}>{t('hunter_license.id_prefix')}: {user.uid.slice(0, 8).toUpperCase()}</p>
 
                 {/* Bio */}
                 {user.bio && (
@@ -93,7 +95,7 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
                         {/* Top 3 Favorites */}
                         {(top3FavoritesData && top3FavoritesData.length > 0) ? (
                             <div style={{ textAlign: 'left' }}>
-                                <div style={{ fontSize: '0.7rem', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', opacity: 0.8 }}>Top 3 Favoris</div>
+                                <div style={{ fontSize: '0.7rem', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', opacity: 0.8 }}>{t('hunter_license.top_3')}</div>
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                                     {top3FavoritesData.map(fav => (
                                         <div key={fav.id} style={{ width: '50px', position: 'relative' }}>
@@ -114,7 +116,7 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', border: `1px solid ${borderColor}`, padding: '0.5rem', borderRadius: '4px', background: 'rgba(255,255,255,0.1)' }}>
                                     <img src={favoriteMangaData.image} alt="Fav" style={{ width: '30px', height: '40px', objectFit: 'cover' }} />
                                     <div style={{ textAlign: 'left' }}>
-                                        <div style={{ fontSize: '0.6rem', opacity: 0.7, textTransform: 'uppercase' }}>FAVORI</div>
+                                        <div style={{ fontSize: '0.6rem', opacity: 0.7, textTransform: 'uppercase' }}>{t('hunter_license.favorite')}</div>
                                         <div style={{ fontWeight: 900, fontSize: '0.8rem', maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{favoriteMangaData.title}</div>
                                     </div>
                                 </div>
@@ -139,7 +141,7 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
                 {/* XP Bar */}
                 <div style={{ marginBottom: '2rem', textAlign: 'left' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontWeight: 700 }}>
-                        <span>EXPÉRIENCE</span>
+                        <span>{t('stats.xp')}</span>
                         <span>{stats.xp} / {stats.xpToNextLevel}</span>
                     </div>
                     <div style={{ height: '12px', background: '#eee', border: `2px solid ${borderColor}` }}>
@@ -151,16 +153,16 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
                     <div style={{ border: `2px solid ${borderColor}`, padding: '0.5rem' }}>
                         <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{stats.streak}</div>
-                        <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 700 }}>Jours Streak</div>
+                        <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 700 }}>{t('stats.streak')}</div>
                     </div>
                     <div style={{ border: `2px solid ${borderColor}`, padding: '0.5rem' }}>
                         <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{stats.badgeCount}</div>
-                        <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 700 }}>Badges</div>
+                        <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 700 }}>{t('stats.badges')}</div>
                     </div>
                 </div>
 
                 {isOwnProfile && onLogout && (
-                    <Button variant="outline" style={{ width: '100%', borderRadius: 0, fontWeight: 900, borderColor: borderColor, color: textColor === '#fff' ? borderColor : undefined }} icon={<LogOut size={16} />} onClick={onLogout}>DECONNEXION</Button>
+                    <Button variant="outline" style={{ width: '100%', borderRadius: 0, fontWeight: 900, borderColor: borderColor, color: textColor === '#fff' ? borderColor : undefined }} icon={<LogOut size={16} />} onClick={onLogout}>{t('hunter_license.logout')}</Button>
                 )}
             </div >
         </div >

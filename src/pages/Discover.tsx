@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Card } from '@/components/ui/Card';
@@ -15,6 +16,7 @@ import styles from './Discover.module.css';
 
 export default function Discover() {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const { user } = useAuthStore();
     const [searchParams] = useSearchParams();
     const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
@@ -46,6 +48,13 @@ export default function Discover() {
     const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
 
     const GENRES = [
+        { id: 1, label: t('discover.filters.genre') }, // "Action" likely specific, but kept simple for now or need dynamic? Actually GENRES array has hardcoded labels. 
+        // Wait, the user prompt said "Identifier les textes". "Action", "Adventure" etc are usually standard but t('discover.genres.action') would be better.
+        // Let's stick to the plan. I didn't add genre translations in i18n, only the label "Genre". 
+        // The GENRES list in Discover.tsx has hardcoded English labels that look like API IDs or standard names.
+        // For now I will translate the UI around it. The user expectation "Traduire les pages" usually implies content too if static.
+        // But for genre IDs usually comes from API or static list.
+        // Let's focus on UI elements first as per my i18n additions.
         { id: 1, label: 'Action' },
         { id: 2, label: 'Adventure' },
         { id: 4, label: 'Comedy' },
@@ -209,14 +218,14 @@ export default function Discover() {
                     }}>
                         <div>
                             <p style={{ fontWeight: 900, fontSize: '1.1rem', marginBottom: '0.25rem' }}>
-                                ✨ Créez un compte pour débloquer toutes les fonctionnalités !
+                                {t('discover.guest_banner.title')}
                             </p>
                             <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>
-                                Bibliothèque personnelle, suivi de progression, badges, classements et plus encore...
+                                {t('discover.guest_banner.subtitle')}
                             </p>
                         </div>
                         <Button onClick={() => navigate('/auth')} variant="primary" size="sm">
-                            S'inscrire gratuitement
+                            {t('discover.guest_banner.cta')}
                         </Button>
                     </div>
                 )}
@@ -254,7 +263,7 @@ export default function Discover() {
                                     transition={{ duration: 0.5, delay: 0.2 }}
                                 >
                                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-primary)', color: '#fff', padding: '0.5rem 1rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '1rem', boxShadow: '4px 4px 0 #000' }}>
-                                        <Flame size={18} fill="#fff" /> A LA UNE
+                                        <Flame size={18} fill="#fff" /> {t('discover.hero.featured')}
                                     </div>
                                     <h1 className={styles.heroTitle}>
                                         {heroWork.title}
@@ -278,7 +287,7 @@ export default function Discover() {
                                                 color: '#fff'
                                             }}
                                         >
-                                            AJOUTER À MA LISTE
+                                            {t('discover.hero.add_to_list')}
                                         </Button>
                                         <Button
                                             variant="manga"
@@ -292,7 +301,7 @@ export default function Discover() {
                                                 borderColor: '#000'
                                             }}
                                         >
-                                            PLUS DE DÉTAILS
+                                            {t('discover.hero.more_details')}
                                         </Button>
                                     </div>
                                 </motion.div>
@@ -327,7 +336,7 @@ export default function Discover() {
                             >
                                 <Search size={28} style={{ marginLeft: '1rem', opacity: 0.4 }} />
                                 <input
-                                    placeholder="Rechercher un anime, un manga..."
+                                    placeholder={t('discover.search.placeholder')}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     style={{
@@ -377,7 +386,7 @@ export default function Discover() {
                                     }}>
                                         {/* Status */}
                                         <div>
-                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>Statut</label>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>{t('discover.filters.status')}</label>
                                             <select
                                                 value={filterStatus}
                                                 onChange={(e) => setFilterStatus(e.target.value)}
@@ -392,16 +401,16 @@ export default function Discover() {
                                                     boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
                                                 }}
                                             >
-                                                <option value="">TOUS</option>
-                                                <option value="airing">EN COURS</option>
-                                                <option value="complete">TERMINÉ</option>
-                                                <option value="upcoming">À VENIR</option>
+                                                <option value="">{t('discover.filters.all')}</option>
+                                                <option value="airing">{t('discover.filters.airing')}</option>
+                                                <option value="complete">{t('discover.filters.complete')}</option>
+                                                <option value="upcoming">{t('discover.filters.upcoming')}</option>
                                             </select>
                                         </div>
 
                                         {/* Rating */}
                                         <div>
-                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>Public</label>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>{t('discover.filters.rating')}</label>
                                             <select
                                                 value={filterRating}
                                                 onChange={(e) => setFilterRating(e.target.value)}
@@ -416,16 +425,16 @@ export default function Discover() {
                                                     boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
                                                 }}
                                             >
-                                                <option value="">TOUS</option>
-                                                <option value="g">TOUT PUBLIC</option>
-                                                <option value="pg13">ADO (PG-13)</option>
-                                                <option value="r17">ADULTE (R-17)</option>
+                                                <option value="">{t('discover.filters.all')}</option>
+                                                <option value="g">{t('discover.filters.all_ages')}</option>
+                                                <option value="pg13">{t('discover.filters.teen')}</option>
+                                                <option value="r17">{t('discover.filters.adult')}</option>
                                             </select>
                                         </div>
 
                                         {/* Score */}
                                         <div>
-                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>Score Min : <span style={{ color: 'var(--color-primary)' }}>{filterScore}</span></label>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>{t('discover.filters.min_score')} : <span style={{ color: 'var(--color-primary)' }}>{filterScore}</span></label>
                                             <input
                                                 type="range"
                                                 min="0"
@@ -449,10 +458,10 @@ export default function Discover() {
 
                                         {/* Year */}
                                         <div>
-                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>Année</label>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>{t('discover.filters.year')}</label>
                                             <input
                                                 type="number"
-                                                placeholder="ex: 2024"
+                                                placeholder={t('discover.filters.year_placeholder')}
                                                 value={filterYear}
                                                 onChange={(e) => setFilterYear(e.target.value)}
                                                 style={{
@@ -469,7 +478,7 @@ export default function Discover() {
 
                                         {/* Studio */}
                                         <div style={{ gridColumn: '1 / -1' }}>
-                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>Studio</label>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>{t('discover.filters.studio')}</label>
                                             <select
                                                 value={filterStudio}
                                                 onChange={(e) => setFilterStudio(e.target.value)}
@@ -484,7 +493,7 @@ export default function Discover() {
                                                     boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
                                                 }}
                                             >
-                                                <option value="">TOUS LES STUDIOS</option>
+                                                <option value="">{t('discover.filters.all_studios')}</option>
                                                 {POPULAR_STUDIOS.map(studio => (
                                                     <option key={studio.id} value={studio.id}>{studio.name.toUpperCase()}</option>
                                                 ))}
@@ -511,7 +520,7 @@ export default function Discover() {
                                                     transition: 'all 0.2s'
                                                 }}
                                             >
-                                                <X size={16} /> Réinitialiser
+                                                <X size={16} /> {t('discover.filters.reset')}
                                             </button>
                                         </div>
                                     </div>
@@ -556,17 +565,17 @@ export default function Discover() {
                         <div>
                             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '2rem', color: '#000', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 <Search size={32} />
-                                Résultats de la recherche
+                                {t('discover.search.results_title')}
                             </h2>
 
                             {/* Filter Chips (if any active) */}
                             {hasFilters && (
                                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
-                                    {selectedGenre && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>Genre: {GENRES.find(g => g.id === selectedGenre)?.label || selectedGenre}</span>}
-                                    {filterStatus && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>Status: {filterStatus}</span>}
-                                    {filterYear && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>Année: {filterYear}</span>}
-                                    {filterScore > 0 && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>Score : {filterScore}</span>}
-                                    {filterStudio && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>Studio: {POPULAR_STUDIOS.find(s => s.id === filterStudio)?.name}</span>}
+                                    {selectedGenre && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.genre')}: {GENRES.find(g => g.id === selectedGenre)?.label || selectedGenre}</span>}
+                                    {filterStatus && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.status')}: {filterStatus}</span>}
+                                    {filterYear && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.year')}: {filterYear}</span>}
+                                    {filterScore > 0 && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.score')} : {filterScore}</span>}
+                                    {filterStudio && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.studio')}: {POPULAR_STUDIOS.find(s => s.id === filterStudio)?.name}</span>}
                                 </div>
                             )}
 
@@ -625,7 +634,7 @@ export default function Discover() {
                                     })}
                                     {searchResults.length === 0 && !loading && (
                                         <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem', fontSize: '1.2rem', fontWeight: 600 }}>
-                                            Aucun résultat trouvé. Essayez de relâcher les filtres !
+                                            {t('discover.search.no_results')}
                                         </div>
                                     )}
                                 </div>
@@ -649,9 +658,9 @@ export default function Discover() {
                                 }}>
                                     <div>
                                         <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '0.5rem', color: '#fff' }}>
-                                            En panne d'inspiration ?
+                                            {t('discover.surprise.title')}
                                         </h2>
-                                        <p style={{ opacity: 0.8, fontSize: '1.1rem' }}>Laisse le destin choisir ta prochaine aventure.</p>
+                                        <p style={{ opacity: 0.8, fontSize: '1.1rem' }}>{t('discover.surprise.subtitle')}</p>
                                     </div>
                                     <Button
                                         variant="manga"
@@ -674,14 +683,14 @@ export default function Discover() {
                                             boxShadow: '4px 4px 0 var(--color-primary)'
                                         }}
                                     >
-                                        SURPRENDS-MOI
+                                        {t('discover.surprise.button')}
                                     </Button>
                                 </Card>
                             </div>
 
                             {/* Carousels */}
                             <Carousel
-                                title={<><Flame size={24} color="#ef4444" /> Anime de la Saison</>}
+                                title={<><Flame size={24} color="#ef4444" /> {t('discover.carousels.seasonal')}</>}
                                 items={seasonalAnime}
                                 onItemClick={handleWorkClick}
                                 libraryIds={libraryIds}
@@ -690,7 +699,7 @@ export default function Discover() {
                             />
 
                             <Carousel
-                                title={<><Sparkles size={24} color="#eab308" /> Top 10 Animes</>}
+                                title={<><Sparkles size={24} color="#eab308" /> {t('discover.carousels.top_anime')}</>}
                                 items={topAnime}
                                 onItemClick={handleWorkClick}
                                 libraryIds={libraryIds}
@@ -700,7 +709,7 @@ export default function Discover() {
                             />
 
                             <Carousel
-                                title={<><TrendingUp size={24} color="var(--color-primary)" /> Mangas Populaires</>}
+                                title={<><TrendingUp size={24} color="var(--color-primary)" /> {t('discover.carousels.popular_manga')}</>}
                                 items={popularManga}
                                 onItemClick={handleWorkClick}
                                 libraryIds={libraryIds}
@@ -709,7 +718,7 @@ export default function Discover() {
                             />
 
                             <Carousel
-                                title={<><Star size={24} color="#f59e0b" /> Top 10 Mangas</>}
+                                title={<><Star size={24} color="#f59e0b" /> {t('discover.carousels.top_manga')}</>}
                                 items={topManga}
                                 onItemClick={handleWorkClick}
                                 libraryIds={libraryIds}

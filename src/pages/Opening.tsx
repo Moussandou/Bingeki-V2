@@ -6,6 +6,7 @@ import styles from '@/styles/Opening.module.css';
 import { Card } from '@/components/ui/Card';
 import { HunterLicenseCard } from '@/components/HunterLicenseCard';
 import { Search, Check, Users, MessageCircle, Heart, TrendingUp, ChevronUp, History as HistoryIcon, Trophy, Star, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // Counter Component for Animated Numbers
 function Counter({ from, to }: { from: number; to: number }) {
@@ -48,6 +49,7 @@ interface SearchResult {
 import { getTopWorks } from '@/services/animeApi';
 
 export default function Opening() {
+    const { t } = useTranslation();
     const [showScrollTop, setShowScrollTop] = useState(false);
     const [placeholderIndex, setPlaceholderIndex] = useState(0);
     const [placeholderText, setPlaceholderText] = useState('');
@@ -66,9 +68,9 @@ export default function Opening() {
     const [visibleComments, setVisibleComments] = useState<any[]>([]);
 
     const mockComments = [
-        { user: "Levi", text: "Ce chapitre était incroyable !! 🔥", time: "2m" },
-        { user: "Armin", text: "Je ne m'attendais pas à ça...", time: "5m" },
-        { user: "Mikasa", text: "Eren...", time: "12m" }
+        { user: "Levi", text: "landing.features.community.comments.levi", time: "2m" },
+        { user: "Armin", text: "landing.features.community.comments.armin", time: "5m" },
+        { user: "Mikasa", text: "landing.features.community.comments.mikasa", time: "12m" }
     ];
 
     useEffect(() => {
@@ -88,7 +90,7 @@ export default function Opening() {
     }, [areCommentsInView, visibleComments, mockComments]);
 
     // Typewriter effect data
-    const placeholders = ['Seinen', 'Shonen', 'Romance', 'Horreur', 'Isekai'];
+    const placeholders = ['landing.features.exploration.genres.seinen', 'landing.features.exploration.genres.shonen', 'landing.features.exploration.genres.romance', 'landing.features.exploration.genres.horror', 'landing.features.exploration.genres.isekai'];
 
     useEffect(() => {
         const handleScroll = () => {
@@ -215,7 +217,7 @@ export default function Opening() {
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ type: "spring", stiffness: 100 }}
                     >
-                        VOTRE HISTOIRE<br />COMMENCE
+                        <span dangerouslySetInnerHTML={{ __html: t('landing.hero.title') }} />
                     </motion.h1>
                     <motion.div
                         className={styles.heroSubtitle}
@@ -223,7 +225,7 @@ export default function Opening() {
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.3 }}
                     >
-                        Ne soyez plus un simple spectateur. Devenez le protagoniste.
+                        {t('landing.hero.subtitle')}
                     </motion.div>
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -232,7 +234,7 @@ export default function Opening() {
                         style={{ marginTop: '2rem' }}
                     >
                         <Link to="/auth">
-                            <button className={styles.ctaButton}>COMMENCER L'AVENTURE</button>
+                            <button className={styles.ctaButton}>{t('landing.hero.cta')}</button>
                         </Link>
                     </motion.div>
                 </header>
@@ -241,14 +243,14 @@ export default function Opening() {
                 <section className={styles.featureSection}>
                     <div className={styles.textContent}>
                         <div className={styles.sfx} style={{ top: -50, left: -20, fontSize: '8rem', color: '#808080', opacity: 0.1, transform: 'rotate(-10deg)' }}>SUIVI !!</div>
-                        <h2 className={styles.sectionTitle}>LE Q.G.</h2>
+                        <h2 className={styles.sectionTitle}>{t('landing.features.qg.title')}</h2>
                         <div className={styles.sectionDescription}>
-                            <p>Organisez votre vidéothèque comme un stratège.</p>
-                            <p style={{ marginTop: '1rem' }}>Séparez vos lectures en cours, vos pauses, et vos archives. Ne perdez plus jamais le fil de vos intrigues favorites.</p>
+                            <p>{t('landing.features.qg.description_1')}</p>
+                            <p style={{ marginTop: '1rem' }}>{t('landing.features.qg.description_2')}</p>
                             <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', fontWeight: 900, flexWrap: 'wrap', justifyContent: 'center' }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Check size={20} /> CHAPITRES</span>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Check size={20} /> ÉPISODES</span>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Check size={20} /> TOMES</span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Check size={20} /> {t('landing.features.qg.check_chapters')}</span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Check size={20} /> {t('landing.features.qg.check_episodes')}</span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Check size={20} /> {t('landing.features.qg.check_volumes')}</span>
                             </div>
                         </div>
                     </div>
@@ -280,14 +282,14 @@ export default function Opening() {
                 <section className={`${styles.featureSection} ${styles.featureSectionReverse}`} ref={progressionRef}>
                     <div className={styles.textContent}>
                         <div className={styles.sfx} style={{ top: -40, right: 0, fontSize: '6rem', color: '#808080', opacity: 0.1, transform: 'rotate(5deg)' }}>LEVEL UP</div>
-                        <h2 className={styles.sectionTitle}>PROGRESSION</h2>
+                        <h2 className={styles.sectionTitle}>{t('landing.features.progression.title')}</h2>
                         <div className={styles.sectionDescription}>
-                            <p>Chaque chapitre lu vous rend plus fort.</p>
-                            <p style={{ marginTop: '1rem' }}>Gagnez de l'XP en mettant à jour votre liste. Débloquez des <strong>Badges Holographiques</strong> et grimpez les rangs de la Hunter Society.</p>
+                            <p>{t('landing.features.progression.description_1')}</p>
+                            <p style={{ marginTop: '1rem' }} dangerouslySetInnerHTML={{ __html: t('landing.features.progression.description_2') }} />
                             <div style={{ marginTop: '2rem', padding: '1rem', background: '#fff', border: '2px solid #000', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 <TrendingUp size={32} />
                                 <div>
-                                    <div style={{ fontWeight: 900 }}>STATISTIQUES DÉTAILLÉES</div>
+                                    <div style={{ fontWeight: 900 }}>{t('landing.features.progression.stats_title')}</div>
                                     <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>
                                         Niveau <Counter from={0} to={42} /> • XP <Counter from={0} to={2800} />
                                     </div>
@@ -322,10 +324,10 @@ export default function Opening() {
                 <section className={styles.featureSection}>
                     <div className={styles.textContent}>
                         <div className={styles.sfx} style={{ bottom: -30, left: 20, fontSize: '5rem', color: '#808080', opacity: 0.1 }}>WAKU WAKU</div>
-                        <h2 className={styles.sectionTitle}>EXPLORATION</h2>
+                        <h2 className={styles.sectionTitle}>{t('landing.features.exploration.title')}</h2>
                         <div className={styles.sectionDescription}>
-                            <p>Une base de données infinie à portée de main.</p>
-                            <p style={{ marginTop: '1rem' }}>Recherchez parmis des milliers d'Anime et Manga. Filtrez par genre, score, ou popularité. Trouvez votre prochaine addiction en quelques secondes.</p>
+                            <p>{t('landing.features.exploration.description_1')}</p>
+                            <p style={{ marginTop: '1rem' }}>{t('landing.features.exploration.description_2')}</p>
                         </div>
                         <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                             {placeholders.map((genre, i) => (
@@ -342,7 +344,7 @@ export default function Opening() {
                                     }}
                                     className="hover:scale-105"
                                 >
-                                    {genre}
+                                    {t(genre)}
                                 </span>
                             ))}
                         </div>
@@ -365,7 +367,7 @@ export default function Opening() {
                                             alignItems: 'center'
                                         }}
                                     >
-                                        <span style={{ opacity: 0.5 }}>{placeholderText || "Rechercher un anime, un manga..."}</span>
+                                        <span style={{ opacity: 0.5 }}>{placeholderText || t('landing.features.exploration.search_placeholder')}</span>
                                         <motion.span
                                             animate={{ opacity: [1, 0] }}
                                             transition={{ duration: 0.8, repeat: Infinity }}
@@ -404,23 +406,23 @@ export default function Opening() {
                 {/* SECTION 4: SOCIAL (NEW) */}
                 <section className={`${styles.featureSection} ${styles.featureSectionReverse}`} ref={progressionRef}>
                     <div className={styles.textContent}>
-                        <h2 className={styles.sectionTitle}>COMMUNAUTÉ</h2>
+                        <h2 className={styles.sectionTitle}>{t('landing.features.community.title')}</h2>
                         <div className={styles.sectionDescription}>
-                            <p>Vous n'êtes pas seul dans ce monde.</p>
-                            <p style={{ marginTop: '1rem' }}>Suivez l'activité de vos amis. Partagez vos avis sans spoil. Comparez vos collections et vos badges.</p>
+                            <p>{t('landing.features.community.description_1')}</p>
+                            <p style={{ marginTop: '1rem' }}>{t('landing.features.community.description_2')}</p>
                         </div>
                         <div style={{ marginTop: '2rem', display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <Users size={32} style={{ marginBottom: '0.5rem' }} />
-                                <span style={{ fontWeight: 800 }}>AMIS</span>
+                                <span style={{ fontWeight: 800 }}>{t('landing.features.community.friends')}</span>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <MessageCircle size={32} style={{ marginBottom: '0.5rem' }} />
-                                <span style={{ fontWeight: 800 }}>DÉBATS</span>
+                                <span style={{ fontWeight: 800 }}>{t('landing.features.community.debates')}</span>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <Heart size={32} style={{ marginBottom: '0.5rem' }} />
-                                <span style={{ fontWeight: 800 }}>PARTAGE</span>
+                                <span style={{ fontWeight: 800 }}>{t('landing.features.community.share')}</span>
                             </div>
                         </div>
                     </div>
@@ -442,7 +444,7 @@ export default function Opening() {
                                                     <span style={{ fontWeight: 900 }}>@{comment.user}</span>
                                                     <span style={{ opacity: 0.5, fontSize: '0.8rem' }}>{comment.time}</span>
                                                 </div>
-                                                <p style={{ fontSize: '0.9rem' }}>{comment.text}</p>
+                                                <p style={{ fontSize: '0.9rem' }}>{t(comment.text)}</p>
                                             </Card>
                                         </motion.div>
                                     ))}
@@ -453,7 +455,7 @@ export default function Opening() {
                                         animate={{ opacity: 1 }}
                                         style={{ textAlign: 'center', marginTop: '1rem' }}
                                     >
-                                        <button style={{ background: '#000', color: '#fff', border: 'none', padding: '0.5rem 1rem', fontWeight: 700, cursor: 'pointer' }}>VOIR LA DISCUSSION</button>
+                                        <button style={{ background: '#000', color: '#fff', border: 'none', padding: '0.5rem 1rem', fontWeight: 700, cursor: 'pointer' }}>{t('landing.features.community.see_discussion')}</button>
                                     </motion.div>
                                 )}
                             </div>
@@ -465,10 +467,10 @@ export default function Opening() {
                 <section className={styles.featureSection}>
                     <div className={styles.textContent}>
                         <div className={styles.sfx} style={{ bottom: -40, left: 10, fontSize: '6rem', color: '#808080', opacity: 0.1, transform: 'rotate(-5deg)' }}>FOCUS</div>
-                        <h2 className={styles.sectionTitle}>TOUT SAVOIR</h2>
+                        <h2 className={styles.sectionTitle}>{t('landing.features.details.title')}</h2>
                         <div className={styles.sectionDescription}>
-                            <p>Plongez au cœur de vos œuvres.</p>
-                            <p style={{ marginTop: '1rem' }}>Synopsis, staff, statistiques détaillées, personnages... Accédez à une fiche d'identité complète pour chaque Anime et Manga. Ne ratez aucun détail.</p>
+                            <p>{t('landing.features.details.description_1')}</p>
+                            <p style={{ marginTop: '1rem' }}>{t('landing.features.details.description_2')}</p>
                         </div>
                     </div>
 
@@ -505,8 +507,8 @@ export default function Opening() {
                                                         JUJUTSU KAISEN
                                                     </h3>
                                                     <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                                                        <span style={{ fontSize: '0.7rem', fontWeight: 800, background: '#fff', color: '#000', padding: '2px 6px' }}>MANGA</span>
-                                                        <span style={{ fontSize: '0.7rem', fontWeight: 800, background: 'var(--color-primary)', color: '#000', padding: '2px 6px', border: '1px solid #000' }}>EN COURS</span>
+                                                        <span style={{ fontSize: '0.7rem', fontWeight: 800, background: '#fff', color: '#000', padding: '2px 6px' }}>{t('landing.features.details.mock_card.manga')}</span>
+                                                        <span style={{ fontSize: '0.7rem', fontWeight: 800, background: 'var(--color-primary)', color: '#000', padding: '2px 6px', border: '1px solid #000' }}>{t('landing.features.details.mock_card.ongoing')}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -516,17 +518,17 @@ export default function Opening() {
                                         <div style={{ padding: '1rem 1rem 1rem 1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                             {/* Tabs Mockup */}
                                             <div style={{ display: 'flex', gap: '1.5rem', borderBottom: '2px solid #eee', paddingBottom: '0.5rem', paddingLeft: '90px' }}>
-                                                <span style={{ fontSize: '0.8rem', fontWeight: 900, borderBottom: '3px solid #000', paddingBottom: '0.5rem', marginBottom: '-0.6rem' }}>GÉNÉRAL</span>
-                                                <span style={{ fontSize: '0.8rem', fontWeight: 700, opacity: 0.4 }}>CHAPITRES</span>
-                                                <span style={{ fontSize: '0.8rem', fontWeight: 700, opacity: 0.4 }}>STATS</span>
-                                                <span style={{ fontSize: '0.8rem', fontWeight: 700, opacity: 0.4 }}>AVIS</span>
+                                                <span style={{ fontSize: '0.8rem', fontWeight: 900, borderBottom: '3px solid #000', paddingBottom: '0.5rem', marginBottom: '-0.6rem' }}>{t('landing.features.details.mock_card.general')}</span>
+                                                <span style={{ fontSize: '0.8rem', fontWeight: 700, opacity: 0.4 }}>{t('landing.features.details.mock_card.chapters')}</span>
+                                                <span style={{ fontSize: '0.8rem', fontWeight: 700, opacity: 0.4 }}>{t('landing.features.details.mock_card.stats')}</span>
+                                                <span style={{ fontSize: '0.8rem', fontWeight: 700, opacity: 0.4 }}>{t('landing.features.details.mock_card.reviews')}</span>
                                             </div>
 
                                             {/* Content Area */}
                                             <div style={{ marginTop: '0.5rem' }}>
                                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                                                     <div style={{ flex: 1, fontSize: '0.9rem', lineHeight: 1.5, color: '#444', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                                        Pour sauver ses amis, Yuji Itadori avale un doigt maudit et partage désormais son corps avec Ryomen Sukuna, le plus puissant des fléaux.
+                                                        {t('landing.features.details.mock_card.synopsis')}
                                                     </div>
                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', minWidth: '80px' }}>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem', fontWeight: 800 }}>
@@ -539,7 +541,7 @@ export default function Opening() {
                                                 </div>
 
                                                 <div style={{ background: '#000', color: '#fff', textAlign: 'center', padding: '0.8rem', fontWeight: 900, fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                                                    VOIR LA FICHE COMPLÈTE <ArrowRight size={16} />
+                                                    {t('landing.features.details.mock_card.view_full')} <ArrowRight size={16} />
                                                 </div>
                                             </div>
                                         </div>
@@ -554,10 +556,10 @@ export default function Opening() {
                 <section className={`${styles.featureSection} ${styles.featureSectionReverse}`}>
                     <div className={styles.textContent}>
                         <div className={styles.sfx} style={{ top: -30, right: 20, fontSize: '4rem', color: '#808080', opacity: 0.1, transform: 'rotate(-5deg)' }}>BETA</div>
-                        <h2 className={styles.sectionTitle}>WORK IN PROGRESS</h2>
+                        <h2 className={styles.sectionTitle}>{t('landing.features.wip.title')}</h2>
                         <div className={styles.sectionDescription}>
-                            <p>Bingeki est vivant. Il évolue.</p>
-                            <p style={{ marginTop: '1rem' }}>Je construis cette plateforme avec vous. Suivez chaque mise à jour, suggérez des fonctionnalités, et voyez vos idées prendre vie. </p>
+                            <p>{t('landing.features.wip.description_1')}</p>
+                            <p style={{ marginTop: '1rem' }}>{t('landing.features.wip.description_2')}</p>
                         </div>
                         <div style={{ marginTop: '2rem' }}>
                             <Link to="/changelog">
@@ -577,7 +579,7 @@ export default function Opening() {
                                     className="hover:scale-105 transition-transform"
                                 >
                                     <HistoryIcon size={20} />
-                                    VOIR LA ROADMAP
+                                    {t('landing.features.wip.roadmap_btn')}
                                 </button>
                             </Link>
                         </div>
@@ -600,10 +602,10 @@ export default function Opening() {
                                     }} />
                                     <div style={{ background: '#fff', padding: '1.5rem', borderRadius: '4px', border: '3px solid #000', boxShadow: '4px 4px 0 rgba(0,0,0,0.1)' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                                            <span style={{ fontWeight: 900, fontSize: '1.1rem' }}>Feedback & Changelog 2.0</span>
+                                            <span style={{ fontWeight: 900, fontSize: '1.1rem' }}>{t('landing.features.wip.timeline.feedback_title')}</span>
                                             <span style={{ fontSize: '0.8rem', background: 'var(--color-primary)', color: '#000', padding: '0.1rem 0.5rem', fontWeight: 800, border: '1px solid #000' }}>V1.2.0</span>
                                         </div>
-                                        <p style={{ fontSize: '0.9rem', color: '#555' }}>Refonte complète du système de feedback et de l'affichage des mises à jour.</p>
+                                        <p style={{ fontSize: '0.9rem', color: '#555' }}>{t('landing.features.wip.timeline.feedback_desc')}</p>
                                     </div>
                                 </div>
 
@@ -614,10 +616,10 @@ export default function Opening() {
                                     }} />
                                     <div style={{ background: '#f4f4f4', padding: '1.5rem', borderRadius: '4px', border: '3px solid #000' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                                            <span style={{ fontWeight: 900, fontSize: '1.1rem' }}>Système de "Guildes"</span>
-                                            <span style={{ fontSize: '0.8rem', border: '1px solid #000', color: '#000', padding: '0.1rem 0.5rem', fontWeight: 800 }}>SOON</span>
+                                            <span style={{ fontWeight: 900, fontSize: '1.1rem' }}>{t('landing.features.wip.timeline.guilds_title')}</span>
+                                            <span style={{ fontSize: '0.8rem', border: '1px solid #000', color: '#000', padding: '0.1rem 0.5rem', fontWeight: 800 }}>{t('landing.features.wip.timeline.soon')}</span>
                                         </div>
-                                        <p style={{ fontSize: '0.9rem', color: '#555' }}>Créez votre propre clan, participez à des guerres de guildes et dominez le classement.</p>
+                                        <p style={{ fontSize: '0.9rem', color: '#555' }}>{t('landing.features.wip.timeline.guilds_desc')}</p>
                                     </div>
                                 </div>
                             </div>
@@ -644,7 +646,7 @@ export default function Opening() {
                         lineHeight: 1,
                         pointerEvents: 'none'
                     }}>
-                        SUPPORT
+                        {t('landing.features.support.sfx')}
                     </div>
 
                     <div style={{
@@ -673,7 +675,7 @@ export default function Opening() {
                                 marginBottom: '2rem',
                                 clipPath: 'polygon(3% 0, 100% 0, 97% 100%, 0% 100%)'
                             }}>
-                                TIPS FOR DEVS
+                                {t('landing.features.support.tag')}
                             </div>
 
                             <h2 style={{
@@ -684,7 +686,7 @@ export default function Opening() {
                                 lineHeight: 1.2,
                                 color: '#000'
                             }}>
-                                SOUTENEZ LE PROJET
+                                {t('landing.features.support.title')}
                             </h2>
 
                             <p style={{
@@ -693,7 +695,7 @@ export default function Opening() {
                                 fontWeight: 700,
                                 color: '#000'
                             }}>
-                                Bingeki est développé avec ❤️ en open-source
+                                {t('landing.features.support.description_1')}
                             </p>
 
                             <p style={{
@@ -705,7 +707,7 @@ export default function Opening() {
                                 margin: '0 auto 2.5rem',
                                 color: '#000'
                             }}>
-                                Si Bingeki enrichit votre expérience manga/anime, aidez à financer le développement de nouvelles fonctionnalités. Chaque café compte ! ☕
+                                {t('landing.features.support.description_2')}
                             </p>
 
                             <motion.a
@@ -750,13 +752,13 @@ export default function Opening() {
                                 color: '#000'
                             }}>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Check size={18} /> Nouvelles features
+                                    <Check size={18} /> {t('landing.features.support.features')}
                                 </span>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Check size={18} /> Serveurs performants
+                                    <Check size={18} /> {t('landing.features.support.servers')}
                                 </span>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Check size={18} /> Support premium
+                                    <Check size={18} /> {t('landing.features.support.premium')}
                                 </span>
                             </div>
                         </motion.div>
@@ -771,11 +773,11 @@ export default function Opening() {
                         transition={{ repeat: Infinity, repeatType: "reverse", duration: 0.8 }}
                     >
                         <h2 style={{ fontSize: 'min(3rem, 10vw)', marginBottom: '2rem', textTransform: 'uppercase', fontFamily: 'var(--font-heading)', lineHeight: 1 }}>
-                            REJOIGNEZ L'ÉLITE
+                            {t('landing.features.final_cta.title')}
                         </h2>
                         <Link to="/auth">
                             <button className={styles.ctaButton}>
-                                CRÉER MON COMPTE
+                                {t('landing.features.final_cta.button')}
                             </button>
                         </Link>
                     </motion.div>
