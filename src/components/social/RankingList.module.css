@@ -1,0 +1,139 @@
+/* RankingList.module.css */
+
+.container {
+    width: 100%;
+    max-width: 48rem;
+    /* max-w-3xl */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 2px solid #000;
+    background: #fff;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.item:hover {
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.currentUser {
+    background: #f9fafb;
+    /* gray-50 */
+    border-left: 8px solid #000;
+}
+
+.rank {
+    font-weight: 900;
+    font-size: 1.25rem;
+    width: 2.5rem;
+    color: #9ca3af;
+    /* gray-400 */
+}
+
+.avatarFrame {
+    width: 2.5rem;
+    /* w-10 */
+    height: 2.5rem;
+    border-radius: 9999px;
+    border: 2px solid #000;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.avatarImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.info {
+    flex: 1;
+    min-width: 0;
+}
+
+.nameRow {
+    font-weight: 700;
+    font-size: 1.125rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.badge {
+    font-size: 0.625rem;
+    background: #000;
+    color: #fff;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.level {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #6b7280;
+    /* gray-500 */
+}
+
+.stats {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.score {
+    font-weight: 900;
+    font-size: 1.125rem;
+}
+
+.category {
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #9ca3af;
+}
+
+.actions {
+    margin-left: 0.5rem;
+}
+
+.pending {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    font-weight: 700;
+}
+
+.accepted {
+    opacity: 0.3;
+}
+
+.showMoreContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.showMoreButton {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}

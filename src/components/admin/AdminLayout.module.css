@@ -1,0 +1,74 @@
+/* Admin Layout Container */
+.container {
+    display: flex;
+    min-height: 100vh;
+    background: #f0f0f0;
+    color: #000;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Main Content Area */
+.main {
+    flex: 1;
+    margin-left: 80px;
+    /* Default sidebar width */
+    padding: 3rem;
+    overflow-y: auto;
+    transition: margin-left 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    min-height: 100vh;
+}
+
+.mainExpanded {
+    margin-left: 260px;
+    /* Expanded sidebar width */
+}
+
+.contentWrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Mobile Header (Hamburger) */
+.mobileHeader {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: #000;
+    color: #fff;
+    align-items: center;
+    padding: 0 1rem;
+    z-index: 90;
+    border-bottom: 2px solid #333;
+}
+
+.hamburger {
+    background: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        padding-top: 60px;
+        /* Space for mobile header */
+    }
+
+    .main {
+        margin-left: 0 !important;
+        padding: 1.5rem;
+        width: 100%;
+    }
+
+    .mobileHeader {
+        display: flex;
+    }
+}

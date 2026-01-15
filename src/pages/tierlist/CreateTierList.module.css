@@ -1,0 +1,154 @@
+/* Container */
+.container {
+    padding: 2rem;
+    display: flex;
+    gap: 2rem;
+    flex-direction: column;
+    background: #09090b;
+    min-height: calc(100vh - 80px);
+    color: white;
+    font-family: var(--font-body);
+}
+
+/* Header Section */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.titleInputContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.titleInput {
+    font-size: 2.5rem;
+    font-family: var(--font-heading);
+    background: transparent;
+    border: none;
+    border-bottom: 4px solid white;
+    outline: none;
+    width: 100%;
+    max-width: 500px;
+    color: white;
+    padding-bottom: 0.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.titleInput:focus {
+    border-color: var(--color-primary);
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Workspace (Board + Pool) */
+.workspace {
+    display: flex;
+    gap: 2rem;
+    height: 80vh;
+}
+
+.board {
+    flex: 3;
+    background: #111;
+    padding: 1.5rem;
+    overflow-y: auto;
+    border: 3px solid white;
+    box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.1);
+    border-radius: 0;
+    /* Brutalist - no radius */
+}
+
+.poolContainer {
+    flex: 1;
+    min-width: 320px;
+    background: #111;
+    border: 3px solid white;
+    box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.1);
+    /* height: 100%; handled by flex parent but good to ensure */
+    overflow-y: auto;
+}
+
+/* Trash Zone */
+.trashZone {
+    height: 100px;
+    margin-top: 2rem;
+    border: 3px dashed #444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    background: #000;
+    transition: all 0.2s;
+    gap: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.trashZoneActive {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    transform: scale(1.02);
+}
+
+.trashText {
+    font-weight: 900;
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+        gap: 1rem;
+        min-height: auto;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .titleInput {
+        width: 100%;
+        max-width: none;
+        font-size: 1.5rem;
+    }
+
+    .actions {
+        /* gap: 1rem; */
+        justify-content: stretch;
+    }
+
+    .actions button {
+        flex: 1;
+    }
+
+    .workspace {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .board {
+        min-height: 50vh;
+        flex: none;
+    }
+
+    .poolContainer {
+        min-width: 0;
+        flex: none;
+        height: 40vh;
+        /* Give fixed height for scroll on mobile */
+    }
+}

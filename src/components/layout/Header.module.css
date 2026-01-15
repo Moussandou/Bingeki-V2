@@ -176,8 +176,15 @@
         display: flex;
     }
 
+
     .desktopOnly {
         display: none;
+    }
+
+    .mobileHeaderAction {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 
@@ -185,4 +192,52 @@
     .mobileNav {
         display: none !important;
     }
+
+    .mobileHeaderAction {
+        display: none !important;
+    }
+}
+
+.mobileMenuDropdown {
+    position: fixed;
+    top: 72px;
+    /* Approx header height */
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border-bottom: 3px solid #000;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 1);
+    /* Solid shadow */
+    z-index: 49;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobileMenuItem {
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 900;
+    text-decoration: none;
+    color: #000;
+    border-bottom: 2px solid #000;
+    /* Brutalist border */
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    transition: all 0.2s;
+    font-size: 1.1rem;
+}
+
+.mobileMenuItem:last-child {
+    border-bottom: none;
+}
+
+.mobileMenuItem:hover,
+.mobileMenuItem:active {
+    background: #000;
+    color: #fff;
+    padding-left: 2rem;
+    /* Slide effect */
 }

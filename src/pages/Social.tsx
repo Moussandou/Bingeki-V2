@@ -22,6 +22,8 @@ import type { ActivityEvent } from '@/types/activity';
 import { ACTIVITY_EMOJIS, ACTIVITY_LABELS } from '@/types/activity';
 import { ChallengesSection } from '@/components/ChallengesSection';
 import { WatchPartiesSection } from '@/components/WatchPartiesSection';
+import { Podium } from '@/components/social/Podium';
+import { RankingList } from '@/components/social/RankingList';
 
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/context/ToastContext';
@@ -45,14 +47,6 @@ export default function Social() {
     // Leaderboard filters
     const [leaderboardCategory, setLeaderboardCategory] = useState<LeaderboardCategory>('xp');
     const [leaderboardPeriod, _setLeaderboardPeriod] = useState<LeaderboardPeriod>('all');
-
-    const [width, setWidth] = useState(window.innerWidth);
-
-    useEffect(() => {
-        const handleResize = () => setWidth(window.innerWidth);
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
     useEffect(() => {
         loadData();
@@ -153,9 +147,6 @@ export default function Social() {
 
         try {
             await rejectFriendRequest(user.uid, friendUid);
-            // loadData(); // No need to reload entire data if we updated locally, but maybe good for consistency
-            console.log("Friend request rejected successfully");
-            // loadData(); // No need to reload entire data if we updated locally, but maybe good for consistency
             console.log("Friend request rejected successfully");
             addToast(t('social.friends.reject_success'), 'info');
         } catch (error) {
@@ -165,399 +156,285 @@ export default function Social() {
         }
     };
 
-    // Responsive toggle based on JavaScript width
-    const isMobile = width < 768;
-
     return (
         <Layout>
-            <div className={styles.container}>
-                <h1 className={styles.title}>
-                    {t('social.title')}
-                </h1>
+            <div style={{ minHeight: 'calc(100vh - 80px)', overflowX: 'hidden' }}>
+                <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
+                    <h1 className={styles.title}>
+                        {t('social.title')}
+                    </h1>
 
-                {/* Tabs */}
-                <div className={styles.tabContainer}>
-                    <Button
-                        variant={activeTab === 'ranking' ? 'primary' : 'ghost'}
-                        onClick={() => setActiveTab('ranking')}
-                        icon={<Trophy size={20} />}
-                        style={{ flexShrink: 0 }}
-                    >
-                        {t('social.tabs.ranking')}
-                    </Button>
-                    <Button
-                        variant={activeTab === 'activity' ? 'primary' : 'ghost'}
-                        onClick={() => setActiveTab('activity')}
-                        icon={<Activity size={20} />}
-                        style={{ flexShrink: 0 }}
-                    >
-                        {t('social.tabs.activity')}
-                    </Button>
-                    <Button
-                        variant={activeTab === 'challenges' ? 'primary' : 'ghost'}
-                        onClick={() => setActiveTab('challenges')}
-                        icon={<Swords size={20} />}
-                        style={{ flexShrink: 0 }}
-                    >
-                        {t('social.tabs.challenges')}
-                    </Button>
-                    <Button
-                        variant={activeTab === 'parties' ? 'primary' : 'ghost'}
-                        onClick={() => setActiveTab('parties')}
-                        icon={<Tv size={20} />}
-                        style={{ flexShrink: 0 }}
-                    >
-                        {t('social.tabs.parties')}
-                    </Button>
-                    <Button
-                        variant={activeTab === 'friends' ? 'primary' : 'ghost'}
-                        onClick={() => setActiveTab('friends')}
-                        icon={<Users size={20} />}
-                        style={{ flexShrink: 0 }}
-                    >
-                        {t('social.tabs.friends')}
-                    </Button>
-                </div>
-
-                {/* PARTIES TAB */}
-                {activeTab === 'parties' && (
-                    <WatchPartiesSection />
-                )}
-
-                {/* CHALLENGES TAB */}
-                {activeTab === 'challenges' && (
-                    <ChallengesSection onNavigateToProfile={(uid) => navigate(`/profile/${uid}`)} />
-                )}
-
-                {/* ACTIVITY FEED */}
-                {activeTab === 'activity' && (
-                    <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff' }}>
-                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <Flame size={24} color="#ef4444" /> {t('social.activity.title')}
-                        </h2>
-                        {loading ? (
-                            <p style={{ textAlign: 'center', opacity: 0.6 }}>{t('social.activity.loading')}</p>
-                        ) : activities.length === 0 ? (
-                            <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.6 }}>
-                                <p>{t('social.activity.no_activity')}</p>
-                                <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>{t('social.activity.add_friends_hint')}</p>
-                            </div>
-                        ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                {activities.map((activity) => {
-                                    const timeDiff = Date.now() - activity.timestamp;
-                                    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-                                    const timeAgo = hours < 1 ? t('social.activity.time.less_than_hour') :
-                                        hours < 24 ? t('social.activity.time.hours_ago', { hours }) :
-                                            t('social.activity.time.days_ago', { days: Math.floor(hours / 24) });
-
-                                    return (
-                                        <div key={activity.id} style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '1rem',
-                                            padding: '1rem',
-                                            background: '#f8f8f8',
-                                            borderRadius: '8px',
-                                            border: '1px solid #eee'
-                                        }}>
-                                            <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000', flexShrink: 0 }}>
-                                                <img src={activity.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${activity.userName}`}
-                                                    alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                            </div>
-                                            <div style={{ flex: 1, minWidth: 0 }}>
-                                                <p style={{
-                                                    fontWeight: 600,
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    display: '-webkit-box',
-                                                    WebkitLineClamp: 2,
-                                                    WebkitBoxOrient: 'vertical',
-                                                    lineHeight: '1.2'
-                                                }}>
-                                                    {ACTIVITY_EMOJIS[activity.type]} <strong>{activity.userName}</strong> {ACTIVITY_LABELS[activity.type]}
-                                                    {activity.workTitle && <span style={{ color: 'var(--color-primary)' }}> {activity.workTitle}</span>}
-                                                    {activity.episodeNumber && <span> (Ep. {activity.episodeNumber})</span>}
-                                                    {activity.newLevel && <span style={{ color: 'var(--color-primary)' }}> {activity.newLevel}</span>}
-                                                    {activity.badgeName && <span style={{ color: 'var(--color-primary)' }}> {activity.badgeName}</span>}
-                                                </p>
-                                                <p style={{ fontSize: '0.75rem', opacity: 0.5, display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.25rem' }}>
-                                                    <Clock size={12} /> {timeAgo}
-                                                </p>
-                                            </div>
-                                            {activity.workImage && (
-                                                <div style={{ width: 50, height: 70, borderRadius: '4px', overflow: 'hidden', flexShrink: 0 }}>
-                                                    <img src={activity.workImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
+                    {/* Tabs */}
+                    <div className={styles.tabContainer}>
+                        <Button
+                            variant={activeTab === 'ranking' ? 'primary' : 'ghost'}
+                            onClick={() => setActiveTab('ranking')}
+                            icon={<Trophy size={20} />}
+                            style={{ flexShrink: 0 }}
+                        >
+                            {t('social.tabs.ranking')}
+                        </Button>
+                        <Button
+                            variant={activeTab === 'activity' ? 'primary' : 'ghost'}
+                            onClick={() => setActiveTab('activity')}
+                            icon={<Activity size={20} />}
+                            style={{ flexShrink: 0 }}
+                        >
+                            {t('social.tabs.activity')}
+                        </Button>
+                        <Button
+                            variant={activeTab === 'challenges' ? 'primary' : 'ghost'}
+                            onClick={() => setActiveTab('challenges')}
+                            icon={<Swords size={20} />}
+                            style={{ flexShrink: 0 }}
+                        >
+                            {t('social.tabs.challenges')}
+                        </Button>
+                        <Button
+                            variant={activeTab === 'parties' ? 'primary' : 'ghost'}
+                            onClick={() => setActiveTab('parties')}
+                            icon={<Tv size={20} />}
+                            style={{ flexShrink: 0 }}
+                        >
+                            {t('social.tabs.parties')}
+                        </Button>
+                        <Button
+                            variant={activeTab === 'friends' ? 'primary' : 'ghost'}
+                            onClick={() => setActiveTab('friends')}
+                            icon={<Users size={20} />}
+                            style={{ flexShrink: 0 }}
+                        >
+                            {t('social.tabs.friends')}
+                        </Button>
                     </div>
-                )}
 
-                {/* RANKING VIEW */}
-                {activeTab === 'ranking' && (
-                    <>
-                        {/* Leaderboard Filters */}
-                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                                <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{t('social.ranking.filter_by')}</span>
-                                <Button
-                                    variant={leaderboardCategory === 'xp' ? 'manga' : 'ghost'}
-                                    size="sm"
-                                    onClick={() => setLeaderboardCategory('xp')}
-                                    icon={<Trophy size={14} />}
-                                >{t('social.ranking.xp')}</Button>
-                                <Button
-                                    variant={leaderboardCategory === 'chapters' ? 'manga' : 'ghost'}
-                                    size="sm"
-                                    onClick={() => setLeaderboardCategory('chapters')}
-                                    icon={<BookOpen size={14} />}
-                                >{t('social.ranking.chapters')}</Button>
-                                <Button
-                                    variant={leaderboardCategory === 'streak' ? 'manga' : 'ghost'}
-                                    size="sm"
-                                    onClick={() => setLeaderboardCategory('streak')}
-                                    icon={<Flame size={14} />}
-                                >{t('social.ranking.streak')}</Button>
-                            </div>
-                        </div>
+                    {/* PARTIES TAB */}
+                    {activeTab === 'parties' && (
+                        <WatchPartiesSection />
+                    )}
 
-                        {/* MOBILE LEADERBOARD */}
-                        {isMobile ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: '#fff' }}>
-                                {leaderboard.map((player, index) => (
-                                    <div
-                                        key={player.uid}
-                                        onClick={() => navigate(`/profile/${player.uid}`)}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            padding: '0.75rem 0.5rem',
-                                            borderBottom: '1px solid #f0f0f0',
-                                            background: player.uid === user?.uid ? '#f9fafb' : '#fff',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        {/* LEFT: Rank, Avatar, Info */}
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
-                                            <span style={{
-                                                fontSize: '0.9rem',
-                                                fontWeight: 900,
-                                                color: index < 3 ? '#fbbf24' : '#9ca3af',
-                                                minWidth: '20px'
-                                            }}>
-                                                #{index + 1}
-                                            </span>
+                    {/* CHALLENGES TAB */}
+                    {activeTab === 'challenges' && (
+                        <ChallengesSection onNavigateToProfile={(uid) => navigate(`/profile/${uid}`)} />
+                    )}
 
-                                            <div style={{ position: 'relative' }}>
-                                                <img
-                                                    src={player.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.displayName}`}
-                                                    alt=""
-                                                    style={{
-                                                        width: '36px',
-                                                        height: '36px',
-                                                        borderRadius: '50%',
-                                                        border: '1px solid #e5e7eb',
-                                                        objectFit: 'cover'
-                                                    }}
-                                                />
-                                            </div>
-
-                                            <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                                                <span style={{
-                                                    fontSize: '0.9rem',
-                                                    fontWeight: 700,
-                                                    color: '#111827',
-                                                    whiteSpace: 'nowrap',
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis'
-                                                }}>
-                                                    {player.displayName || t('social.ranking.anonymous')}
-                                                </span>
-                                                <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                                                    Lvl {player.level || 1}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {/* RIGHT: Stats */}
-                                        <div style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'flex-end',
-                                            paddingLeft: '0.5rem',
-                                            minWidth: '70px',
-                                            flexShrink: 0
-                                        }}>
-                                            <span style={{
-                                                fontSize: '0.95rem',
-                                                fontWeight: 800,
-                                                color: '#000'
-                                            }}>
-                                                {leaderboardCategory === 'xp' && `${(player.xp || 0).toLocaleString()}`}
-                                                {leaderboardCategory === 'chapters' && `${player.totalChaptersRead || 0}`}
-                                                {leaderboardCategory === 'streak' && `${player.streak || 0}j`}
-                                            </span>
-                                            <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: '#9ca3af', fontWeight: 600 }}>
-                                                {leaderboardCategory.toUpperCase()}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            /* DESKTOP LEADERBOARD */
-                            <div className={styles.leaderboardPanel}>
-                                {leaderboard.map((player, index) => (
-                                    <div key={player.uid} className={styles.leaderboardItem} style={{
-                                        background: player.uid === user?.uid ? '#f0f0f0' : '#fff'
-                                    }}>
-                                        <div className={styles.rank} style={{ color: index < 3 ? '#ffce00' : '#000' }}>
-                                            #{index + 1}
-                                        </div>
-                                        <div className={styles.avatar}>
-                                            <img
-                                                src={player.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.displayName}`}
-                                                alt=""
-                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                            />
-                                        </div>
-                                        <div className={styles.playerInfo} onClick={() => navigate(`/profile/${player.uid}`)}>
-                                            <div className={styles.playerName}>
-                                                {player.displayName || t('social.ranking.anonymous')}
-                                                {player.featuredBadge && (
-                                                    <span className={styles.playerBadge}>{player.featuredBadge}</span>
-                                                )}
-                                            </div>
-                                            <div className={styles.playerLvl}>Lvl {player.level || 1}</div>
-                                        </div>
-                                        <div className={styles.playerStats}>
-                                            {leaderboardCategory === 'xp' && <>{(player.xp || 0).toLocaleString()} XP</>}
-                                            {leaderboardCategory === 'chapters' && <><BookOpen size={14} /> {player.totalChaptersRead || 0}</>}
-                                            {leaderboardCategory === 'streak' && <><Flame size={14} /> {player.streak || 0}j</>}
-                                        </div>
-                                        {player.uid !== user?.uid && (
-                                            <div className={styles.actions}>
-                                                {getFriendStatus(player.uid) === 'none' && (
-                                                    <Button size="sm" variant="ghost" onClick={() => handleQuickAdd(player)}>
-                                                        <UserPlus size={16} />
-                                                    </Button>
-                                                )}
-                                                {getFriendStatus(player.uid) === 'pending' && (
-                                                    <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>{t('social.ranking.pending')}</span>
-                                                )}
-                                                {getFriendStatus(player.uid) === 'accepted' && (
-                                                    <User size={16} style={{ opacity: 0.3 }} />
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </>
-                )}
-
-                {/* FRIENDS VIEW */}
-                {activeTab === 'friends' && (
-                    <div>
-                        {/* Add Friend Section */}
-                        <div className="manga-panel" style={{ padding: '1.5rem', marginBottom: '2rem', background: '#fff' }}>
-                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1rem' }}>{t('social.friends.add_title')}</h3>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', border: '2px solid #000', padding: '0.5rem' }}>
-                                    <Search size={20} style={{ marginRight: '0.5rem', opacity: 0.5 }} />
-                                    <input
-                                        type="email"
-                                        placeholder={t('social.friends.search_placeholder')}
-                                        value={searchEmail}
-                                        onChange={(e) => setSearchEmail(e.target.value)}
-                                        style={{ border: 'none', outline: 'none', width: '100%', fontSize: '1rem', fontFamily: 'inherit' }}
-                                    />
-                                </div>
-                                <Button onClick={handleSearch} disabled={loading}>{t('social.friends.search_btn')}</Button>
-                            </div>
-
-                            {/* Search Result */}
-                            {searchResult && (
-                                <div style={{ marginTop: '1rem', padding: '1rem', border: '2px dashed #000', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
-                                            <img src={searchResult.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${searchResult.displayName}`} alt="Avatar" style={{ width: '100%', height: '100%' }} />
-                                        </div>
-                                        <div>
-                                            <div style={{ fontWeight: 700 }}>{searchResult.displayName}</div>
-                                        </div>
-                                    </div>
-                                    {requestSent ? (
-                                        <Button variant="ghost" icon={<Check size={18} />}>{t('social.friends.request_sent')}</Button>
-                                    ) : (
-                                        <Button variant="manga" onClick={handleSendRequest} icon={<UserPlus size={18} />}>{t('social.friends.add_btn')}</Button>
-                                    )}
-                                </div>
-                            )}
-                            {searchResult === null && searchEmail && !loading && searchResult !== undefined && ( // Check if strictly null (not found) vs undefined (initial)
-                                <div style={{ marginTop: '0.5rem', color: 'red', fontWeight: 600 }}>{t('social.friends.not_found')}</div>
-                            )}
-                        </div>
-
-                        {/* Requests List */}
-                        {friends.filter(f => f.status === 'pending' && f.direction === 'incoming').length > 0 && (
-                            <div style={{ marginBottom: '2rem' }}>
-                                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1rem' }}>{t('social.friends.requests_title')}</h3>
-                                <div className="manga-panel" style={{ padding: 0 }}>
-                                    {friends.filter(f => f.status === 'pending' && f.direction === 'incoming').map(friend => (
-                                        <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                                <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
-                                                    <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                </div>
-                                                <div style={{ fontWeight: 700 }}>{friend.displayName}</div>
-                                            </div>
-                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                <Button
-                                                    variant="ghost"
-                                                    onClick={() => handleReject(friend.uid)}
-                                                    style={{ color: '#ef4444' }}
-                                                    title="Refuser"
-                                                >
-                                                    <X size={20} />
-                                                </Button>
-                                                <Button variant="primary" onClick={() => handleAccept(friend.uid)}>{t('social.friends.accept')}</Button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Friends List */}
-                        <div className="manga-panel" style={{ padding: 0 }}>
-                            {friends.filter(f => f.status === 'accepted').length === 0 ? (
-                                <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.6 }}>
-                                    {t('social.friends.no_friends')}
+                    {/* ACTIVITY FEED */}
+                    {activeTab === 'activity' && (
+                        <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff' }}>
+                            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <Flame size={24} color="#ef4444" /> {t('social.activity.title')}
+                            </h2>
+                            {loading ? (
+                                <p style={{ textAlign: 'center', opacity: 0.6 }}>{t('social.activity.loading')}</p>
+                            ) : activities.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.6 }}>
+                                    <p>{t('social.activity.no_activity')}</p>
+                                    <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>{t('social.activity.add_friends_hint')}</p>
                                 </div>
                             ) : (
-                                friends.filter(f => f.status === 'accepted').map(friend => (
-                                    <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => navigate(`/profile/${friend.uid}`)}>
-                                        <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
-                                            <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                        </div>
-                                        <div style={{ flex: 1, fontWeight: 700 }}>{friend.displayName}</div>
-                                        <Button variant="ghost" size="icon"><User size={20} /></Button>
-                                    </div>
-                                ))
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                    {activities.map((activity) => {
+                                        const timeDiff = Date.now() - activity.timestamp;
+                                        const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+                                        const timeAgo = hours < 1 ? t('social.activity.time.less_than_hour') :
+                                            hours < 24 ? t('social.activity.time.hours_ago', { hours }) :
+                                                t('social.activity.time.days_ago', { days: Math.floor(hours / 24) });
+
+                                        return (
+                                            <div key={activity.id} style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '1rem',
+                                                padding: '1rem',
+                                                background: '#f8f8f8',
+                                                borderRadius: '8px',
+                                                border: '1px solid #eee'
+                                            }}>
+                                                <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000', flexShrink: 0 }}>
+                                                    <img src={activity.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${activity.userName}`}
+                                                        alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                </div>
+                                                <div style={{ flex: 1, minWidth: 0 }}>
+                                                    <p style={{
+                                                        fontWeight: 600,
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        display: '-webkit-box',
+                                                        WebkitLineClamp: 2,
+                                                        WebkitBoxOrient: 'vertical',
+                                                        lineHeight: '1.2'
+                                                    }}>
+                                                        {ACTIVITY_EMOJIS[activity.type]} <strong>{activity.userName}</strong> {ACTIVITY_LABELS[activity.type]}
+                                                        {activity.workTitle && <span style={{ color: 'var(--color-primary)' }}> {activity.workTitle}</span>}
+                                                        {activity.episodeNumber && <span> (Ep. {activity.episodeNumber})</span>}
+                                                        {activity.newLevel && <span style={{ color: 'var(--color-primary)' }}> {activity.newLevel}</span>}
+                                                        {activity.badgeName && <span style={{ color: 'var(--color-primary)' }}> {activity.badgeName}</span>}
+                                                    </p>
+                                                    <p style={{ fontSize: '0.75rem', opacity: 0.5, display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.25rem' }}>
+                                                        <Clock size={12} /> {timeAgo}
+                                                    </p>
+                                                </div>
+                                                {activity.workImage && (
+                                                    <div style={{ width: 50, height: 70, borderRadius: '4px', overflow: 'hidden', flexShrink: 0 }}>
+                                                        <img src={activity.workImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             )}
                         </div>
+                    )}
 
-                    </div>
-                )}
+                    {/* RANKING VIEW */}
+                    {activeTab === 'ranking' && (
+                        <>
+                            {/* Leaderboard Filters */}
+                            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                                    {/* <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{t('social.ranking.filter_by')}</span> */}
+                                    <Button
+                                        variant={leaderboardCategory === 'xp' ? 'manga' : 'ghost'}
+                                        size="sm"
+                                        onClick={() => setLeaderboardCategory('xp')}
+                                        icon={<Trophy size={14} />}
+                                    >{t('social.ranking.xp')}</Button>
+                                    <Button
+                                        variant={leaderboardCategory === 'chapters' ? 'manga' : 'ghost'}
+                                        size="sm"
+                                        onClick={() => setLeaderboardCategory('chapters')}
+                                        icon={<BookOpen size={14} />}
+                                    >{t('social.ranking.chapters')}</Button>
+                                    <Button
+                                        variant={leaderboardCategory === 'streak' ? 'manga' : 'ghost'}
+                                        size="sm"
+                                        onClick={() => setLeaderboardCategory('streak')}
+                                        icon={<Flame size={14} />}
+                                    >{t('social.ranking.streak')}</Button>
+                                </div>
+                            </div>
+
+                            {/* Podium (Top 3) */}
+                            <Podium
+                                users={leaderboard.slice(0, 3)}
+                                category={leaderboardCategory}
+                            />
+
+                            {/* Ranking List (Rest) */}
+                            <div className="mt-8">
+                                <RankingList
+                                    users={leaderboard.slice(3)}
+                                    category={leaderboardCategory}
+                                    currentUserUid={user?.uid}
+                                    onAddFriend={handleQuickAdd}
+                                    friendStatuses={
+                                        leaderboard.slice(3).reduce((acc, curr) => ({
+                                            ...acc,
+                                            [curr.uid]: getFriendStatus(curr.uid)
+                                        }), {} as Record<string, string>)
+                                    }
+                                />
+                            </div>
+                        </>
+                    )}
+
+                    {/* FRIENDS VIEW */}
+                    {activeTab === 'friends' && (
+                        <div>
+                            {/* Add Friend Section */}
+                            <div className="manga-panel" style={{ padding: '1.5rem', marginBottom: '2rem', background: '#fff' }}>
+                                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1rem' }}>{t('social.friends.add_title')}</h3>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', border: '2px solid #000', padding: '0.5rem' }}>
+                                        <Search size={20} style={{ marginRight: '0.5rem', opacity: 0.5 }} />
+                                        <input
+                                            type="email"
+                                            placeholder={t('social.friends.search_placeholder')}
+                                            value={searchEmail}
+                                            onChange={(e) => setSearchEmail(e.target.value)}
+                                            style={{ border: 'none', outline: 'none', width: '100%', fontSize: '1rem', fontFamily: 'inherit' }}
+                                        />
+                                    </div>
+                                    <Button onClick={handleSearch} disabled={loading}>{t('social.friends.search_btn')}</Button>
+                                </div>
+
+                                {/* Search Result */}
+                                {searchResult && (
+                                    <div style={{ marginTop: '1rem', padding: '1rem', border: '2px dashed #000', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                            <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                                <img src={searchResult.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${searchResult.displayName}`} alt="Avatar" style={{ width: '100%', height: '100%' }} />
+                                            </div>
+                                            <div>
+                                                <div style={{ fontWeight: 700 }}>{searchResult.displayName}</div>
+                                            </div>
+                                        </div>
+                                        {requestSent ? (
+                                            <Button variant="ghost" icon={<Check size={18} />}>{t('social.friends.request_sent')}</Button>
+                                        ) : (
+                                            <Button variant="manga" onClick={handleSendRequest} icon={<UserPlus size={18} />}>{t('social.friends.add_btn')}</Button>
+                                        )}
+                                    </div>
+                                )}
+                                {searchResult === null && searchEmail && !loading && searchResult !== undefined && ( // Check if strictly null (not found) vs undefined (initial)
+                                    <div style={{ marginTop: '0.5rem', color: 'red', fontWeight: 600 }}>{t('social.friends.not_found')}</div>
+                                )}
+                            </div>
+
+                            {/* Requests List */}
+                            {friends.filter(f => f.status === 'pending' && f.direction === 'incoming').length > 0 && (
+                                <div style={{ marginBottom: '2rem' }}>
+                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1rem' }}>{t('social.friends.requests_title')}</h3>
+                                    <div className="manga-panel" style={{ padding: 0 }}>
+                                        {friends.filter(f => f.status === 'pending' && f.direction === 'incoming').map(friend => (
+                                            <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                                    <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                                        <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    </div>
+                                                    <div style={{ fontWeight: 700 }}>{friend.displayName}</div>
+                                                </div>
+                                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleReject(friend.uid)}
+                                                        style={{ color: '#ef4444' }}
+                                                        title="Refuser"
+                                                    >
+                                                        <X size={20} />
+                                                    </Button>
+                                                    <Button variant="primary" onClick={() => handleAccept(friend.uid)}>{t('social.friends.accept')}</Button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Friends List */}
+                            <div className="manga-panel" style={{ padding: 0 }}>
+                                {friends.filter(f => f.status === 'accepted').length === 0 ? (
+                                    <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.6 }}>
+                                        {t('social.friends.no_friends')}
+                                    </div>
+                                ) : (
+                                    friends.filter(f => f.status === 'accepted').map(friend => (
+                                        <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => navigate(`/profile/${friend.uid}`)}>
+                                            <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                                <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            </div>
+                                            <div style={{ flex: 1, fontWeight: 700 }}>{friend.displayName}</div>
+                                            <Button variant="ghost" size="icon"><User size={20} /></Button>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+
+                        </div>
+                    )}
+                </div>
             </div>
-        </Layout >
+        </Layout>
     );
 }

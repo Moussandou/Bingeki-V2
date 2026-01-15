@@ -11,13 +11,16 @@ const resources = {
                 agenda: "AGENDA",
                 community: "COMMUNAUTÉ",
                 news: "NOUVEAUTÉS",
+                tierlist: "TIER LISTS",
                 login: "CONNEXION",
                 search_placeholder: "Rechercher...",
                 discover: "DÉCOUVRIR",
                 changelog: "CHANGELOG",
                 profile: "Mon Profil",
                 settings: "Paramètres",
-                logout: "Déconnexion"
+                logout: "Déconnexion",
+                feedback: "Avis",
+                more: "PLUS"
             },
             landing: {
                 hero: {
@@ -500,6 +503,13 @@ const resources = {
                     spoiler_disabled: "Mode Spoiler désactivé",
                     spoiler_help: "Floute les synopsis pour éviter les révélations."
                 },
+                colors: {
+                    red: "Rouge Bingeki",
+                    cyan: "Cyan Futur",
+                    green: "Vert Toxique",
+                    yellow: "Jaune Solaire",
+                    purple: "Violet Royal"
+                },
                 preferences: {
                     title: "PRÉFÉRENCES",
                     reduce_motion: "Réduire les animations",
@@ -856,13 +866,133 @@ const resources = {
                 agenda: "SCHEDULE",
                 community: "COMMUNITY",
                 news: "WHATS NEW",
+                feedback: "FEEDBACK",
                 login: "LOGIN",
                 search_placeholder: "Search...",
                 discover: "DISCOVER",
                 changelog: "CHANGELOG",
                 profile: "My Profile",
                 settings: "Settings",
-                logout: "Logout"
+                logout: "Logout",
+                more: "MORE",
+                tierlist: "Tier List"
+            },
+            profile: {
+                title: "Hunter License",
+                edit: "EDIT",
+                guide: "GUIDE",
+                back: "BACK",
+                loading: "Loading profile...",
+                chapters_read: "Chapters read",
+                in_progress: "In progress",
+                completed: "Completed",
+                collection: "Collection",
+                badges: "Badges",
+                xp_total: "Total XP",
+                common_works: "{{count}} work in common",
+                common_works_plural: "{{count}} works in common",
+                recent_badges: "Recent Badges",
+                edit_modal: {
+                    title: "EDIT LICENSE",
+                    banner_label: "BANNER / GIF (URL Link)",
+                    banner_help: "Copy image address (right click > Copy image address) and paste it here.",
+                    banner_placeholder: "https://example.com/image.jpg",
+                    colors: "COLORS",
+                    accent: "ACCENT",
+                    background: "BACKGROUND",
+                    border: "BORDER",
+                    top3: "TOP 3 FAVORITES",
+                    select_favorite: "Select a favorite #{{index}}",
+                    featured_badge: "FEATURED BADGE",
+                    none: "None",
+                    bio: "BIO / QUOTE",
+                    bio_placeholder: "A phrase that defines you...",
+                    save: "SAVE"
+                },
+                guide_modal: {
+                    title: "Hunter Guide",
+                    xp_title: "EXPERIENCE (XP)",
+                    xp_desc: "Earn XP with every action on Bingeki:",
+                    xp_read: "Read a chapter:",
+                    xp_add: "Add a work:",
+                    xp_complete: "Complete a work:",
+                    xp_daily: "Daily login:",
+                    streak_title: "STREAK",
+                    streak_desc: "The flame of your passion! 🔥 Log in every day to increase your Streak.",
+                    streak_warning: "Warning: if you miss a day, the flame goes out and returns to 0.",
+                    ranks_title: "Earning Ranks",
+                    ranks_desc: "By accumulating XP, you level up and rank up (F -> S). Unlock unique badges to show off your achievements on your profile!"
+                },
+                toast: {
+                    profile_updated: "Profile updated successfully!",
+                    save_error: "Error saving: "
+                }
+            },
+            settings: {
+                title: "Settings",
+                appearance: {
+                    title: "APPEARANCE",
+                    accent_color: "Accent Color",
+                    spoiler_mode: "Spoiler Mode",
+                    spoiler_enabled: "Spoiler Mode enabled",
+                    spoiler_disabled: "Spoiler Mode disabled",
+                    spoiler_help: "Blurs synopsis to avoid spoilers."
+                },
+                colors: {
+                    red: "Bingeki Red",
+                    cyan: "Cyan Future",
+                    green: "Toxic Green",
+                    yellow: "Sunny Yellow",
+                    purple: "Royal Purple"
+                },
+                preferences: {
+                    title: "PREFERENCES",
+                    reduce_motion: "Reduce Motion",
+                    sound_effects: "Sound Effects (UI)",
+                    notifications: "Notifications"
+                },
+                data: {
+                    title: "DATA MANAGEMENT",
+                    storage_used: "Storage Used",
+                    storage_local: "{{size}} MB stored locally",
+                    clear_cache: "Clear Cache",
+                    export_backup: "Export Backup",
+                    import_backup: "Import Backup",
+                    sync_library: "Sync Library",
+                    danger_zone: "Danger Zone",
+                    danger_desc: "Irreversible actions",
+                    reset_all: "Reset All",
+                    delete_account: "Delete Account",
+                    confirm_sure: "Sure?",
+                    no: "No",
+                    yes_reset: "Yes, Reset",
+                    cancel: "Cancel",
+                    delete_confirm_title: "PERMANENTLY DELETE?",
+                    delete_confirm_desc: "This action will delete your account, your library, and all your progress. Cannot be undone.",
+                    goodbye: "GOODBYE"
+                },
+                about: {
+                    title: "ABOUT",
+                    version: "Version 1.0.0 (Alpha)",
+                    made_with: "Developed with ❤️ for anime and manga fans.",
+                    credits: "Data provided by Jikan API (MyAnimeList). Images and titles belong to their respective creators."
+                },
+                sync: {
+                    no_works: "No works to sync",
+                    complete: "Sync complete: {{count}} updated",
+                    error: "Sync error",
+                    button: "Sync"
+                },
+                toast: {
+                    reset_success: "All data has been reset!",
+                    reset_error: "Reset error",
+                    import_success: "Data imported successfully!",
+                    import_error: "Import failed",
+                    account_deleted: "Account deleted. Sayonara.",
+                    relogin_required: "Please log in again to delete your account",
+                    delete_error: "Deletion error",
+                    cache_cleared: "Cache cleared (simulated)"
+                }
             },
             discover: {
                 guest_banner: {

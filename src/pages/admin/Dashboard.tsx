@@ -172,7 +172,7 @@ export default function AdminDashboard() {
                     </div>
                     <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#666', fontFamily: 'monospace' }}>{t('admin.dashboard.last_7_days')}</div>
                 </div>
-                <div style={{ height: '300px', width: '100%' }}>
+                <div style={{ height: '300px', width: '100%', minWidth: 0 }}>
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                             <defs>
@@ -211,7 +211,7 @@ export default function AdminDashboard() {
                 </div>
             </Card>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                 {/* Recent Users */}
                 <div>
                     <h2 style={sectionTitleStyle}>
