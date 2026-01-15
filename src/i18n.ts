@@ -1641,7 +1641,9 @@ const resources = {
                         added_toast: "Comment added!",
                         error_toast: "Error adding comment",
                         reply_added_toast: "Reply added!",
-                        reply_error_toast: "Error adding reply"
+                        reply_error_toast: "Error adding reply",
+                        show_less: "▲ Collapse",
+                        show_more: "▼ See {{count}} more"
                     },
                     danger: {
                         delete: "Remove from library",
