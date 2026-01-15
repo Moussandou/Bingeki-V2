@@ -671,7 +671,7 @@ export default function WorkDetails() {
                                 onClick={() => setActiveTab('info')}
                                 className={`${styles.tabButton} ${activeTab === 'info' ? styles.activeTab : ''}`}
                             >
-                                {t('work_details.hero.general_tab')}
+                                {t('work_details.tabs.general')}
                             </button>
                             {(work.type) && (
                                 <button
