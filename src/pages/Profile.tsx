@@ -31,7 +31,7 @@ import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { useToast } from '@/context/ToastContext';
 
 export default function Profile() {
-    const { user, setUser, loading } = useAuthStore();
+    const { user, setUser, loading, userProfile } = useAuthStore();
     // Default (local) stats
     const { level, xp, xpToNextLevel, streak, badges, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, totalWorksAdded, totalWorksCompleted } = useGamificationStore();
     const { works, favoriteCharacters } = useLibraryStore();
@@ -49,7 +49,7 @@ export default function Profile() {
     // Extended Profile State (for current or visited user)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-    const [extendedProfile, setExtendedProfile] = useState<Partial<UserProfile>>({});
+    const [extendedProfile, setExtendedProfile] = useState<Partial<UserProfile>>(userProfile || {});
 
     // Visited Profile Stats (if viewing someone else)
     const [visitedStats, setVisitedStats] = useState<any>(null);

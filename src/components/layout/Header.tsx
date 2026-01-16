@@ -20,7 +20,7 @@ import styles from './Header.module.css';
 import { useTranslation } from 'react-i18next';
 
 export function Header() {
-    const { user } = useAuthStore();
+    const { user, userProfile } = useAuthStore();
     const { level, xp, streak } = useGamificationStore();
     const location = useLocation();
     const navigate = useNavigate();
@@ -207,7 +207,7 @@ export function Header() {
                                         style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '4px', border: '2px solid #000', background: '#fff' }}
                                     >
                                         <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#333', overflow: 'hidden', border: '2px solid #000' }}>
-                                            <img src={user?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <img src={userProfile?.photoURL || user?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userProfile?.displayName || user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         </div >
                                         <ChevronDown size={16} style={{ opacity: 0.7, color: '#000', transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
                                     </button >
