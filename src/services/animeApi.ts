@@ -1,5 +1,50 @@
 const BASE_URL = 'https://api.jikan.moe/v4';
 
+// Jikan API Status Response
+export interface JikanStatusResponse {
+    status: 'online' | 'offline' | 'error';
+    responseTime?: number; // in milliseconds
+    message?: string;
+    timestamp: number;
+}
+
+// Check Jikan API status
+export const checkJikanStatus = async (): Promise<JikanStatusResponse> => {
+    const startTime = Date.now();
+    try {
+        const response = await fetch(`${BASE_URL}/anime/1`, {
+            method: 'HEAD', // Use HEAD to minimize data transfer
+            signal: AbortSignal.timeout(5000) // 5 second timeout
+        });
+
+        const responseTime = Date.now() - startTime;
+
+        if (response.ok) {
+            return {
+                status: 'online',
+                responseTime,
+                timestamp: Date.now()
+            };
+        } else {
+            return {
+                status: 'error',
+                responseTime,
+                message: `HTTP ${response.status}: ${response.statusText}`,
+                timestamp: Date.now()
+            };
+        }
+    } catch (error) {
+        const responseTime = Date.now() - startTime;
+        return {
+            status: 'offline',
+            responseTime,
+            message: error instanceof Error ? error.message : 'Unknown error',
+            timestamp: Date.now()
+        };
+    }
+};
+
+
 export interface JikanResult {
     mal_id: number;
     title: string;
