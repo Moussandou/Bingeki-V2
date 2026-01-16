@@ -1,5 +1,5 @@
 
-import { searchWorks } from './src/services/animeApi';
+import { searchWorks } from '../src/services/animeApi';
 const genres = {
   Seinen: '42',
   Shonen: '27',

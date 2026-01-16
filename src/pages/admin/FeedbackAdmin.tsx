@@ -255,10 +255,10 @@ export default function AdminFeedback() {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#000', color: '#fff', padding: '2px 8px', borderRadius: '4px', fontSize: '0.8rem' }}>
                                         <Star size={12} fill="white" /> {item.rating}
                                     </div>
-                                    {item.attachments && item.attachments.length > 0 && (
+                                    {item.attachments?.length > 0 && (
                                         <ImageIcon size={18} style={{ opacity: 0.5 }} />
                                     )}
-                                    {item.adminResponses.length > 0 && (
+                                    {(item.adminResponses?.length || 0) > 0 && (
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#3b82f6' }}>
                                             <MessageSquare size={16} />
                                             <span style={{ fontWeight: 'bold' }}>{item.adminResponses.length}</span>
@@ -387,7 +387,7 @@ export default function AdminFeedback() {
 
                                         {/* Response History */}
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                            {item.adminResponses.length === 0 ? (
+                                            {(!item.adminResponses || item.adminResponses.length === 0) ? (
                                                 <p style={{ fontSize: '0.8rem', fontStyle: 'italic', opacity: 0.5 }}>Aucun message envoyé.</p>
                                             ) : (
                                                 item.adminResponses.map((res, idx) => (

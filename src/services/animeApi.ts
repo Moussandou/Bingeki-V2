@@ -100,6 +100,7 @@ export const searchWorks = async (
         start_date?: string; // YYYY-MM-DD
         end_date?: string;
         producers?: string; // Comma separated IDs
+        limit?: number;
     }
 ) => {
     try {
