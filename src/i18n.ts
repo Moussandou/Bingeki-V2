@@ -1039,10 +1039,12 @@ const resources = {
                 status: {
                     title: "STATUT",
                     watching: "En cours",
+                    reading: "Lecture en cours",
                     completed: "Terminé",
                     on_hold: "En pause",
                     dropped: "Abandonné",
-                    plan_to_watch: "À voir"
+                    plan_to_watch: "À voir",
+                    plan_to_read: "À lire"
                 },
                 rating: {
                     title: "MA NOTE"
@@ -2193,10 +2195,12 @@ const resources = {
                 status: {
                     title: "STATUS",
                     watching: "Watching",
+                    reading: "Reading",
                     completed: "Completed",
                     on_hold: "On Hold",
                     dropped: "Dropped",
-                    plan_to_watch: "Plan to Watch"
+                    plan_to_watch: "Plan to Watch",
+                    plan_to_read: "Plan to Read"
                 },
                 rating: {
                     title: "MY RATING"

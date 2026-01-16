@@ -262,6 +262,7 @@ export default function WorkDetails() {
     const [isEditing, setIsEditing] = useState(false);
     const [progress, setProgress] = useState(libraryWork?.currentChapter || 0); // Use libraryWork for initial progress
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
     const [isSynopsisExpanded, setIsSynopsisExpanded] = useState(false);
     const [isNotesExpanded, setIsNotesExpanded] = useState(false);
     const [isCommentsExpanded, setIsCommentsExpanded] = useState(false);
@@ -1395,7 +1396,13 @@ export default function WorkDetails() {
                                             {['reading', 'completed', 'plan_to_read', 'dropped'].map((s) => (
                                                 <button
                                                     key={s}
-                                                    onClick={() => updateStatus(work.id, s as any)}
+                                                    onClick={() => {
+                                                        if (s === 'completed' && work.status !== 'completed') {
+                                                            setIsCompleteModalOpen(true);
+                                                        } else {
+                                                            updateStatus(work.id, s as any);
+                                                        }
+                                                    }}
                                                     className={`${styles.statusButton} ${work.status === s ? styles.statusButtonActive : ''}`}
                                                 >
                                                     {t(`work_details.status.${s}`)}
@@ -1405,6 +1412,41 @@ export default function WorkDetails() {
                                     </div>
                                 )
                                 }
+
+                                <Modal
+                                    isOpen={isCompleteModalOpen}
+                                    onClose={() => setIsCompleteModalOpen(false)}
+                                    title={t('work_details.status.completed')} // Ensure we have a title key or reuse 'completed'
+                                >
+                                    <div style={{ textAlign: 'center' }}>
+                                        <p style={{ marginBottom: '1.5rem', fontWeight: 500 }}>
+                                            {t('work_details.progress.mark_complete_confirm', "Have you finished this work? Your progress will be set to the maximum.")}
+                                        </p>
+                                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                                            <Button
+                                                variant="ghost"
+                                                onClick={() => setIsCompleteModalOpen(false)}
+                                            >
+                                                {t('common.cancel')}
+                                            </Button>
+                                            <Button
+                                                variant="primary"
+                                                onClick={() => {
+                                                    updateStatus(work.id, 'completed');
+                                                    if (work.totalChapters && work.totalChapters > 0) {
+                                                        handleProgressUpdateWithXP(work.id, work.totalChapters, work.totalChapters);
+                                                        updateWorkDetails(work.id, { currentChapter: work.totalChapters }); // Force update store locally just in case
+                                                        setProgress(work.totalChapters);
+                                                    }
+                                                    addToast(t('work_details.progress.saved_toast'), 'success');
+                                                    setIsCompleteModalOpen(false);
+                                                }}
+                                            >
+                                                {t('common.confirm')}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </Modal>
 
                                 {/* Rating Section */}
                                 {libraryWork && (
