@@ -120,26 +120,20 @@ export default function Discover() {
                 if (filterStudio) filters.producers = filterStudio;
 
                 try {
-                    // Perform parallel search for Anime and Manga
-                    // Note: If filterStudio is set, it might only apply to Anime typically, but we'll try both to be safe or just Anime if studio is strict.
-                    // Actually, producers (studios) are mostly for anime. Manga has magazines/authors. 
-                    // To be safe and simple: Search both unless it fails.
+                    // Perform search for Anime and default to searching both if technically possible
+                    // Note: If filterStudio is set, it typically applies well to Anime.
 
                     const promises = [
                         searchWorks(searchQuery, 'anime', filters)
                     ];
 
-                    // Only search manga if we aren't filtering by strictly Anime-only fields (like Studio/Producers which are usually Anime-centric in Jikan context, though Manga has magazines)
-                    // Search both for now to maximize results.
+                    // Only search manga if we aren't filtering by strictly Anime-only fields
                     if (!filterStudio) {
                         promises.push(searchWorks(searchQuery, 'manga', filters));
                     }
 
                     const [animeResults, mangaResults = []] = await Promise.all(promises);
 
-                    // Combine and shuffle slightly or just concat? 
-
-                    // Or better: sort by popularity/score if possible? 
                     // Concat: Anime first (primary), then Manga.
                     const allResults = [...animeResults, ...mangaResults];
 
