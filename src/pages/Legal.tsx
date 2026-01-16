@@ -1,6 +1,6 @@
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
-import { Link } from 'react-router-dom';
+import { Link } from '@/components/routing/LocalizedLink';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

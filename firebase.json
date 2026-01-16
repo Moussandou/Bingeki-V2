@@ -16,6 +16,14 @@
                 "destination": "/robots.txt"
             },
             {
+                "source": "/en/**",
+                "destination": "/index-en.html"
+            },
+            {
+                "source": "/fr/**",
+                "destination": "/index.html"
+            },
+            {
                 "source": "**",
                 "destination": "/index.html"
             }

@@ -1,4 +1,5 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link } from '@/components/routing/LocalizedLink';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
@@ -30,10 +31,17 @@ export function Header() {
     const { t, i18n } = useTranslation();
     const toggleLanguage = () => {
         const newLang = i18n.language === 'fr' ? 'en' : 'fr';
-        i18n.changeLanguage(newLang);
+        // The structure is guaranteed to be /:lang/... by LanguageManager
+        const pathSegments = location.pathname.split('/');
+        pathSegments[1] = newLang;
+        navigate(pathSegments.join('/') + location.search);
     };
 
-    const isActive = (path: string) => location.pathname === path;
+    const isActive = (path: string) => {
+        const currentPath = location.pathname;
+        const cleanPath = currentPath.replace(/^\/(fr|en)/, '') || '/';
+        return cleanPath === path;
+    };
 
     return (
         <>

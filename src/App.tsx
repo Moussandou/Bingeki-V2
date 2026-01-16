@@ -1,6 +1,6 @@
-import './i18n';
 import { Suspense, lazy, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation, Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { useAuthStore } from '@/store/authStore';
 import { useLibraryStore } from '@/store/libraryStore';
@@ -48,6 +48,37 @@ const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
 const AdminUsers = lazy(() => import('@/pages/admin/Users'));
 const AdminFeedback = lazy(() => import('@/pages/admin/FeedbackAdmin'));
 const AdminSystem = lazy(() => import('@/pages/admin/SystemLogs'));
+
+// Language Manager Component
+const LanguageManager = () => {
+  const { lang } = useParams();
+  const { i18n } = useTranslation();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (lang && (lang === 'fr' || lang === 'en')) {
+      if (i18n.language !== lang) {
+        i18n.changeLanguage(lang);
+      }
+    }
+  }, [lang, i18n]);
+
+  // If language is invalid or missing, redirect to detection
+  if (!lang || !['fr', 'en'].includes(lang)) {
+    const detectedLang = i18n.language || 'fr';
+    const cleanPath = location.pathname === '/' ? '' : location.pathname;
+    return <Navigate to={`/${detectedLang}${cleanPath}${location.search}`} replace />;
+  }
+
+  return <Outlet />;
+};
+
+const RootRedirect = () => {
+  const { i18n } = useTranslation();
+  const location = useLocation();
+  const lang = i18n.language === 'en' ? 'en' : 'fr';
+  return <Navigate to={`/${lang}${location.pathname}${location.search}`} replace />;
+};
 
 function App() {
   const { setUser, setLoading, user } = useAuthStore();
@@ -158,68 +189,75 @@ function App() {
       <BrowserRouter>
         <Suspense fallback={<LoadingScreen />}>
           <Routes>
-            <Route path="/" element={<Opening />} />
-            <Route path="/challenges" element={
-              <Suspense fallback={<LoadingScreen />}>
-                <Challenges />
-              </Suspense>
-            } />
-            <Route path="/feedback" element={
-              <Suspense fallback={<LoadingScreen />}>
-                <Feedback />
-              </Suspense>
-            } />
-            <Route path="/feedback-admin" element={
-              <Suspense fallback={<LoadingScreen />}>
-                <FeedbackList />
-              </Suspense>
-            } />
-            <Route path="/changelog" element={<Changelog />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/library" element={<Library />} />
-            <Route path="/discover" element={<Discover />} />
-            <Route path="/social" element={<Social />} />
-            <Route path="/work/:id" element={<WorkDetails />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/profile/:uid" element={<Profile />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/schedule" element={
-              <Suspense fallback={<LoadingScreen />}>
-                <Schedule />
-              </Suspense>
-            } />
-            <Route path="/character/:id" element={
-              <Suspense fallback={<LoadingScreen />}>
-                <CharacterDetails />
-              </Suspense>
-            } />
-            <Route path="/person/:id" element={
-              <Suspense fallback={<LoadingScreen />}>
-                <PersonDetails />
-              </Suspense>
-            } />
+            {/* Root redirect to language prefix */}
+            <Route path="/" element={<RootRedirect />} />
 
-            <Route path="/legal" element={<Legal />} />
-            <Route path="/credits" element={
-              <Suspense fallback={<LoadingScreen />}>
-                <Credits />
-              </Suspense>
-            } />
-            <Route path="/assets" element={<Assets />} />
+            {/* Language-prefixed routes */}
+            <Route path="/:lang" element={<LanguageManager />}>
+              <Route index element={<Opening />} />
+              <Route path="challenges" element={
+                <Suspense fallback={<LoadingScreen />}>
+                  <Challenges />
+                </Suspense>
+              } />
+              <Route path="feedback" element={
+                <Suspense fallback={<LoadingScreen />}>
+                  <Feedback />
+                </Suspense>
+              } />
+              <Route path="feedback-admin" element={
+                <Suspense fallback={<LoadingScreen />}>
+                  <FeedbackList />
+                </Suspense>
+              } />
+              <Route path="changelog" element={<Changelog />} />
+              <Route path="auth" element={<Auth />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="library" element={<Library />} />
+              <Route path="discover" element={<Discover />} />
+              <Route path="social" element={<Social />} />
+              <Route path="work/:id" element={<WorkDetails />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="profile/:uid" element={<Profile />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="schedule" element={
+                <Suspense fallback={<LoadingScreen />}>
+                  <Schedule />
+                </Suspense>
+              } />
+              <Route path="character/:id" element={
+                <Suspense fallback={<LoadingScreen />}>
+                  <CharacterDetails />
+                </Suspense>
+              } />
+              <Route path="person/:id" element={
+                <Suspense fallback={<LoadingScreen />}>
+                  <PersonDetails />
+                </Suspense>
+              } />
 
+              <Route path="legal" element={<Legal />} />
+              <Route path="credits" element={
+                <Suspense fallback={<LoadingScreen />}>
+                  <Credits />
+                </Suspense>
+              } />
+              <Route path="assets" element={<Assets />} />
 
-
-            <Route path="/admin" element={
-              <RequireAdmin>
-                <AdminLayout />
-              </RequireAdmin>
-            }>
-              <Route index element={<AdminDashboard />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route path="feedback" element={<AdminFeedback />} />
-              <Route path="system" element={<AdminSystem />} />
+              <Route path="admin" element={
+                <RequireAdmin>
+                  <AdminLayout />
+                </RequireAdmin>
+              }>
+                <Route index element={<AdminDashboard />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="feedback" element={<AdminFeedback />} />
+                <Route path="system" element={<AdminSystem />} />
+              </Route>
             </Route>
+
+            {/* Fallback for non-prefixed paths */}
+            <Route path="*" element={<RootRedirect />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

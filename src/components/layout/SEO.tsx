@@ -9,10 +9,12 @@ interface SEOProps {
 }
 
 export const SEO = ({ title, description, image, url }: SEOProps) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const defaultTitle = "Bingeki | Votre aventure Manga";
-    // We'll add this key to i18n later, for now we use the fallback
     const defaultDescription = t('seo.default_description', "Transformez votre passion manga en quête RPG ! Suivez vos lectures, gagnez de l'XP, débloquez des badges et affrontez vos amis.");
+    const defaultImage = i18n.language === 'en'
+        ? "https://bingeki.web.app/bingeki-preview-en.png"
+        : "https://bingeki.web.app/bingeki-preview.png";
 
     useEffect(() => {
         const fullTitle = title ? `${title} | Bingeki` : defaultTitle;
@@ -35,10 +37,9 @@ export const SEO = ({ title, description, image, url }: SEOProps) => {
         setMeta('twitter:title', fullTitle);
         setMeta('twitter:description', finalDesc);
 
-        if (image) {
-            setMeta('og:image', image, 'property');
-            setMeta('twitter:image', image);
-        }
+        const finalImage = image || defaultImage;
+        setMeta('og:image', finalImage, 'property');
+        setMeta('twitter:image', finalImage);
 
         if (url) {
             setMeta('og:url', url, 'property');

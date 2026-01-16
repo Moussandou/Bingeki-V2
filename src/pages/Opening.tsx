@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '@/components/routing/LocalizedLink';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { Layout } from '@/components/layout/Layout';
