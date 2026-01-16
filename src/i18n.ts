@@ -868,9 +868,8 @@ const resources = {
                 anime_appearances: "APPARITIONS ANIME",
                 manga_appearances: "APPARITIONS MANGA"
             }
-        }
-    }
-},
+        },
+    },
     en: {
         translation: {
             header: {
@@ -1564,177 +1563,177 @@ const resources = {
                     data_shield: "Data Shield Protocol v3.0 Active",
                     manual_backup: "Start Manual Backup",
                     live: "LIVE"
-                },
-                work_details: {
-                    back: "BACK",
-                    loading: "LOADING...",
-                    not_found: "WORK NOT FOUND",
-                    not_found_desc: "Unable to retrieve details. Check your connection or the ID.",
-                    tabs: {
-                        general: "GENERAL",
-                        chapters_list: "CHAPTERS LIST",
-                        episodes_list: "EPISODES LIST",
-                        music: "MUSIC",
-                        reviews: "REVIEWS",
-                        gallery: "GALLERY",
-                        stats: "STATISTICS"
-                    },
-                    meta: {
-                        score: "Score",
-                        chaps: "Chaps",
-                        eps: "Eps"
-                    },
-                    streaming: {
-                        watch_on: "Watch on",
-                        watch: "WATCH",
-                        read: "READ",
-                        search_episode: "Google Search - Episode",
-                        search_chapter: "Read - Chapter"
-                    },
-                    synopsis: {
-                        title: "SYNOPSIS",
-                        show_less: "Less",
-                        show_more: "Read more"
-                    },
-                    info: {
-                        season: "SEASON",
-                        studio: "STUDIO",
-                        rank: "RANK",
-                        popularity: "POPULARITY"
-                    },
-                    trailer: {
-                        title: "TRAILER",
-                        watch: "WATCH TRAILER",
-                        close: "CLOSE"
-                    },
-                    casting: {
-                        title: "CASTING",
-                        show_more: "SEE MORE",
-                        show_less: "SEE LESS"
-                    },
-                    universe: {
-                        title: "EXTENDED UNIVERSE",
-                        collapse: "Collapse",
-                        expand: "See {{count}} more"
-                    },
-                    library: {
-                        interested: "INTERESTED?",
-                        add_desc: "Add this work to your library to track your progress!",
-                        add_to_collection: "ADD TO MY COLLECTION",
-                        login_to_add: "LOG IN TO ADD",
-                        added_toast: "Added to your library!"
-                    },
-                    progress: {
-                        title: "PROGRESS",
-                        edit: "Edit",
-                        saved_toast: "Progress saved!"
-                    },
-                    status: {
-                        title: "STATUS"
-                    },
-                    rating: {
-                        title: "MY RATING"
-                    },
-                    notes: {
-                        title: "MY NOTES",
-                        placeholder: "Write your thoughts here..."
-                    },
-                    comments: {
-                        title: "COMMENTS",
-                        time_now: "Just now",
-                        time_hours: "{{hours}}h ago",
-                        time_days: "{{days}}d ago",
-                        reply: "REPLY",
-                        reply_to: "Reply to {{name}}...",
-                        spoiler: "SPOILER",
-                        friends_reading: "{{count}} friend(s) {{action}} this work too",
-                        friends_watching: "is watching",
-                        friends_reading_action: "is reading",
-                        share_opinion: "Share your opinion...",
-                        contains_spoilers: "Contains spoilers",
-                        publish: "PUBLISH",
-                        login_to_comment: "Log in to comment",
-                        loading: "Loading comments...",
-                        no_comments: "No comments. Be the first!",
-                        error_loading: "Loading error:",
-                        permission_error: "You do not have permission to view comments (Firestore Rules).",
-                        generic_error: "Unable to load comments.",
-                        added_toast: "Comment added!",
-                        error_toast: "Error adding comment",
-                        reply_added_toast: "Reply added!",
-                        reply_error_toast: "Error adding reply",
-                        show_less: "▲ Collapse",
-                        show_more: "▼ See {{count}} more",
-                        reading: "You and {{count}} friend(s) are also reading this work",
-                        watching: "You and {{count}} friend(s) are also watching this work",
-                        placeholder: "Share your opinion (no spoilers please)...",
-                        submit: "SUBMIT"
-                    },
-                    danger: {
-                        delete: "Remove from library",
-                        deleted_toast: "\"{{title}}\" has been removed"
-                    },
-                    delete_modal: {
-                        title: "DELETION",
-                        confirm: "Delete \"{{title}}\"?",
-                        warning: "This action is irreversible. Your progress and notes will be lost.",
-                        cancel: "CANCEL",
-                        delete: "DELETE"
-                    },
-                    stats_tab: {
-                        no_data: "No statistics or staff information available for this work.",
-                        staff_title: "STAFF (MAIN)",
-                        statistics_title: "STATISTICS",
-                        in_libraries: "IN LIBRARIES",
-                        status_watching: "Watching",
-                        status_completed: "Completed",
-                        status_on_hold: "On Hold",
-                        status_dropped: "Dropped",
-                        status_plan_to_watch: "Plan to Watch",
-                        members_scores: "MEMBER SCORES"
-                    },
-                    reviews_tab: {
-                        title: "COMMUNITY REVIEWS (MyAnimeList)",
-                        read_full: "READ FULL REVIEW",
-                        no_reviews: "NO REVIEWS FOUND",
-                        no_reviews_desc: "Be the first to give your opinion in the comments section below!"
-                    },
-                    gallery_tab: {
-                        title: "OFFICIAL GALLERY",
-                        no_images: "No images available."
-                    },
-                    themes_tab: {
-                        title: "SOUNDTRACKS",
-                        openings: "OPENINGS",
-                        endings: "ENDINGS",
-                        no_opening: "No opening found.",
-                        no_ending: "No ending found.",
-                        no_music: "No music (opening/ending) available."
-                    },
-                    recommendations: {
-                        title: "YOU MIGHT ALSO LIKE",
-                        votes: "VOTES"
-                    },
-                    chapters: {
-                        unknown_count: "UNKNOWN CHAPTER COUNT",
-                        unknown_desc: "Please set the total number of chapters in the \"General\" tab to generate the list.",
-                        set_count: "Set chapter count",
-                        prompt: "Enter total number of chapters:",
-                        prompt_total: "Enter total number:",
-                        click_to_edit: "Click to edit total"
-                    }
-                },
-                character_details: {
-                    back: "BACK",
-                    not_found: "Character not found.",
-                    favorites: "favorites",
-                    identity: "IDENTITY",
-                    biography: "BIOGRAPHY",
-                    source: "Source",
-                    seiyuu: "SEIYUU (JP VOICE ACTORS)",
-                    anime_appearances: "ANIME APPEARANCES",
-                    manga_appearances: "MANGA APPEARANCES"
                 }
+            },
+            work_details: {
+                back: "BACK",
+                loading: "LOADING...",
+                not_found: "WORK NOT FOUND",
+                not_found_desc: "Unable to retrieve details. Check your connection or the ID.",
+                tabs: {
+                    general: "GENERAL",
+                    chapters_list: "CHAPTERS LIST",
+                    episodes_list: "EPISODES LIST",
+                    music: "MUSIC",
+                    reviews: "REVIEWS",
+                    gallery: "GALLERY",
+                    stats: "STATISTICS"
+                },
+                meta: {
+                    score: "Score",
+                    chaps: "Chaps",
+                    eps: "Eps"
+                },
+                streaming: {
+                    watch_on: "Watch on",
+                    watch: "WATCH",
+                    read: "READ",
+                    search_episode: "Google Search - Episode",
+                    search_chapter: "Read - Chapter"
+                },
+                synopsis: {
+                    title: "SYNOPSIS",
+                    show_less: "Less",
+                    show_more: "Read more"
+                },
+                info: {
+                    season: "SEASON",
+                    studio: "STUDIO",
+                    rank: "RANK",
+                    popularity: "POPULARITY"
+                },
+                trailer: {
+                    title: "TRAILER",
+                    watch: "WATCH TRAILER",
+                    close: "CLOSE"
+                },
+                casting: {
+                    title: "CASTING",
+                    show_more: "SEE MORE",
+                    show_less: "SEE LESS"
+                },
+                universe: {
+                    title: "EXTENDED UNIVERSE",
+                    collapse: "Collapse",
+                    expand: "See {{count}} more"
+                },
+                library: {
+                    interested: "INTERESTED?",
+                    add_desc: "Add this work to your library to track your progress!",
+                    add_to_collection: "ADD TO MY COLLECTION",
+                    login_to_add: "LOG IN TO ADD",
+                    added_toast: "Added to your library!"
+                },
+                progress: {
+                    title: "PROGRESS",
+                    edit: "Edit",
+                    saved_toast: "Progress saved!"
+                },
+                status: {
+                    title: "STATUS"
+                },
+                rating: {
+                    title: "MY RATING"
+                },
+                notes: {
+                    title: "MY NOTES",
+                    placeholder: "Write your thoughts here..."
+                },
+                comments: {
+                    title: "COMMENTS",
+                    time_now: "Just now",
+                    time_hours: "{{hours}}h ago",
+                    time_days: "{{days}}d ago",
+                    reply: "REPLY",
+                    reply_to: "Reply to {{name}}...",
+                    spoiler: "SPOILER",
+                    friends_reading: "{{count}} friend(s) {{action}} this work too",
+                    friends_watching: "is watching",
+                    friends_reading_action: "is reading",
+                    share_opinion: "Share your opinion...",
+                    contains_spoilers: "Contains spoilers",
+                    publish: "PUBLISH",
+                    login_to_comment: "Log in to comment",
+                    loading: "Loading comments...",
+                    no_comments: "No comments. Be the first!",
+                    error_loading: "Loading error:",
+                    permission_error: "You do not have permission to view comments (Firestore Rules).",
+                    generic_error: "Unable to load comments.",
+                    added_toast: "Comment added!",
+                    error_toast: "Error adding comment",
+                    reply_added_toast: "Reply added!",
+                    reply_error_toast: "Error adding reply",
+                    show_less: "▲ Collapse",
+                    show_more: "▼ See {{count}} more",
+                    reading: "You and {{count}} friend(s) are also reading this work",
+                    watching: "You and {{count}} friend(s) are also watching this work",
+                    placeholder: "Share your opinion (no spoilers please)...",
+                    submit: "SUBMIT"
+                },
+                danger: {
+                    delete: "Remove from library",
+                    deleted_toast: "\"{{title}}\" has been removed"
+                },
+                delete_modal: {
+                    title: "DELETION",
+                    confirm: "Delete \"{{title}}\"?",
+                    warning: "This action is irreversible. Your progress and notes will be lost.",
+                    cancel: "CANCEL",
+                    delete: "DELETE"
+                },
+                stats_tab: {
+                    no_data: "No statistics or staff information available for this work.",
+                    staff_title: "STAFF (MAIN)",
+                    statistics_title: "STATISTICS",
+                    in_libraries: "IN LIBRARIES",
+                    status_watching: "Watching",
+                    status_completed: "Completed",
+                    status_on_hold: "On Hold",
+                    status_dropped: "Dropped",
+                    status_plan_to_watch: "Plan to Watch",
+                    members_scores: "MEMBER SCORES"
+                },
+                reviews_tab: {
+                    title: "COMMUNITY REVIEWS (MyAnimeList)",
+                    read_full: "READ FULL REVIEW",
+                    no_reviews: "NO REVIEWS FOUND",
+                    no_reviews_desc: "Be the first to give your opinion in the comments section below!"
+                },
+                gallery_tab: {
+                    title: "OFFICIAL GALLERY",
+                    no_images: "No images available."
+                },
+                themes_tab: {
+                    title: "SOUNDTRACKS",
+                    openings: "OPENINGS",
+                    endings: "ENDINGS",
+                    no_opening: "No opening found.",
+                    no_ending: "No ending found.",
+                    no_music: "No music (opening/ending) available."
+                },
+                recommendations: {
+                    title: "YOU MIGHT ALSO LIKE",
+                    votes: "VOTES"
+                },
+                chapters: {
+                    unknown_count: "UNKNOWN CHAPTER COUNT",
+                    unknown_desc: "Please set the total number of chapters in the \"General\" tab to generate the list.",
+                    set_count: "Set chapter count",
+                    prompt: "Enter total number of chapters:",
+                    prompt_total: "Enter total number:",
+                    click_to_edit: "Click to edit total"
+                }
+            },
+            character_details: {
+                back: "BACK",
+                not_found: "Character not found.",
+                favorites: "favorites",
+                identity: "IDENTITY",
+                biography: "BIOGRAPHY",
+                source: "Source",
+                seiyuu: "SEIYUU (JP VOICE ACTORS)",
+                anime_appearances: "ANIME APPEARANCES",
+                manga_appearances: "MANGA APPEARANCES"
             }
         }
     }
