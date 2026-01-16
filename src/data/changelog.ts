@@ -8,6 +8,19 @@ export interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
     {
+        version: 'v3.1',
+        date: '16 Janvier 2026',
+        title: 'SEO & Global I18n Fix',
+        description: 'Amélioration massive du SEO et correction globale du système de traduction.',
+        changes: [
+            'SEO : Intégration du composant SEO sur les pages Détails (Animes, Persos, Staff).',
+            'I18n : Restructuration complète des namespaces pour une meilleure résolution des clés.',
+            'I18n : Traduction intégrale de la fiche Personne (PersonDetails).',
+            'Fix : Correction des clés de thèmes (Openings/Endings) et des titres de chargement.',
+            'Git : Migration vers origin/main avec déploiement automatique.'
+        ]
+    },
+    {
         version: 'v3.0',
         date: '14 Janvier 2026',
         title: 'Data Shield & Support',

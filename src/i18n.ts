@@ -579,7 +579,173 @@ const resources = {
                 updates: "Mises à jour",
                 current_version: "Version Actuelle",
                 new: "NEW",
-                to_be_continued: "TO BE CONTINUED..."
+                to_be_continued: "À SUIVRE...",
+                entries: {
+                    v3_1: {
+                        title: "SEO & Global I18n Fix",
+                        description: "Amélioration massive du SEO et correction globale du système de traduction.",
+                        changes: [
+                            "SEO : Intégration du composant SEO sur les pages Détails (Animes, Persos, Staff).",
+                            "I18n : Restructuration complète des namespaces pour une meilleure résolution des clés.",
+                            "I18n : Traduction intégrale de la fiche Personne (PersonDetails).",
+                            "Fix : Correction des clés de thèmes (Openings/Endings) et des titres de chargement.",
+                            "Git : Migration vers origin/main avec déploiement automatique."
+                        ]
+                    },
+                    v3_0: {
+                        title: "Data Shield & Support",
+                        description: "Une mise à jour critique pour la protection de vos données et le support du projet.",
+                        changes: [
+                            "Fix Critique : Système de protection des données (Anti-reset pour niveau/XP).",
+                            "Nouveau : Section \"Tips for Devs\" avec intégration Ko-fi.",
+                            "Tech : Backups automatiques et fusion intelligente des données cloud/local.",
+                            "UI : Amélioration visuelle des boutons de support sur l'accueil et le footer."
+                        ]
+                    },
+                    v2_9: {
+                        title: "Trailer & UI Polish",
+                        description: "Correction critique du lecteur de bande-annonce et optimisation de l'interface.",
+                        changes: [
+                            "Fix : Le bouton \"Fermer\" du trailer est maintenant toujours visible (Z-Index fix).",
+                            "Tech : Utilisation de React Portals pour les modales plein écran.",
+                            "UI : Amélioration du contraste des boutons d'interaction."
+                        ]
+                    },
+                    v2_8: {
+                        title: "Showcase & Accessibilité",
+                        description: "Mise en avant des détails d'œuvres et ouverture au public.",
+                        changes: [
+                            "Nouveau : Section \"Tout Savoir\" sur la Landing Page (Showcase Brutalist)",
+                            "Accessibilité : Agenda et Changelog désormais accessibles aux invités",
+                            "Nouveau : Page Crédits et mentions légales",
+                            "UI : Harmonisation des visuels Jujutsu Kaisen sur le showcase"
+                        ]
+                    },
+                    v2_7: {
+                        title: "Personnages et Seiyuu",
+                        description: "Explorez les fiches détaillées des personnages et doubleurs avec un style wiki.",
+                        changes: [
+                            "Nouveau : Pages dédiées Personnages avec fiche wiki (Age, Clan, Kekkei Genkai, etc.)",
+                            "Nouveau : Pages dédiées Seiyuu avec infos structurées (Twitter, Birthplace, etc.)",
+                            "Navigation : Cliquez sur les personnages/seiyuu depuis le casting",
+                            "UI : Logos des services de streaming (Crunchyroll, Netflix, ADN, etc.)",
+                            "UI : Univers Étendu collapsible avec cartes adaptatives",
+                            "Responsive : Amélioration mobile des pages Feedback et WorkDetails"
+                        ]
+                    },
+                    v2_6: {
+                        title: "Community Voices & Discovery",
+                        description: "Intégration des avis communautaires et amélioration de la recherche.",
+                        changes: [
+                            "Nouveau : Onglet \"Avis\" sur les fiches (Intégration MyAnimeList)",
+                            "Nouveau : Filtre par Studio dans la recherche avancée",
+                            "UI : Refonte brutalist de l'écran de chargement",
+                            "UI : Amélioration de la grille des avis et des filtres de recherche"
+                        ]
+                    },
+                    v2_5: {
+                        title: "Suivi Hebdomadaire",
+                        description: "Ne ratez plus jamais un épisode grâce au nouveau Calendrier de Sorties.",
+                        changes: [
+                            "Nouvel Agenda : Visualisez les sorties d'animes jour par jour.",
+                            "Accès rapide via le Header (Icône Calendrier).",
+                            "Mise à jour des boutons de streaming pour plus de clarté.",
+                            "Indication des heures de diffusion sur les cartes d'agenda."
+                        ]
+                    },
+                    v2_4: {
+                        title: "Profondeur de Données",
+                        description: "Une immersion totale avec les détails du casting et les statistiques de la communauté.",
+                        changes: [
+                            "Casting Enrichi : Découvrez les Seiyuu (doubleurs) originaux sous chaque personnage.",
+                            "Statistiques : Visualisez la popularité et la répartition des notes de l'œuvre.",
+                            "Visualisation Brutaliste : Nouveaux graphiques pour les scores et le statut de visionnage.",
+                            "Optimisation de la structure de la page Détails."
+                        ]
+                    },
+                    v2_3: {
+                        title: "Discovery & Immersion",
+                        description: "Enrichissement visuel et découverte de nouvelles pépites.",
+                        changes: [
+                            "Nouvel onglet 'Galerie' : Explorez les artworks officiels en haute qualité.",
+                            "Section 'Vous Aimerez Aussi' : Recommandations basées sur les votes de la communauté.",
+                            "Intégration d'une modale 'Click-to-Zoom' pour les images.",
+                            "Amélioration UX : Stop de l'autoplay vidéo et optimisation des grilles.",
+                            "Nouvel onglet 'MUSIQUES' : Écoutez tous les openings et endings avec recherche YouTube intégrée."
+                        ]
+                    },
+                    v2_2: {
+                        title: "Deep Dive Update",
+                        description: "Plongez au cœur de vos œuvres préférées avec le Casting et l'Univers Étendu.",
+                        changes: [
+                            "Ajout de la section 'Casting' : Les 10 personnages principaux en un coup d'œil.",
+                            "Ajout de la section 'Univers Étendu' : Navigation facile entre préquels, suites et side-stories.",
+                            "Nouveau style de scroll horizontal 'Invisible' pour une esthétique ultra-clean.",
+                            "Optimisation des performances API (Chargement parallèle des détails)."
+                        ]
+                    },
+                    v2_1: {
+                        title: "L'Ère des Détails",
+                        description: "Une mise à jour majeure pour fiches d'anime et de manga.",
+                        changes: [
+                            "Ajout des bandes-annonces (trailers) directement sur la page de détails.",
+                            "Nouvelles informations : Studios, Rang, Popularité, Saison et Année.",
+                            "Nouvelle page Changelog pour suivre l'historique des mises à jour.",
+                            "Amélioration de la synchronisation des données API vs Bibliothèque."
+                        ]
+                    },
+                    v1_5: {
+                        title: "Optimisation Mobile & Social",
+                        description: "Focus sur l'expérience mobile et la stabilité.",
+                        changes: [
+                            "Refonte complète de l'affichage Social sur mobile.",
+                            "Correction des problèmes d'affichage des graphiques.",
+                            "Optimisation des permissions Firestore.",
+                            "Résolution des doublons dans la page Découvrir."
+                        ]
+                    },
+                    v1_4: {
+                        title: "Mobile First & Stabilité",
+                        description: "Améliorations cruciales pour la navigation sur petits écrans.",
+                        changes: [
+                            "Amélioration globale de la responsivité 'Bingeki Style' sur mobile.",
+                            "Correction des problèmes de redimensionnement des graphiques.",
+                            "Injection correcte des IDs utilisateurs dans les profils."
+                        ]
+                    },
+                    v1_3: {
+                        title: "Community & Feedback",
+                        description: "Introduction des fonctionnalités communautaires.",
+                        changes: [
+                            "Système de commentaires avancé avec mentions.",
+                            "Nouvelle page Feedback et interface d'administration.",
+                            "Ajout du Rang spécial 'Niveau 100'.",
+                            "Sécurisation renforcée des données utilisateurs.",
+                            "Style Brutalist appliqué aux zones de texte."
+                        ]
+                    },
+                    v1_2: {
+                        title: "Profile 2.0 & Gamification",
+                        description: "Refonte de l'identité utilisateur et du système de progression.",
+                        changes: [
+                            "Nouveau Profil : Graphique de Nen, Top 3 Favoris et Badges.",
+                            "Système d'invitation aux Défis et contrôles de Watch Party.",
+                            "Amélioration de la gestion des bannières de profil.",
+                            "Mise à jour de la logique d'XP et de progression.",
+                            "Filtre de contenu 'SFW' activé par défaut."
+                        ]
+                    },
+                    v1_1: {
+                        title: "Discover & UI Polish",
+                        description: "Amélioration de la découverte et harmonisation visuelle.",
+                        changes: [
+                            "Nouvelle interface 'Discover' immersive.",
+                            "Filtres par genre fonctionnels via l'API.",
+                            "Harmonisation des boutons et cartes brutalist.",
+                            "Correction des styles de la bibliothèque."
+                        ]
+                    }
+                }
             },
             legal: {
                 back: "RETOUR",
@@ -1332,7 +1498,173 @@ const resources = {
                 updates: "Updates",
                 current_version: "Current Version",
                 new: "NEW",
-                to_be_continued: "TO BE CONTINUED..."
+                to_be_continued: "TO BE CONTINUED...",
+                entries: {
+                    v3_1: {
+                        title: "SEO & Global I18n Fix",
+                        description: "Massive SEO improvement and global translation system correction.",
+                        changes: [
+                            "SEO: SEO component integration on Details pages (Animes, Characters, Staff).",
+                            "I18n: Complete restructuring of namespaces for better key resolution.",
+                            "I18n: Full translation of PersonDetails sheet.",
+                            "Fix: Correction of theme keys (Openings/Endings) and loading titles.",
+                            "Git: Migration to origin/main with automatic deployment."
+                        ]
+                    },
+                    v3_0: {
+                        title: "Data Shield & Support",
+                        description: "A critical update for your data protection and project support.",
+                        changes: [
+                            "Critical Fix: Data protection system (Anti-reset for level/XP).",
+                            "New: \"Tips for Devs\" section with Ko-fi integration.",
+                            "Tech: Automatic backups and intelligent cloud/local data merging.",
+                            "UI: Visual improvement of support buttons on home and footer."
+                        ]
+                    },
+                    v2_9: {
+                        title: "Trailer & UI Polish",
+                        description: "Critical fix for the trailer player and interface optimization.",
+                        changes: [
+                            "Fix: The trailer's \"Close\" button is now always visible (Z-Index fix).",
+                            "Tech: Use of React Portals for full-screen modals.",
+                            "UI: Improved contrast for interaction buttons."
+                        ]
+                    },
+                    v2_8: {
+                        title: "Showcase & Accessibility",
+                        description: "Highlighting work details and opening to the public.",
+                        changes: [
+                            "New: \"Learn Everything\" section on the Landing Page (Brutalist Showcase)",
+                            "Accessibility: Schedule and Changelog now accessible to guests",
+                            "New: Credits and legal mentions page",
+                            "UI: Harmonization of Jujutsu Kaisen visuals on the showcase"
+                        ]
+                    },
+                    v2_7: {
+                        title: "Characters and Seiyuu",
+                        description: "Explore detailed character and voice actor profiles with a wiki style.",
+                        changes: [
+                            "New: Dedicated Character pages with wiki sheet (Age, Clan, Kekkei Genkai, etc.)",
+                            "New: Dedicated Seiyuu pages with structured info (Twitter, Birthplace, etc.)",
+                            "Navigation: Click on characters/seiyuu from the casting section",
+                            "UI: Streaming service logos (Crunchyroll, Netflix, ADN, etc.)",
+                            "UI: Collapsible Extended Universe with adaptive cards",
+                            "Responsive: Mobile improvement for Feedback and WorkDetails pages"
+                        ]
+                    },
+                    v2_6: {
+                        title: "Community Voices & Discovery",
+                        description: "Integration of community reviews and search improvements.",
+                        changes: [
+                            "New: \"Reviews\" tab on sheets (MyAnimeList integration)",
+                            "New: Studio filter in advanced search",
+                            "UI: Brutalist redesign of the loading screen",
+                            "UI: Improvement of the reviews grid and search filters"
+                        ]
+                    },
+                    v2_5: {
+                        title: "Weekly Follow-up",
+                        description: "Never miss an episode again with the new Release Schedule.",
+                        changes: [
+                            "New Schedule: View anime releases day by day.",
+                            "Quick access via Header (Calendar icon).",
+                            "Updated streaming buttons for more clarity.",
+                            "Broadcasting times indicated on schedule cards."
+                        ]
+                    },
+                    v2_4: {
+                        title: "Data Depth",
+                        description: "Full immersion with casting details and community statistics.",
+                        changes: [
+                            "Enriched Casting: Discover original Seiyuu (voice actors) under each character.",
+                            "Statistics: Visualize popularity and score distribution of the work.",
+                            "Brutalist Visualization: New charts for scores and watching status.",
+                            "Optimization of the Details page structure."
+                        ]
+                    },
+                    v2_3: {
+                        title: "Discovery & Immersion",
+                        description: "Visual enrichment and discovery of new gems.",
+                        changes: [
+                            "New 'Gallery' tab: Explore official artworks in high quality.",
+                            " 'You Might Also Like' section: Recommendations based on community votes.",
+                            "Integration of a 'Click-to-Zoom' modal for images.",
+                            "UX Improvement: Video autoplay stop and grid optimization.",
+                            "New 'MUSIC' tab: Listen to all openings and endings with integrated YouTube search."
+                        ]
+                    },
+                    v2_2: {
+                        title: "Deep Dive Update",
+                        description: "Dive into your favorite works with Casting and Extended Universe.",
+                        changes: [
+                            "Added 'Casting' section: Top 10 main characters at a glance.",
+                            "Added 'Extended Universe' section: Easy navigation between prequels, sequels, and side-stories.",
+                            "New 'Invisible' horizontal scroll style for an ultra-clean aesthetic.",
+                            "API performance optimization (Parallel details loading)."
+                        ]
+                    },
+                    v2_1: {
+                        title: "The Details Era",
+                        description: "A major update to enrich anime and manga sheets.",
+                        changes: [
+                            "Added trailers directly on the details page.",
+                            "New info: Studios, Rank, Popularity, Season, and Year.",
+                            "New Changelog page to track update history.",
+                            "Improved API vs Library data synchronization."
+                        ]
+                    },
+                    v1_5: {
+                        title: "Mobile & Social Optimization",
+                        description: "Focus on mobile experience and stability.",
+                        changes: [
+                            "Complete redesign of Social display on mobile.",
+                            "Fixed chart display issues.",
+                            "Firestore permissions optimization.",
+                            "Resolved duplicates in Discovery page."
+                        ]
+                    },
+                    v1_4: {
+                        title: "Mobile First & Stability",
+                        description: "Crucial improvements for small screen navigation.",
+                        changes: [
+                            "Global improvement of 'Bingeki Style' responsivity on mobile.",
+                            "Fixed chart resizing issues.",
+                            "Correct injection of user IDs in profiles."
+                        ]
+                    },
+                    v1_3: {
+                        title: "Community & Feedback",
+                        description: "Introduction of community features.",
+                        changes: [
+                            "Advanced commenting system with mentions.",
+                            "New Feedback page and admin interface.",
+                            "Added 'Level 100' special rank.",
+                            "Enhanced user data security.",
+                            "Brutalist style applied to text areas."
+                        ]
+                    },
+                    v1_2: {
+                        title: "Profile 2.0 & Gamification",
+                        description: "Major overhaul of user identity and progression system.",
+                        changes: [
+                            "New Profile: Nen Chart, Top 3 Favorites, and Badges.",
+                            "Challenge invitation system and Watch Party controls.",
+                            "Improved profile banner management.",
+                            "XP and progression logic update.",
+                            "'SFW' content filter enabled by default."
+                        ]
+                    },
+                    v1_1: {
+                        title: "Discover & UI Polish",
+                        description: "Discovery improvement and visual harmonization.",
+                        changes: [
+                            "New immersive 'Discover' interface.",
+                            "Functional genre filters via API.",
+                            "Harmonization of buttons and brutalist cards.",
+                            "Fixed library styles."
+                        ]
+                    }
+                }
             },
             legal: {
                 back: "BACK",

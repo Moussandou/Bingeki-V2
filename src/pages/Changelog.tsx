@@ -1,11 +1,21 @@
+import { useState } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { changelogData } from '@/data/changelog';
-import { Calendar, Tag, GitCommit, Check } from 'lucide-react';
+import { Calendar, Tag, GitCommit, Check, ChevronDown, ChevronUp } from 'lucide-react';
 import styles from './Changelog.module.css';
 import { useTranslation } from 'react-i18next';
 
 export default function Changelog() {
     const { t } = useTranslation();
+    const [expandedEntries, setExpandedEntries] = useState<Record<number, boolean>>({ 0: true });
+
+    const toggleEntry = (index: number) => {
+        setExpandedEntries(prev => ({
+            ...prev,
+            [index]: !prev[index]
+        }));
+    };
+
     const totalUpdates = changelogData.length;
     const latestVersion = changelogData[0]?.version || 'v0.0';
 
@@ -42,6 +52,9 @@ export default function Changelog() {
 
                     {changelogData.map((entry, index) => {
                         const isLatest = index === 0;
+                        const isExpanded = expandedEntries[index];
+                        const versionKey = entry.version.replace('.', '_');
+
                         return (
                             <div key={index} className={styles.timelineEntry}>
                                 {/* Timeline Node */}
@@ -50,7 +63,11 @@ export default function Changelog() {
                                 </div>
 
                                 {/* Content Card */}
-                                <div className={`${styles.contentCard} ${isLatest ? styles.isNew : ''}`}>
+                                <div
+                                    className={`${styles.contentCard} ${isLatest ? styles.isNew : ''} ${isExpanded ? styles.expanded : ''}`}
+                                    onClick={() => toggleEntry(index)}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     {/* Header: Version & Date */}
                                     <div className={styles.cardHeader}>
                                         <div className={styles.versionTag}>
@@ -58,44 +75,47 @@ export default function Changelog() {
                                                 <Tag size={16} /> {entry.version}
                                             </div>
                                             {isLatest && (
-                                                <span style={{
-                                                    background: '#FFD700',
-                                                    color: '#000',
-                                                    padding: '0.25rem 0.5rem',
-                                                    fontSize: '0.8rem',
-                                                    fontWeight: 800,
-                                                    border: '2px solid #000',
-                                                    marginLeft: '0.5rem',
-                                                    transform: 'rotate(-5deg)'
-                                                }}>
+                                                <span className={styles.newBadge}>
                                                     {t('changelog.new')}
                                                 </span>
                                             )}
                                         </div>
-                                        <div className={styles.dateTag}>
-                                            <Calendar size={16} /> {entry.date}
+                                        <div className={styles.headerRight}>
+                                            <div className={styles.dateTag}>
+                                                <Calendar size={16} /> {entry.date}
+                                            </div>
+                                            <div className={styles.expandIcon}>
+                                                {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                            </div>
                                         </div>
                                     </div>
 
                                     {/* Title & Description */}
                                     <h2 className={styles.entryTitle}>
-                                        {entry.title}
+                                        {t(`changelog.entries.${versionKey}.title`, entry.title)}
                                     </h2>
-                                    <p className={styles.entryDescription}>
-                                        {entry.description}
-                                    </p>
 
-                                    {/* Changes List */}
-                                    <ul className={styles.changesList}>
-                                        {entry.changes.map((change, i) => (
-                                            <li key={i} className={styles.changeItem}>
-                                                <div className={styles.bulletPoint}>
-                                                    <Check size={14} strokeWidth={4} />
-                                                </div>
-                                                <span style={{ fontWeight: 500 }}>{change}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                    {isExpanded && (
+                                        <>
+                                            <p className={styles.entryDescription}>
+                                                {t(`changelog.entries.${versionKey}.description`, entry.description)}
+                                            </p>
+
+                                            {/* Changes List */}
+                                            <ul className={styles.changesList}>
+                                                {entry.changes.map((_, i) => (
+                                                    <li key={i} className={styles.changeItem}>
+                                                        <div className={styles.bulletPoint}>
+                                                            <Check size={14} strokeWidth={4} />
+                                                        </div>
+                                                        <span style={{ fontWeight: 500 }}>
+                                                            {t(`changelog.entries.${versionKey}.changes.${i}`, entry.changes[i])}
+                                                        </span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         );

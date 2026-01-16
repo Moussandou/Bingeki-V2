@@ -130,7 +130,28 @@
 .isNew {
     border-color: #000;
     box-shadow: 8px 8px 0 #FFD700;
-    /* Gold shadow for new */
+}
+
+.newBadge {
+    background: #FFD700;
+    color: #000;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 900;
+    border: 2px solid #000;
+    margin-left: 0.5rem;
+    transform: rotate(-5deg);
+    display: inline-block;
+}
+
+.expanded {
+    transform: translate(-2px, -2px);
+    box-shadow: 10px 10px 0 #000;
+    /* Keep the shadow consistent with hover when expanded */
+}
+
+.expanded.isNew {
+    box-shadow: 10px 10px 0 #FFD700;
 }
 
 .cardHeader {
@@ -138,10 +159,30 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 1rem;
     padding-bottom: 1rem;
     border-bottom: 2px solid #f0f0f0;
+}
+
+.headerRight {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.expandIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+}
+
+.contentCard:hover .expandIcon {
+    background: #f0f0f0;
 }
 
 .versionBadge {
