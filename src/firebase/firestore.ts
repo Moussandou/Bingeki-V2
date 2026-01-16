@@ -1298,8 +1298,8 @@ export async function getSevenDayActivityStats() {
 
         // Convert to array and sort by logical order (today is last)
         // Since we iterated 6..0, the map insertions might not be ordered if we just .values().
-        // But we added an index. Let's rely on the map initialization order or sort.
-        // Actually, let's just create the array based on the last 7 days logic again.
+        // We added an index. Rely on the map initialization order or sort.
+        // Create the array based on the last 7 days logic again.
         const result = [];
         for (let i = 6; i >= 0; i--) {
             const d = new Date();

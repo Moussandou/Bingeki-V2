@@ -133,7 +133,7 @@
     width: 100%;
     background-position: center;
     background-size: cover;
-    /* CHANGED: Cover to fill space better on desktop too, or keep contain if user prefers full image. Let's stick to contain as per previous file but ensure mobile is better. */
+    /* Cover to fill space better on desktop too, or keep contain if user prefers full image. */
     background-size: contain;
     background-repeat: no-repeat;
     background-color: #f4f4f5;

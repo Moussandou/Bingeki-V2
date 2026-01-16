@@ -27,7 +27,7 @@
     font-weight: 900;
     font-style: italic;
     color: #808080;
-    /* Gray as requested */
+    /* Gray */
     opacity: 0.1;
     pointer-events: none;
     user-select: none;
@@ -137,7 +137,7 @@
 
 /* Section specific styling */
 .progressionVisual {
-    /* Straighten the license card as requested */
+    /* Straighten the license card */
     transform: none !important;
 }
 

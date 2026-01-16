@@ -130,7 +130,7 @@ export default function Discover() {
                     ];
 
                     // Only search manga if we aren't filtering by strictly Anime-only fields (like Studio/Producers which are usually Anime-centric in Jikan context, though Manga has magazines)
-                    // Let's search both for now to maximize results.
+                    // Search both for now to maximize results.
                     if (!filterStudio) {
                         promises.push(searchWorks(searchQuery, 'manga', filters));
                     }
@@ -138,9 +138,9 @@ export default function Discover() {
                     const [animeResults, mangaResults = []] = await Promise.all(promises);
 
                     // Combine and shuffle slightly or just concat? 
-                    // Let's interleave or just concat to show Anime then Manga. 
+
                     // Or better: sort by popularity/score if possible? 
-                    // For now, let's just concat: Anime first (primary), then Manga.
+                    // Concat: Anime first (primary), then Manga.
                     const allResults = [...animeResults, ...mangaResults];
 
                     // Filter out duplicates

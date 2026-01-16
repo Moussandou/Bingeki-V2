@@ -210,7 +210,7 @@ export default function Opening() {
     // Actually, resultsByGenre keys are 'Seinen', 'Shonen' etc. 
     // We need to map the translation key back to the data key.
     // Or just use the hardcoded genre names in resultsByGenre matching the translations.
-    // Let's check resultsByGenre keys: 'Seinen', 'Shonen', 'Romance', 'Horreur', 'Isekai'.
+    // Check resultsByGenre keys
     // The translation keys are '...genres.seinen' -> likely returns "Seinen".
 
     // Determine if typing is finished

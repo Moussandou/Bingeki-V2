@@ -471,7 +471,7 @@ export interface JikanReview {
 
 export const getWorkReviews = async (id: number, type: 'anime' | 'manga') => {
     try {
-        // Fetch top rated reviews first (default Jikan behavior usually sorts by helpfullness/date depending on params, but let's stick to default for now)
+        // Fetch top rated reviews first
         const response = await fetch(`${BASE_URL}/${type}/${id}/reviews?spoilers=false&preliminary=false`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
