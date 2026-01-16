@@ -18,7 +18,7 @@ export default function TierListFeed() {
             setLoading(true);
             try {
                 const data = await getPublicTierLists(50);
-                // Sort client-side for now as we lack 'likeCount' index
+                // Sort client-side
                 if (filter === 'popular') {
                     data.sort((a, b) => b.likes.length - a.likes.length);
                 }

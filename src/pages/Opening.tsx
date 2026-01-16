@@ -207,7 +207,7 @@ export default function Opening() {
     // We stick to the key for looking up results, even if we display translated text
     const displayResults = resultsByGenre[t(currentKey)] || resultsByGenre[currentKey] || [];
     // Fallback: try to find results by the translated key (e.g. "Shonen") or the raw key.
-    // Actually, resultsByGenre keys are 'Seinen', 'Shonen' etc. 
+    // resultsByGenre keys are 'Seinen', 'Shonen' etc. 
     // We need to map the translation key back to the data key.
     // Or just use the hardcoded genre names in resultsByGenre matching the translations.
     // Check resultsByGenre keys

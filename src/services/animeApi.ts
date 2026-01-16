@@ -196,7 +196,7 @@ export const getWorkDetails = async (id: number, type: 'anime' | 'manga'): Promi
 
         const response = await fetch(`${BASE_URL}/${type}/${id}`);
         if (!response.ok) {
-            // Handle 429 Too Many Requests specifically if needed, but for now generic error
+            // Handle 429 Too Many Requests specifically if needed
             if (response.status === 429) {
                 console.warn(`Rate limit hit for ${type} ${id}, waiting longer...`);
                 await new Promise(resolve => setTimeout(resolve, 1000));

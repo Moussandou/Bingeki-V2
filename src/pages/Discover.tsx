@@ -121,7 +121,7 @@ export default function Discover() {
 
                 try {
                     // Perform search for Anime and default to searching both if technically possible
-                    // Note: If filterStudio is set, it typically applies well to Anime.
+                    // If filterStudio is set, it typically applies well to Anime.
 
                     const promises = [
                         searchWorks(searchQuery, 'anime', filters)

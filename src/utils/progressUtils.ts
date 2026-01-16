@@ -65,8 +65,7 @@ export const handleProgressUpdateWithXP = (
         }
     } else {
         // Regressing: Remove XP (Penalty)
-        // Note: addXp handles adding, so we pass negative amount.
-        // We might want to cap deduction to not go below 0 total XP? 
+        // Simple deduction. to not go below 0 total XP? 
         // For now, simple deduction.
         const penalty = XP_REWARDS.UPDATE_PROGRESS * Math.abs(diff);
         addXp(-penalty);

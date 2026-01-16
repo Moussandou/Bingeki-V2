@@ -446,7 +446,7 @@ export async function checkFriendship(userId1: string, userId2: string): Promise
     }
 }
 
-// Get Friends List (Real-time listener could be better, but we use simple get for now)
+// Get Friends List
 export async function getFriends(userId: string): Promise<Friend[]> {
     try {
         const q = query(collection(db, 'users', userId, 'friends'));
@@ -647,7 +647,7 @@ export async function getComments(workId: number, limitCount: number = 50): Prom
 // Get comments organized with replies
 // Get comments organized with replies (Recursive)
 export async function getCommentsWithReplies(workId: number): Promise<CommentWithReplies[]> {
-    const allComments = await getComments(workId, 200); // Fetch more to be safe
+    const allComments = await getComments(workId, 200);
 
     // Helper to build tree
     const buildTree = (comments: Comment[], parentId: string | undefined): CommentWithReplies[] => {
@@ -1162,7 +1162,7 @@ export async function getAdminStats(): Promise<{
 
         const newUsersToday = usersSnap.docs.filter(doc => {
             const data = doc.data() as UserProfile;
-            // Use lastLogin as proxy if createdAt missing, but ideally we use createdAt
+            // Use lastLogin as proxy if createdAt missing
             const joinDate = data.createdAt || data.lastLogin || 0;
             return joinDate > startOfDay;
         }).length;
@@ -1282,7 +1282,7 @@ export async function getSevenDayActivityStats() {
                 const stat = statsMap.get(dayName)!;
                 stat.activities += 1;
                 // Active users estimation: increment active for each unique activity user per day
-                // (Simplified: just count activities for now as 'active' volume)
+                // Count activities as 'active' volume
                 stat.active += 1;
             }
         });

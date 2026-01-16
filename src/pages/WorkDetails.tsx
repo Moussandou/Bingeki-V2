@@ -311,7 +311,7 @@ export default function WorkDetails() {
                     typeToFetch = 'manga';
                 }
             }
-            // Fallback: If unknown, try anime first (or maybe we should try both? For now default to anime)
+            // Fallback: default to anime
 
             getWorkDetails(Number(id), typeToFetch).then(res => {
                 // Map JikanResult to compatible format for UI (partial)
