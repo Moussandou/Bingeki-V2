@@ -7,6 +7,7 @@ import { loginWithGoogle, loginWithEmail, registerWithEmail } from '@/firebase/a
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { SEO } from '@/components/layout/SEO';
 
 export default function Auth() {
     const { t } = useTranslation();
@@ -83,6 +84,7 @@ export default function Auth() {
             padding: '1rem',
             overflow: 'hidden'
         }}>
+            <SEO title={isLogin ? t('auth.login_title') : t('auth.register_title')} />
             {/* Back Button */}
             <button
                 onClick={() => navigate('/')}

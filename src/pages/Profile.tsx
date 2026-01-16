@@ -22,6 +22,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getBadgeIcon, getBadgeColors } from '@/utils/badges';
 import type { Badge } from '@/types/badge';
+import { SEO } from '@/components/layout/SEO';
 import { storage } from '@/firebase/config';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { useToast } from '@/context/ToastContext';
@@ -220,6 +221,10 @@ export default function Profile() {
 
     return (
         <Layout>
+            <SEO
+                title={extendedProfile.displayName ? t('profile.seo_title', { name: extendedProfile.displayName }) : t('profile.title')}
+                description={extendedProfile.bio || t('profile.seo_description')}
+            />
             <div style={{ minHeight: 'calc(100vh - 80px)' }}>
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
 
