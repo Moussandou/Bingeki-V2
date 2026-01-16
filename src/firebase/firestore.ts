@@ -1189,6 +1189,16 @@ export async function setGlobalAnnouncement(message: string, type: 'info' | 'war
         throw error;
     }
 }
+
+export async function setGlobalConfig(config: Partial<Omit<GlobalConfig, 'announcement'>>): Promise<void> {
+    try {
+        await setDoc(doc(db, 'config', 'global'), config, { merge: true });
+        console.log('[Firestore] Global config updated');
+    } catch (error) {
+        console.error('[Firestore] Error setting config:', error);
+        throw error;
+    }
+}
 // ==================== TIER LIST FUNCTIONS ====================
 
 export interface TierList {
