@@ -2151,6 +2151,11 @@ i18n
     .init({
         resources,
         fallbackLng: 'fr',
+        detection: {
+            order: ['path', 'localStorage', 'navigator'],
+            lookupFromPathIndex: 0
+        },
+        supportedLngs: ['fr', 'en'],
         interpolation: {
             escapeValue: false // react already safes from xss
         }

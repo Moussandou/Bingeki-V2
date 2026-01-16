@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink } from '@/components/routing/LocalizedLink';
 import { LayoutDashboard, Users, MessageSquare, ShieldAlert, LogOut, Home, X } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { auth } from '@/firebase/config';

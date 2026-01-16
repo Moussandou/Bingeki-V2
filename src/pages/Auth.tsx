@@ -5,8 +5,8 @@ import { Input } from '@/components/ui/Input';
 import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { loginWithGoogle, loginWithEmail, registerWithEmail } from '@/firebase/auth';
 import { useAuthStore } from '@/store/authStore';
-import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Link, useLocalizedNavigate } from '@/components/routing/LocalizedLink';
 import { SEO } from '@/components/layout/SEO';
 
 export default function Auth() {
@@ -21,7 +21,7 @@ export default function Auth() {
     const [displayName, setDisplayName] = useState('');
 
     const { setUser } = useAuthStore();
-    const navigate = useNavigate();
+    const navigate = useLocalizedNavigate();
 
     const toggleMode = () => {
         setIsLogin(!isLogin);

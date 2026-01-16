@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Users, AlertCircle, TrendingUp, Activity, ExternalLink, Shield } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
-import { Link } from 'react-router-dom';
+import { Link } from '@/components/routing/LocalizedLink';
 import { getAdminStats, getAllUsers, getSevenDayActivityStats } from '@/firebase/firestore';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTranslation } from 'react-i18next';

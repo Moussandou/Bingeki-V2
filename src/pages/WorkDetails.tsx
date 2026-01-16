@@ -1,5 +1,6 @@
-import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Link, useLocalizedNavigate } from '@/components/routing/LocalizedLink';
 import { Layout } from '@/components/layout/Layout';
 import { createPortal } from 'react-dom';
 import { useLibraryStore } from '@/store/libraryStore';
@@ -215,7 +216,7 @@ function RecursiveComment({
 
 export default function WorkDetails() {
     const { id } = useParams();
-    const navigate = useNavigate();
+    const navigate = useLocalizedNavigate();
     const { t } = useTranslation();
     const { addToast } = useToast(); // Initialize hook
     const { getWork, addWork, updateStatus, updateWorkDetails, removeWork } = useLibraryStore(); // Add removeWork

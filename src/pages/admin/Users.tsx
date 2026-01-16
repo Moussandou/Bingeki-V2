@@ -3,7 +3,7 @@ import { Search, Shield, Ban, ExternalLink, Edit, Eye } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Switch } from '@/components/ui/Switch';
 import { getAllUsers, toggleUserBan, toggleUserAdmin, adminUpdateUserGamification, type UserProfile } from '@/firebase/firestore';
-import { Link } from 'react-router-dom';
+import { Link } from '@/components/routing/LocalizedLink';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';

@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { useLibraryStore } from '@/store/libraryStore';
-import { Link } from 'react-router-dom';
+import { Link } from '@/components/routing/LocalizedLink';
 import { calculateRank, getRankColor } from '@/utils/rankUtils';
 import { useState, useEffect } from 'react';
 import { getFriendsActivity } from '@/firebase/firestore';
