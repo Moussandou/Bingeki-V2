@@ -18,6 +18,17 @@ interface AddWorkModalProps {
 }
 
 export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps) {
+    const isValidImageSrc = (src: string) => {
+        if (!src) return false;
+        if (src.startsWith('data:image/')) return true;
+        try {
+            const url = new URL(src);
+            return ['http:', 'https:'].includes(url.protocol);
+        } catch {
+            return false;
+        }
+    };
+
     const { t } = useTranslation();
     const [mode, setMode] = useState<'api' | 'manual'>('api');
     const [query, setQuery] = useState('');
@@ -423,7 +434,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                         ) : (
                             <div style={{ position: 'relative', width: '100px', height: '140px', border: '2px solid #000' }}>
                                 <img
-                                    src={manualImage}
+                                    src={isValidImageSrc(manualImage) ? manualImage : ""}
                                     alt="Preview"
                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                 />
