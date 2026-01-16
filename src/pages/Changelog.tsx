@@ -82,7 +82,7 @@ export default function Changelog() {
                                         </div>
                                         <div className={styles.headerRight}>
                                             <div className={styles.dateTag}>
-                                                <Calendar size={16} /> {entry.date}
+                                                <Calendar size={16} /> {t(`changelog.entries.${versionKey}.date`, entry.date)}
                                             </div>
                                             <div className={styles.expandIcon}>
                                                 {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
