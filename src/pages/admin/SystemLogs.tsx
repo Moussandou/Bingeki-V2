@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Shield, Save, Database, Server, Terminal, Radio, Megaphone } from 'lucide-react';
+import { Shield, Save, Database, Server, Terminal, Radio, Megaphone, Activity, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Switch } from '@/components/ui/Switch';
 import { logDataBackup } from '@/utils/dataProtection';
-import { getAllActivities, setGlobalAnnouncement, getGlobalConfig, type ActivityEvent } from '@/firebase/firestore';
+import { getAllActivities, setGlobalAnnouncement, setGlobalConfig, getGlobalConfig, type ActivityEvent } from '@/firebase/firestore';
 import { useTranslation } from 'react-i18next';
+import { checkJikanStatus, type JikanStatusResponse } from '@/services/animeApi';
 
 export default function AdminSystem() {
     const { t } = useTranslation();
@@ -16,6 +17,10 @@ export default function AdminSystem() {
     const [broadcastMessage, setBroadcastMessage] = useState('');
     const [broadcastActive, setBroadcastActive] = useState(false);
     const [broadcastType, setBroadcastType] = useState<'info' | 'warning' | 'alert'>('info');
+
+    // Jikan API Status
+    const [jikanStatus, setJikanStatus] = useState<JikanStatusResponse | null>(null);
+    const [checkingJikan, setCheckingJikan] = useState(false);
 
     useEffect(() => {
         // Initial Mock Logs (System Boot)
@@ -54,10 +59,21 @@ export default function AdminSystem() {
             });
         };
 
-        fetchActivities(); // First fetch
-        const interval = setInterval(fetchActivities, 5000); // Poll every 5s
+        fetchActivities();
+        const interval = setInterval(fetchActivities, 5000);
 
-        return () => clearInterval(interval);
+        // Check Jikan API Status
+        const checkApiStatus = async () => {
+            setCheckingJikan(true);
+            const status = await checkJikanStatus();
+            setJikanStatus(status);
+            setCheckingJikan(false);
+            addLog(`[API] Jikan: ${status.status.toUpperCase()} | ${status.responseTime}ms`);
+        };
+        checkApiStatus();
+        const apiInterval = setInterval(checkApiStatus, 30000);
+
+        return () => { clearInterval(interval); clearInterval(apiInterval); };
     }, []);
 
     const formatActivityLog = (act: ActivityEvent) => {
@@ -162,6 +178,37 @@ export default function AdminSystem() {
                         </div>
                     </Card>
 
+                    {/* Jikan API Status Card */}
+                    <Card variant="manga" style={{ padding: '1.5rem', backgroundColor: 'white' }}>
+                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', textTransform: 'uppercase', borderBottom: '2px solid black', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Activity size={20} /> JIKAN API STATUS
+                        </h2>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {jikanStatus && (
+                                <>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '1rem', border: '2px solid black', backgroundColor: jikanStatus.status === 'online' ? '#d4edda' : jikanStatus.status === 'error' ? '#fff3cd' : '#f8d7da' }}>
+                                        {jikanStatus.status === 'online' && <CheckCircle size={24} color="#28a745" />}
+                                        {jikanStatus.status === 'error' && <AlertCircle size={24} color="#ffc107" />}
+                                        {jikanStatus.status === 'offline' && <XCircle size={24} color="#dc3545" />}
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontWeight: 'bold', fontSize: '1rem', textTransform: 'uppercase' }}>
+                                                {jikanStatus.status === 'online' && 'ONLINE'}
+                                                {jikanStatus.status === 'error' && 'ERROR'}
+                                                {jikanStatus.status === 'offline' && 'OFFLINE'}
+                                            </div>
+                                            {jikanStatus.responseTime !== undefined && <div style={{ fontSize: '0.85rem', color: '#6b7280', fontFamily: 'monospace' }}>Response: {jikanStatus.responseTime}ms</div>}
+                                            {jikanStatus.message && <div style={{ fontSize: '0.75rem', color: '#6b7280', fontFamily: 'monospace', marginTop: '0.25rem' }}>{jikanStatus.message}</div>}
+                                        </div>
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', color: '#6b7280', fontFamily: 'monospace' }}>Last checked: {new Date(jikanStatus.timestamp).toLocaleTimeString()}</div>
+                                </>
+                            )}
+                            <button onClick={async () => { setCheckingJikan(true); const s = await checkJikanStatus(); setJikanStatus(s); setCheckingJikan(false); addLog(`[API] Manual check: ${s.status.toUpperCase()} | ${s.responseTime}ms`); }} disabled={checkingJikan} style={{ width: '100%', padding: '0.5rem', backgroundColor: checkingJikan ? '#6b7280' : 'black', color: 'white', fontWeight: 'bold', textTransform: 'uppercase', cursor: checkingJikan ? 'not-allowed' : 'pointer', border: 'none', opacity: checkingJikan ? 0.6 : 1 }}>
+                                {checkingJikan ? 'CHECKING...' : 'CHECK NOW'}
+                            </button>
+                        </div>
+                    </Card>
+
                     <Card variant="manga" style={{ padding: '1.5rem', backgroundColor: 'white' }}>
                         <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', textTransform: 'uppercase', borderBottom: '2px solid black', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Server size={20} /> {t('admin.system.server_config')}
@@ -173,9 +220,11 @@ export default function AdminSystem() {
                                     <div style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t('admin.system.maintenance_mode')}</div>
                                     <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{t('admin.system.maintenance_desc')}</div>
                                 </div>
-                                <Switch isOn={maintenanceMode} onToggle={() => {
-                                    setMaintenanceMode(!maintenanceMode);
-                                    addLog(`[CONFIG] Maintenance mode set to ${!maintenanceMode}`);
+                                <Switch isOn={maintenanceMode} onToggle={async () => {
+                                    const newVal = !maintenanceMode;
+                                    setMaintenanceMode(newVal);
+                                    await setGlobalConfig({ maintenance: newVal });
+                                    addLog(`[CONFIG] Maintenance mode set to ${newVal}`);
                                 }} />
                             </div>
 
@@ -184,9 +233,11 @@ export default function AdminSystem() {
                                     <div style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t('admin.system.registrations')}</div>
                                     <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{t('admin.system.registrations_desc')}</div>
                                 </div>
-                                <Switch isOn={registrationsOpen} onToggle={() => {
-                                    setRegistrationsOpen(!registrationsOpen);
-                                    addLog(`[CONFIG] Registrations set to ${!registrationsOpen}`);
+                                <Switch isOn={registrationsOpen} onToggle={async () => {
+                                    const newVal = !registrationsOpen;
+                                    setRegistrationsOpen(newVal);
+                                    await setGlobalConfig({ registrationsOpen: newVal });
+                                    addLog(`[CONFIG] Registrations set to ${newVal}`);
                                 }} />
                             </div>
                         </div>
