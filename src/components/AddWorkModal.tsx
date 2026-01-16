@@ -10,6 +10,7 @@ import { useLibraryStore, type Work } from '@/store/libraryStore';
 import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
 import { useAuthStore } from '@/store/authStore';
 import { logActivity } from '@/firebase/firestore';
+import { isValidImageSrc } from '@/utils/validation';
 
 interface AddWorkModalProps {
     isOpen: boolean;
@@ -18,17 +19,6 @@ interface AddWorkModalProps {
 }
 
 export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps) {
-    const isValidImageSrc = (src: string) => {
-        if (!src) return false;
-        if (src.startsWith('data:image/')) return true;
-        try {
-            const url = new URL(src);
-            return ['http:', 'https:'].includes(url.protocol);
-        } catch {
-            return false;
-        }
-    };
-
     const { t } = useTranslation();
     const [mode, setMode] = useState<'api' | 'manual'>('api');
     const [query, setQuery] = useState('');
@@ -82,10 +72,13 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
     const handleManualAdd = () => {
         if (!manualTitle.trim()) return;
 
+        // Ensure we only save valid image URLs
+        const safeImage = isValidImageSrc(manualImage) ? manualImage : 'https://placehold.co/400x600/000000/FFFFFF/png?text=NO+IMAGE';
+
         const newWork: Work = {
             id: Date.now(), // Generate a temporary ID
             title: manualTitle,
-            image: manualImage || 'https://placehold.co/400x600/000000/FFFFFF/png?text=NO+IMAGE',
+            image: safeImage,
             type: type,
             totalChapters: manualTotal,
             currentChapter: 0,
