@@ -108,6 +108,9 @@ export function Header() {
                                     <Link to="/feedback" className={styles.dropdownItem} style={{ color: 'black', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
                                         <MessageCircle size={16} /> {t('header.feedback')}
                                     </Link>
+                                    <Link to="/feedback?tab=tickets" className={styles.dropdownItem} style={{ color: 'black', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
+                                        <MessageSquare size={16} /> {t('feedback.my_tickets')}
+                                    </Link>
                                 </div>
                             </div>
                         </nav>
@@ -245,6 +248,14 @@ export function Header() {
                                                 >
                                                     <Settings size={18} /> {t('header.settings')}
                                                 </Link>
+                                                <Link
+                                                    to="/feedback?tab=tickets"
+                                                    onClick={() => setIsDropdownOpen(false)}
+                                                    style={{ padding: '0.75rem', fontWeight: 700, color: '#000', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid transparent' }}
+                                                    className={styles.dropdownItem}
+                                                >
+                                                    <MessageSquare size={18} /> {t('feedback.my_tickets')}
+                                                </Link>
                                                 <div style={{ height: '1px', background: '#eee', margin: '0.25rem 0' }}></div>
                                                 <button
                                                     onClick={async () => {
@@ -295,6 +306,10 @@ export function Header() {
                             <Link to="/feedback" className={styles.mobileMenuItem} onClick={() => setIsMobileMenuOpen(false)}>
                                 <MessageCircle size={20} />
                                 <span>{t('header.feedback')}</span>
+                            </Link>
+                            <Link to="/feedback/my-tickets" className={styles.mobileMenuItem} onClick={() => setIsMobileMenuOpen(false)}>
+                                <MessageSquare size={20} />
+                                <span>{t('feedback.my_tickets')}</span>
                             </Link>
                         </motion.div>
                     )}

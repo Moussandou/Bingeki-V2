@@ -346,7 +346,7 @@ const resources = {
                 rating_label: "Votre Note Globale",
                 category_label: "C'est à propos de quoi ?",
                 category_bug: "UN BUG",
-                category_idea: "UNE IDÉE",
+                category_feature: "UNE IDÉE",
                 category_general: "GÉNÉRAL",
                 message_label: "Votre Message",
                 message_placeholder: "Dites-nous tout...",
@@ -358,7 +358,26 @@ const resources = {
                 toast_write_message: "Veuillez écrire un message",
                 toast_success: "Merci pour votre retour !",
                 toast_error: "Erreur lors de l'envoi. Réessayez.",
-                toast_unexpected: "Erreur inattendue."
+                toast_unexpected: "Erreur inattendue.",
+                // Enhanced fields
+                priority_label: "Priorité",
+                priority_low: "FAIBLE",
+                priority_medium: "MOYENNE",
+                priority_high: "HAUTE",
+                priority_critical: "CRITIQUE",
+                status_open: "Ouvert",
+                status_in_progress: "En cours",
+                status_resolved: "Résolu",
+                status_closed: "Fermé",
+                attachments_label: "Captures d'écran (max 3)",
+                attachments_hint: "Glissez-déposez ou cliquez pour ajouter",
+                my_tickets: "Mes Tickets",
+                no_tickets: "Vous n'avez pas encore envoyé de feedback.",
+                ticket_id: "Ticket #",
+                last_updated: "Mis à jour",
+                admin_reply: "Réponse Admin",
+                your_message: "Votre Message",
+                view_details: "Voir Détails"
             },
             components: {
                 add_work_modal: {
@@ -945,7 +964,11 @@ const resources = {
                     action_ban: "bannir",
                     action_unban: "débannir",
                     action_give: "Donner",
-                    action_remove: "Retirer"
+                    action_remove: "Retirer",
+                    delete_account: "Supprimer Compte",
+                    confirm_delete: "Es-tu SÛR de vouloir supprimer définitivement ce compte ? Toutes les données (bibliothèque, niveau, activités) seront PERDUES à jamais.",
+                    delete_success: "Compte supprimé avec succès.",
+                    delete_error: "Erreur lors de la suppression."
                 },
                 feedback: {
                     title: "Feedback Center",
@@ -1972,7 +1995,7 @@ const resources = {
                 rating_label: "Your Overall Rating",
                 category_label: "What is this about?",
                 category_bug: "A BUG",
-                category_idea: "AN IDEA",
+                category_feature: "AN IDEA",
                 category_general: "GENERAL",
                 message_label: "Your Message",
                 message_placeholder: "Tell us everything...",
@@ -1983,8 +2006,27 @@ const resources = {
                 toast_select_rating: "Please select a rating",
                 toast_write_message: "Please write a message",
                 toast_success: "Thank you for your feedback!",
-                toast_error: "Error sending. Please try again.",
-                toast_unexpected: "Unexpected error."
+                toast_error: "Error while sending. Please try again.",
+                toast_unexpected: "Unexpected error.",
+                // Enhanced fields
+                priority_label: "Priority",
+                priority_low: "LOW",
+                priority_medium: "MEDIUM",
+                priority_high: "HIGH",
+                priority_critical: "CRITICAL",
+                status_open: "Open",
+                status_in_progress: "In Progress",
+                status_resolved: "Resolved",
+                status_closed: "Closed",
+                attachments_label: "Screenshots (max 3)",
+                attachments_hint: "Drag & drop or click to add",
+                my_tickets: "My Tickets",
+                no_tickets: "You haven't sent any feedback yet.",
+                ticket_id: "Ticket #",
+                last_updated: "Last updated",
+                admin_reply: "Admin Response",
+                your_message: "Your Message",
+                view_details: "View Details"
             },
             components: {
                 add_work_modal: {
@@ -2117,7 +2159,11 @@ const resources = {
                     action_ban: "ban",
                     action_unban: "unban",
                     action_give: "Give",
-                    action_remove: "Remove"
+                    action_remove: "Remove",
+                    delete_account: "Delete Account",
+                    confirm_delete: "Are you SURE you want to permanently delete this account? All data (library, level, activities) will be LOST forever.",
+                    delete_success: "Account deleted successfully.",
+                    delete_error: "Error deleting account."
                 },
                 feedback: {
                     title: "Feedback Center",

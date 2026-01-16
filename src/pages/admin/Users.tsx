@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Search, Shield, Ban, ExternalLink, Edit, Eye } from 'lucide-react';
+import { Search, Shield, Ban, ExternalLink, Edit, Eye, Trash2 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Switch } from '@/components/ui/Switch';
-import { getAllUsers, toggleUserBan, toggleUserAdmin, adminUpdateUserGamification, type UserProfile } from '@/firebase/firestore';
+import { getAllUsers, toggleUserBan, toggleUserAdmin, adminUpdateUserGamification, deleteUserData, type UserProfile } from '@/firebase/firestore';
 import { Link } from '@/components/routing/LocalizedLink';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '@/components/ui/Modal';
@@ -94,6 +94,19 @@ export default function AdminUsers() {
         } catch (e) {
             console.error(e);
             alert("Failed to update user stats.");
+        }
+    };
+
+    const handleDeleteAccount = async (uid: string, name: string) => {
+        if (!confirm(t('admin.users.confirm_delete', { name }))) return;
+
+        try {
+            await deleteUserData(uid);
+            setUsers(prev => prev.filter(u => u.uid !== uid));
+            alert(t('admin.users.delete_success'));
+        } catch (error) {
+            console.error(error);
+            alert(t('admin.users.delete_error'));
         }
     };
 
@@ -207,19 +220,35 @@ export default function AdminUsers() {
                                 </Button>
                             </div>
 
-                            <Link to={`/profile/${user.uid}`} style={{
-                                width: '100%',
-                                padding: '0.5rem',
-                                background: 'black',
-                                color: 'white',
-                                textAlign: 'center',
-                                fontWeight: 'bold',
-                                textTransform: 'uppercase',
-                                fontSize: '0.9rem',
-                                display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem'
-                            }}>
-                                <ExternalLink size={14} /> {t('admin.users.view_profile')}
-                            </Link>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                                <Link to={`/profile/${user.uid}`} style={{
+                                    padding: '0.5rem',
+                                    background: 'black',
+                                    color: 'white',
+                                    textAlign: 'center',
+                                    fontWeight: 'bold',
+                                    textTransform: 'uppercase',
+                                    fontSize: '0.75rem',
+                                    display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px'
+                                }}>
+                                    <ExternalLink size={14} /> {t('admin.users.view_profile')}
+                                </Link>
+
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => handleDeleteAccount(user.uid, user.displayName || 'User')}
+                                    style={{
+                                        color: '#ef4444',
+                                        border: '1px solid currentColor',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 900,
+                                        display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center'
+                                    }}
+                                >
+                                    <Trash2 size={14} /> {t('admin.users.delete_account')}
+                                </Button>
+                            </div>
                         </div>
                     </Card>
                 ))}

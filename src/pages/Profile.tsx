@@ -18,7 +18,7 @@ import {
     User
 } from 'lucide-react';
 import { HunterLicenseCard } from '@/components/HunterLicenseCard';
-import { getUserProfile, saveUserProfileToFirestore, compareLibraries, type UserProfile } from '@/firebase/firestore';
+import { getUserProfile, saveUserProfileToFirestore, compareLibraries, checkFriendship, type UserProfile } from '@/firebase/firestore';
 import { Input } from '@/components/ui/Input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -56,6 +56,7 @@ export default function Profile() {
 
     // Library comparison (for visited profiles)
     const [commonWorks, setCommonWorks] = useState<{ common: any[]; count: number } | null>(null);
+    const [friendshipStatus, setFriendshipStatus] = useState<'accepted' | 'pending' | 'none' | 'loading'>('loading');
 
     // Determine if we are viewing our own profile
     const isOwnProfile = !uid || (user && user.uid === uid);
@@ -113,11 +114,16 @@ export default function Profile() {
             });
         }
 
-        // Load common works if visiting another profile
+        // Load friendship status and common works if visiting another profile
         if (!isOwnProfile && user?.uid && uid) {
+            checkFriendship(user.uid, uid).then(status => {
+                setFriendshipStatus(status);
+            });
             compareLibraries(user.uid, uid).then(common => {
                 setCommonWorks(common);
             });
+        } else {
+            setFriendshipStatus('none');
         }
 
     }, [uid, user?.uid, isOwnProfile]);
@@ -264,7 +270,9 @@ export default function Profile() {
                             )}
                             {!isOwnProfile && (
                                 <>
-                                    <Button variant="primary" onClick={() => navigate(`/users/${uid}/library`)} icon={<Library size={18} />}>{t('profile.view_library')}</Button>
+                                    {(friendshipStatus === 'accepted' || userProfile?.isAdmin) && (
+                                        <Button variant="primary" onClick={() => navigate(`/users/${uid}/library`)} icon={<Library size={18} />}>{t('profile.view_library')}</Button>
+                                    )}
                                     <Button variant="ghost" onClick={() => navigate(-1)}>{t('profile.back')}</Button>
                                 </>
                             )}
