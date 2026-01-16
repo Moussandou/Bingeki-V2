@@ -15,16 +15,6 @@ export interface ActivityEvent {
     timestamp: number;
 }
 
-// Activity type labels in French
-export const ACTIVITY_LABELS: Record<ActivityEvent['type'], string> = {
-    'watch': 'a regardé',
-    'read': 'a lu',
-    'complete': 'a terminé',
-    'add_work': 'a ajouté',
-    'level_up': 'est passé au niveau',
-    'badge': 'a débloqué le badge',
-};
-
 // Activity type emojis
 export const ACTIVITY_EMOJIS: Record<ActivityEvent['type'], string> = {
     'watch': '🎬',
@@ -33,4 +23,10 @@ export const ACTIVITY_EMOJIS: Record<ActivityEvent['type'], string> = {
     'add_work': '➕',
     'level_up': '⬆️',
     'badge': '🏅',
+};
+
+// Helper function to get translated activity label
+// Usage: getActivityLabel(activity.type, t)
+export const getActivityLabel = (type: ActivityEvent['type'], t: (key: string) => string): string => {
+    return t(`activity_labels.${type}`);
 };

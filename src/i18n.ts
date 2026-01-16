@@ -179,6 +179,14 @@ const resources = {
                 hours_ago: "Il y a {{hours}}h",
                 days_ago: "Il y a {{days}}j"
             },
+            activity_labels: {
+                watch: "a regardé",
+                read: "a lu",
+                complete: "a terminé",
+                add_work: "a ajouté",
+                level_up: "est passé au niveau",
+                badge: "a débloqué le badge"
+            },
             library: {
                 total: "Total",
                 completed: "Terminées",
@@ -1245,6 +1253,14 @@ const resources = {
                 just_now: "Just now",
                 hours_ago: "{{hours}}h ago",
                 days_ago: "{{days}}d ago"
+            },
+            activity_labels: {
+                watch: "watched",
+                read: "read",
+                complete: "completed",
+                add_work: "added",
+                level_up: "leveled up to",
+                badge: "unlocked the badge"
             },
             library: {
                 total: "Total",
