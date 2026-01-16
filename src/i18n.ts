@@ -667,6 +667,19 @@ const resources = {
                 new: "NEW",
                 to_be_continued: "À SUIVRE...",
                 entries: {
+                    v3_2: {
+                        date: "16 Janvier 2026",
+                        title: "Social & Sécurité",
+                        description: "Accès aux bibliothèques d'amis, Discord Login, et renforcement de la sécurité.",
+                        changes: [
+                            "Nouveau : Voir la bibliothèque de vos amis en lecture seule.",
+                            "Nouveau : Connexion via Discord (OAuth).",
+                            "Sécurité : Protection XSS renforcée sur les URLs d'images.",
+                            "Sécurité : Validation stricte des niveaux utilisateurs (max 100).",
+                            "Fix : Confirmation avant de marquer une œuvre comme terminée.",
+                            "Tech : Audit ESLint et correction des erreurs de code."
+                        ]
+                    },
                     v3_1: {
                         date: "16 Janvier 2026",
                         title: "SEO & Global I18n Fix",
@@ -1690,6 +1703,19 @@ const resources = {
                 new: "NEW",
                 to_be_continued: "TO BE CONTINUED...",
                 entries: {
+                    v3_2: {
+                        date: "January 16, 2026",
+                        title: "Social & Security",
+                        description: "Friend library access, Discord Login, and security hardening.",
+                        changes: [
+                            "New: View your friends' library in read-only mode.",
+                            "New: Discord OAuth login.",
+                            "Security: Enhanced XSS protection on image URLs.",
+                            "Security: Strict user level validation (max 100).",
+                            "Fix: Confirmation before marking a work as completed.",
+                            "Tech: ESLint audit and code error fixes."
+                        ]
+                    },
                     v3_1: {
                         date: "January 16, 2026",
                         title: "SEO & Global I18n Fix",
