@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Check, ChevronLeft, ChevronRight, Eye, Loader2, Tv, FileText } from 'lucide-react';
 
@@ -48,6 +49,7 @@ export function ContentList({
     readOnly = false,
     streamingServices = []
 }: ContentListProps) {
+    const { t } = useTranslation();
     const [visibleCount, setVisibleCount] = useState(25);
     const [expandedIds, setExpandedIds] = useState<number[]>([]);
     const [loadingIds, setLoadingIds] = useState<number[]>([]);
@@ -82,7 +84,7 @@ export function ContentList({
     }
 
     if (items.length === 0) {
-        return <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.6 }}>Aucun contenu disponible.</div>;
+        return <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.6 }}>{t('content_list.no_content')}</div>;
     }
 
     const visibleItems = items.slice(0, visibleCount);
@@ -131,7 +133,7 @@ export function ContentList({
                                             {item.title}
                                         </div>
                                         <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>
-                                            {item.date ? new Date(item.date).toLocaleDateString() : 'Date inconnue'} {item.isFiller && '(Filler)'}
+                                            {item.date ? new Date(item.date).toLocaleDateString() : t('content_list.unknown_date')} {item.isFiller && '(Filler)'}
                                         </div>
                                     </div>
                                 </div>
@@ -146,7 +148,7 @@ export function ContentList({
                                                     variant="ghost"
                                                     size="sm"
                                                     onClick={(e) => openLink(e, `https://www.google.com/search?q=site:crunchyroll.com/fr/watch ${encodeURIComponent(workTitle)} episode ${item.number}`)}
-                                                    title="Regarder sur Crunchyroll"
+                                                    title={t('content_list.watch_on_crunchyroll')}
                                                     style={{ padding: '0', height: '36px', width: '36px', overflow: 'hidden' }}
                                                 >
                                                     <img src={logoCrunchyroll} alt="CR" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
@@ -159,7 +161,7 @@ export function ContentList({
                                                     variant="ghost"
                                                     size="sm"
                                                     onClick={(e) => openLink(e, `https://www.google.com/search?q=site:animationdigitalnetwork.fr ${encodeURIComponent(workTitle)} episode ${item.number}`)}
-                                                    title="Regarder sur ADN"
+                                                    title={t('content_list.watch_on_adn')}
                                                     style={{ padding: '0', height: '36px', width: '36px', overflow: 'hidden' }}
                                                 >
                                                     <img src={logoADN} alt="ADN" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
@@ -171,7 +173,7 @@ export function ContentList({
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={(e) => openLink(e, `https://www.google.com/search?q=${encodeURIComponent(workTitle)} episode ${item.number} streaming vostfr`)}
-                                                title="Rechercher Streaming VOSTFR"
+                                                title={t('content_list.search_streaming')}
                                                 style={{ padding: '0.5rem', color: '#64748b' }}
                                             >
                                                 <Tv size={20} />
@@ -182,7 +184,7 @@ export function ContentList({
                                             variant="ghost"
                                             size="sm"
                                             onClick={(e) => openLink(e, `https://www.google.com/search?q=manga scan ${encodeURIComponent(workTitle)} chapitre ${item.number} fr`)}
-                                            title="Rechercher Scan FR"
+                                            title={t('content_list.search_scan')}
                                             style={{ padding: '0.5rem', color: '#22c55e' }}
                                         >
                                             <FileText size={18} />
@@ -204,7 +206,7 @@ export function ContentList({
                                             onClick={() => onSelect(item.number)}
                                             icon={isWatched ? <Check size={16} /> : <Eye size={16} />}
                                         >
-                                            {isWatched ? 'VU' : 'VOIR'}
+                                            {isWatched ? t('content_list.seen') : t('content_list.see')}
                                         </Button>
                                     )}
                                 </div>
@@ -215,11 +217,11 @@ export function ContentList({
                                 <div style={{ marginTop: '1rem', borderTop: '1px dashed #ccc', paddingTop: '1rem', paddingLeft: '3.5rem' }}>
                                     {isLoadingDetails ? (
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.6 }}>
-                                            <Loader2 size={16} className="spin" /> Chargement du résumé...
+                                            <Loader2 size={16} className="spin" /> {t('content_list.loading_summary')}
                                         </div>
                                     ) : (
                                         <p style={{ fontSize: '0.9rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
-                                            {item.synopsis ? item.synopsis : "Aucun résumé disponible."}
+                                            {item.synopsis ? item.synopsis : t('content_list.no_summary')}
                                         </p>
                                     )}
                                 </div>
@@ -237,7 +239,7 @@ export function ContentList({
                         onClick={() => setVisibleCount(prev => prev + 25)}
                         style={{ width: '100%', border: '1px dashed #ccc' }}
                     >
-                        AFFICHER PLUS D'ÉPISODES
+                        {t('content_list.show_more')}
                     </Button>
                 </div>
             )}
@@ -249,15 +251,15 @@ export function ContentList({
                     onClick={onPrevPage}
                     disabled={!hasPrevPage || isLoading}
                 >
-                    <ChevronLeft /> Précédent
+                    <ChevronLeft /> {t('content_list.previous')}
                 </Button>
-                <span style={{ fontWeight: 900 }}>PAGE {page}</span>
+                <span style={{ fontWeight: 900 }}>{t('content_list.page')} {page}</span>
                 <Button
                     variant="ghost"
                     onClick={onNextPage}
                     disabled={!hasNextPage || isLoading}
                 >
-                    Suivant <ChevronRight />
+                    {t('content_list.next')} <ChevronRight />
                 </Button>
             </div>
         </div>

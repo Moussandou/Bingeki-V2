@@ -81,7 +81,7 @@ const RootRedirect = () => {
 };
 
 function App() {
-  const { setUser, setLoading, user } = useAuthStore();
+  const { setUser, setUserProfile, syncUserProfile, setLoading, user } = useAuthStore();
 
   const libraryWorks = useLibraryStore((s) => s.works);
   const gamificationState = useGamificationStore(useShallow((s) => ({
@@ -94,6 +94,8 @@ function App() {
     totalChaptersRead: s.totalChaptersRead,
     totalWorksAdded: s.totalWorksAdded,
     totalWorksCompleted: s.totalWorksCompleted,
+    totalAnimeEpisodesWatched: s.totalAnimeEpisodesWatched,
+    totalMoviesWatched: s.totalMoviesWatched,
   })));
 
   // Auth state listener + Firestore sync
@@ -109,6 +111,9 @@ function App() {
 
         // Sync user profile (email, name, photo)
         await saveUserProfileToFirestore(firebaseUser);
+
+        // Sync detailed profile data (including custom overrides) to store
+        await syncUserProfile(firebaseUser.uid);
 
         // Load cloud data
         const cloudLibrary = await loadLibraryFromFirestore(firebaseUser.uid);
@@ -136,6 +141,7 @@ function App() {
         // User logged out - clear local stores
         useLibraryStore.getState().resetStore();
         useGamificationStore.getState().resetStore();
+        setUserProfile(null);
       }
 
       setLoading(false);
@@ -214,6 +220,7 @@ function App() {
               <Route path="auth" element={<Auth />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="library" element={<Library />} />
+              <Route path="users/:uid/library" element={<Library />} />
               <Route path="discover" element={<Discover />} />
               <Route path="social" element={<Social />} />
               <Route path="work/:id" element={<WorkDetails />} />

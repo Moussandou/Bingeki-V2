@@ -111,9 +111,6 @@ export default function Discover() {
             if (searchQuery.length > 2 || hasActiveFilters) {
                 setLoading(true);
 
-                // If searching by text, we might want to keep the genre?
-                // Previously: if (selectedGenre) setSelectedGenre(null); -> Let's allow combining
-
                 const filters: any = {};
                 if (filterStatus) filters.status = filterStatus;
                 if (filterRating) filters.rating = filterRating;
@@ -122,12 +119,39 @@ export default function Discover() {
                 if (selectedGenre) filters.genres = selectedGenre.toString();
                 if (filterStudio) filters.producers = filterStudio;
 
-                const results = await searchWorks(searchQuery, 'anime', filters);
+                try {
+                    // Perform parallel search for Anime and Manga
+                    // Note: If filterStudio is set, it might only apply to Anime typically, but we'll try both to be safe or just Anime if studio is strict.
+                    // Actually, producers (studios) are mostly for anime. Manga has magazines/authors. 
+                    // To be safe and simple: Search both unless it fails.
 
-                // Filter out duplicates
-                const uniqueResults = Array.from(new Map(results.map(item => [item.mal_id, item])).values());
-                setSearchResults(uniqueResults);
-                setLoading(false);
+                    const promises = [
+                        searchWorks(searchQuery, 'anime', filters)
+                    ];
+
+                    // Only search manga if we aren't filtering by strictly Anime-only fields (like Studio/Producers which are usually Anime-centric in Jikan context, though Manga has magazines)
+                    // Let's search both for now to maximize results.
+                    if (!filterStudio) {
+                        promises.push(searchWorks(searchQuery, 'manga', filters));
+                    }
+
+                    const [animeResults, mangaResults = []] = await Promise.all(promises);
+
+                    // Combine and shuffle slightly or just concat? 
+                    // Let's interleave or just concat to show Anime then Manga. 
+                    // Or better: sort by popularity/score if possible? 
+                    // For now, let's just concat: Anime first (primary), then Manga.
+                    const allResults = [...animeResults, ...mangaResults];
+
+                    // Filter out duplicates
+                    const uniqueResults = Array.from(new Map(allResults.map(item => [item.mal_id, item])).values());
+                    setSearchResults(uniqueResults);
+                } catch (err) {
+                    console.error("Search failed", err);
+                    setSearchResults([]);
+                } finally {
+                    setLoading(false);
+                }
             } else {
                 setSearchResults([]);
             }

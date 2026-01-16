@@ -42,7 +42,18 @@ export const handleProgressUpdateWithXP = (
         // Progressing: Add XP
         addXp(XP_REWARDS.UPDATE_PROGRESS * diff);
         for (let i = 0; i < diff; i++) {
-            incrementStat('chapters');
+            if (work.type === 'manga') {
+                incrementStat('chapters');
+            } else if (work.type === 'anime') {
+                if (work.format === 'Movie') {
+                    incrementStat('movies');
+                } else {
+                    incrementStat('episodes');
+                }
+            } else {
+                // Default fallback
+                incrementStat('chapters');
+            }
         }
         recordActivity(); // Maintain streak
 

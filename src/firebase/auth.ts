@@ -1,6 +1,7 @@
 import { auth } from './config';
 import {
     GoogleAuthProvider,
+    OAuthProvider,
     signInWithPopup,
     signOut,
     signInWithEmailAndPassword,
@@ -13,6 +14,19 @@ import { useLibraryStore } from '@/store/libraryStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 
 const googleProvider = new GoogleAuthProvider();
+const discordProvider = new OAuthProvider('discord.com');
+discordProvider.addScope('identify');
+discordProvider.addScope('email');
+
+export const loginWithDiscord = async (): Promise<User | null> => {
+    try {
+        const result = await signInWithPopup(auth, discordProvider);
+        return result.user;
+    } catch (error) {
+        console.error("Error logging in with Discord", error);
+        return null;
+    }
+};
 
 export const loginWithGoogle = async (): Promise<User | null> => {
     try {
@@ -75,6 +89,8 @@ export const logout = async (): Promise<void> => {
                 lastActivityDate: gamificationState.lastActivityDate,
                 badges: gamificationState.badges,
                 totalChaptersRead: gamificationState.totalChaptersRead,
+                totalAnimeEpisodesWatched: gamificationState.totalAnimeEpisodesWatched,
+                totalMoviesWatched: gamificationState.totalMoviesWatched,
                 totalWorksAdded: gamificationState.totalWorksAdded,
                 totalWorksCompleted: gamificationState.totalWorksCompleted
             });

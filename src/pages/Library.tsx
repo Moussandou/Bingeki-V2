@@ -1,27 +1,65 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { useLibraryStore, type Work } from '@/store/libraryStore';
-import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle, BookOpen, CheckCircle, SortAsc, ChevronDown, Download, Upload, TrendingUp } from 'lucide-react';
+import { useAuthStore } from '@/store/authStore';
+import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle, BookOpen, CheckCircle, SortAsc, ChevronDown, Download, Upload, TrendingUp, User } from 'lucide-react';
 import styles from './Library.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { SEO } from '@/components/layout/SEO';
 import { statusToFrench } from '@/utils/statusTranslation';
 import { useToast } from '@/context/ToastContext';
 import { exportData, importData } from '@/utils/storageUtils';
 import { useTranslation } from 'react-i18next';
-// Removed unused imports
-// Removed unused gamification store
+import { loadLibraryFromFirestore, getUserProfile, type UserProfile } from '@/firebase/firestore';
 
 export default function Library() {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { uid } = useParams();
+    const { user: currentUser } = useAuthStore();
     const { addToast } = useToast();
-    const { works, removeWork } = useLibraryStore();
+    const { works: localWorks, removeWork } = useLibraryStore();
+
+    // Friend Library State
+    const [friendWorks, setFriendWorks] = useState<Work[]>([]);
+    const [friendProfile, setFriendProfile] = useState<UserProfile | null>(null);
+    const [isLoadingFriend, setIsLoadingFriend] = useState(false);
+
+    const isReadOnly = useMemo(() => {
+        return !!uid && uid !== currentUser?.uid;
+    }, [uid, currentUser]);
+
+    // Determines which works to display
+    const currentWorks = isReadOnly ? friendWorks : localWorks;
+
+    // Load Friend Data
+    useEffect(() => {
+        if (isReadOnly && uid) {
+            const loadFriend = async () => {
+                setIsLoadingFriend(true);
+                try {
+                    const [profile, lib] = await Promise.all([
+                        getUserProfile(uid),
+                        loadLibraryFromFirestore(uid)
+                    ]);
+                    setFriendProfile(profile);
+                    setFriendWorks(lib || []);
+                } catch (error) {
+                    console.error("Failed to load friend library", error);
+                    addToast("Impossible de charger la bibliothèque", 'error');
+                } finally {
+                    setIsLoadingFriend(false);
+                }
+            };
+            loadFriend();
+        }
+    }, [isReadOnly, uid, addToast]);
+
 
     // UI State
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -49,21 +87,21 @@ export default function Library() {
 
     // Stats
     const stats = useMemo(() => {
-        const total = works.length;
-        const reading = works.filter(w => w.status === 'reading').length;
-        const completed = works.filter(w => w.status === 'completed').length;
-        const progressSum = works.reduce((acc, w) => {
+        const total = currentWorks.length;
+        const reading = currentWorks.filter(w => w.status === 'reading').length;
+        const completed = currentWorks.filter(w => w.status === 'completed').length;
+        const progressSum = currentWorks.reduce((acc, w) => {
             if (!w.totalChapters || w.totalChapters === 0) return acc;
             return acc + (w.currentChapter || 0) / w.totalChapters;
         }, 0);
         const avgProgress = total > 0 ? Math.round((progressSum / total) * 100) : 0;
 
         return { total, reading, completed, avgProgress };
-    }, [works]);
+    }, [currentWorks]);
 
     // Filter Logic
     const filteredWorks = useMemo(() => {
-        return works
+        return currentWorks
             .filter(work => {
                 const matchesSearch = work.title.toLowerCase().includes(searchQuery.toLowerCase());
                 const matchesType = filterType === 'all' || work.type === filterType;
@@ -86,10 +124,11 @@ export default function Library() {
                         return 0;
                 }
             });
-    }, [works, searchQuery, filterType, filterStatus, sortBy]);
+    }, [currentWorks, searchQuery, filterType, filterStatus, sortBy]);
 
     // Selection Handlers
     const toggleSelection = (id: string | number) => {
+        if (isReadOnly) return;
         const newSelection = new Set(selectedWorks);
         if (newSelection.has(id)) {
             newSelection.delete(id);
@@ -100,6 +139,7 @@ export default function Library() {
     };
 
     const handleBulkDelete = () => {
+        if (isReadOnly) return;
         if (confirm(t('library.delete_confirm', { count: selectedWorks.size }))) {
             selectedWorks.forEach(id => removeWork(id));
             setSelectedWorks(new Set());
@@ -109,6 +149,7 @@ export default function Library() {
     };
 
     const confirmDelete = () => {
+        if (isReadOnly) return;
         if (workToDelete) {
             removeWork(workToDelete.id);
             addToast(t('library.deleted_single', { title: workToDelete.title }), 'error');
@@ -118,12 +159,41 @@ export default function Library() {
 
     return (
         <Layout>
-            <SEO title={t('library.title')} />
+            <SEO title={isReadOnly && friendProfile ? t('library.friend_title', { name: friendProfile.displayName }) : t('library.title')} />
             <div style={{ minHeight: 'calc(100vh - 80px)' }}>
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
-                    <h1 className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: '0', margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', border: '0' }}>
-                        {t('library.title')}
-                    </h1>
+
+                    {/* Public Library Header */}
+                    {isReadOnly && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '2px solid #000' }}>
+                            <div style={{
+                                width: 50, height: 50, borderRadius: '50%', background: '#000', overflow: 'hidden',
+                                border: '2px solid #000'
+                            }}>
+                                {friendProfile?.photoURL ? (
+                                    <img src={friendProfile.photoURL} alt={friendProfile.displayName || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                                        <User size={24} />
+                                    </div>
+                                )}
+                            </div>
+                            <div>
+                                <h1 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', margin: 0 }}>
+                                    {t('library.friend_title', { name: friendProfile?.displayName || '...' })}
+                                </h1>
+                                <span style={{ fontSize: '0.9rem', opacity: 0.7 }}>
+                                    {t('library.read_only')}
+                                </span>
+                            </div>
+                        </div>
+                    )}
+
+                    {!isReadOnly && (
+                        <h1 className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: '0', margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', border: '0' }}>
+                            {t('library.title')}
+                        </h1>
+                    )}
 
                     {/* Stats Header - Consolidated */}
                     <div className={`manga-panel ${styles.statsPanel}`}>
@@ -151,23 +221,25 @@ export default function Library() {
                             </div>
                         </div>
 
-                        <div className={styles.addWorkContainer}>
-                            <Button
-                                variant="primary"
-                                onClick={() => setIsAddModalOpen(true)}
-                                icon={<Plus size={20} />}
-                                className={styles.addWorkButton}
-                                style={{
-                                    height: 'auto',
-                                    padding: '0.75rem 1.5rem',
-                                    fontWeight: 800,
-                                    fontSize: '1rem',
-                                    whiteSpace: 'nowrap'
-                                }}
-                            >
-                                {t('library.add_work')}
-                            </Button>
-                        </div>
+                        {!isReadOnly && (
+                            <div className={styles.addWorkContainer}>
+                                <Button
+                                    variant="primary"
+                                    onClick={() => setIsAddModalOpen(true)}
+                                    icon={<Plus size={20} />}
+                                    className={styles.addWorkButton}
+                                    style={{
+                                        height: 'auto',
+                                        padding: '0.75rem 1.5rem',
+                                        fontWeight: 800,
+                                        fontSize: '1rem',
+                                        whiteSpace: 'nowrap'
+                                    }}
+                                >
+                                    {t('library.add_work')}
+                                </Button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Controls Bar */}
@@ -360,59 +432,65 @@ export default function Library() {
                                 >
                                     <List size={20} />
                                 </button>
-                                <button
-                                    onClick={exportData}
-                                    className={styles.controlButton}
-                                    title={t('library.export')}
-                                >
-                                    <Download size={20} />
-                                </button>
-                                <div style={{ position: 'relative', display: 'flex' }}>
-                                    <input
-                                        type="file"
-                                        accept=".json"
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0];
-                                            if (file) {
-                                                importData(file).then(() => {
-                                                    addToast(t('library.data_imported'), 'success');
-                                                }).catch(() => addToast(t('library.error'), 'error'));
-                                            }
-                                        }}
-                                        style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', zIndex: 10 }}
-                                    />
-                                    <button
-                                        className={styles.controlButton}
-                                        title={t('library.import')}
-                                    >
-                                        <Upload size={20} />
-                                    </button>
-                                </div>
+                                {!isReadOnly && (
+                                    <>
+                                        <button
+                                            onClick={exportData}
+                                            className={styles.controlButton}
+                                            title={t('library.export')}
+                                        >
+                                            <Download size={20} />
+                                        </button>
+                                        <div style={{ position: 'relative', display: 'flex' }}>
+                                            <input
+                                                type="file"
+                                                accept=".json"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        importData(file).then(() => {
+                                                            addToast(t('library.data_imported'), 'success');
+                                                        }).catch(() => addToast(t('library.error'), 'error'));
+                                                    }
+                                                }}
+                                                style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', zIndex: 10 }}
+                                            />
+                                            <button
+                                                className={styles.controlButton}
+                                                title={t('library.import')}
+                                            >
+                                                <Upload size={20} />
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
                             </Card>
 
                             {/* Selection Mode Toggle */}
-                            <div style={{ flex: '1 0 100%', display: 'flex' }}>
-                                <Button
-                                    variant={isSelectionMode ? 'primary' : 'manga'}
-                                    onClick={() => {
-                                        setIsSelectionMode(!isSelectionMode);
-                                        setSelectedWorks(new Set());
-                                    }}
-                                    style={{
-                                        width: '100%',
-                                        justifyContent: 'center',
-                                        background: isSelectionMode ? 'var(--color-primary)' : '#fff',
-                                        color: isSelectionMode ? '#fff' : '#000',
-                                        borderColor: isSelectionMode ? 'var(--color-primary)' : '#000'
-                                    }}
-                                >
-                                    {isSelectionMode ? t('library.cancel') : t('library.select')}
-                                </Button>
-                            </div>
+                            {!isReadOnly && (
+                                <div style={{ flex: '1 0 100%', display: 'flex' }}>
+                                    <Button
+                                        variant={isSelectionMode ? 'primary' : 'manga'}
+                                        onClick={() => {
+                                            setIsSelectionMode(!isSelectionMode);
+                                            setSelectedWorks(new Set());
+                                        }}
+                                        style={{
+                                            width: '100%',
+                                            justifyContent: 'center',
+                                            background: isSelectionMode ? 'var(--color-primary)' : '#fff',
+                                            color: isSelectionMode ? '#fff' : '#000',
+                                            borderColor: isSelectionMode ? 'var(--color-primary)' : '#000'
+                                        }}
+                                    >
+                                        {isSelectionMode ? t('library.cancel') : t('library.select')}
+                                    </Button>
+                                </div>
+                            )}
                         </div>
 
                         {/* Bulk Actions (outside grid) */}
-                        {isSelectionMode && selectedWorks.size > 0 && (
+                        {isSelectionMode && selectedWorks.size > 0 && !isReadOnly && (
                             <Button
                                 variant="primary"
                                 onClick={handleBulkDelete}
@@ -433,7 +511,11 @@ export default function Library() {
                     </div>
 
                     {/* Content Grid/List */}
-                    {filteredWorks.length === 0 ? (
+                    {isLoadingFriend ? (
+                        <div style={{ textAlign: 'center', padding: '4rem' }}>
+                            <p>Chargement de la bibliothèque...</p>
+                        </div>
+                    ) : filteredWorks.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '4rem', opacity: 0.5 }}>
                             <BookOpen size={48} style={{ marginBottom: '1rem' }} />
                             <h3>{t('library.no_works')}</h3>
@@ -472,7 +554,7 @@ export default function Library() {
                                             }}
                                         >
                                             {/* Selection Overlay */}
-                                            {isSelectionMode && (
+                                            {isSelectionMode && !isReadOnly && (
                                                 <div style={{
                                                     position: 'absolute',
                                                     inset: 0,
@@ -543,8 +625,8 @@ export default function Library() {
                                             </div>
                                         </Card>
 
-                                        {/* Delete Button (visible on hover or always on mobile? defaulting to always for visibility) */}
-                                        {!isSelectionMode && (
+                                        {/* Delete Button */}
+                                        {!isSelectionMode && !isReadOnly && (
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
@@ -582,7 +664,7 @@ export default function Library() {
                                         )}
 
                                         {/* Selection Checkbox (Visual only) */}
-                                        {isSelectionMode && (
+                                        {isSelectionMode && !isReadOnly && (
                                             <div style={{
                                                 position: 'absolute',
                                                 top: 10,

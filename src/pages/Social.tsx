@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
-import { Trophy, Users, Search, UserPlus, Check, User, X, Activity, BookOpen, Flame, Clock, Swords, Tv } from 'lucide-react';
+import { Trophy, Users, Search, UserPlus, Check, User, X, Activity, BookOpen, Flame, Clock, Swords, Tv, Library } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import {
     getFriends,
@@ -427,6 +427,9 @@ export default function Social() {
                                                 <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                             </div>
                                             <div style={{ flex: 1, fontWeight: 700 }}>{friend.displayName}</div>
+                                            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); navigate(`/users/${friend.uid}/library`); }} title={t('profile.view_library')}>
+                                                <Library size={20} />
+                                            </Button>
                                             <Button variant="ghost" size="icon"><User size={20} /></Button>
                                         </div>
                                     ))
