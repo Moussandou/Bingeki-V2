@@ -51,7 +51,7 @@ export default function AdminUsers() {
 
         try {
             await toggleUserBan(uid, !currentStatus);
-        } catch (e) {
+        } catch {
             alert(t('admin.users.update_error'));
             // Revert
             setUsers(prev => prev.map(u => u.uid === uid ? { ...u, isBanned: currentStatus } : u));
@@ -66,7 +66,7 @@ export default function AdminUsers() {
 
         try {
             await toggleUserAdmin(uid, !currentStatus);
-        } catch (e) {
+        } catch {
             alert(t('admin.users.update_error'));
             setUsers(prev => prev.map(u => u.uid === uid ? { ...u, isAdmin: currentStatus } : u));
         }
@@ -288,14 +288,21 @@ export default function AdminUsers() {
                         </div>
 
                         {/* Profile Customization */}
-                        {(selectedUser as any).profileCustomization && (
+                        {(selectedUser.banner || selectedUser.bio || selectedUser.themeColor) && (
                             <div style={{ background: '#fff', border: '2px solid #000', padding: '1rem' }}>
                                 <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>PROFILE CUSTOMIZATION</h3>
                                 <table style={{ width: '100%', fontSize: '0.9rem', fontFamily: 'monospace' }}>
                                     <tbody>
-                                        <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>Banner:</td><td style={{ wordBreak: 'break-all', fontSize: '0.75rem' }}>{(selectedUser as any).profileCustomization.banner || 'N/A'}</td></tr>
-                                        <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Bio:</td><td>{(selectedUser as any).profileCustomization.bio || 'N/A'}</td></tr>
-                                        <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Colors:</td><td>{JSON.stringify((selectedUser as any).profileCustomization.colors || {})}</td></tr>
+                                        <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>Banner:</td><td style={{ wordBreak: 'break-all', fontSize: '0.75rem' }}>{selectedUser.banner || 'N/A'}</td></tr>
+                                        <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Bio:</td><td>{selectedUser.bio || 'N/A'}</td></tr>
+                                        <tr>
+                                            <td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Colors:</td>
+                                            <td>
+                                                {selectedUser.themeColor && <span style={{ marginRight: '8px' }}>Theme: <span style={{ color: selectedUser.themeColor }}>■</span></span>}
+                                                {selectedUser.cardBgColor && <span style={{ marginRight: '8px' }}>Card: <span style={{ color: selectedUser.cardBgColor }}>■</span></span>}
+                                                {selectedUser.borderColor && <span>Border: <span style={{ color: selectedUser.borderColor }}>■</span></span>}
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>

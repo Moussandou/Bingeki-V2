@@ -22,6 +22,28 @@ export default function AdminSystem() {
     const [jikanStatus, setJikanStatus] = useState<JikanStatusResponse | null>(null);
     const [checkingJikan, setCheckingJikan] = useState(false);
 
+    // Helper functions (declared before useEffect to avoid hoisting issues)
+    const formatActivityLog = (act: ActivityEvent) => {
+        const time = new Date(act.timestamp).toLocaleTimeString();
+        let prefix = '[INFO]';
+        let detail = '';
+
+        switch (act.type) {
+            case 'watch': prefix = '[WATCH]'; detail = `watched ${act.workTitle || '?'} Ep.${act.episodeNumber}`; break;
+            case 'read': prefix = '[READ]'; detail = `read ${act.workTitle || '?'} Vol.${act.episodeNumber}`; break;
+            case 'complete': prefix = '[DONE]'; detail = `completed ${act.workTitle || 'a work'}`; break;
+            case 'level_up': prefix = '[GAMIF]'; detail = `reached Level ${act.newLevel}`; break;
+            case 'badge': prefix = '[BADGE]'; detail = `unlocked ${act.badgeName}`; break;
+            default: prefix = '[USER]'; detail = `performed action ${act.type}`;
+        }
+
+        return `[${time}] ${prefix} User ${(act.userName || 'Guest').slice(0, 10)}... ${detail}`;
+    };
+
+    const addLog = (msg: string) => {
+        setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev].slice(0, 50));
+    };
+
     useEffect(() => {
         // Initial Mock Logs (System Boot)
         const initialLogs = [
@@ -76,33 +98,14 @@ export default function AdminSystem() {
         return () => { clearInterval(interval); clearInterval(apiInterval); };
     }, []);
 
-    const formatActivityLog = (act: ActivityEvent) => {
-        const time = new Date(act.timestamp).toLocaleTimeString();
-        let prefix = '[INFO]';
-        let detail = '';
-
-        switch (act.type) {
-            case 'watch': prefix = '[WATCH]'; detail = `watched ${act.workTitle || '?'} Ep.${act.episodeNumber}`; break;
-            case 'read': prefix = '[READ]'; detail = `read ${act.workTitle || '?'} Vol.${act.episodeNumber}`; break;
-            case 'complete': prefix = '[DONE]'; detail = `completed ${act.workTitle || 'a work'}`; break;
-            case 'level_up': prefix = '[GAMIF]'; detail = `reached Level ${act.newLevel}`; break;
-            case 'badge': prefix = '[BADGE]'; detail = `unlocked ${act.badgeName}`; break;
-            default: prefix = '[USER]'; detail = `performed action ${act.type}`;
-        }
-
-        return `[${time}] ${prefix} User ${(act.userName || 'Guest').slice(0, 10)}... ${detail}`;
-    };
-
-    const addLog = (msg: string) => {
-        setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev].slice(0, 50));
-    };
+    // formatActivityLog and addLog are declared above the useEffect
 
     const handleBackup = () => {
         addLog("[BACKUP] Starting manual system backup...");
         try {
             logDataBackup('system', 'gamification', { source: 'manual_admin_trigger', time: Date.now() });
             setTimeout(() => addLog("[BACKUP] Backup completed successfully. Data synchronized."), 1000);
-        } catch (e) {
+        } catch {
             addLog("[ERROR] Backup failed.");
         }
     };
@@ -112,7 +115,7 @@ export default function AdminSystem() {
         try {
             await setGlobalAnnouncement(broadcastMessage, broadcastType, broadcastActive);
             addLog(`[BROADCAST] Success. Message is now ${broadcastActive ? 'LIVE' : 'OFFLINE'}.`);
-        } catch (e) {
+        } catch {
             addLog(`[ERROR] Broadcast update failed.`);
         }
     };
