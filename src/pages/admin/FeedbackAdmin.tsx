@@ -226,7 +226,7 @@ export default function AdminFeedback() {
                                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '60px' }}>
                                         <StatusBadge status={item.status} />
                                         <span style={{ fontSize: '0.7rem', fontWeight: 900, marginTop: '4px', color: getPriorityColor(item.priority) }}>
-                                            {item.priority.toUpperCase()}
+                                            {item.priority?.toUpperCase() || 'MEDIUM'}
                                         </span>
                                     </div>
 
@@ -276,7 +276,7 @@ export default function AdminFeedback() {
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
                                         <div>
                                             <label style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', opacity: 0.5 }}>Catégorie</label>
-                                            <p style={{ margin: '4px 0', fontWeight: 'bold' }}>{item.category.toUpperCase()}</p>
+                                            <p style={{ margin: '4px 0', fontWeight: 'bold' }}>{item.category?.toUpperCase() || 'GENERAL'}</p>
                                         </div>
                                         <div>
                                             <label style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', opacity: 0.5 }}>E-mail</label>

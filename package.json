@@ -30,7 +30,7 @@
     "react-dom": "^19.2.0",
     "react-i18next": "^16.5.3",
     "react-parallax-tilt": "^1.7.315",
-    "react-router-dom": "^7.10.1",
+    "react-router-dom": "^7.12.0",
     "recharts": "^3.6.0",
     "tailwind-merge": "^3.4.0",
     "three": "^0.182.0",

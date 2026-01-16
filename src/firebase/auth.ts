@@ -24,10 +24,7 @@ discordProvider.addScope('email');
 export const loginWithDiscord = async (): Promise<User | null> => {
     try {
         const result = await signInWithPopup(auth, discordProvider);
-        // We need to import saveUserProfileToFirestore from './firestore' but it's not imported yet?
-        // Ah, looking at the previous file content, it seems I missed that saveUserProfileToFirestore is NOT imported in the viewed file snippet.
-        // Wait, looking at line 12: `import { saveLibraryToFirestore, saveGamificationToFirestore } from './firestore';`
-        // It seems `saveUserProfileToFirestore` is missing from imports. I should fix that too.
+
         return result.user;
     } catch (error) {
         console.error("Error logging in with Discord", error);

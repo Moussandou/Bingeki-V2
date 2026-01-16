@@ -242,7 +242,7 @@
     background: #000;
     color: #fff;
     border-radius: 50%;
-    /* Or stick to square for brutalism? Let's use circle for check */
+    /* Circle for check */
     display: flex;
     align-items: center;
     justify-content: center;
