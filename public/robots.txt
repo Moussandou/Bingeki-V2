@@ -1,0 +1,25 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://bingeki.web.app/sitemap.xml
+
+# Disallow admin pages for search engines
+Disallow: /admin
+Disallow: /admin/*
+
+# Allow all other pages
+Allow: /discover
+Allow: /library
+Allow: /social
+Allow: /schedule
+Allow: /auth
+Allow: /feedback
+Allow: /changelog
+Allow: /legal
+Allow: /credits
+Allow: /profile
+Allow: /work/*
+Allow: /character/*
+Allow: /tierlist
