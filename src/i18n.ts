@@ -582,6 +582,7 @@ const resources = {
                 to_be_continued: "À SUIVRE...",
                 entries: {
                     v3_1: {
+                        date: "16 Janvier 2026",
                         title: "SEO & Global I18n Fix",
                         description: "Amélioration massive du SEO et correction globale du système de traduction.",
                         changes: [
@@ -593,6 +594,7 @@ const resources = {
                         ]
                     },
                     v3_0: {
+                        date: "14 Janvier 2026",
                         title: "Data Shield & Support",
                         description: "Une mise à jour critique pour la protection de vos données et le support du projet.",
                         changes: [
@@ -603,6 +605,7 @@ const resources = {
                         ]
                     },
                     v2_9: {
+                        date: "03 Janvier 2026",
                         title: "Trailer & UI Polish",
                         description: "Correction critique du lecteur de bande-annonce et optimisation de l'interface.",
                         changes: [
@@ -612,6 +615,7 @@ const resources = {
                         ]
                     },
                     v2_8: {
+                        date: "03 Janvier 2026",
                         title: "Showcase & Accessibilité",
                         description: "Mise en avant des détails d'œuvres et ouverture au public.",
                         changes: [
@@ -622,6 +626,7 @@ const resources = {
                         ]
                     },
                     v2_7: {
+                        date: "03 Janvier 2026",
                         title: "Personnages et Seiyuu",
                         description: "Explorez les fiches détaillées des personnages et doubleurs avec un style wiki.",
                         changes: [
@@ -634,6 +639,7 @@ const resources = {
                         ]
                     },
                     v2_6: {
+                        date: "03 Janvier 2026",
                         title: "Community Voices & Discovery",
                         description: "Intégration des avis communautaires et amélioration de la recherche.",
                         changes: [
@@ -644,6 +650,7 @@ const resources = {
                         ]
                     },
                     v2_5: {
+                        date: "03 Janvier 2026",
                         title: "Suivi Hebdomadaire",
                         description: "Ne ratez plus jamais un épisode grâce au nouveau Calendrier de Sorties.",
                         changes: [
@@ -654,6 +661,7 @@ const resources = {
                         ]
                     },
                     v2_4: {
+                        date: "03 Janvier 2026",
                         title: "Profondeur de Données",
                         description: "Une immersion totale avec les détails du casting et les statistiques de la communauté.",
                         changes: [
@@ -664,6 +672,7 @@ const resources = {
                         ]
                     },
                     v2_3: {
+                        date: "03 Janvier 2026",
                         title: "Discovery & Immersion",
                         description: "Enrichissement visuel et découverte de nouvelles pépites.",
                         changes: [
@@ -675,6 +684,7 @@ const resources = {
                         ]
                     },
                     v2_2: {
+                        date: "03 Janvier 2026",
                         title: "Deep Dive Update",
                         description: "Plongez au cœur de vos œuvres préférées avec le Casting et l'Univers Étendu.",
                         changes: [
@@ -685,6 +695,7 @@ const resources = {
                         ]
                     },
                     v2_1: {
+                        date: "03 Janvier 2026",
                         title: "L'Ère des Détails",
                         description: "Une mise à jour majeure pour fiches d'anime et de manga.",
                         changes: [
@@ -695,6 +706,7 @@ const resources = {
                         ]
                     },
                     v1_5: {
+                        date: "19 Décembre 2025",
                         title: "Optimisation Mobile & Social",
                         description: "Focus sur l'expérience mobile et la stabilité.",
                         changes: [
@@ -705,6 +717,7 @@ const resources = {
                         ]
                     },
                     v1_4: {
+                        date: "18 Décembre 2025",
                         title: "Mobile First & Stabilité",
                         description: "Améliorations cruciales pour la navigation sur petits écrans.",
                         changes: [
@@ -714,6 +727,7 @@ const resources = {
                         ]
                     },
                     v1_3: {
+                        date: "17 Décembre 2025",
                         title: "Community & Feedback",
                         description: "Introduction des fonctionnalités communautaires.",
                         changes: [
@@ -725,6 +739,7 @@ const resources = {
                         ]
                     },
                     v1_2: {
+                        date: "17 Décembre 2025",
                         title: "Profile 2.0 & Gamification",
                         description: "Refonte de l'identité utilisateur et du système de progression.",
                         changes: [
@@ -736,6 +751,7 @@ const resources = {
                         ]
                     },
                     v1_1: {
+                        date: "17 Décembre 2025",
                         title: "Discover & UI Polish",
                         description: "Amélioration de la découverte et harmonisation visuelle.",
                         changes: [
@@ -1501,6 +1517,7 @@ const resources = {
                 to_be_continued: "TO BE CONTINUED...",
                 entries: {
                     v3_1: {
+                        date: "January 16, 2026",
                         title: "SEO & Global I18n Fix",
                         description: "Massive SEO improvement and global translation system correction.",
                         changes: [
@@ -1512,6 +1529,7 @@ const resources = {
                         ]
                     },
                     v3_0: {
+                        date: "January 14, 2026",
                         title: "Data Shield & Support",
                         description: "A critical update for your data protection and project support.",
                         changes: [
@@ -1522,6 +1540,7 @@ const resources = {
                         ]
                     },
                     v2_9: {
+                        date: "January 03, 2026",
                         title: "Trailer & UI Polish",
                         description: "Critical fix for the trailer player and interface optimization.",
                         changes: [
@@ -1531,6 +1550,7 @@ const resources = {
                         ]
                     },
                     v2_8: {
+                        date: "January 03, 2026",
                         title: "Showcase & Accessibility",
                         description: "Highlighting work details and opening to the public.",
                         changes: [
@@ -1541,6 +1561,7 @@ const resources = {
                         ]
                     },
                     v2_7: {
+                        date: "January 03, 2026",
                         title: "Characters and Seiyuu",
                         description: "Explore detailed character and voice actor profiles with a wiki style.",
                         changes: [
@@ -1553,6 +1574,7 @@ const resources = {
                         ]
                     },
                     v2_6: {
+                        date: "January 03, 2026",
                         title: "Community Voices & Discovery",
                         description: "Integration of community reviews and search improvements.",
                         changes: [
@@ -1563,6 +1585,7 @@ const resources = {
                         ]
                     },
                     v2_5: {
+                        date: "January 03, 2026",
                         title: "Weekly Follow-up",
                         description: "Never miss an episode again with the new Release Schedule.",
                         changes: [
@@ -1573,6 +1596,7 @@ const resources = {
                         ]
                     },
                     v2_4: {
+                        date: "January 03, 2026",
                         title: "Data Depth",
                         description: "Full immersion with casting details and community statistics.",
                         changes: [
@@ -1583,6 +1607,7 @@ const resources = {
                         ]
                     },
                     v2_3: {
+                        date: "January 03, 2026",
                         title: "Discovery & Immersion",
                         description: "Visual enrichment and discovery of new gems.",
                         changes: [
@@ -1594,6 +1619,7 @@ const resources = {
                         ]
                     },
                     v2_2: {
+                        date: "January 03, 2026",
                         title: "Deep Dive Update",
                         description: "Dive into your favorite works with Casting and Extended Universe.",
                         changes: [
@@ -1604,6 +1630,7 @@ const resources = {
                         ]
                     },
                     v2_1: {
+                        date: "January 03, 2026",
                         title: "The Details Era",
                         description: "A major update to enrich anime and manga sheets.",
                         changes: [
@@ -1614,6 +1641,7 @@ const resources = {
                         ]
                     },
                     v1_5: {
+                        date: "December 19, 2025",
                         title: "Mobile & Social Optimization",
                         description: "Focus on mobile experience and stability.",
                         changes: [
@@ -1624,6 +1652,7 @@ const resources = {
                         ]
                     },
                     v1_4: {
+                        date: "December 18, 2025",
                         title: "Mobile First & Stability",
                         description: "Crucial improvements for small screen navigation.",
                         changes: [
@@ -1633,6 +1662,7 @@ const resources = {
                         ]
                     },
                     v1_3: {
+                        date: "December 17, 2025",
                         title: "Community & Feedback",
                         description: "Introduction of community features.",
                         changes: [
@@ -1644,6 +1674,7 @@ const resources = {
                         ]
                     },
                     v1_2: {
+                        date: "December 17, 2025",
                         title: "Profile 2.0 & Gamification",
                         description: "Major overhaul of user identity and progression system.",
                         changes: [
@@ -1655,6 +1686,7 @@ const resources = {
                         ]
                     },
                     v1_1: {
+                        date: "December 17, 2025",
                         title: "Discover & UI Polish",
                         description: "Discovery improvement and visual harmonization.",
                         changes: [
