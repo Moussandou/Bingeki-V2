@@ -1034,7 +1034,8 @@ const resources = {
                 progress: {
                     title: "PROGRESSION",
                     edit: "Éditer",
-                    saved_toast: "Progression sauvegardée !"
+                    saved_toast: "Progression sauvegardée !",
+                    mark_complete_confirm: "Avez-vous terminé cette œuvre ? Votre progression sera mise au maximum."
                 },
                 status: {
                     title: "STATUT",
@@ -2190,7 +2191,8 @@ const resources = {
                 progress: {
                     title: "PROGRESS",
                     edit: "Edit",
-                    saved_toast: "Progress saved!"
+                    saved_toast: "Progress saved!",
+                    mark_complete_confirm: "Have you finished this work? Your progress will be set to the maximum."
                 },
                 status: {
                     title: "STATUS",
