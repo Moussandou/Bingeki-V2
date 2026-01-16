@@ -13,7 +13,7 @@ import { calculateRank, getRankColor } from '@/utils/rankUtils';
 import { useState, useEffect } from 'react';
 import { getFriendsActivity } from '@/firebase/firestore';
 import type { ActivityEvent } from '@/types/activity';
-import { ACTIVITY_EMOJIS, ACTIVITY_LABELS } from '@/types/activity';
+import { ACTIVITY_EMOJIS, getActivityLabel } from '@/types/activity';
 import { getTopWorks } from '@/services/animeApi';
 import type { JikanResult } from '@/services/animeApi';
 import { Star } from 'lucide-react';
@@ -366,7 +366,7 @@ export default function Dashboard() {
                                                 <div style={{ flex: 1, minWidth: 0 }}>
                                                     <p style={{ fontSize: '0.9rem', lineHeight: 1.4 }}>
                                                         <span style={{ fontWeight: 700 }}>{activity.userName}</span>
-                                                        <span style={{ opacity: 0.8 }}> {ACTIVITY_LABELS[activity.type]}</span>
+                                                        <span style={{ opacity: 0.8 }}> {getActivityLabel(activity.type, t)}</span>
                                                         {activity.workTitle && <span> <strong>{activity.workTitle}</strong></span>}
                                                     </p>
                                                     <p style={{ fontSize: '0.75rem', opacity: 0.5, marginTop: '0.25rem' }}>

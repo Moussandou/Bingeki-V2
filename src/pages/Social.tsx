@@ -19,7 +19,7 @@ import {
     type LeaderboardPeriod
 } from '@/firebase/firestore';
 import type { ActivityEvent } from '@/types/activity';
-import { ACTIVITY_EMOJIS, ACTIVITY_LABELS } from '@/types/activity';
+import { ACTIVITY_EMOJIS, getActivityLabel } from '@/types/activity';
 import { ChallengesSection } from '@/components/ChallengesSection';
 import { WatchPartiesSection } from '@/components/WatchPartiesSection';
 import { Podium } from '@/components/social/Podium';
@@ -264,7 +264,7 @@ export default function Social() {
                                                         WebkitBoxOrient: 'vertical',
                                                         lineHeight: '1.2'
                                                     }}>
-                                                        {ACTIVITY_EMOJIS[activity.type]} <strong>{activity.userName}</strong> {ACTIVITY_LABELS[activity.type]}
+                                                        {ACTIVITY_EMOJIS[activity.type]} <strong>{activity.userName}</strong> {getActivityLabel(activity.type, t)}
                                                         {activity.workTitle && <span style={{ color: 'var(--color-primary)' }}> {activity.workTitle}</span>}
                                                         {activity.episodeNumber && <span> (Ep. {activity.episodeNumber})</span>}
                                                         {activity.newLevel && <span style={{ color: 'var(--color-primary)' }}> {activity.newLevel}</span>}
