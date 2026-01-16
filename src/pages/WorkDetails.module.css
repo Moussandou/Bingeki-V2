@@ -206,7 +206,7 @@
     margin: 0.5rem 0;
     text-align: center;
     width: 100%;
-    /* Break to new line on mobile maybe */
+    /* Break to new line on mobile */
 }
 
 .statusButtons {

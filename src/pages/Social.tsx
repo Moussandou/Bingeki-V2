@@ -124,7 +124,7 @@ export default function Social() {
                 searchResult
             );
             setRequestSent(true);
-            loadData(); // Refresh list to maybe show pending outgoing
+            loadData(); // Refresh list
         } catch (error) {
             console.error("Failed to send request", error);
         }

@@ -186,7 +186,7 @@ function App() {
     const rgb = hexToRgb(accentColor);
     if (rgb) {
       document.documentElement.style.setProperty('--color-primary-glow', `rgba(${rgb}, 0.5)`);
-      // Update gradient to use the accent color (simple gradient for now)
+      // Update gradient to use the accent color
       document.documentElement.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${accentColor} 0%, ${accentColor} 100%)`);
     }
   }, [accentColor]);
