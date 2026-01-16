@@ -117,7 +117,9 @@ const resources = {
                     },
                     final_cta: {
                         title: "REJOIGNEZ L'ÉLITE",
-                        button: "CRÉER MON COMPTE"
+                        title_logged_in: "PRÊT À REPRENDRE ?",
+                        button: "CRÉER MON COMPTE",
+                        button_logged_in: "ACCÉDER AU Q.G."
                     }
                 }
             },
@@ -1561,7 +1563,9 @@ const resources = {
                     },
                     final_cta: {
                         title: "JOIN THE ELITE",
-                        button: "CREATE MY ACCOUNT"
+                        title_logged_in: "READY TO CONTINUE?",
+                        button: "CREATE MY ACCOUNT",
+                        button_logged_in: "GO TO HQ"
                     }
                 }
             },
