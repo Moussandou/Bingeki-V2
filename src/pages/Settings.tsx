@@ -140,7 +140,9 @@ export default function Settings() {
                     badges: [],
                     totalChaptersRead: 0,
                     totalWorksAdded: 0,
-                    totalWorksCompleted: 0
+                    totalWorksCompleted: 0,
+                    totalAnimeEpisodesWatched: 0,
+                    totalMoviesWatched: 0
                 });
             }
 

@@ -10,6 +10,8 @@ export interface GamificationData {
     lastActivityDate: string | null;
     badges: Badge[];
     totalChaptersRead: number;
+    totalAnimeEpisodesWatched: number;
+    totalMoviesWatched: number;
     totalWorksAdded: number;
     totalWorksCompleted: number;
     lastUpdated?: number;
@@ -42,6 +44,8 @@ export function mergeGamificationData(
             lastActivityDate: local.lastActivityDate || null,
             badges: local.badges || [],
             totalChaptersRead: local.totalChaptersRead || 0,
+            totalAnimeEpisodesWatched: local.totalAnimeEpisodesWatched || 0,
+            totalMoviesWatched: local.totalMoviesWatched || 0,
             totalWorksAdded: local.totalWorksAdded || 0,
             totalWorksCompleted: local.totalWorksCompleted || 0,
             lastUpdated: Date.now(),
@@ -66,6 +70,8 @@ export function mergeGamificationData(
     const mergedLevel = Math.max(local.level || 1, cloud.level || 1);
     const mergedXp = Math.max(local.xp || 0, cloud.xp || 0);
     const mergedTotalChapters = Math.max(local.totalChaptersRead || 0, cloud.totalChaptersRead || 0);
+    const mergedTotalEpisodes = Math.max(local.totalAnimeEpisodesWatched || 0, cloud.totalAnimeEpisodesWatched || 0);
+    const mergedTotalMovies = Math.max(local.totalMoviesWatched || 0, cloud.totalMoviesWatched || 0);
     const mergedTotalWorks = Math.max(local.totalWorksAdded || 0, cloud.totalWorksAdded || 0);
     const mergedTotalCompleted = Math.max(local.totalWorksCompleted || 0, cloud.totalWorksCompleted || 0);
 
@@ -113,6 +119,8 @@ export function mergeGamificationData(
         lastActivityDate: mergedLastActivity || null,
         badges: mergedBadges,
         totalChaptersRead: mergedTotalChapters,
+        totalAnimeEpisodesWatched: mergedTotalEpisodes,
+        totalMoviesWatched: mergedTotalMovies,
         totalWorksAdded: mergedTotalWorks,
         totalWorksCompleted: mergedTotalCompleted,
         lastUpdated: Date.now(),
@@ -185,6 +193,8 @@ export function validateGamificationWrite(
     const checks = [
         { name: 'level', newVal: newData.level, oldVal: existing.level },
         { name: 'totalChaptersRead', newVal: newData.totalChaptersRead, oldVal: existing.totalChaptersRead },
+        { name: 'totalAnimeEpisodesWatched', newVal: newData.totalAnimeEpisodesWatched, oldVal: existing.totalAnimeEpisodesWatched },
+        { name: 'totalMoviesWatched', newVal: newData.totalMoviesWatched, oldVal: existing.totalMoviesWatched },
         { name: 'totalWorksAdded', newVal: newData.totalWorksAdded, oldVal: existing.totalWorksAdded },
         { name: 'totalWorksCompleted', newVal: newData.totalWorksCompleted, oldVal: existing.totalWorksCompleted }
     ];

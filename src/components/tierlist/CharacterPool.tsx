@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDraggable } from '@dnd-kit/core';
 import { Search, Info } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -41,6 +42,7 @@ function DraggablePoolItem({ character }: { character: any }) {
 }
 
 export function CharacterPool() {
+    const { t } = useTranslation();
     const [query, setQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [characters, setCharacters] = useState<any[]>([]);
@@ -175,7 +177,7 @@ export function CharacterPool() {
 
             <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
                 {isLoading ? (
-                    <div style={{ textAlign: 'center', opacity: 0.5 }}>Loading...</div>
+                    <div style={{ textAlign: 'center', opacity: 0.5 }}>{t('common.loading')}</div>
                 ) : (
                     <>
                         {mode === 'character' ? (
@@ -186,7 +188,7 @@ export function CharacterPool() {
                                 {characters.length === 0 && !isLoading && (
                                     <div style={{ textAlign: 'center', opacity: 0.5, marginTop: '2rem' }}>
                                         <Info size={24} style={{ marginBottom: '0.5rem' }} />
-                                        <p>No characters found.</p>
+                                        <p>{t('tierlist.no_characters')}</p>
                                     </div>
                                 )}
                             </div>
@@ -219,7 +221,7 @@ export function CharacterPool() {
                                 {works.length === 0 && !isLoading && (
                                     <div style={{ textAlign: 'center', opacity: 0.5, marginTop: '2rem', gridColumn: 'span 2' }}>
                                         <Info size={24} style={{ marginBottom: '0.5rem' }} />
-                                        <p>No anime found.</p>
+                                        <p>{t('tierlist.no_anime')}</p>
                                     </div>
                                 )}
                             </div>

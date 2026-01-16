@@ -1,7 +1,9 @@
 import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy, limit, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
-import { db } from './config';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from './config';
 import type { Work } from '@/store/libraryStore';
 import type { Badge } from '@/types/badge';
+import type { FavoriteCharacter } from '@/types/character';
 import type { ActivityEvent } from '@/types/activity';
 export type { ActivityEvent };
 import type { Comment, CommentWithReplies } from '@/types/comment';
@@ -23,6 +25,8 @@ interface GamificationData {
     lastActivityDate: string | null;
     badges: Badge[];
     totalChaptersRead: number;
+    totalAnimeEpisodesWatched: number;
+    totalMoviesWatched: number;
     totalWorksAdded: number;
     totalWorksCompleted: number;
     lastUpdated: number;
@@ -40,6 +44,8 @@ export interface UserProfile {
     streak?: number;
     badges?: { id: string; name: string; description: string; icon: string; rarity: string; unlockedAt?: number }[];
     totalChaptersRead?: number;
+    totalAnimeEpisodesWatched?: number;
+    totalMoviesWatched?: number;
     totalWorksAdded?: number;
     totalWorksCompleted?: number;
     banner?: string;
@@ -49,6 +55,7 @@ export interface UserProfile {
     borderColor?: string;
     favoriteManga?: string;
     top3Favorites?: string[];
+    favoriteCharacters?: FavoriteCharacter[];
     featuredBadge?: string;
     isAdmin?: boolean;
     isBanned?: boolean;
@@ -63,6 +70,9 @@ export async function saveUserProfileToFirestore(user: Partial<UserProfile>): Pr
 
         const docRef = doc(db, 'users', user.uid);
 
+        const docSnap = await getDoc(docRef);
+        const exists = docSnap.exists();
+
         // Prepare data to save - filter out undefined but Keep null/empty strings to allow clearing
         const dataToSave: any = {
             lastLogin: Date.now()
@@ -72,10 +82,16 @@ export async function saveUserProfileToFirestore(user: Partial<UserProfile>): Pr
         const allowedFields: (keyof UserProfile)[] = [
             'uid', 'email', 'displayName', 'photoURL', 'banner', 'bio',
             'themeColor', 'cardBgColor', 'borderColor',
-            'favoriteManga', 'top3Favorites', 'featuredBadge'
+            'favoriteManga', 'top3Favorites', 'featuredBadge',
+            'favoriteCharacters'
         ];
 
         allowedFields.forEach(field => {
+            // Prevent overwriting custom profile data with Auth provider data on subsequent logins
+            if (exists && (field === 'displayName' || field === 'photoURL')) {
+                return;
+            }
+
             if (user[field] !== undefined) {
                 dataToSave[field] = user[field];
             }
@@ -86,6 +102,36 @@ export async function saveUserProfileToFirestore(user: Partial<UserProfile>): Pr
     } catch (error) {
         console.error('[Firestore] Error saving user profile:', error);
         throw error; // Re-throw to let UI know
+    }
+}
+
+// Update user profile fields (DisplayName, Bio, etc.)
+export async function updateUserProfile(uid: string, data: Partial<Pick<UserProfile, 'displayName' | 'bio' | 'photoURL' | 'banner'>>): Promise<void> {
+    try {
+        const docRef = doc(db, 'users', uid);
+        await updateDoc(docRef, { ...data, lastUpdated: Date.now() });
+        console.log('[Firestore] User profile updated:', data);
+    } catch (error) {
+        console.error('[Firestore] Error updating user profile:', error);
+        throw error;
+    }
+}
+
+// Upload profile picture to Firebase Storage
+export async function uploadProfilePicture(uid: string, file: File): Promise<string> {
+    try {
+        // Create a unique reference to avoid caching issues
+        const storageRef = ref(storage, `users/${uid}/avatar_${Date.now()}`);
+        const snapshot = await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+
+        // Update user profile with new photoURL
+        await updateUserProfile(uid, { photoURL: downloadURL });
+
+        return downloadURL;
+    } catch (error) {
+        console.error('[Storage] Error uploading profile picture:', error);
+        throw error;
     }
 }
 
@@ -180,6 +226,8 @@ export async function saveGamificationToFirestore(
             streak: mergedData.streak,
             badges: mergedData.badges,
             totalChaptersRead: mergedData.totalChaptersRead,
+            totalAnimeEpisodesWatched: mergedData.totalAnimeEpisodesWatched || 0,
+            totalMoviesWatched: mergedData.totalMoviesWatched || 0,
             totalWorksAdded: mergedData.totalWorksAdded,
             totalWorksCompleted: mergedData.totalWorksCompleted
         }, { merge: true });

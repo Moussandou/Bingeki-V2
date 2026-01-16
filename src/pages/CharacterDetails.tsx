@@ -5,6 +5,10 @@ import { Button } from '@/components/ui/Button';
 import { ArrowLeft, Heart, User, Loader2, Mic } from 'lucide-react';
 import { getCharacterFull, type JikanCharacterFull, type JikanCharacterAnime, type JikanCharacterVoice } from '@/services/animeApi';
 import { SEO } from '@/components/layout/SEO';
+import { useLibraryStore } from '@/store/libraryStore';
+import { useAuthStore } from '@/store/authStore';
+import { useToast } from '@/context/ToastContext';
+import { saveUserProfileToFirestore } from '@/firebase/firestore'; // Added import
 import styles from './CharacterDetails.module.css';
 
 type CharacterFullData = JikanCharacterFull & {
@@ -19,6 +23,9 @@ export default function CharacterDetails() {
     const { t } = useTranslation();
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { user } = useAuthStore();
+    const { addFavoriteCharacter, removeFavoriteCharacter, isFavoriteCharacter } = useLibraryStore();
+    const { addToast } = useToast();
     const [character, setCharacter] = useState<CharacterFullData | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -87,8 +94,40 @@ export default function CharacterDetails() {
                             <p className={styles.nameKanji}>{character.name_kanji}</p>
                         )}
                         <div className={styles.metaContainer}>
-                            <div className={styles.metaItem}>
-                                <Heart size={16} fill="#e11d48" color="#e11d48" />
+                            <div className={styles.metaItem} style={{ cursor: 'pointer' }} onClick={() => {
+                                if (!user) {
+                                    addToast(t('auth.login_required'), 'error');
+                                    return;
+                                }
+                                if (!character) return;
+                                const charId = character.mal_id;
+                                const currentFavorites = useLibraryStore.getState().favoriteCharacters;
+
+                                if (isFavoriteCharacter(charId)) {
+                                    removeFavoriteCharacter(charId);
+                                    if (user) {
+                                        const updatedFavorites = currentFavorites.filter(c => c.id !== charId);
+                                        saveUserProfileToFirestore({ uid: user.uid, favoriteCharacters: updatedFavorites });
+                                    }
+                                    addToast(t('character_details.removed_from_favorites'), 'info');
+                                } else {
+                                    const newChar = {
+                                        id: charId,
+                                        name: character.name,
+                                        image: character.images?.jpg?.image_url || '',
+                                        role: 'Main',
+                                        workId: 0,
+                                        workTitle: ''
+                                    };
+                                    addFavoriteCharacter(newChar);
+                                    if (user) {
+                                        const updatedFavorites = [...currentFavorites, newChar];
+                                        saveUserProfileToFirestore({ uid: user.uid, favoriteCharacters: updatedFavorites });
+                                    }
+                                    addToast(t('character_details.added_to_favorites'), 'success');
+                                }
+                            }}>
+                                <Heart size={16} fill={character && isFavoriteCharacter(character.mal_id) ? "#e11d48" : "none"} color="#e11d48" />
                                 <span>{character.favorites?.toLocaleString() || 0} {t('character_details.favorites')}</span>
                             </div>
                             {character.nicknames && character.nicknames.length > 0 && (

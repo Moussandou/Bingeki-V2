@@ -7,6 +7,8 @@ import { Card } from '@/components/ui/Card';
 import { HunterLicenseCard } from '@/components/HunterLicenseCard';
 import { Search, Check, Users, MessageCircle, Heart, TrendingUp, ChevronUp, History as HistoryIcon, Trophy, Star, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useAuthStore } from '@/store/authStore';
+
 
 // Counter Component for Animated Numbers
 function Counter({ from, to }: { from: number; to: number }) {
@@ -50,6 +52,7 @@ import { getTopWorks } from '@/services/animeApi';
 
 export default function Opening() {
     const { t } = useTranslation();
+    const { user } = useAuthStore();
     const [showScrollTop, setShowScrollTop] = useState(false);
     const [placeholderIndex, setPlaceholderIndex] = useState(0);
     const [placeholderText, setPlaceholderText] = useState('');
@@ -245,8 +248,10 @@ export default function Opening() {
                         transition={{ delay: 0.6 }}
                         style={{ marginTop: '2rem' }}
                     >
-                        <Link to="/auth">
-                            <button className={styles.ctaButton}>{t('landing.hero.cta')}</button>
+                        <Link to={user ? "/dashboard" : "/auth"}>
+                            <button className={styles.ctaButton}>
+                                {user ? t('landing.hero.cta_logged_in') : t('landing.hero.cta')}
+                            </button>
                         </Link>
                     </motion.div>
                 </header>

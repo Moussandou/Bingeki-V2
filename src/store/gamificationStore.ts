@@ -13,6 +13,8 @@ interface GamificationState {
 
     // Stats for badge tracking
     totalChaptersRead: number;
+    totalAnimeEpisodesWatched: number;
+    totalMoviesWatched: number;
     totalWorksAdded: number;
     totalWorksCompleted: number;
 
@@ -20,7 +22,7 @@ interface GamificationState {
     recordActivity: () => void;
     unlockBadge: (badgeId: string) => void;
     clearRecentUnlock: () => void;
-    incrementStat: (stat: 'chapters' | 'works' | 'completed') => void;
+    incrementStat: (stat: 'chapters' | 'episodes' | 'movies' | 'works' | 'completed') => void;
     checkBadges: () => void;
     resetStore: () => void;
 }
@@ -49,6 +51,8 @@ export const useGamificationStore = create<GamificationState>()(
             badges: [],
             recentUnlock: null,
             totalChaptersRead: 0,
+            totalAnimeEpisodesWatched: 0,
+            totalMoviesWatched: 0,
             totalWorksAdded: 0,
             totalWorksCompleted: 0,
 
@@ -111,10 +115,14 @@ export const useGamificationStore = create<GamificationState>()(
             clearRecentUnlock: () => set({ recentUnlock: null }),
 
             incrementStat: (stat) => {
-                const { totalChaptersRead, totalWorksAdded, totalWorksCompleted, checkBadges } = get();
+                const { totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, totalWorksAdded, totalWorksCompleted, checkBadges } = get();
 
                 if (stat === 'chapters') {
                     set({ totalChaptersRead: totalChaptersRead + 1 });
+                } else if (stat === 'episodes') {
+                    set({ totalAnimeEpisodesWatched: totalAnimeEpisodesWatched + 1 });
+                } else if (stat === 'movies') {
+                    set({ totalMoviesWatched: totalMoviesWatched + 1 });
                 } else if (stat === 'works') {
                     set({ totalWorksAdded: totalWorksAdded + 1 });
                 } else if (stat === 'completed') {
@@ -165,6 +173,8 @@ export const useGamificationStore = create<GamificationState>()(
                 badges: [],
                 recentUnlock: null,
                 totalChaptersRead: 0,
+                totalAnimeEpisodesWatched: 0,
+                totalMoviesWatched: 0,
                 totalWorksAdded: 0,
                 totalWorksCompleted: 0
             })

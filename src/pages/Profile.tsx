@@ -12,7 +12,10 @@ import { logout } from '@/firebase/auth';
 import {
     Settings, Award, BookOpen, CheckCircle, Library, Trophy, Flame, Info,
     PenTool,
-    X
+    X,
+    Play,
+    Film,
+    User
 } from 'lucide-react';
 import { HunterLicenseCard } from '@/components/HunterLicenseCard';
 import { getUserProfile, saveUserProfileToFirestore, compareLibraries, type UserProfile } from '@/firebase/firestore';
@@ -30,8 +33,8 @@ import { useToast } from '@/context/ToastContext';
 export default function Profile() {
     const { user, setUser, loading } = useAuthStore();
     // Default (local) stats
-    const { level, xp, xpToNextLevel, streak, badges, totalChaptersRead, totalWorksAdded, totalWorksCompleted } = useGamificationStore();
-    const { works } = useLibraryStore();
+    const { level, xp, xpToNextLevel, streak, badges, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, totalWorksAdded, totalWorksCompleted } = useGamificationStore();
+    const { works, favoriteCharacters } = useLibraryStore();
     const { addToast } = useToast();
 
     // Router
@@ -94,6 +97,8 @@ export default function Profile() {
                 if (p) {
                     setExtendedProfile(p);
                     setEditForm({
+                        displayName: p.displayName || user?.displayName || '',
+                        avatar: p.photoURL || user?.photoURL || '',
                         banner: p.banner || '',
                         bio: p.bio || '',
                         themeColor: p.themeColor || '#000000',
@@ -101,7 +106,8 @@ export default function Profile() {
                         borderColor: p.borderColor || '#000000',
                         favoriteManga: p.favoriteManga || '',
                         top3Favorites: p.top3Favorites || [],
-                        featuredBadge: p.featuredBadge || ''
+                        featuredBadge: p.featuredBadge || '',
+                        favoriteCharacters: p.favoriteCharacters || []
                     });
                 }
             });
@@ -146,9 +152,14 @@ export default function Profile() {
     const displayTotalWorks = isOwnProfile ? totalWorksAdded : (visitedStats?.totalWorksAdded || 0);
     const displayWorksCompleted = isOwnProfile ? totalWorksCompleted : (visitedStats?.totalWorksCompleted || 0);
 
+    // Display Favorite Characters
+    const displayFavoriteCharacters = isOwnProfile ? favoriteCharacters : (extendedProfile?.favoriteCharacters || []);
+
 
     // Edit Form State
     const [editForm, setEditForm] = useState({
+        displayName: '',
+        avatar: '', // URL or Data URL
         banner: '',
         bio: '',
         themeColor: '#000000',
@@ -156,7 +167,8 @@ export default function Profile() {
         borderColor: '#000000',
         favoriteManga: '',
         top3Favorites: [] as string[],
-        featuredBadge: ''
+        featuredBadge: '',
+        favoriteCharacters: [] as any[]
     });
 
     // --- Drag & Drop Handlers ---
@@ -177,8 +189,16 @@ export default function Profile() {
 
         setIsSaving(true);
         let bannerUrl = editForm.banner;
+        let avatarUrl = editForm.avatar;
 
         try {
+            // Upload Avatar if changed (Data URL)
+            if (avatarUrl && avatarUrl.startsWith('data:')) {
+                const storageRef = ref(storage, `users/${user.uid}/avatar_${Date.now()}`);
+                await uploadString(storageRef, avatarUrl, 'data_url');
+                avatarUrl = await getDownloadURL(storageRef);
+            }
+
             // If banner is a Data URL (new upload), upload to Storage
             if (bannerUrl && bannerUrl.startsWith('data:')) {
                 const storageRef = ref(storage, `banners/${user.uid}_${Date.now()}`);
@@ -192,6 +212,8 @@ export default function Profile() {
             const profileData = {
                 uid: user.uid,
                 ...editForm,
+                displayName: editForm.displayName,
+                photoURL: avatarUrl,
                 banner: bannerUrl,
                 top3Favorites: cleanTop3
             };
@@ -199,7 +221,7 @@ export default function Profile() {
             await saveUserProfileToFirestore(profileData);
 
             setExtendedProfile({ ...extendedProfile, ...profileData });
-            setEditForm(prev => ({ ...prev, banner: bannerUrl, top3Favorites: cleanTop3 }));
+            setEditForm(prev => ({ ...prev, banner: bannerUrl, avatar: avatarUrl, top3Favorites: cleanTop3 }));
 
             addToast(t('profile.toast.profile_updated'), 'success');
             setIsEditModalOpen(false);
@@ -241,7 +263,10 @@ export default function Profile() {
                                 </>
                             )}
                             {!isOwnProfile && (
-                                <Button variant="ghost" onClick={() => navigate(-1)}>{t('profile.back')}</Button>
+                                <>
+                                    <Button variant="primary" onClick={() => navigate(`/users/${uid}/library`)} icon={<Library size={18} />}>{t('profile.view_library')}</Button>
+                                    <Button variant="ghost" onClick={() => navigate(-1)}>{t('profile.back')}</Button>
+                                </>
                             )}
                         </div>
                     </div>
@@ -295,7 +320,7 @@ export default function Profile() {
                                 </div>
 
                                 {/* En cours */}
-                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--color-primary)', color: '#fff' }}>
                                     <div style={{ padding: '0.75rem', background: 'var(--color-primary)', color: '#fff' }}>
                                         <Flame size={24} />
                                     </div>
@@ -313,6 +338,28 @@ export default function Profile() {
                                     <div>
                                         <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayWorksCompleted}</div>
                                         <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.completed')}</p>
+                                    </div>
+                                </div>
+
+                                {/* Episodes Vus */}
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
+                                    <div style={{ padding: '0.75rem', background: '#0ea5e9', color: '#fff' }}>
+                                        <Play size={24} />
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{totalAnimeEpisodesWatched || 0}</div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.episodes_watched')}</p>
+                                    </div>
+                                </div>
+
+                                {/* Films Vus */}
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
+                                    <div style={{ padding: '0.75rem', background: '#f43f5e', color: '#fff' }}>
+                                        <Film size={24} />
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{totalMoviesWatched || 0}</div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.movies_watched')}</p>
                                     </div>
                                 </div>
 
@@ -413,6 +460,59 @@ export default function Profile() {
                                 </div>
                             )}
 
+
+                            {/* Favorite Characters Section */}
+                            {displayFavoriteCharacters && displayFavoriteCharacters.length > 0 && (
+                                <>
+                                    <h3 className="manga-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem', background: '#ffe4e6', color: '#e11d48', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <User size={24} /> {t('profile.favorite_characters') || "Personnages Favoris"}
+                                    </h3>
+                                    <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1.5rem' }}>
+                                        {displayFavoriteCharacters.map((char: any) => (
+                                            <div
+                                                key={char.id}
+                                                className="character-card"
+                                                onClick={() => navigate(`/character/${char.id}`)}
+                                                style={{
+                                                    minWidth: '100px',
+                                                    maxWidth: '100px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    alignItems: 'center',
+                                                    gap: '0.5rem'
+                                                }}
+                                            >
+                                                <div style={{
+                                                    width: '80px',
+                                                    height: '80px',
+                                                    borderRadius: '50%',
+                                                    overflow: 'hidden',
+                                                    border: '3px solid #e11d48',
+                                                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                                                }}>
+                                                    <img
+                                                        src={char.image}
+                                                        alt={char.name}
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    />
+                                                </div>
+                                                <p style={{
+                                                    fontSize: '0.8rem',
+                                                    fontWeight: 700,
+                                                    textAlign: 'center',
+                                                    lineHeight: '1.2'
+                                                }}>
+                                                    {char.name}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div style={{ marginBottom: '2rem' }}></div>
+                                </>
+                            )}
+
+
                             <h3 className="manga-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem', background: 'var(--color-secondary)', color: '#000' }}>{t('profile.recent_badges')}</h3>
                             <div className="manga-panel" style={{ padding: '2rem', background: '#fff', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '2rem' }}>
                                 {displayBadges.map((badge: Badge) => (
@@ -505,6 +605,46 @@ export default function Profile() {
                     {/* Edit Profile Modal */}
                     <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title={t('profile.edit_modal.title')}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxHeight: '70vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
+
+                            {/* AVATAR & NAME */}
+                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                <div style={{ position: 'relative', width: '80px', height: '80px', flexShrink: 0 }}>
+                                    <div style={{ width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                        <img
+                                            src={editForm.avatar || 'https://via.placeholder.com/150'}
+                                            alt="Avatar"
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                    </div>
+                                    <label htmlFor="avatar-upload" style={{ position: 'absolute', bottom: 0, right: 0, background: '#000', color: '#fff', borderRadius: '50%', padding: '4px', cursor: 'pointer' }}>
+                                        <PenTool size={12} />
+                                    </label>
+                                    <input
+                                        id="avatar-upload"
+                                        type="file"
+                                        accept="image/*"
+                                        style={{ display: 'none' }}
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                const reader = new FileReader();
+                                                reader.onloadend = () => {
+                                                    setEditForm(prev => ({ ...prev, avatar: reader.result as string }));
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>{t('profile.edit_modal.pseudo')}</label>
+                                    <Input
+                                        placeholder="Pseudo"
+                                        value={editForm.displayName}
+                                        onChange={(e) => setEditForm(prev => ({ ...prev, displayName: e.target.value }))}
+                                    />
+                                </div>
+                            </div>
 
                             {/* BANNER URL */}
                             <div>

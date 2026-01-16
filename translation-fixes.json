@@ -1,0 +1,177 @@
+{
+  "totalFixes": 21,
+  "fixes": [
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/components/WatchPartiesSection.tsx",
+      "line": 154,
+      "original": "Connectez-vous pour créer des Watch Parties",
+      "translationKey": "watch_parties_section.connectezvous_pour_creer_des_w",
+      "frText": "Connectez-vous pour créer des Watch Parties",
+      "enText": "Log in pour Create des Watch Parties"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/components/WatchPartiesSection.tsx",
+      "line": 171,
+      "original": "Chargement...",
+      "translationKey": "watch_parties_section.chargement",
+      "frText": "Chargement...",
+      "enText": "Loading..."
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/components/WatchPartiesSection.tsx",
+      "line": 175,
+      "original": "Aucune party en cours",
+      "translationKey": "watch_parties_section.aucune_party_en_cours",
+      "frText": "Aucune party en cours",
+      "enText": "Nonee party In progress"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/components/WatchPartiesSection.tsx",
+      "line": 176,
+      "original": "Crée une party et regarde/lis avec tes amis !",
+      "translationKey": "watch_parties_section.cree_une_party_et_regardelis_a",
+      "frText": "Crée une party et regarde/lis avec tes amis !",
+      "enText": "Crée une party et regarde/lis avec tes friends !"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/components/WatchPartiesSection.tsx",
+      "line": 288,
+      "original": "Choisir une œuvre",
+      "translationKey": "watch_parties_section.choisir_une_uvre",
+      "frText": "Choisir une œuvre",
+      "enText": "[TRANSLATE] Choisir une œuvre"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/components/WatchPartiesSection.tsx",
+      "line": 290,
+      "original": "Ajoutez d'abord une œuvre à votre bibliothèque",
+      "translationKey": "watch_parties_section.ajoutez_dabord_une_uvre_a_votr",
+      "frText": "Ajoutez d'abord une œuvre à votre bibliothèque",
+      "enText": "Ajoutez d'abord une œuvre à votre Library"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/components/WatchPartiesSection.tsx",
+      "line": 339,
+      "original": "Vous n'avez pas encore d'amis",
+      "translationKey": "watch_parties_section.vous_navez_pas_encore_damis",
+      "frText": "Vous n'avez pas encore d'amis",
+      "enText": "Vous n'avez pas encore d'friends"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/components/WatchPartiesSection.tsx",
+      "line": 372,
+      "original": "Annuler",
+      "translationKey": "watch_parties_section.annuler",
+      "frText": "Annuler",
+      "enText": "Cancel"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/components/WatchPartiesSection.tsx",
+      "line": 373,
+      "original": "Créer la party",
+      "translationKey": "watch_parties_section.creer_la_party",
+      "frText": "Créer la party",
+      "enText": "Create la party"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/pages/AssetsPage.tsx",
+      "line": 43,
+      "original": "Landing Page (Tone & Speedlines)",
+      "translationKey": "assets_page.landing_page_tone_speedlines",
+      "frText": "Landing Page (Tone & Speedlines)",
+      "enText": "Landing Page (Tone & Speedlines)"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/pages/AssetsPage.tsx",
+      "line": 118,
+      "original": "Série",
+      "translationKey": "assets_page.serie",
+      "frText": "Série",
+      "enText": "[TRANSLATE] Série"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/pages/AssetsPage.tsx",
+      "line": 145,
+      "original": "Chapitre 1100",
+      "translationKey": "assets_page.chapitre_1100",
+      "frText": "Chapitre 1100",
+      "enText": "Chapter 1100"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/pages/AssetsPage.tsx",
+      "line": 277,
+      "original": "Gamification Elements",
+      "translationKey": "assets_page.gamification_elements",
+      "frText": "Gamification Elements",
+      "enText": "Gfriendfication Elements"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/pages/AssetsPage.tsx",
+      "line": 373,
+      "original": "3 amis",
+      "translationKey": "assets_page.3_amis",
+      "frText": "3 amis",
+      "enText": "3 friends"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/pages/AssetsPage.tsx",
+      "line": 492,
+      "original": "Landing Page UI Kit",
+      "translationKey": "assets_page.landing_page_ui_kit",
+      "frText": "Landing Page UI Kit",
+      "enText": "Landing Page UI Kit"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/pages/AssetsPage.tsx",
+      "line": 553,
+      "original": "Organisez votre vidéothèque comme un stratège. Séparez vos lectures en cours et ne perdez plus jamais le fil.",
+      "translationKey": "assets_page.organisez_votre_videotheque_co",
+      "frText": "Organisez votre vidéothèque comme un stratège. Séparez vos lectures en cours et ne perdez plus jamais le fil.",
+      "enText": "Organisez votre vidéothèque comme un stratège. Séparez vos lectures In progress et ne perdez plus jamais le fil."
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/pages/AssetsPage.tsx",
+      "line": 745,
+      "original": "Budget Global Estimé",
+      "translationKey": "assets_page.budget_global_estime",
+      "frText": "Budget Global Estimé",
+      "enText": "[TRANSLATE] Budget Global Estimé"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/pages/AssetsPage.tsx",
+      "line": 766,
+      "original": "Déjà Réalisé",
+      "translationKey": "assets_page.deja_realise",
+      "frText": "Déjà Réalisé",
+      "enText": "[TRANSLATE] Déjà Réalisé"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/pages/AssetsPage.tsx",
+      "line": 797,
+      "original": "Fonctionnalités Live",
+      "translationKey": "assets_page.fonctionnalites_live",
+      "frText": "Fonctionnalités Live",
+      "enText": "[TRANSLATE] Fonctionnalités Live"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/pages/FeedbackList.tsx",
+      "line": 34,
+      "original": "Accès refusé",
+      "translationKey": "feedback_list.acces_refuse",
+      "frText": "Accès refusé",
+      "enText": "[TRANSLATE] Accès refusé"
+    },
+    {
+      "file": "/Users/moussandou/Epitech/Bingeki-V2/src/pages/FeedbackList.tsx",
+      "line": 53,
+      "original": "Chargement...",
+      "translationKey": "feedback_list.chargement",
+      "frText": "Chargement...",
+      "enText": "Loading..."
+    }
+  ],
+  "i18n": {
+    "fr": "            watch_parties_section: {\n                connectezvous_pour_creer_des_w: \"Connectez-vous pour créer des Watch Parties\",\n                chargement: \"Chargement...\",\n                aucune_party_en_cours: \"Aucune party en cours\",\n                cree_une_party_et_regardelis_a: \"Crée une party et regarde/lis avec tes amis !\",\n                choisir_une_uvre: \"Choisir une œuvre\",\n                ajoutez_dabord_une_uvre_a_votr: \"Ajoutez d'abord une œuvre à votre bibliothèque\",\n                vous_navez_pas_encore_damis: \"Vous n'avez pas encore d'amis\",\n                annuler: \"Annuler\",\n                creer_la_party: \"Créer la party\",\n            },\n            assets_page: {\n                landing_page_tone_speedlines: \"Landing Page (Tone & Speedlines)\",\n                serie: \"Série\",\n                chapitre_1100: \"Chapitre 1100\",\n                gamification_elements: \"Gamification Elements\",\n                3_amis: \"3 amis\",\n                landing_page_ui_kit: \"Landing Page UI Kit\",\n                organisez_votre_videotheque_co: \"Organisez votre vidéothèque comme un stratège. Séparez vos lectures en cours et ne perdez plus jamais le fil.\",\n                budget_global_estime: \"Budget Global Estimé\",\n                deja_realise: \"Déjà Réalisé\",\n                fonctionnalites_live: \"Fonctionnalités Live\",\n            },\n            feedback_list: {\n                acces_refuse: \"Accès refusé\",\n                chargement: \"Chargement...\",\n            },\n",
+    "en": "            watch_parties_section: {\n                connectezvous_pour_creer_des_w: \"Log in pour Create des Watch Parties\",\n                chargement: \"Loading...\",\n                aucune_party_en_cours: \"Nonee party In progress\",\n                cree_une_party_et_regardelis_a: \"Crée une party et regarde/lis avec tes friends !\",\n                choisir_une_uvre: \"[TRANSLATE] Choisir une œuvre\",\n                ajoutez_dabord_une_uvre_a_votr: \"Ajoutez d'abord une œuvre à votre Library\",\n                vous_navez_pas_encore_damis: \"Vous n'avez pas encore d'friends\",\n                annuler: \"Cancel\",\n                creer_la_party: \"Create la party\",\n            },\n            assets_page: {\n                landing_page_tone_speedlines: \"Landing Page (Tone & Speedlines)\",\n                serie: \"[TRANSLATE] Série\",\n                chapitre_1100: \"Chapter 1100\",\n                gamification_elements: \"Gfriendfication Elements\",\n                3_amis: \"3 friends\",\n                landing_page_ui_kit: \"Landing Page UI Kit\",\n                organisez_votre_videotheque_co: \"Organisez votre vidéothèque comme un stratège. Séparez vos lectures In progress et ne perdez plus jamais le fil.\",\n                budget_global_estime: \"[TRANSLATE] Budget Global Estimé\",\n                deja_realise: \"[TRANSLATE] Déjà Réalisé\",\n                fonctionnalites_live: \"[TRANSLATE] Fonctionnalités Live\",\n            },\n            feedback_list: {\n                acces_refuse: \"[TRANSLATE] Accès refusé\",\n                chargement: \"Loading...\",\n            },\n"
+  }
+}

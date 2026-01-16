@@ -30,7 +30,9 @@ const resources = {
                 hero: {
                     title: "VOTRE HISTOIRE<br />COMMENCE",
                     subtitle: "Ne soyez plus un simple spectateur. Devenez le protagoniste.",
-                    cta: "COMMENCER L'AVENTURE"
+                    cta: "COMMENCER L'AVENTURE",
+                    cta_logged_in: "ACCÉDER AU Q.G."
+
                 },
                 features: {
                     qg: {
@@ -119,12 +121,86 @@ const resources = {
                     }
                 }
             },
+            content_list: {
+                no_content: "Aucun contenu disponible.",
+                unknown_date: "Date inconnue",
+                watch_on_crunchyroll: "Regarder sur Crunchyroll",
+                watch_on_adn: "Regarder sur ADN",
+                search_streaming: "Rechercher Streaming VOSTFR",
+                search_scan: "Rechercher Scan FR",
+                seen: "VU",
+                see: "VOIR",
+                loading_summary: "Chargement du résumé...",
+                no_summary: "Aucun résumé disponible.",
+                show_more: "AFFICHER PLUS",
+                previous: "Précédent",
+                next: "Suivant",
+                page: "PAGE"
+            },
             hunter_license: {
                 title: "HUNTER LICENSE",
                 top_3: "Top 3 Favoris",
                 favorite: "FAVORI",
                 id_prefix: "ID",
                 logout: "DECONNEXION"
+            },
+            watch_parties: {
+                title: "WATCH PARTIES",
+                new_party: "NOUVELLE PARTY",
+                login_required: "Connectez-vous pour créer des Watch Parties",
+                loading: "Chargement...",
+                no_parties: "Aucune party en cours",
+                no_parties_desc: "Crée une party et regarde/lis avec tes amis !",
+                episode: "Épisode",
+                chapter: "Chapitre",
+                participant: "participant",
+                participants: "participants",
+                end_party: "Terminer",
+                leave_party: "Quitter",
+                choose_work: "Choisir une œuvre",
+                add_work_first: "Ajoutez d'abord une œuvre à votre bibliothèque",
+                party_name: "Nom de la party (optionnel)",
+                party_name_placeholder: "Ex: Marathon One Piece",
+                invite_friends: "Inviter des amis",
+                no_friends: "Vous n'avez pas encore d'amis",
+                cancel: "Annuler",
+                create_party: "Créer la party",
+                party_created: "Party créée !",
+                party_ended: "Party terminée",
+                left_party: "Vous avez quitté la party",
+                episode_advanced: "Épisode avancé !",
+                select_work: "Sélectionnez une œuvre"
+            },
+            common: {
+                loading: "Chargement...",
+                error: "Erreur",
+                success: "Succès",
+                cancel: "Annuler",
+                confirm: "Confirmer",
+                save: "Enregistrer",
+                delete: "Supprimer",
+                edit: "Modifier",
+                add: "Ajouter",
+                back: "Retour",
+                next: "Suivant",
+                previous: "Précédent",
+                search: "Rechercher",
+                no_results: "Aucun résultat",
+                see_more: "Voir plus",
+                show_more: "Afficher plus",
+                close: "Fermer",
+                yes: "Oui",
+                no: "Non",
+                access_denied: "Accès refusé"
+            },
+            tierlist: {
+                characters: "PERSONNAGES",
+                by_name: "Par Nom",
+                by_anime: "Par Anime",
+                search_name: "Rechercher un nom...",
+                search_anime: "Rechercher un anime...",
+                no_characters: "Aucun personnage trouvé.",
+                no_anime: "Aucun anime trouvé."
             },
             stats: {
                 level: "Niveau",
@@ -193,6 +269,8 @@ const resources = {
             },
             library: {
                 title: "Ma Bibliothèque",
+                friend_title: "Bibliothèque de {{name}}",
+                read_only: "Affichage en lecture seule (pas de modification)",
 
                 total: "Total",
                 completed: "Terminées",
@@ -247,6 +325,7 @@ const resources = {
                 register_btn: "S'INSCRIRE",
                 or: "OU",
                 google_login: "CONTINUER AVEC GOOGLE",
+                discord_login: "CONTINUER AVEC DISCORD",
                 no_account: "Pas encore de compte ? S'inscrire",
                 has_account: "Déjà un compte ? Se connecter",
                 error_pseudo: "Veuillez entrer un pseudo",
@@ -458,11 +537,14 @@ const resources = {
             },
             profile: {
                 title: "Fiche de Chasseur",
+                view_library: "VOIR LA BIBLIOTHÈQUE",
                 edit: "EDITER",
                 guide: "GUIDE",
                 back: "RETOUR",
                 loading: "Chargement du profil...",
                 chapters_read: "Chapitres lus",
+                episodes_watched: "Épisodes vus",
+                movies_watched: "Films vus",
                 in_progress: "En cours",
                 completed: "Terminées",
                 collection: "Collection",
@@ -471,8 +553,10 @@ const resources = {
                 common_works: "{{count}} œuvre en commun",
                 common_works_plural: "{{count}} œuvres en commun",
                 recent_badges: "Badges Récents",
+                favorite_characters: "Personnages Favoris",
                 edit_modal: {
                     title: "EDITER LA LICENSE",
+                    pseudo: "PSEUDO",
                     banner_label: "BANNIÈRE / GIF (Lien URL)",
                     banner_help: "Copiez l'adresse d'une image (clic droit > Copier l'adresse de l'image) et collez-la ici.",
                     banner_placeholder: "https://exemple.com/image.jpg",
@@ -1098,11 +1182,14 @@ const resources = {
             },
             profile: {
                 title: "Hunter License",
+                view_library: "VIEW LIBRARY",
                 edit: "EDIT",
                 guide: "GUIDE",
                 back: "BACK",
                 loading: "Loading profile...",
                 chapters_read: "Chapters read",
+                episodes_watched: "Episodes Watched",
+                movies_watched: "Movies Watched",
                 in_progress: "In progress",
                 completed: "Completed",
                 collection: "Collection",
@@ -1111,8 +1198,10 @@ const resources = {
                 common_works: "{{count}} work in common",
                 common_works_plural: "{{count}} works in common",
                 recent_badges: "Recent Badges",
+                favorite_characters: "Favorite Characters",
                 edit_modal: {
                     title: "EDIT LICENSE",
+                    pseudo: "PSEUDO",
                     banner_label: "BANNER / GIF (URL Link)",
                     banner_help: "Copy image address (right click > Copy image address) and paste it here.",
                     banner_placeholder: "https://example.com/image.jpg",
@@ -1146,6 +1235,80 @@ const resources = {
                     profile_updated: "Profile updated successfully!",
                     save_error: "Error saving: "
                 }
+            },
+            content_list: {
+                no_content: "No content available.",
+                unknown_date: "Unknown date",
+                watch_on_crunchyroll: "Watch on Crunchyroll",
+                watch_on_adn: "Watch on ADN",
+                search_streaming: "Search Streaming",
+                search_scan: "Search Scan",
+                seen: "SEEN",
+                see: "SEE",
+                loading_summary: "Loading summary...",
+                no_summary: "No summary available.",
+                show_more: "SHOW MORE",
+                previous: "Previous",
+                next: "Next",
+                page: "PAGE"
+            },
+            watch_parties: {
+                title: "WATCH PARTIES",
+                new_party: "NEW PARTY",
+                login_required: "Log in to create Watch Parties",
+                loading: "Loading...",
+                no_parties: "No parties in progress",
+                no_parties_desc: "Create a party and watch/read with your friends!",
+                episode: "Episode",
+                chapter: "Chapter",
+                participant: "participant",
+                participants: "participants",
+                end_party: "End",
+                leave_party: "Leave",
+                choose_work: "Choose a work",
+                add_work_first: "Add a work to your library first",
+                party_name: "Party name (optional)",
+                party_name_placeholder: "Ex: One Piece Marathon",
+                invite_friends: "Invite friends",
+                no_friends: "You don't have any friends yet",
+                cancel: "Cancel",
+                create_party: "Create party",
+                party_created: "Party created!",
+                party_ended: "Party ended",
+                left_party: "You left the party",
+                episode_advanced: "Episode advanced!",
+                select_work: "Select a work"
+            },
+            common: {
+                loading: "Loading...",
+                error: "Error",
+                success: "Success",
+                cancel: "Cancel",
+                confirm: "Confirm",
+                save: "Save",
+                delete: "Delete",
+                edit: "Edit",
+                add: "Add",
+                back: "Back",
+                next: "Next",
+                previous: "Previous",
+                search: "Search",
+                no_results: "No results",
+                see_more: "See more",
+                show_more: "Show more",
+                close: "Close",
+                yes: "Yes",
+                no: "No",
+                access_denied: "Access denied"
+            },
+            tierlist: {
+                characters: "CHARACTERS",
+                by_name: "By Name",
+                by_anime: "By Anime",
+                search_name: "Search Name...",
+                search_anime: "Search Anime...",
+                no_characters: "No characters found.",
+                no_anime: "No anime found."
             },
             settings: {
                 title: "Settings",
@@ -1308,7 +1471,9 @@ const resources = {
                 hero: {
                     title: "YOUR STORY<br />BEGINS",
                     subtitle: "Don't just be a spectator. Become the protagonist.",
-                    cta: "START THE ADVENTURE"
+                    cta: "START THE ADVENTURE",
+                    cta_logged_in: "ACCESS H.Q."
+
                 },
                 features: {
                     qg: {
@@ -1471,6 +1636,8 @@ const resources = {
             },
             library: {
                 title: "My Library",
+                friend_title: "{{name}}'s Library",
+                read_only: "Read-only view (no modification)",
 
                 total: "Total",
                 completed: "Completed",
@@ -1753,6 +1920,7 @@ const resources = {
                 register_btn: "SIGN UP",
                 or: "OR",
                 google_login: "CONTINUE WITH GOOGLE",
+                discord_login: "CONTINUE WITH DISCORD",
                 no_account: "No account yet? Sign up",
                 has_account: "Already have an account? Log in",
                 error_pseudo: "Please enter a username",

@@ -27,7 +27,7 @@ import styles from './Dashboard.module.css';
 export default function Dashboard() {
     const { t } = useTranslation();
     const { user } = useAuthStore();
-    const { level, xp, xpToNextLevel, streak } = useGamificationStore();
+    const { level, xp, xpToNextLevel, streak, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched } = useGamificationStore();
     const { works } = useLibraryStore();
 
     const [friendsActivity, setFriendsActivity] = useState<ActivityEvent[]>([]);
@@ -154,16 +154,26 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {/* Weekly Stats */}
+                        {/* Total Stats */}
                         <div className={styles.statItem}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', opacity: 0.7 }}>
                                 <TrendingUp size={20} />
-                                <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>{t('dashboard.weekly')}</span>
+                                <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>TOTAL</span>
                             </div>
-                            <div style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>
-                                {weeklyChapters}
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <span style={{ fontSize: '1.2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{totalChaptersRead}</span>
+                                    <span style={{ fontSize: '0.6rem', opacity: 0.5 }}>CHAPS</span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <span style={{ fontSize: '1.2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{totalAnimeEpisodesWatched}</span>
+                                    <span style={{ fontSize: '0.6rem', opacity: 0.5 }}>EPS</span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <span style={{ fontSize: '1.2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{totalMoviesWatched}</span>
+                                    <span style={{ fontSize: '0.6rem', opacity: 0.5 }}>FILMS</span>
+                                </div>
                             </div>
-                            <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.25rem' }}>{t('dashboard.chapters_read')}</p>
                         </div>
 
                         {/* Streak */}

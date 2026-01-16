@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Play, Users, Plus, BookOpen, Tv, LogOut, Ban } from 'lucide-react';
@@ -20,6 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import { handleProgressUpdateWithXP } from '@/utils/progressUtils';
 
 export function WatchPartiesSection() {
+    const { t } = useTranslation();
     const { user } = useAuthStore();
     const { works } = useLibraryStore();
     const { addToast } = useToast();
@@ -59,7 +61,7 @@ export function WatchPartiesSection() {
 
     const handleCreateParty = async () => {
         if (!user || !newParty.workId) {
-            addToast('Sélectionnez une œuvre', 'error');
+            addToast(t('watch_parties.select_work'), 'error');
             return;
         }
 
@@ -69,7 +71,7 @@ export function WatchPartiesSection() {
         const participants: PartyParticipant[] = [
             {
                 id: user.uid,
-                name: user.displayName || 'Hôte',
+                name: user.displayName || t('watch_parties.host'),
                 photo: user.photoURL || '',
                 joinedAt: Date.now(),
                 isReady: true,
@@ -95,7 +97,7 @@ export function WatchPartiesSection() {
             workImage: selectedWork.image,
             workType: selectedWork.type,
             hostId: user.uid,
-            hostName: user.displayName || 'Hôte',
+            hostName: user.displayName || t('watch_parties.host'),
             participants,
             currentEpisode: selectedWork.currentChapter || 1,
             status: 'active',
@@ -104,7 +106,7 @@ export function WatchPartiesSection() {
         };
 
         await createWatchParty(party);
-        addToast('Party créée !', 'success');
+        addToast(t('watch_parties.party_created'), 'success');
         setIsCreateModalOpen(false);
         setNewParty({ workId: 0, title: '', selectedFriends: [] });
         loadData();
@@ -122,7 +124,7 @@ export function WatchPartiesSection() {
             handleProgressUpdateWithXP(libraryWork.id, newEpisode, libraryWork.totalChapters);
         }
 
-        addToast('Épisode avancé !', 'success');
+        addToast(t('watch_parties.episode_advanced'), 'success');
         loadData();
     };
 
@@ -137,21 +139,21 @@ export function WatchPartiesSection() {
 
     const handleEndParty = async (partyId: string) => {
         await endWatchParty(partyId);
-        addToast('Party terminée', 'success');
+        addToast(t('watch_parties.party_ended'), 'success');
         loadData();
     };
 
     const handleLeaveParty = async (partyId: string) => {
         if (!user) return;
         await leaveWatchParty(partyId, user.uid);
-        addToast('Vous avez quitté la party', 'info');
+        addToast(t('watch_parties.left_party'), 'info');
         loadData();
     };
 
     if (!user) {
         return (
             <div className="manga-panel" style={{ padding: '2rem', textAlign: 'center', background: '#fff' }}>
-                <p style={{ opacity: 0.6 }}>Connectez-vous pour créer des Watch Parties</p>
+                <p style={{ opacity: 0.6 }}>{t('watch_parties.login_required')}</p>
             </div>
         );
     }
@@ -160,20 +162,20 @@ export function WatchPartiesSection() {
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Tv size={24} /> WATCH PARTIES
+                    <Tv size={24} /> {t('watch_parties.title')}
                 </h2>
                 <Button onClick={() => setIsCreateModalOpen(true)} variant="manga" size="sm" icon={<Plus size={16} />}>
-                    NOUVELLE PARTY
+                    {t('watch_parties.new_party')}
                 </Button>
             </div>
 
             {isLoading ? (
-                <p style={{ textAlign: 'center', opacity: 0.6 }}>Chargement...</p>
+                <p style={{ textAlign: 'center', opacity: 0.6 }}>{t('common.loading')}</p>
             ) : parties.length === 0 ? (
                 <div className="manga-panel" style={{ padding: '2rem', textAlign: 'center', background: '#fff' }}>
                     <Tv size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
-                    <p style={{ fontWeight: 600 }}>Aucune party en cours</p>
-                    <p style={{ opacity: 0.6, fontSize: '0.9rem', marginTop: '0.5rem' }}>Crée une party et regarde/lis avec tes amis !</p>
+                    <p style={{ fontWeight: 600 }}>{t('watch_parties.no_parties')}</p>
+                    <p style={{ opacity: 0.6, fontSize: '0.9rem', marginTop: '0.5rem' }}>{t('watch_parties.no_parties_desc')}</p>
                 </div>
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -215,7 +217,7 @@ export function WatchPartiesSection() {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
                                         {party.workType === 'anime' ? <Play size={16} /> : <BookOpen size={16} />}
                                         <span style={{ fontWeight: 700 }}>
-                                            {party.workType === 'anime' ? 'Épisode' : 'Chapitre'} {party.currentEpisode}
+                                            {party.workType === 'anime' ? t('watch_parties.episode') : t('watch_parties.chapter')} {party.currentEpisode}
                                         </span>
                                         {party.hostId === user.uid && party.status === 'active' && (
                                             <Button
@@ -246,7 +248,7 @@ export function WatchPartiesSection() {
                                                 </div>
                                             ))}
                                         </div>
-                                        <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{party.participants.length} participant{party.participants.length > 1 ? 's' : ''}</span>
+                                        <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{party.participants.length} {party.participants.length > 1 ? t('watch_parties.participants') : t('watch_parties.participant')}</span>
                                     </div>
 
                                     {/* Action Buttons */}
@@ -260,7 +262,7 @@ export function WatchPartiesSection() {
                                                     icon={<Ban size={14} />}
                                                     style={{ color: '#ef4444' }}
                                                 >
-                                                    Terminer
+                                                    {t('watch_parties.end_party')}
                                                 </Button>
                                             ) : (
                                                 <Button
@@ -269,7 +271,7 @@ export function WatchPartiesSection() {
                                                     onClick={() => handleLeaveParty(party.id)}
                                                     icon={<LogOut size={14} />}
                                                 >
-                                                    Quitter
+                                                    {t('watch_parties.leave_party')}
                                                 </Button>
                                             )}
                                         </div>
@@ -282,12 +284,12 @@ export function WatchPartiesSection() {
             )}
 
             {/* Create Party Modal */}
-            <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="NOUVELLE WATCH PARTY">
+            <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title={t('watch_parties.new_party')}>
                 <div style={{ padding: '1rem' }}>
                     <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>Choisir une œuvre</label>
+                        <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>{t('watch_parties.choose_work')}</label>
                         {works.filter(w => w.status === 'reading').length === 0 ? (
-                            <p style={{ opacity: 0.6, fontStyle: 'italic' }}>Ajoutez d'abord une œuvre à votre bibliothèque</p>
+                            <p style={{ opacity: 0.6, fontStyle: 'italic' }}>{t('watch_parties.add_work_first')}</p>
                         ) : (
                             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', maxHeight: '200px', overflowY: 'auto' }}>
                                 {works.filter(w => w.status === 'reading').map(work => (
@@ -314,12 +316,12 @@ export function WatchPartiesSection() {
                     </div>
 
                     <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>Nom de la party (optionnel)</label>
+                        <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>{t('watch_parties.party_name')}</label>
                         <input
                             type="text"
                             value={newParty.title}
                             onChange={e => setNewParty(prev => ({ ...prev, title: e.target.value }))}
-                            placeholder="Ex: Marathon One Piece"
+                            placeholder={t('watch_parties.party_name_placeholder')}
                             style={{
                                 width: '100%',
                                 padding: '0.75rem',
@@ -333,10 +335,10 @@ export function WatchPartiesSection() {
                     <div style={{ marginBottom: '1.5rem' }}>
                         <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>
                             <Users size={16} style={{ marginRight: '0.5rem' }} />
-                            Inviter des amis ({newParty.selectedFriends.length})
+                            {t('watch_parties.invite_friends')} ({newParty.selectedFriends.length})
                         </label>
                         {friends.length === 0 ? (
-                            <p style={{ opacity: 0.6, fontStyle: 'italic' }}>Vous n'avez pas encore d'amis</p>
+                            <p style={{ opacity: 0.6, fontStyle: 'italic' }}>{t('watch_parties.no_friends')}</p>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '150px', overflowY: 'auto' }}>
                                 {friends.map(friend => (
@@ -369,8 +371,8 @@ export function WatchPartiesSection() {
                     </div>
 
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                        <Button variant="ghost" onClick={() => setIsCreateModalOpen(false)}>Annuler</Button>
-                        <Button variant="manga" onClick={handleCreateParty}>Créer la party</Button>
+                        <Button variant="ghost" onClick={() => setIsCreateModalOpen(false)}>{t('common.cancel')}</Button>
+                        <Button variant="manga" onClick={handleCreateParty}>{t('watch_parties.create_party')}</Button>
                     </div>
                 </div>
             </Modal>
