@@ -1,13 +1,27 @@
 import { useState, useEffect } from 'react';
-import { Star, Mail, Trash2, CheckCircle, AlertCircle, MessageSquare } from 'lucide-react';
+import {
+    Star, Trash2,
+    MessageSquare, Send, ChevronDown, ChevronUp,
+    Image as ImageIcon, ExternalLink
+} from 'lucide-react';
 import { Card } from '@/components/ui/Card';
-import { getAllFeedback, deleteFeedback, updateFeedbackStatus, type FeedbackData } from '@/firebase/firestore';
+import {
+    getAllFeedback, deleteFeedback, addAdminResponse,
+    updateFeedbackDetails, type FeedbackData
+} from '@/firebase/firestore';
+import { useAuthStore } from '@/store/authStore';
 import { useTranslation } from 'react-i18next';
+import { StatusBadge } from '@/components/feedback/StatusBadge';
 
 export default function AdminFeedback() {
     const { t } = useTranslation();
+    const { userProfile } = useAuthStore();
     const [feedbacks, setFeedbacks] = useState<FeedbackData[]>([]);
     const [loading, setLoading] = useState(true);
+    const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [responseText, setResponseText] = useState('');
+    const [isSubmittingResponse, setIsSubmittingResponse] = useState(false);
+    const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'resolved'>('open');
 
     useEffect(() => {
         loadFeedback();
@@ -36,37 +50,133 @@ export default function AdminFeedback() {
         }
     };
 
-    const handleToggleStatus = async (id: string, currentStatus: string | undefined) => {
-        const newStatus = currentStatus === 'resolved' ? 'open' : 'resolved';
+    const handleStatusUpdate = async (id: string, newStatus: FeedbackData['status']) => {
         try {
-            await updateFeedbackStatus(id, newStatus);
-            setFeedbacks(prev => prev.map(f => f.id === id ? { ...f, status: newStatus } : f));
+            await updateFeedbackDetails(id, { status: newStatus });
+            setFeedbacks(prev => prev.map(f => f.id === id ? { ...f, status: newStatus, lastUpdated: Date.now() } : f));
         } catch (e) {
             alert(t('admin.feedback.status_error'));
         }
     };
 
-    const getCategoryColor = (category: string) => {
-        switch (category) {
-            case 'bug': return '#ef4444'; // Red
-            case 'feature': return '#3b82f6'; // Blue
-            default: return '#6b7280'; // Gray
+    const handlePriorityUpdate = async (id: string, newPriority: FeedbackData['priority']) => {
+        try {
+            await updateFeedbackDetails(id, { priority: newPriority });
+            setFeedbacks(prev => prev.map(f => f.id === id ? { ...f, priority: newPriority, lastUpdated: Date.now() } : f));
+        } catch (e) {
+            alert(t('admin.feedback.priority_error'));
         }
     };
+
+    const handleSendResponse = async (id: string) => {
+        if (!responseText.trim() || !userProfile) return;
+
+        setIsSubmittingResponse(true);
+        try {
+            await addAdminResponse(id, {
+                adminId: userProfile.uid,
+                adminName: userProfile.displayName || 'Admin',
+                message: responseText
+            });
+
+            // Update local state
+            setFeedbacks(prev => prev.map(f => {
+                if (f.id === id) {
+                    return {
+                        ...f,
+                        status: 'in_progress',
+                        lastUpdated: Date.now(),
+                        adminResponses: [
+                            ...f.adminResponses,
+                            {
+                                adminId: userProfile.uid,
+                                adminName: userProfile.displayName || 'Admin',
+                                message: responseText,
+                                timestamp: Date.now()
+                            }
+                        ]
+                    };
+                }
+                return f;
+            }));
+            setResponseText('');
+            alert('Réponse envoyée !');
+        } catch (e) {
+            console.error("Error sending response:", e);
+            alert("Erreur lors de l'envoi de la réponse");
+        } finally {
+            setIsSubmittingResponse(false);
+        }
+    };
+
+    const getPriorityColor = (priority: string) => {
+        switch (priority) {
+            case 'critical': return '#ef4444';
+            case 'high': return '#f97316';
+            case 'medium': return '#3b82f6';
+            case 'low': return '#10b981';
+            default: return '#6b7280';
+        }
+    };
+
+    const filteredFeedbacks = feedbacks.filter(f => {
+        if (filterStatus === 'all') return true;
+        if (filterStatus === 'open') return f.status === 'open' || f.status === 'in_progress';
+        if (filterStatus === 'resolved') return f.status === 'resolved' || f.status === 'closed';
+        return true;
+    }).sort((a, b) => b.timestamp - a.timestamp);
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', animation: 'fadeIn 0.5s ease' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', textTransform: 'uppercase' }}>{t('admin.feedback.title')}</h1>
-                    <p style={{
-                        borderLeft: '2px solid black',
-                        paddingLeft: '0.5rem',
-                        color: '#666',
-                        fontStyle: 'italic'
-                    }}>
-                        {t('admin.feedback.tickets_pending', { count: feedbacks.filter(f => (f as any).status !== 'resolved').length })}
-                    </p>
+                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', textTransform: 'uppercase', color: 'black' }}>
+                        {t('admin.feedback.title')}
+                    </h1>
+                    <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                        <button
+                            onClick={() => setFilterStatus('open')}
+                            style={{
+                                background: filterStatus === 'open' ? 'black' : 'transparent',
+                                color: filterStatus === 'open' ? 'white' : 'black',
+                                border: '2px solid black',
+                                padding: '4px 12px',
+                                fontWeight: 'bold',
+                                borderRadius: '4px',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            En cours ({feedbacks.filter(f => f.status === 'open' || f.status === 'in_progress').length})
+                        </button>
+                        <button
+                            onClick={() => setFilterStatus('resolved')}
+                            style={{
+                                background: filterStatus === 'resolved' ? 'black' : 'transparent',
+                                color: filterStatus === 'resolved' ? 'white' : 'black',
+                                border: '2px solid black',
+                                padding: '4px 12px',
+                                fontWeight: 'bold',
+                                borderRadius: '4px',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Résolus ({feedbacks.filter(f => f.status === 'resolved' || f.status === 'closed').length})
+                        </button>
+                        <button
+                            onClick={() => setFilterStatus('all')}
+                            style={{
+                                background: filterStatus === 'all' ? 'black' : 'transparent',
+                                color: filterStatus === 'all' ? 'white' : 'black',
+                                border: '2px solid black',
+                                padding: '4px 12px',
+                                fontWeight: 'bold',
+                                borderRadius: '4px',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Tout ({feedbacks.length})
+                        </button>
+                    </div>
                 </div>
                 <button
                     onClick={loadFeedback}
@@ -75,148 +185,261 @@ export default function AdminFeedback() {
                         fontSize: '0.875rem',
                         textDecoration: 'underline',
                         cursor: 'pointer',
-                        color: 'black'
+                        color: 'black',
+                        background: 'none',
+                        border: 'none'
                     }}
-                    onMouseOver={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
-                    onMouseOut={(e) => e.currentTarget.style.color = 'black'}
                 >
                     {t('admin.feedback.refresh')}
                 </button>
             </div>
 
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: '1.5rem'
-            }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {loading ? (
-                    <p>{t('admin.feedback.loading')}</p>
-                ) : feedbacks.length === 0 ? (
-                    <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem', color: '#666' }}>
+                    <p style={{ color: 'black' }}>{t('admin.feedback.loading')}</p>
+                ) : filteredFeedbacks.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '3rem', color: '#666', background: 'white', border: '2px dashed black' }}>
                         {t('admin.feedback.no_messages')}
                     </div>
                 ) : (
-                    feedbacks.map((item) => {
-                        const isResolved = (item as any).status === 'resolved';
-                        return (
-                            <Card
-                                key={item.id}
-                                variant="manga"
-                                style={{
-                                    padding: '1.5rem',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'space-between',
-                                    minHeight: '250px',
-                                    position: 'relative',
-                                    background: 'white',
-                                    opacity: isResolved ? 0.75 : 1,
-                                    filter: isResolved ? 'grayscale(80%)' : 'none',
-                                    transition: 'all 0.3s ease'
-                                }}
+                    filteredFeedbacks.map((item) => (
+                        <Card
+                            key={item.id}
+                            variant="manga"
+                            style={{
+                                padding: '1.5rem',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                background: 'white',
+                                border: '3px solid black',
+                                boxShadow: expandedId === item.id ? '8px 8px 0 #000' : '4px 4px 0 #000',
+                                transition: 'all 0.2s ease',
+                                color: 'black'
+                            }}
+                        >
+                            {/* Summary View */}
+                            <div
+                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                                onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
                             >
-                                {/* Badges */}
-                                <div style={{ position: 'absolute', top: '-10px', right: '-10px', display: 'flex', gap: '0.5rem' }}>
-                                    <div style={{
-                                        backgroundColor: getCategoryColor(item.category),
-                                        color: 'white',
-                                        padding: '0.25rem 0.75rem',
-                                        border: '2px solid black',
-                                        fontWeight: 900,
-                                        textTransform: 'uppercase',
-                                        fontSize: '0.75rem',
-                                        boxShadow: '2px 2px 0 #000'
-                                    }}>
-                                        {item.category}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1 }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '60px' }}>
+                                        <StatusBadge status={item.status} />
+                                        <span style={{ fontSize: '0.7rem', fontWeight: 900, marginTop: '4px', color: getPriorityColor(item.priority) }}>
+                                            {item.priority.toUpperCase()}
+                                        </span>
                                     </div>
-                                    {isResolved && (
-                                        <div style={{
-                                            backgroundColor: '#10b981',
-                                            color: 'white',
-                                            padding: '0.25rem 0.75rem',
-                                            border: '2px solid black',
-                                            fontWeight: 900,
-                                            textTransform: 'uppercase',
-                                            fontSize: '0.75rem',
-                                            boxShadow: '2px 2px 0 #000',
-                                            display: 'flex', alignItems: 'center', gap: '4px'
-                                        }}>
-                                            <CheckCircle size={12} strokeWidth={3} /> {t('admin.feedback.resolved')}
-                                        </div>
-                                    )}
-                                </div>
 
-                                {/* Content */}
-                                <div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                                        <div>
-                                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.125rem', lineHeight: 1.25, textTransform: 'uppercase' }}>
-                                                {item.userName || t('admin.feedback.anonymous')}
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <h3 style={{ margin: 0, fontFamily: 'var(--font-heading)', fontSize: '1.1rem', textTransform: 'uppercase' }}>
+                                                {item.userName || 'Anonyme'}
                                             </h3>
-                                            <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontFamily: 'monospace' }}>
-                                                {new Date(item.timestamp).toLocaleDateString()}
-                                            </span>
+                                            <span style={{ fontSize: '0.8rem', opacity: 0.5 }}>• {new Date(item.timestamp).toLocaleDateString()}</span>
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', backgroundColor: 'black', color: 'white', padding: '0.25rem 0.5rem', fontWeight: 'bold', fontSize: '0.875rem' }}>
-                                            <Star size={12} fill="currentColor" /> {item.rating}/10
-                                        </div>
-                                    </div>
-
-                                    <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
-                                        <MessageSquare size={48} style={{ position: 'absolute', top: '-0.5rem', left: '-0.5rem', opacity: 0.05, color: 'black' }} />
-                                        <p style={{ color: '#374151', lineHeight: 1.625, fontWeight: 500, position: 'relative', zIndex: 10 }}>
-                                            "{item.message}"
+                                        <p style={{
+                                            margin: '4px 0 0',
+                                            fontSize: '0.9rem',
+                                            opacity: 0.8,
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: expandedId === item.id ? 'unset' : 1,
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden'
+                                        }}>
+                                            {item.message}
                                         </p>
                                     </div>
                                 </div>
 
-                                {/* Actions */}
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '1rem', borderTop: '2px solid #f3f4f6', marginTop: 'auto', gap: '0.5rem' }}>
-                                    {item.contactEmail ? (
-                                        <a href={`mailto:${item.contactEmail}`} style={{
-                                            display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                            fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase',
-                                            padding: '0.25rem 0.5rem', borderRadius: '0.125rem',
-                                            color: 'black', textDecoration: 'none'
-                                        }} title={item.contactEmail}>
-                                            <Mail size={14} /> {t('admin.feedback.reply')}
-                                        </a>
-                                    ) : (
-                                        <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontStyle: 'italic' }}>{t('admin.feedback.no_email')}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#000', color: '#fff', padding: '2px 8px', borderRadius: '4px', fontSize: '0.8rem' }}>
+                                        <Star size={12} fill="white" /> {item.rating}
+                                    </div>
+                                    {item.attachments && item.attachments.length > 0 && (
+                                        <ImageIcon size={18} style={{ opacity: 0.5 }} />
+                                    )}
+                                    {item.adminResponses.length > 0 && (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#3b82f6' }}>
+                                            <MessageSquare size={16} />
+                                            <span style={{ fontWeight: 'bold' }}>{item.adminResponses.length}</span>
+                                        </div>
+                                    )}
+                                    {expandedId === item.id ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+                                </div>
+                            </div>
+
+                            {/* Expanded View */}
+                            {expandedId === item.id && (
+                                <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '2px solid #eee', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+                                    {/* Info Grid */}
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                                        <div>
+                                            <label style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', opacity: 0.5 }}>Catégorie</label>
+                                            <p style={{ margin: '4px 0', fontWeight: 'bold' }}>{item.category.toUpperCase()}</p>
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', opacity: 0.5 }}>E-mail</label>
+                                            <p style={{ margin: '4px 0', fontWeight: 'bold' }}>
+                                                {item.contactEmail ? (
+                                                    <a href={`mailto:${item.contactEmail}`} style={{ color: '#3b82f6', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                        {item.contactEmail} <ExternalLink size={12} />
+                                                    </a>
+                                                ) : 'Non fourni'}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', opacity: 0.5 }}>User Agent</label>
+                                            <p style={{ margin: '4px 0', fontSize: '0.7rem', opacity: 0.6 }}>{item.userAgent || 'N/A'}</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Full Message */}
+                                    <div>
+                                        <label style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', opacity: 0.5 }}>Message Complet</label>
+                                        <p style={{ margin: '8px 0', lineHeight: 1.6, whiteSpace: 'pre-wrap', background: '#f8f8f8', padding: '1rem', border: '1px solid #ddd' }}>
+                                            {item.message}
+                                        </p>
+                                    </div>
+
+                                    {/* Attachments */}
+                                    {item.attachments && item.attachments.length > 0 && (
+                                        <div>
+                                            <label style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', opacity: 0.5 }}>Pièces Jointes</label>
+                                            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                                                {item.attachments.map((url, idx) => (
+                                                    <a key={idx} href={url} target="_blank" rel="noopener noreferrer" style={{ width: '100px', height: '100px', border: '2px solid black', overflow: 'hidden' }}>
+                                                        <img src={url} alt="Attachment" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    </a>
+                                                ))}
+                                            </div>
+                                        </div>
                                     )}
 
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <button
-                                            onClick={() => handleToggleStatus(item.id, (item as any).status)}
-                                            style={{
-                                                padding: '0.5rem',
-                                                border: '2px solid black',
-                                                backgroundColor: isResolved ? '#fbbf24' : '#4ade80',
-                                                cursor: 'pointer',
-                                                transition: 'transform 0.1s'
-                                            }}
-                                            title={isResolved ? t('admin.feedback.reopen') : t('admin.feedback.mark_resolved')}
-                                        >
-                                            {isResolved ? <AlertCircle size={16} /> : <CheckCircle size={16} />}
-                                        </button>
+                                    {/* Admin Controls */}
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', padding: '1rem', background: '#f5f5f5', border: '2px solid black' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                            <label style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase' }}>Changer Statut</label>
+                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                {(['open', 'in_progress', 'resolved', 'closed'] as const).map(s => (
+                                                    <button
+                                                        key={s}
+                                                        onClick={() => handleStatusUpdate(item.id, s)}
+                                                        style={{
+                                                            padding: '4px 8px',
+                                                            fontSize: '0.7rem',
+                                                            fontWeight: 'bold',
+                                                            background: item.status === s ? 'black' : 'white',
+                                                            color: item.status === s ? 'white' : 'black',
+                                                            border: '1px solid black',
+                                                            cursor: 'pointer'
+                                                        }}
+                                                    >
+                                                        {s.replace('_', ' ').toUpperCase()}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                            <label style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase' }}>Changer Priorité</label>
+                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                {(['low', 'medium', 'high', 'critical'] as const).map(p => (
+                                                    <button
+                                                        key={p}
+                                                        onClick={() => handlePriorityUpdate(item.id, p)}
+                                                        style={{
+                                                            padding: '4px 8px',
+                                                            fontSize: '0.7rem',
+                                                            fontWeight: 'bold',
+                                                            background: item.priority === p ? getPriorityColor(p) : 'white',
+                                                            color: item.priority === p ? 'white' : 'black',
+                                                            border: '1px solid black',
+                                                            cursor: 'pointer'
+                                                        }}
+                                                    >
+                                                        {p.toUpperCase()}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
                                         <button
                                             onClick={() => handleDelete(item.id)}
-                                            style={{
-                                                padding: '0.5rem',
-                                                border: '2px solid black',
-                                                backgroundColor: 'white',
-                                                cursor: 'pointer',
-                                                color: '#ef4444'
-                                            }}
-                                            title={t('admin.feedback.delete')}
+                                            style={{ marginLeft: 'auto', alignSelf: 'center', background: '#fee2e2', color: '#ef4444', border: '2px solid #ef4444', padding: '8px', cursor: 'pointer', borderRadius: '4px' }}
                                         >
-                                            <Trash2 size={16} />
+                                            <Trash2 size={20} />
                                         </button>
                                     </div>
+
+                                    {/* Response Section */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                        <label style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem',
+                                            fontSize: '0.8rem',
+                                            fontWeight: 900,
+                                            textTransform: 'uppercase'
+                                        }}>
+                                            <MessageSquare size={16} /> Conversation / Historique
+                                        </label>
+
+                                        {/* Response History */}
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                            {item.adminResponses.length === 0 ? (
+                                                <p style={{ fontSize: '0.8rem', fontStyle: 'italic', opacity: 0.5 }}>Aucun message envoyé.</p>
+                                            ) : (
+                                                item.adminResponses.map((res, idx) => (
+                                                    <div key={idx} style={{ padding: '0.75rem', background: '#e0f2fe', borderLeft: '4px solid #0ea5e9', fontSize: '0.9rem' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '0.7rem', fontWeight: 'bold', opacity: 0.6 }}>
+                                                            <span>{res.adminName} (ADMIN)</span>
+                                                            <span>{new Date(res.timestamp).toLocaleString()}</span>
+                                                        </div>
+                                                        {res.message}
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+
+                                        {/* New Response Form */}
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <textarea
+                                                value={responseText}
+                                                onChange={(e) => setResponseText(e.target.value)}
+                                                placeholder="Écrire une réponse à l'utilisateur..."
+                                                style={{
+                                                    flex: 1,
+                                                    padding: '0.75rem',
+                                                    border: '2px solid black',
+                                                    minHeight: '80px',
+                                                    fontSize: '0.9rem',
+                                                    fontFamily: 'inherit'
+                                                }}
+                                            />
+                                            <button
+                                                onClick={() => handleSendResponse(item.id)}
+                                                disabled={isSubmittingResponse || !responseText.trim()}
+                                                style={{
+                                                    background: 'black',
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    padding: '0 1.5rem',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.5rem',
+                                                    fontWeight: 'bold'
+                                                }}
+                                            >
+                                                {isSubmittingResponse ? '...' : <><Send size={18} /> Répondre</>}
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </Card>
-                        );
-                    })
+                            )}
+                        </Card>
+                    ))
                 )}
             </div>
         </div>

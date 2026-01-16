@@ -87,8 +87,10 @@ service cloud.firestore {
     match /feedback/{feedbackId} {
       // Anyone can create feedback
       allow create: if true;
-      // Only Admins can read (Dashboard) or update/delete (Resolution)
-      allow read, update, delete: if isAdmin();
+      // Users can read their own feedback, Admins can read all
+      allow read: if (isAuthenticated() && resource.data.userId == request.auth.uid) || isAdmin();
+      // Only Admins can update/delete (Resolution)
+      allow update, delete: if isAdmin();
     }
 
     // WATCH PARTIES

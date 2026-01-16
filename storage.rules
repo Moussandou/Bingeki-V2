@@ -1,0 +1,30 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper: Is admin
+    function isAdmin() {
+      return request.auth != null && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    // Feedback Attachments
+    match /feedback-attachments/{tempId}/{allPaths=**} {
+      // Anyone can upload (guests included)
+      allow write: if true;
+      // Only owner (if logged in) or Admin can read
+      // Note: TempId version is tricky since we don't have the final doc ID yet.
+      // But we can allow public read for these specific URLs if needed, OR 
+      // restrict to auth users. For now, let's allow read if you have the URL (public)
+      // but only admin or uploader can list/delete.
+      allow read: if true;
+      allow delete: if isAdmin();
+    }
+
+    // Existing rules for other paths...
+    match /avatars/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

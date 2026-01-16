@@ -431,6 +431,21 @@ export async function rejectFriendRequest(currentUserId: string, friendUid: stri
     }
 }
 
+// Check friendship status between two users
+export async function checkFriendship(userId1: string, userId2: string): Promise<'accepted' | 'pending' | 'none'> {
+    try {
+        const docRef = doc(db, 'users', userId1, 'friends', userId2);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data().status || 'none';
+        }
+        return 'none';
+    } catch (error) {
+        console.error('[Firestore] Error checking friendship:', error);
+        return 'none';
+    }
+}
+
 // Get Friends List (Real-time listener could be better, but we use simple get for now)
 export async function getFriends(userId: string): Promise<Friend[]> {
     try {
@@ -964,6 +979,13 @@ export async function leaveWatchParty(partyId: string, participantId: string): P
 }
 // ==================== FEEDBACK SYSTEM ====================
 
+export interface AdminResponse {
+    adminId: string;
+    adminName: string;
+    message: string;
+    timestamp: number;
+}
+
 export interface FeedbackData {
     id: string;
     rating: number; // 1-10
@@ -974,19 +996,31 @@ export interface FeedbackData {
     contactEmail?: string; // Optional for guests
     timestamp: number;
     userAgent: string;
+    // Enhanced fields
+    status: 'open' | 'in_progress' | 'resolved' | 'closed';
+    priority: 'low' | 'medium' | 'high' | 'critical';
+    attachments: string[]; // Storage URLs
+    adminResponses: AdminResponse[];
+    lastUpdated: number;
 }
 
-export async function submitFeedback(feedback: Omit<FeedbackData, 'id' | 'timestamp'>): Promise<boolean> {
+export async function submitFeedback(feedback: Omit<FeedbackData, 'id' | 'timestamp' | 'status' | 'adminResponses' | 'lastUpdated'> & { attachments?: string[], priority?: FeedbackData['priority'] }): Promise<string | null> {
     try {
+        const now = Date.now();
         const feedbackRef = await addDoc(collection(db, 'feedback'), {
             ...feedback,
-            timestamp: Date.now()
+            timestamp: now,
+            lastUpdated: now,
+            status: 'open',
+            priority: feedback.priority || 'medium',
+            attachments: feedback.attachments || [],
+            adminResponses: []
         });
         console.log('[Firestore] Feedback submitted:', feedbackRef.id);
-        return true;
+        return feedbackRef.id;
     } catch (error) {
         console.error('[Firestore] Error submitting feedback:', error);
-        return false;
+        return null;
     }
 }
 
@@ -1001,15 +1035,106 @@ export async function getAllFeedback(): Promise<FeedbackData[]> {
     }
 }
 
+// Get feedback for a specific user (ticket tracking)
+export async function getUserFeedback(userId: string): Promise<FeedbackData[]> {
+    try {
+        const q = query(
+            collection(db, 'feedback'),
+            where('userId', '==', userId),
+            orderBy('timestamp', 'desc')
+        );
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as FeedbackData));
+    } catch (error) {
+        console.error('[Firestore] Error getting user feedback:', error);
+        return [];
+    }
+}
+
+// Get a single feedback by ID
+export async function getFeedbackById(feedbackId: string): Promise<FeedbackData | null> {
+    try {
+        const docRef = doc(db, 'feedback', feedbackId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return { id: docSnap.id, ...docSnap.data() } as unknown as FeedbackData;
+        }
+        return null;
+    } catch (error) {
+        console.error('[Firestore] Error getting feedback by ID:', error);
+        return null;
+    }
+}
+
+// Add admin response to feedback
+export async function addAdminResponse(feedbackId: string, response: Omit<AdminResponse, 'timestamp'>): Promise<boolean> {
+    try {
+        const docRef = doc(db, 'feedback', feedbackId);
+        const docSnap = await getDoc(docRef);
+
+        if (!docSnap.exists()) return false;
+
+        const currentResponses = (docSnap.data() as FeedbackData).adminResponses || [];
+        const newResponse: AdminResponse = {
+            ...response,
+            timestamp: Date.now()
+        };
+
+        await updateDoc(docRef, {
+            adminResponses: [...currentResponses, newResponse],
+            lastUpdated: Date.now(),
+            status: 'in_progress' // Auto-update status when admin responds
+        });
+
+        console.log('[Firestore] Admin response added to feedback:', feedbackId);
+        return true;
+    } catch (error) {
+        console.error('[Firestore] Error adding admin response:', error);
+        return false;
+    }
+}
+
+// Update feedback status and/or priority
+export async function updateFeedbackDetails(
+    feedbackId: string,
+    updates: { status?: FeedbackData['status']; priority?: FeedbackData['priority'] }
+): Promise<boolean> {
+    try {
+        await updateDoc(doc(db, 'feedback', feedbackId), {
+            ...updates,
+            lastUpdated: Date.now()
+        });
+        console.log('[Firestore] Feedback updated:', feedbackId, updates);
+        return true;
+    } catch (error) {
+        console.error('[Firestore] Error updating feedback:', error);
+        return false;
+    }
+}
+
+
 export async function deleteUserData(userId: string): Promise<void> {
     try {
+        // We use individual deletions or batch for safety
         // Delete user libraries
         await deleteDoc(doc(db, 'libraries', userId));
 
         // Delete user gamification
         await deleteDoc(doc(db, 'gamification', userId));
 
-        // Delete user profile
+        // Delete activities related to user
+        const activitiesQuery = query(collection(db, 'activities'), where('userId', '==', userId));
+        const activitiesSnap = await getDocs(activitiesQuery);
+        const activityDeletions = activitiesSnap.docs.map(d => deleteDoc(d.ref));
+        await Promise.all(activityDeletions);
+
+        // Delete tier lists related to user
+        const tierListsQuery = query(collection(db, 'tierLists'), where('userId', '==', userId));
+        const tierListsSnap = await getDocs(tierListsQuery);
+        const tierListDeletions = tierListsSnap.docs.map(d => deleteDoc(d.ref));
+        await Promise.all(tierListDeletions);
+
+        // Delete user profile (Delete this last to ensure we can still find the user if needed during process)
         await deleteDoc(doc(db, 'users', userId));
 
         console.log('[Firestore] All user data deleted for:', userId);
@@ -1043,8 +1168,8 @@ export async function getAdminStats(): Promise<{
         }).length;
 
         const pendingFeedback = feedbackSnap.docs.filter(doc => {
-            const data = doc.data() as any;
-            return !data.status || data.status === 'open';
+            const data = doc.data() as FeedbackData;
+            return data.status === 'open' || data.status === 'in_progress';
         }).length;
 
         return {
@@ -1093,19 +1218,19 @@ export async function toggleUserAdmin(uid: string, isAdmin: boolean): Promise<vo
     }
 }
 
-// Update Feedback Status
+// Update Feedback Status (Replaced by updateFeedbackDetails in enhanced system)
+// Keeping for backward compatibility but redirecting to new function
 export async function updateFeedbackStatus(id: string, status: 'resolved' | 'open'): Promise<void> {
-    try {
-        await updateDoc(doc(db, 'feedback', id), { status });
-    } catch (error) {
-        console.error('[Firestore] Error updating feedback status:', error);
-        throw error;
-    }
+    await updateFeedbackDetails(id, { status: status === 'resolved' ? 'resolved' : 'open' });
 }
 
 // Delete Feedback
 export async function deleteFeedback(id: string): Promise<void> {
     try {
+        const { deleteFeedbackImages } = await import('./storage');
+        // Delete images first
+        await deleteFeedbackImages(id);
+        // Then delete doc
         await deleteDoc(doc(db, 'feedback', id));
     } catch (error) {
         console.error('[Firestore] Error deleting feedback:', error);
@@ -1137,25 +1262,37 @@ export async function getSevenDayActivityStats() {
             statsMap.set(dayName, { name: dayName, active: 0, new: 0, activities: 0, index: 6 - i });
         }
 
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const startTime = sevenDaysAgo.getTime();
+
+        // Fetch new users in last 7 days
+        const usersQuery = query(
+            collection(db, 'users'),
+            where('createdAt', '>=', startTime)
+        );
+        const usersSnap = await getDocs(usersQuery);
+        const newUsers = usersSnap.docs.map(doc => doc.data() as UserProfile);
+
         activities.forEach(act => {
             const date = new Date(act.timestamp);
             const dayName = days[date.getDay()];
 
-            // Only count if it's within the last 7 days (the map initialized above handles this implicitly by key)
-            // But we need to handle the case where "Lun" appears multiple times if we fetched > 1 week data.
-            // A better way is to check if the date is > 7 days ago.
-            const sevenDaysAgo = new Date();
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
             if (date > sevenDaysAgo && statsMap.has(dayName)) {
                 const stat = statsMap.get(dayName)!;
                 stat.activities += 1;
-                // Heuristic: Unique users per day could be 'active', 'new' could be level 1 events
-                if (act.type === 'level_up' && act.newLevel === 1) {
-                    stat.new += 1;
-                }
-                // We don't have unique daily active users easily without set logic, simple increment for now
+                // Active users estimation: increment active for each unique activity user per day
+                // (Simplified: just count activities for now as 'active' volume)
                 stat.active += 1;
+            }
+        });
+
+        // Add real new user counts
+        newUsers.forEach(u => {
+            const date = new Date(u.createdAt || 0);
+            const dayName = days[date.getDay()];
+            if (statsMap.has(dayName)) {
+                statsMap.get(dayName)!.new += 1;
             }
         });
 
