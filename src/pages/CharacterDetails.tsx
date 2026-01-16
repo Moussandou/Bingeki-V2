@@ -4,6 +4,7 @@ import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 import { ArrowLeft, Heart, User, Loader2, Mic } from 'lucide-react';
 import { getCharacterFull, type JikanCharacterFull, type JikanCharacterAnime, type JikanCharacterVoice } from '@/services/animeApi';
+import { SEO } from '@/components/layout/SEO';
 import styles from './CharacterDetails.module.css';
 
 type CharacterFullData = JikanCharacterFull & {
@@ -60,6 +61,11 @@ export default function CharacterDetails() {
 
     return (
         <Layout>
+            <SEO
+                title={character.name}
+                description={character.about?.slice(0, 160)}
+                image={character.images?.jpg?.image_url || character.images?.webp?.image_url}
+            />
             <div className={styles.container}>
                 {/* Back Button */}
                 <Button variant="ghost" onClick={() => navigate(-1)} icon={<ArrowLeft size={20} />} className={styles.backButton}>

@@ -9,6 +9,7 @@ import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle, BookOpen, Chec
 import styles from './Library.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { SEO } from '@/components/layout/SEO';
 import { statusToFrench } from '@/utils/statusTranslation';
 import { useToast } from '@/context/ToastContext';
 import { exportData, importData } from '@/utils/storageUtils';
@@ -117,8 +118,12 @@ export default function Library() {
 
     return (
         <Layout>
+            <SEO title={t('library.title')} />
             <div style={{ minHeight: 'calc(100vh - 80px)' }}>
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
+                    <h1 className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: '0', margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', border: '0' }}>
+                        {t('library.title')}
+                    </h1>
 
                     {/* Stats Header - Consolidated */}
                     <div className={`manga-panel ${styles.statsPanel}`}>

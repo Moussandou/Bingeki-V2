@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { Card } from '@/components/ui/Card';
+import { SEO } from '@/components/layout/SEO';
 import styles from './Dashboard.module.css';
 
 export default function Dashboard() {
@@ -82,6 +83,7 @@ export default function Dashboard() {
 
     return (
         <Layout>
+            <SEO title={t('dashboard.title', 'Q.G.')} />
             <div style={{ minHeight: 'calc(100vh - 80px)' }}>
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
 

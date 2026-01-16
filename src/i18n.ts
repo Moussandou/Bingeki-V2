@@ -5,7 +5,11 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const resources = {
     fr: {
         translation: {
+            seo: {
+                default_description: "Transformez votre passion manga en quête RPG ! Suivez vos lectures, gagnez de l'XP, débloquez des badges et affrontez vos amis.",
+            },
             header: {
+
                 dashboard: "Q.G.",
                 library: "BIBLIOTHÈQUE",
                 agenda: "AGENDA",
@@ -188,6 +192,8 @@ const resources = {
                 badge: "a débloqué le badge"
             },
             library: {
+                title: "Ma Bibliothèque",
+
                 total: "Total",
                 completed: "Terminées",
                 progression: "Progression",
@@ -752,6 +758,8 @@ const resources = {
                 },
                 library: {
                     interested: "INTÉRESSÉ ?",
+                    interested_title: "AJOUTER À MA LISTE",
+                    interested_desc: "Suivez votre progression et recevez des notifications !",
                     add_desc: "Ajoutez cette œuvre à votre bibliothèque pour suivre votre progression !",
                     add_to_collection: "AJOUTER À MA COLLECTION",
                     login_to_add: "SE CONNECTER POUR AJOUTER",
@@ -763,7 +771,12 @@ const resources = {
                     saved_toast: "Progression sauvegardée !"
                 },
                 status: {
-                    title: "STATUT"
+                    title: "STATUT",
+                    watching: "En cours",
+                    completed: "Terminé",
+                    on_hold: "En pause",
+                    dropped: "Abandonné",
+                    plan_to_watch: "À voir"
                 },
                 rating: {
                     title: "MA NOTE"
@@ -804,44 +817,40 @@ const resources = {
                     submit: "PUBLIER"
                 },
                 danger: {
+                    delete_button: "SUPPRIMER DE MA BIBLIOTHÈQUE",
                     delete: "Supprimer de la bibliothèque",
-                    deleted_toast: "\"{{title}}\" a été supprimé"
-                },
-                delete_modal: {
-                    title: "SUPPRESSION",
-                    confirm: "Supprimer \"{{title}}\" ?",
-                    warning: "Cette action est irréversible. Votre progression et vos notes seront perdues.",
+                    deleted_toast: "\"{{title}}\" a été supprimé",
+                    modal_title: "SUPPRESSION",
+                    confirm_title: "Supprimer \"{{title}}\" ?",
+                    confirm_desc: "Cette action est irréversible. Votre progression et vos notes seront perdues.",
                     cancel: "ANNULER",
-                    delete: "SUPPRIMER"
+                    confirm_delete: "SUPPRIMER"
                 },
-                stats_tab: {
+                stats: {
                     no_data: "Aucune statistique ou information de staff disponible pour cette œuvre.",
                     staff_title: "STAFF (PRINCIPAL)",
-                    statistics_title: "STATISTIQUES",
-                    in_libraries: "DANS LES BIBLIOTHÈQUES",
-                    status_watching: "En cours",
-                    status_completed: "Terminé",
-                    status_on_hold: "En pause",
-                    status_dropped: "Abandonné",
-                    status_plan_to_watch: "À voir",
-                    members_scores: "NOTES DES MEMBRES"
+                    title: "STATISTIQUES",
+                    library_distribution: "RÉPARTITION DANS LES BIBLIOTHÈQUES",
+                    score_distribution: "RÉPARTITION DES NOTES",
+                    show_more: "VOIR PLUS",
+                    show_less: "VOIR MOINS"
                 },
-                reviews_tab: {
-                    title: "AVIS DE LA COMMUNAUTÉ (MyAnimeList)",
+                reviews: {
+                    title: "AVIS DE LA COMMUNAUTÉ",
                     read_full: "LIRE L'AVIS COMPLET",
-                    no_reviews: "AUCUN AVIS TROUVÉ",
-                    no_reviews_desc: "Soyez le premier à donner votre avis dans la section commentaires ci-dessous !"
+                    none_found: "AUCUN AVIS TROUVÉ",
+                    be_first: "Soyez le premier à donner votre avis dans la section commentaires ci-dessous !"
                 },
-                gallery_tab: {
+                gallery: {
                     title: "GALERIE OFFICIELLE",
                     no_images: "Aucune image disponible."
                 },
-                themes_tab: {
+                themes: {
                     title: "BANDES ORIGINALES",
                     openings: "OPENINGS",
                     endings: "ENDINGS",
-                    no_opening: "Aucun opening trouvé.",
-                    no_ending: "Aucun ending trouvé.",
+                    no_openings: "Aucun opening trouvé.",
+                    no_endings: "Aucun ending trouvé.",
                     no_music: "Aucune musique (opening/ending) disponible."
                 },
                 recommendations: {
@@ -858,21 +867,37 @@ const resources = {
                 }
             },
             character_details: {
+                loading_title: "Chargement...",
+                loading_description: "Récupération des informations du personnage.",
                 back: "RETOUR",
                 not_found: "Personnage introuvable.",
                 favorites: "favoris",
-                identity: "FICHE D'IDENTITÉ",
+                identity: "IDENTITÉ",
                 biography: "BIOGRAPHIE",
                 source: "Source",
                 seiyuu: "SEIYUU (DOUBLAGE JP)",
                 anime_appearances: "APPARITIONS ANIME",
                 manga_appearances: "APPARITIONS MANGA"
+            },
+            person_details: {
+                loading_title: "Chargement...",
+                loading_description: "Récupération des informations de la personne.",
+                back: "RETOUR",
+                not_found: "Personne introuvable.",
+                favorites: "favoris",
+                sheet: "FICHE",
+                biography: "BIOGRAPHIE",
+                roles: "RÔLES"
             }
         },
     },
     en: {
         translation: {
+            seo: {
+                default_description: "Transform your manga passion into an RPG quest! Track your reads, earn XP, unlock badges and compete with friends.",
+            },
             header: {
+
                 dashboard: "H.Q.",
                 library: "LIBRARY",
                 agenda: "SCHEDULE",
@@ -1263,6 +1288,8 @@ const resources = {
                 badge: "unlocked the badge"
             },
             library: {
+                title: "My Library",
+
                 total: "Total",
                 completed: "Completed",
                 progression: "Progress",
@@ -1619,6 +1646,8 @@ const resources = {
                 },
                 library: {
                     interested: "INTERESTED?",
+                    interested_title: "ADD TO MY LIST",
+                    interested_desc: "Track your progress and get notifications!",
                     add_desc: "Add this work to your library to track your progress!",
                     add_to_collection: "ADD TO MY COLLECTION",
                     login_to_add: "LOG IN TO ADD",
@@ -1630,7 +1659,12 @@ const resources = {
                     saved_toast: "Progress saved!"
                 },
                 status: {
-                    title: "STATUS"
+                    title: "STATUS",
+                    watching: "Watching",
+                    completed: "Completed",
+                    on_hold: "On Hold",
+                    dropped: "Dropped",
+                    plan_to_watch: "Plan to Watch"
                 },
                 rating: {
                     title: "MY RATING"
@@ -1671,44 +1705,40 @@ const resources = {
                     submit: "SUBMIT"
                 },
                 danger: {
+                    delete_button: "REMOVE FROM MY LIBRARY",
                     delete: "Remove from library",
-                    deleted_toast: "\"{{title}}\" has been removed"
-                },
-                delete_modal: {
-                    title: "DELETION",
-                    confirm: "Delete \"{{title}}\"?",
-                    warning: "This action is irreversible. Your progress and notes will be lost.",
+                    deleted_toast: "\"{{title}}\" has been removed",
+                    modal_title: "DELETION",
+                    confirm_title: "Delete \"{{title}}\"?",
+                    confirm_desc: "This action is irreversible. Your progress and notes will be lost.",
                     cancel: "CANCEL",
-                    delete: "DELETE"
+                    confirm_delete: "DELETE"
                 },
-                stats_tab: {
+                stats: {
                     no_data: "No statistics or staff information available for this work.",
                     staff_title: "STAFF (MAIN)",
-                    statistics_title: "STATISTICS",
-                    in_libraries: "IN LIBRARIES",
-                    status_watching: "Watching",
-                    status_completed: "Completed",
-                    status_on_hold: "On Hold",
-                    status_dropped: "Dropped",
-                    status_plan_to_watch: "Plan to Watch",
-                    members_scores: "MEMBER SCORES"
+                    title: "STATISTICS",
+                    library_distribution: "LIBRARY DISTRIBUTION",
+                    score_distribution: "SCORE DISTRIBUTION",
+                    show_more: "SHOW MORE",
+                    show_less: "SHOW LESS"
                 },
-                reviews_tab: {
-                    title: "COMMUNITY REVIEWS (MyAnimeList)",
+                reviews: {
+                    title: "COMMUNITY REVIEWS",
                     read_full: "READ FULL REVIEW",
-                    no_reviews: "NO REVIEWS FOUND",
-                    no_reviews_desc: "Be the first to give your opinion in the comments section below!"
+                    none_found: "NO REVIEWS FOUND",
+                    be_first: "Be the first to give your opinion in the comments section below!"
                 },
-                gallery_tab: {
+                gallery: {
                     title: "OFFICIAL GALLERY",
                     no_images: "No images available."
                 },
-                themes_tab: {
+                themes: {
                     title: "SOUNDTRACKS",
                     openings: "OPENINGS",
                     endings: "ENDINGS",
-                    no_opening: "No opening found.",
-                    no_ending: "No ending found.",
+                    no_openings: "No opening found.",
+                    no_endings: "No ending found.",
                     no_music: "No music (opening/ending) available."
                 },
                 recommendations: {
@@ -1725,6 +1755,8 @@ const resources = {
                 }
             },
             character_details: {
+                loading_title: "Loading...",
+                loading_description: "Retrieving character information.",
                 back: "BACK",
                 not_found: "Character not found.",
                 favorites: "favorites",
@@ -1734,6 +1766,16 @@ const resources = {
                 seiyuu: "SEIYUU (JP VOICE ACTORS)",
                 anime_appearances: "ANIME APPEARANCES",
                 manga_appearances: "MANGA APPEARANCES"
+            },
+            person_details: {
+                loading_title: "Loading...",
+                loading_description: "Retrieving person information.",
+                back: "BACK",
+                not_found: "Person not found.",
+                favorites: "favorites",
+                sheet: "FACT SHEET",
+                biography: "BIOGRAPHY",
+                roles: "ROLES"
             }
         }
     }

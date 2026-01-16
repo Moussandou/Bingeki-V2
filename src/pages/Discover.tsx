@@ -12,6 +12,7 @@ import { Search, Check, Loader2, Flame, Sparkles, Star, Dice5, TrendingUp, Plus,
 import { motion, AnimatePresence } from 'framer-motion';
 import { AddWorkModal } from '@/components/AddWorkModal';
 import { FriendRecommendations } from '@/components/FriendRecommendations';
+import { SEO } from '@/components/layout/SEO';
 import styles from './Discover.module.css';
 
 export default function Discover() {
@@ -194,6 +195,7 @@ export default function Discover() {
 
     return (
         <Layout>
+            <SEO title={t('discover.title', 'Découvrir')} />
             <div style={{ minHeight: 'calc(100vh - 80px)', paddingBottom: '6rem' }}>
 
                 {/* Guest Banner */}

@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { SEO } from '@/components/layout/SEO';
 import styles from './Schedule.module.css';
 
 const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
@@ -39,6 +40,7 @@ export default function Schedule() {
 
     return (
         <Layout>
+            <SEO title={t('schedule.title', 'Planning')} />
             <div className={styles.container}>
                 <div className={styles.header}>
                     <h1 className={styles.title}>

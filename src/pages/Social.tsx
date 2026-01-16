@@ -27,6 +27,7 @@ import { RankingList } from '@/components/social/RankingList';
 
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/context/ToastContext';
+import { SEO } from '@/components/layout/SEO';
 import styles from './Social.module.css';
 
 export default function Social() {
@@ -158,6 +159,7 @@ export default function Social() {
 
     return (
         <Layout>
+            <SEO title={t('social.title', 'Social')} />
             <div style={{ minHeight: 'calc(100vh - 80px)', overflowX: 'hidden' }}>
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
                     <h1 className={styles.title}>
