@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 import { ArrowLeft, Heart, Calendar, Loader2, Mic } from 'lucide-react';
 import { getPersonFull, type JikanPersonFull, type JikanPersonVoice } from '@/services/animeApi';
+import { SEO } from '@/components/layout/SEO';
 import styles from './PersonDetails.module.css';
 
 type PersonFullData = JikanPersonFull & {
@@ -14,6 +16,7 @@ type PersonFullData = JikanPersonFull & {
 export default function PersonDetails() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
     const [person, setPerson] = useState<PersonFullData | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -30,6 +33,10 @@ export default function PersonDetails() {
     if (loading) {
         return (
             <Layout>
+                <SEO
+                    title={t('person_details.loading_title')}
+                    description={t('person_details.loading_description')}
+                />
                 <div className={styles.container} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
                     <Loader2 size={48} className="spin" />
                 </div>
@@ -42,10 +49,10 @@ export default function PersonDetails() {
             <Layout>
                 <div className={styles.container}>
                     <Button variant="ghost" onClick={() => navigate(-1)} icon={<ArrowLeft size={20} />}>
-                        RETOUR
+                        {t('person_details.back')}
                     </Button>
                     <div style={{ textAlign: 'center', padding: '4rem', opacity: 0.6 }}>
-                        Personne introuvable.
+                        {t('person_details.not_found')}
                     </div>
                 </div>
             </Layout>
@@ -56,7 +63,11 @@ export default function PersonDetails() {
         if (!dateStr) return null;
         try {
             const date = new Date(dateStr);
-            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+            return date.toLocaleDateString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
         } catch {
             return null;
         }
@@ -64,10 +75,15 @@ export default function PersonDetails() {
 
     return (
         <Layout>
+            <SEO
+                title={person.name}
+                description={person.about?.slice(0, 160)}
+                image={person.images?.jpg?.image_url}
+            />
             <div className={styles.container}>
                 {/* Back Button */}
                 <Button variant="ghost" onClick={() => navigate(-1)} icon={<ArrowLeft size={20} />} className={styles.backButton}>
-                    RETOUR
+                    {t('person_details.back')}
                 </Button>
 
                 {/* Header */}
@@ -89,7 +105,7 @@ export default function PersonDetails() {
                         <div className={styles.metaContainer}>
                             <div className={styles.metaItem}>
                                 <Heart size={16} fill="#e11d48" color="#e11d48" />
-                                <span>{person.favorites?.toLocaleString() || 0} favoris</span>
+                                <span>{person.favorites?.toLocaleString() || 0} {t('person_details.favorites')}</span>
                             </div>
                             {formatBirthday(person.birthday) && (
                                 <div className={styles.metaItem}>
@@ -156,7 +172,7 @@ export default function PersonDetails() {
                     return (
                         <div className={styles.aboutSection}>
                             <h2 className={styles.sectionTitle}>
-                                <Mic size={20} /> FICHE
+                                <Mic size={20} /> {t('person_details.sheet')}
                             </h2>
 
                             {/* Info tags */}
@@ -174,7 +190,7 @@ export default function PersonDetails() {
                             {/* Description */}
                             {description && (
                                 <div className={styles.biographySection}>
-                                    <h3 className={styles.biographyTitle}>BIOGRAPHIE</h3>
+                                    <h3 className={styles.biographyTitle}>{t('person_details.biography')}</h3>
                                     <p className={styles.biographyText}>{description}</p>
                                 </div>
                             )}
@@ -182,7 +198,7 @@ export default function PersonDetails() {
                             {/* Source */}
                             {source && (
                                 <div className={styles.sourceTag}>
-                                    Source: {source}
+                                    {t('character_details.source')}: {source}
                                 </div>
                             )}
                         </div>
@@ -193,7 +209,7 @@ export default function PersonDetails() {
                 {person.voices && person.voices.length > 0 && (
                     <div style={{ marginTop: '2rem' }}>
                         <h2 className={styles.sectionTitle}>
-                            <Mic size={20} /> RÔLES ({person.voices.length})
+                            <Mic size={20} /> {t('person_details.roles')} ({person.voices.length})
                         </h2>
                         <div className={styles.rolesGrid}>
                             {person.voices.slice(0, 20).map((v, idx) => (

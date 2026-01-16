@@ -24,6 +24,7 @@ import {
     getAnimeStaff, type JikanStaff, getWorkReviews, type JikanReview
 } from '../services/animeApi';
 import { handleProgressUpdateWithXP } from '@/utils/progressUtils';
+import { SEO } from '@/components/layout/SEO';
 import styles from './WorkDetails.module.css';
 
 // Helper Component for Recursive Comments
@@ -638,6 +639,11 @@ export default function WorkDetails() {
 
     return (
         <Layout>
+            <SEO
+                title={work.title}
+                description={work.synopsis?.slice(0, 160)}
+                image={work.image}
+            />
             <div className={`container ${styles.container}`}>
                 <Button
                     onClick={() => navigate(-1)}
