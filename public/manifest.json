@@ -1,0 +1,62 @@
+{
+    "name": "Bingeki Experience",
+    "short_name": "Bingeki",
+    "description": "Transformez votre passion manga en quête RPG ! Suivez vos lectures, gagnez de l'XP, débloquez des badges et affrontez vos amis.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#ef4444",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "fr",
+    "categories": [
+        "entertainment",
+        "lifestyle",
+        "social"
+    ],
+    "icons": [
+        {
+            "src": "/logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/bingeki-preview.png",
+            "sizes": "1200x630",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Bingeki Experience Homepage"
+        }
+    ],
+    "related_applications": [],
+    "prefer_related_applications": false,
+    "shortcuts": [
+        {
+            "name": "Bibliothèque",
+            "short_name": "Library",
+            "description": "Accéder à ma bibliothèque",
+            "url": "/library",
+            "icons": [
+                {
+                    "src": "/logo.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Découvrir",
+            "short_name": "Discover",
+            "description": "Découvrir de nouveaux mangas",
+            "url": "/discover",
+            "icons": [
+                {
+                    "src": "/logo.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ]
+}
