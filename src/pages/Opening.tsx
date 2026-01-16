@@ -722,11 +722,11 @@ export default function Opening() {
                         transition={{ repeat: Infinity, repeatType: "reverse", duration: 0.8 }}
                     >
                         <h2 style={{ fontSize: 'min(3rem, 10vw)', marginBottom: '2rem', textTransform: 'uppercase', fontFamily: 'var(--font-heading)', lineHeight: 1 }}>
-                            {t('landing.features.final_cta.title')}
+                            {user ? t('landing.features.final_cta.title_logged_in') : t('landing.features.final_cta.title')}
                         </h2>
-                        <Link to="/auth">
+                        <Link to={user ? "/dashboard" : "/auth"}>
                             <button className={styles.ctaButton}>
-                                {t('landing.features.final_cta.button')}
+                                {user ? t('landing.features.final_cta.button_logged_in') : t('landing.features.final_cta.button')}
                             </button>
                         </Link>
                     </motion.div>
