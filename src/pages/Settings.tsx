@@ -11,6 +11,7 @@ import { useLibraryStore } from '@/store/libraryStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { getWorkDetails } from '@/services/animeApi';
 import { RefreshCw } from 'lucide-react';
+import { SEO } from '@/components/layout/SEO';
 import { useToast } from '@/context/ToastContext';
 import { getLocalStorageSize, exportData, importData, clearImageCache } from '@/utils/storageUtils';
 import { useAuthStore } from '@/store/authStore';
@@ -212,6 +213,7 @@ export default function Settings() {
 
     return (
         <Layout>
+            <SEO title={t('settings.title', 'Settings')} />
             <div style={{ minHeight: 'calc(100vh - 80px)' }}>
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem', maxWidth: '800px' }}>
 

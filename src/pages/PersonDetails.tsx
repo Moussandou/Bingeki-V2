@@ -47,6 +47,10 @@ export default function PersonDetails() {
     if (!person) {
         return (
             <Layout>
+                <SEO
+                    title={t('person_details.not_found_title')}
+                    description={t('person_details.not_found_description')}
+                />
                 <div className={styles.container}>
                     <Button variant="ghost" onClick={() => navigate(-1)} icon={<ArrowLeft size={20} />}>
                         {t('person_details.back')}
