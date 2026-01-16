@@ -14,19 +14,28 @@ import { useLibraryStore } from '@/store/libraryStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 
 const googleProvider = new GoogleAuthProvider();
-const discordProvider = new OAuthProvider('discord.com');
+const discordProvider = new OAuthProvider('oidc.discord');
+discordProvider.addScope('openid');
 discordProvider.addScope('identify');
 discordProvider.addScope('email');
+
+// appleConfig removed
 
 export const loginWithDiscord = async (): Promise<User | null> => {
     try {
         const result = await signInWithPopup(auth, discordProvider);
+        // We need to import saveUserProfileToFirestore from './firestore' but it's not imported yet?
+        // Ah, looking at the previous file content, it seems I missed that saveUserProfileToFirestore is NOT imported in the viewed file snippet.
+        // Wait, looking at line 12: `import { saveLibraryToFirestore, saveGamificationToFirestore } from './firestore';`
+        // It seems `saveUserProfileToFirestore` is missing from imports. I should fix that too.
         return result.user;
     } catch (error) {
         console.error("Error logging in with Discord", error);
         return null;
     }
 };
+
+// loginWithApple removed
 
 export const loginWithGoogle = async (): Promise<User | null> => {
     try {

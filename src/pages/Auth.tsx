@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
-import { loginWithGoogle, loginWithEmail, registerWithEmail } from '@/firebase/auth';
+import { loginWithGoogle, loginWithEmail, registerWithEmail, loginWithDiscord } from '@/firebase/auth';
 import { useAuthStore } from '@/store/authStore';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocalizedNavigate } from '@/components/routing/LocalizedLink';
@@ -63,6 +63,17 @@ export default function Auth() {
         setLoading(false);
     };
 
+    const handleDiscordLogin = async () => {
+        setLoading(true);
+        setError(null);
+        const user = await loginWithDiscord();
+        if (user) {
+            setUser(user);
+            navigate('/dashboard');
+        }
+        setLoading(false);
+    };
+
     const handleGoogleLogin = async () => {
         setLoading(true);
         setError(null);
@@ -73,6 +84,8 @@ export default function Auth() {
         }
         setLoading(false);
     };
+
+    // handleAppleLogin removed
 
     return (
         <div style={{
@@ -247,7 +260,30 @@ export default function Auth() {
                                 <img src="https://www.google.com/favicon.ico" alt="Google" style={{ width: 18, height: 18 }} />
                                 {t('auth.google_login')}
                             </Button>
-                        </form>
+
+                            <Button
+                                type="button"
+                                variant="manga"
+                                onClick={handleDiscordLogin}
+                                disabled={loading}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.5rem',
+                                    width: '100%',
+                                    backgroundColor: '#5865F2',
+                                    color: 'white',
+                                    borderColor: '#000'
+                                }}
+                            >
+                                <svg width="20" height="20" viewBox="0 0 127 96" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 20, height: 20 }}>
+                                    <path d="M107.7 8.07001C99.08 4.11001 90.03 1.22001 80.64 0.0300136C80.48 -0.00998642 80.31 0.0600136 80.22 0.210014C79.03 2.33001 77.71 5.12001 76.78 7.33001C66.58 5.81001 56.45 5.81001 46.42 7.33001C45.5 5.11001 44.17 2.33001 42.97 0.210014C42.88 0.0600136 42.71 -0.00998642 42.55 0.0300136C33.15 1.22001 24.1 4.11001 15.48 8.07001C15.41 8.10001 15.35 8.15001 15.31 8.21001C-2.26002 34.6901 -2.71002 60.5401 5.92998 85.0401C5.97998 85.1701 6.07998 85.2701 6.20998 85.3301C17.7 93.7701 28.77 96.3501 39.67 96.3501C39.87 96.3501 40.06 96.2601 40.18 96.1001C42.9 92.3701 45.28 88.3701 47.19 84.1501C47.34 83.8201 47.14 83.4401 46.8 83.3301C42.86 81.8401 39.12 79.9101 35.59 77.6701C35.28 77.4701 35.26 77.0201 35.54 76.7901C36.31 76.2201 37.07 75.6201 37.8 75.0101C38.07 74.7901 38.46 74.7701 38.74 74.9601C55.08 82.4101 72.07 82.4101 88.22 74.9601C88.51 74.7601 88.89 74.7901 89.17 75.0101C89.9 75.6101 90.66 76.2101 91.43 76.7901C91.71 77.0201 91.69 77.4701 91.38 77.6701C87.84 79.9101 84.09 81.8401 80.14 83.3201C79.8 83.4401 79.6 83.8101 79.75 84.1401C81.66 88.3601 84.05 92.3601 86.77 96.0901C86.89 96.2501 87.08 96.3301 87.27 96.3301C98.19 96.3301 109.28 93.7601 120.78 85.3301C120.91 85.2701 121.01 85.1701 121.06 85.0401C130.65 59.2601 127.31 34.6001 111.66 8.21001C111.62 8.15001 111.56 8.10001 111.49 8.07001ZM42.27 65.5201C37.06 65.5201 32.74 60.7501 32.74 54.9101C32.74 49.0701 36.96 44.3001 42.27 44.3001C47.63 44.3001 51.95 49.0701 51.84 54.9101C51.84 60.7501 47.58 65.5201 42.27 65.5201ZM84.69 65.5201C79.48 65.5201 75.16 60.7501 75.16 54.9101C75.16 49.0701 79.38 44.3001 84.69 44.3001C90.05 44.3001 94.37 49.0701 94.26 54.9101C94.26 60.7501 90.05 65.5201 84.69 65.5201Z" fill="white" />
+                                </svg>
+                                {t('auth.discord_login')}
+                            </Button>
+
+                            {/* Apple button removed */}                        </form>
 
                         <div style={{ marginTop: '2rem', textAlign: 'center' }}>
                             <button
