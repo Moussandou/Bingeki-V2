@@ -74,8 +74,8 @@ function SyncButton() {
             onClick={handleSync}
             disabled={isSyncing}
             style={{
-                borderColor: '#000',
-                color: '#000',
+                borderColor: 'var(--color-border-heavy)',
+                color: 'var(--color-text)',
                 minWidth: '130px'
             }}
         >
@@ -224,7 +224,7 @@ export default function Settings() {
                         <Button variant="manga" size="icon" onClick={() => navigate(-1)}>
                             <ArrowLeft size={20} />
                         </Button>
-                        <h1 style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', color: '#000' }}>
+                        <h1 style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', color: 'var(--color-text)' }}>
                             {t('settings.title')}
                         </h1>
                     </div>
@@ -233,10 +233,10 @@ export default function Settings() {
 
                         {/* Personnalisation */}
                         <section>
-                            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>
+                            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: 'var(--color-text)' }}>
                                 <Palette size={20} /> {t('settings.appearance.title')}
                             </h2>
-                            <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
+                            <div className="manga-panel" style={{ padding: '1.5rem', background: 'var(--color-surface)', color: 'var(--color-text)' }}>
                                 <div style={{ marginBottom: '1.5rem' }}>
                                     <p style={{ fontWeight: 700, marginBottom: '0.5rem' }}>{t('settings.appearance.accent_color')}</p>
                                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -249,7 +249,7 @@ export default function Settings() {
                                                     height: '40px',
                                                     borderRadius: '50%',
                                                     background: c.value,
-                                                    border: accentColor === c.value ? '3px solid #000' : '1px solid #ddd',
+                                                    border: accentColor === c.value ? '3px solid var(--color-border-heavy)' : '1px solid var(--color-border)',
                                                     cursor: 'pointer',
                                                     transform: accentColor === c.value ? 'scale(1.1)' : 'scale(1)',
                                                     transition: 'all 0.2s ease'
@@ -259,7 +259,7 @@ export default function Settings() {
                                         ))}
                                     </div>
                                 </div>
-                                <div style={{ height: '1px', background: '#eee', margin: '1rem 0' }} />
+                                <div style={{ height: '1px', background: 'var(--color-border)', margin: '1rem 0' }} />
                                 <Switch
                                     label={t('settings.appearance.spoiler_mode')}
                                     isOn={spoilerMode}
@@ -277,22 +277,22 @@ export default function Settings() {
 
                         {/* Accessibilité & Audio */}
                         <section>
-                            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>
+                            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: 'var(--color-text)' }}>
                                 <Volume2 size={20} /> {t('settings.preferences.title')}
                             </h2>
-                            <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div className="manga-panel" style={{ padding: '1.5rem', background: 'var(--color-surface)', color: 'var(--color-text)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 <Switch
                                     label={t('settings.preferences.reduce_motion')}
                                     isOn={reducedMotion}
                                     onToggle={toggleReducedMotion}
                                 />
-                                <div style={{ height: '1px', background: '#eee' }} />
+                                <div style={{ height: '1px', background: 'var(--color-border)' }} />
                                 <Switch
                                     label={t('settings.preferences.sound_effects')}
                                     isOn={soundEnabled}
                                     onToggle={toggleSound}
                                 />
-                                <div style={{ height: '1px', background: '#eee' }} />
+                                <div style={{ height: '1px', background: 'var(--color-border)' }} />
                                 <Switch
                                     label={t('settings.preferences.notifications')}
                                     isOn={notifications}
@@ -303,10 +303,10 @@ export default function Settings() {
 
                         {/* Stockage & Données */}
                         <section>
-                            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>
+                            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: 'var(--color-text)' }}>
                                 <HardDrive size={20} /> {t('settings.data.title')}
                             </h2>
-                            <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
+                            <div className="manga-panel" style={{ padding: '1.5rem', background: 'var(--color-surface)', color: 'var(--color-text)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                                     <div>
                                         <p style={{ fontWeight: 700 }}>{t('settings.data.storage_used')}</p>
@@ -335,7 +335,7 @@ export default function Settings() {
                                     </div>
                                 </div>
 
-                                <div style={{ height: '1px', background: '#eee', margin: '1rem 0' }} />
+                                <div style={{ height: '1px', background: 'var(--color-border)', margin: '1rem 0' }} />
 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -344,7 +344,7 @@ export default function Settings() {
                                         </div>
                                         <SyncButton />
                                     </div>
-                                    <div style={{ height: '1px', background: '#eee' }} />
+                                    <div style={{ height: '1px', background: 'var(--color-border)' }} />
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
                                             <p style={{ fontWeight: 700, color: '#ef4444' }}>{t('settings.data.danger_zone')}</p>
@@ -389,10 +389,10 @@ export default function Settings() {
 
                         {/* À propos */}
                         <section>
-                            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>
+                            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: 'var(--color-text)' }}>
                                 <Info size={20} /> {t('settings.about.title')}
                             </h2>
-                            <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
+                            <div className="manga-panel" style={{ padding: '1.5rem', background: 'var(--color-surface)', color: 'var(--color-text)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                                     <div>
                                         <h3 style={{ fontSize: '1.2rem', fontWeight: 900 }}>BINGEKI</h3>

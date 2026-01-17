@@ -303,7 +303,7 @@ export default function Opening() {
                         <div className={styles.sectionDescription}>
                             <p>{t('landing.features.progression.description_1')}</p>
                             <p style={{ marginTop: '1rem' }} dangerouslySetInnerHTML={{ __html: t('landing.features.progression.description_2') }} />
-                            <div style={{ marginTop: '2rem', padding: '1rem', background: '#fff', border: '2px solid #000', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div style={{ marginTop: '2rem', padding: '1rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 <TrendingUp size={32} />
                                 <div>
                                     <div style={{ fontWeight: 900 }}>{t('landing.features.progression.stats_title')}</div>
@@ -352,8 +352,9 @@ export default function Opening() {
                                     onClick={() => { setPlaceholderIndex(i); setPlaceholderText(''); setIsDeleting(false); }}
                                     style={{
                                         padding: '0.5rem 1rem',
-                                        background: i === placeholderIndex ? 'var(--color-primary)' : '#000',
-                                        color: '#fff',
+                                        background: i === placeholderIndex ? 'var(--color-primary)' : 'var(--color-surface)',
+                                        color: i === placeholderIndex ? '#000' : 'var(--color-text)',
+                                        border: '2px solid var(--color-border)',
                                         fontWeight: 700,
                                         borderRadius: '0',
                                         cursor: 'pointer',
@@ -369,7 +370,7 @@ export default function Opening() {
 
                     <div className={styles.visualContent}>
                         <div className={styles.mockupContainer} style={{ width: '90%', minHeight: '440px' }}>
-                            <Card variant="manga" hoverable style={{ padding: '0.5rem', background: '#fff', marginBottom: '1.5rem' }}>
+                            <Card variant="manga" hoverable style={{ padding: '0.5rem', background: 'var(--color-surface)', marginBottom: '1.5rem', border: '2px solid var(--color-border)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                                     <Search style={{ marginRight: '1rem', marginLeft: '0.5rem' }} />
                                     <div
@@ -410,7 +411,7 @@ export default function Opening() {
                                                 <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>{res.type} • ★ {res.score}</div>
                                             </div>
                                             <div style={{ padding: '0 1.5rem' }}>
-                                                <div style={{ width: 30, height: 30, borderRadius: '50%', border: '2px solid #000' }} />
+                                                <div style={{ width: 30, height: 30, borderRadius: '50%', border: '2px solid var(--color-border)' }} />
                                             </div>
                                         </Card>
                                     </motion.div>
@@ -456,7 +457,7 @@ export default function Opening() {
                                             exit={{ opacity: 0, scale: 0.5 }}
                                             transition={{ type: "spring", stiffness: 120, damping: 15 }}
                                         >
-                                            <Card hoverable variant="manga" style={{ padding: '1rem', background: '#fff', borderLeft: '4px solid var(--color-primary)' }}>
+                                            <Card hoverable variant="manga" style={{ padding: '1rem', background: 'var(--color-surface)', color: 'var(--color-text)', borderLeft: '4px solid var(--color-primary)' }}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                                                     <span style={{ fontWeight: 900 }}>@{comment.user}</span>
                                                     <span style={{ opacity: 0.5, fontSize: '0.8rem' }}>{comment.time}</span>
@@ -472,7 +473,7 @@ export default function Opening() {
                                         animate={{ opacity: 1 }}
                                         style={{ textAlign: 'center', marginTop: '1rem' }}
                                     >
-                                        <button style={{ background: '#000', color: '#fff', border: 'none', padding: '0.5rem 1rem', fontWeight: 700, cursor: 'pointer' }}>{t('landing.features.community.see_discussion')}</button>
+                                        <button style={{ background: 'var(--color-text)', color: 'var(--color-surface)', border: 'none', padding: '0.5rem 1rem', fontWeight: 700, cursor: 'pointer' }}>{t('landing.features.community.see_discussion')}</button>
                                     </motion.div>
                                 )}
                             </div>
@@ -496,9 +497,9 @@ export default function Opening() {
                             <Link to="/work/113138?type=manga" style={{ textDecoration: 'none', color: 'inherit' }}>
                                 <motion.div whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300 }}>
                                     <div style={{
-                                        background: '#fff',
-                                        border: '4px solid #000',
-                                        boxShadow: '8px 8px 0 #000',
+                                        background: 'var(--color-surface)',
+                                        border: '4px solid var(--color-border)',
+                                        boxShadow: '8px 8px 0 var(--color-shadow)',
                                         overflow: 'hidden',
                                         position: 'relative',
                                         display: 'flex',
@@ -515,7 +516,7 @@ export default function Opening() {
 
                                             <div style={{ position: 'absolute', bottom: '1rem', left: '1rem', display: 'flex', alignItems: 'flex-end', gap: '1rem' }}>
                                                 {/* Mini Poster */}
-                                                <div style={{ width: '80px', height: '120px', border: '3px solid #fff', boxShadow: '0 4px 6px rgba(0,0,0,0.3)', marginBottom: '-3rem', zIndex: 10, background: '#000' }}>
+                                                <div style={{ width: '80px', height: '120px', border: '3px solid var(--color-surface)', boxShadow: '0 4px 6px var(--color-shadow)', marginBottom: '-3rem', zIndex: 10, background: '#000' }}>
                                                     <img src="https://cdn.myanimelist.net/images/manga/3/210341l.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                 </div>
 
@@ -524,7 +525,7 @@ export default function Opening() {
                                                         JUJUTSU KAISEN
                                                     </h3>
                                                     <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                                                        <span style={{ fontSize: '0.7rem', fontWeight: 800, background: '#fff', color: '#000', padding: '2px 6px' }}>{t('landing.features.details.mock_card.manga')}</span>
+                                                        <span style={{ fontSize: '0.7rem', fontWeight: 800, background: 'var(--color-surface)', color: 'var(--color-text)', padding: '2px 6px' }}>{t('landing.features.details.mock_card.manga')}</span>
                                                         <span style={{ fontSize: '0.7rem', fontWeight: 800, background: 'var(--color-primary)', color: '#000', padding: '2px 6px', border: '1px solid #000' }}>{t('landing.features.details.mock_card.ongoing')}</span>
                                                     </div>
                                                 </div>
@@ -534,8 +535,8 @@ export default function Opening() {
                                         {/* Fake Tabs & Content */}
                                         <div style={{ padding: '1rem 1rem 1rem 1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                             {/* Tabs Mockup */}
-                                            <div style={{ display: 'flex', gap: '1.5rem', borderBottom: '2px solid #eee', paddingBottom: '0.5rem', paddingLeft: '90px' }}>
-                                                <span style={{ fontSize: '0.8rem', fontWeight: 900, borderBottom: '3px solid #000', paddingBottom: '0.5rem', marginBottom: '-0.6rem' }}>{t('landing.features.details.mock_card.general')}</span>
+                                            <div style={{ display: 'flex', gap: '1.5rem', borderBottom: '2px solid var(--color-border)', paddingBottom: '0.5rem', paddingLeft: '90px' }}>
+                                                <span style={{ fontSize: '0.8rem', fontWeight: 900, borderBottom: '3px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '-0.6rem' }}>{t('landing.features.details.mock_card.general')}</span>
                                                 <span style={{ fontSize: '0.8rem', fontWeight: 700, opacity: 0.4 }}>{t('landing.features.details.mock_card.chapters')}</span>
                                                 <span style={{ fontSize: '0.8rem', fontWeight: 700, opacity: 0.4 }}>{t('landing.features.details.mock_card.stats')}</span>
                                                 <span style={{ fontSize: '0.8rem', fontWeight: 700, opacity: 0.4 }}>{t('landing.features.details.mock_card.reviews')}</span>
@@ -544,7 +545,7 @@ export default function Opening() {
                                             {/* Content Area */}
                                             <div style={{ marginTop: '0.5rem' }}>
                                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                                                    <div style={{ flex: 1, fontSize: '0.9rem', lineHeight: 1.5, color: '#444', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                    <div style={{ flex: 1, fontSize: '0.9rem', lineHeight: 1.5, color: 'var(--color-text-dim)', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                                         {t('landing.features.details.mock_card.synopsis')}
                                                     </div>
                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', minWidth: '80px' }}>
@@ -552,12 +553,12 @@ export default function Opening() {
                                                             <Trophy size={16} /> #4
                                                         </div>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem', fontWeight: 800 }}>
-                                                            <Star size={16} fill="black" /> 8.64
+                                                            <Star size={16} fill="currentColor" /> 8.64
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <div style={{ background: '#000', color: '#fff', textAlign: 'center', padding: '0.8rem', fontWeight: 900, fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                                <div style={{ background: 'var(--color-primary)', color: '#000', textAlign: 'center', padding: '0.8rem', fontWeight: 900, fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
                                                     {t('landing.features.details.mock_card.view_full')} <ArrowRight size={16} />
                                                 </div>
                                             </div>
@@ -605,7 +606,7 @@ export default function Opening() {
                     <div className={styles.visualContent}>
                         <div className={styles.mockupContainer} style={{ width: '90%', height: 'auto', background: 'transparent', border: 'none', boxShadow: 'none' }}>
                             <div style={{
-                                borderLeft: '4px dashed #000',
+                                borderLeft: '4px dashed var(--color-border)',
                                 paddingLeft: '2rem',
                                 position: 'relative',
                                 display: 'flex',
@@ -615,28 +616,28 @@ export default function Opening() {
                                 {/* Timeline Item 1 */}
                                 <div style={{ position: 'relative' }}>
                                     <div style={{
-                                        position: 'absolute', left: '-2.6rem', top: 0, width: '20px', height: '20px', background: 'var(--color-primary)', borderRadius: '50%', border: '4px solid #000'
+                                        position: 'absolute', left: '-2.6rem', top: 0, width: '20px', height: '20px', background: 'var(--color-primary)', borderRadius: '50%', border: '4px solid var(--color-border)'
                                     }} />
-                                    <div style={{ background: '#fff', padding: '1.5rem', borderRadius: '4px', border: '3px solid #000', boxShadow: '4px 4px 0 rgba(0,0,0,0.1)' }}>
+                                    <div style={{ background: 'var(--color-surface)', padding: '1.5rem', borderRadius: '4px', border: '3px solid var(--color-border)', boxShadow: '4px 4px 0 var(--color-shadow)' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
                                             <span style={{ fontWeight: 900, fontSize: '1.1rem' }}>{t('landing.features.wip.timeline.feedback_title')}</span>
-                                            <span style={{ fontSize: '0.8rem', background: 'var(--color-primary)', color: '#000', padding: '0.1rem 0.5rem', fontWeight: 800, border: '1px solid #000' }}>V1.2.0</span>
+                                            <span style={{ fontSize: '0.8rem', background: 'var(--color-primary)', color: '#000', padding: '0.1rem 0.5rem', fontWeight: 800, border: '1px solid var(--color-border)' }}>V1.2.0</span>
                                         </div>
-                                        <p style={{ fontSize: '0.9rem', color: '#555' }}>{t('landing.features.wip.timeline.feedback_desc')}</p>
+                                        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-dim)' }}>{t('landing.features.wip.timeline.feedback_desc')}</p>
                                     </div>
                                 </div>
 
                                 {/* Timeline Item 2 */}
                                 <div style={{ position: 'relative', opacity: 0.7 }}>
                                     <div style={{
-                                        position: 'absolute', left: '-2.6rem', top: 0, width: '20px', height: '20px', background: '#ccc', borderRadius: '50%', border: '4px solid #000'
+                                        position: 'absolute', left: '-2.6rem', top: 0, width: '20px', height: '20px', background: 'var(--color-surface-hover)', borderRadius: '50%', border: '4px solid var(--color-border)'
                                     }} />
-                                    <div style={{ background: '#f4f4f4', padding: '1.5rem', borderRadius: '4px', border: '3px solid #000' }}>
+                                    <div style={{ background: 'var(--color-surface-hover)', padding: '1.5rem', borderRadius: '4px', border: '3px solid var(--color-border)' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
                                             <span style={{ fontWeight: 900, fontSize: '1.1rem' }}>{t('landing.features.wip.timeline.guilds_title')}</span>
-                                            <span style={{ fontSize: '0.8rem', border: '1px solid #000', color: '#000', padding: '0.1rem 0.5rem', fontWeight: 800 }}>{t('landing.features.wip.timeline.soon')}</span>
+                                            <span style={{ fontSize: '0.8rem', border: '1px solid var(--color-border)', color: 'var(--color-text)', padding: '0.1rem 0.5rem', fontWeight: 800 }}>{t('landing.features.wip.timeline.soon')}</span>
                                         </div>
-                                        <p style={{ fontSize: '0.9rem', color: '#555' }}>{t('landing.features.wip.timeline.guilds_desc')}</p>
+                                        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-dim)' }}>{t('landing.features.wip.timeline.guilds_desc')}</p>
                                     </div>
                                 </div>
                             </div>
@@ -745,8 +746,8 @@ export default function Opening() {
                             right: '2rem',
                             width: '50px',
                             height: '50px',
-                            background: '#000',
-                            color: '#fff',
+                            background: 'var(--color-surface)',
+                            color: 'var(--color-text)',
                             border: '2px solid var(--color-primary)',
                             display: 'flex',
                             alignItems: 'center',

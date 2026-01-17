@@ -27,10 +27,23 @@ interface HunterLicenseCardProps {
 
 export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, featuredBadgeData, favoriteMangaData, top3FavoritesData }: HunterLicenseCardProps) {
     const { t } = useTranslation();
-    const borderColor = user.borderColor || '#000';
+    const borderColor = user.borderColor || 'var(--color-border)';
     const accentColor = user.themeColor || 'var(--color-primary)';
-    const bgColor = user.cardBgColor || '#fff';
-    const textColor = bgColor === '#000000' || bgColor === '#000' ? '#fff' : '#000';
+    // If no custom background set, use theme surface. Otherwise use custom.
+    const bgColor = user.cardBgColor || 'var(--color-surface)';
+
+    // Determine text color:
+    // 1. If user has a custom bg color, try to pick contrasting text (simple check for black/white)
+    // 2. If no custom bg (using theme), use theme text color
+    const isCustomBg = !!user.cardBgColor;
+    let textColor = 'var(--color-text)'; // Default to theme text
+
+    if (isCustomBg) {
+        // Simple heuristic for legacy/hardcoded custom backgrounds
+        if (user.cardBgColor === '#000000' || user.cardBgColor === '#000') textColor = '#fff';
+        else if (user.cardBgColor === '#ffffff' || user.cardBgColor === '#fff') textColor = '#000';
+        // else leave as theme text or could default to black for unknown light colors
+    }
 
     return (
         <div className="manga-panel" style={{ padding: '0', overflow: 'hidden', background: bgColor, color: textColor, position: 'relative', border: `3px solid ${borderColor} ` }}>

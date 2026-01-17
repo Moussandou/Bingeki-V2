@@ -130,11 +130,13 @@ export default function AdminUsers() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                         style={{
                             padding: '0.75rem 1rem 0.75rem 2.5rem',
-                            border: '2px solid black',
+                            border: '2px solid var(--color-border)',
                             fontFamily: 'monospace',
                             minWidth: '300px',
                             width: '100%',
-                            outline: 'none'
+                            outline: 'none',
+                            background: 'var(--color-surface)',
+                            color: 'var(--color-text)'
                         }}
                     />
                     <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#666' }} />
@@ -147,7 +149,7 @@ export default function AdminUsers() {
                 ) : filteredUsers.map(user => (
                     <Card key={user.uid} variant="manga" style={{
                         padding: '1.5rem',
-                        background: 'white',
+                        background: 'var(--color-surface)',
                         position: 'relative',
                         opacity: user.isBanned ? 0.7 : 1,
                         filter: user.isBanned ? 'grayscale(100%)' : 'none'
@@ -158,9 +160,9 @@ export default function AdminUsers() {
                                 <div style={{
                                     width: '48px', height: '48px',
                                     borderRadius: '50%',
-                                    border: '2px solid black',
+                                    border: '2px solid var(--color-border)',
                                     overflow: 'hidden',
-                                    background: '#eee'
+                                    background: 'var(--color-surface-hover)'
                                 }}>
                                     {user.photoURL && <img src={user.photoURL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                                 </div>
@@ -172,7 +174,7 @@ export default function AdminUsers() {
                                 </div>
                             </div>
                             {user.isAdmin && (
-                                <div style={{ background: 'black', color: 'white', padding: '0.25rem 0.5rem', fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <div style={{ background: 'var(--color-text)', color: 'var(--color-surface)', padding: '0.25rem 0.5rem', fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                     <Shield size={10} /> {t('admin.users.admin')}
                                 </div>
                             )}
@@ -223,8 +225,8 @@ export default function AdminUsers() {
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                                 <Link to={`/profile/${user.uid}`} style={{
                                     padding: '0.5rem',
-                                    background: 'black',
-                                    color: 'white',
+                                    background: 'var(--color-text)',
+                                    color: 'var(--color-surface)',
                                     textAlign: 'center',
                                     fontWeight: 'bold',
                                     textTransform: 'uppercase',
@@ -280,8 +282,8 @@ export default function AdminUsers() {
                         gap: '1rem'
                     }}>
                         {/* Basic Info */}
-                        <div style={{ background: '#fff', border: '2px solid #000', padding: '1rem' }}>
-                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>BASIC INFO</h3>
+                        <div style={{ background: 'var(--color-surface)', border: '2px solid var(--color-border)', padding: '1rem' }}>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid var(--color-border)', paddingBottom: '0.5rem' }}>BASIC INFO</h3>
                             <table style={{ width: '100%', fontSize: '0.9rem', fontFamily: 'monospace' }}>
                                 <tbody>
                                     <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>UID:</td><td style={{ wordBreak: 'break-all' }}>{selectedUser.uid}</td></tr>
@@ -293,8 +295,8 @@ export default function AdminUsers() {
                         </div>
 
                         {/* Gamification */}
-                        <div style={{ background: '#fff', border: '2px solid #000', padding: '1rem' }}>
-                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>GAMIFICATION</h3>
+                        <div style={{ background: 'var(--color-surface)', border: '2px solid var(--color-border)', padding: '1rem' }}>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid var(--color-border)', paddingBottom: '0.5rem' }}>GAMIFICATION</h3>
                             <table style={{ width: '100%', fontSize: '0.9rem', fontFamily: 'monospace' }}>
                                 <tbody>
                                     <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>Level:</td><td>{selectedUser.level || 1}</td></tr>
@@ -306,8 +308,8 @@ export default function AdminUsers() {
                         </div>
 
                         {/* Admin Status */}
-                        <div style={{ background: '#fff', border: '2px solid #000', padding: '1rem' }}>
-                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>PERMISSIONS</h3>
+                        <div style={{ background: 'var(--color-surface)', border: '2px solid var(--color-border)', padding: '1rem' }}>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid var(--color-border)', paddingBottom: '0.5rem' }}>PERMISSIONS</h3>
                             <table style={{ width: '100%', fontSize: '0.9rem', fontFamily: 'monospace' }}>
                                 <tbody>
                                     <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>Is Admin:</td><td>{selectedUser.isAdmin ? '✅ YES' : '❌ NO'}</td></tr>
@@ -318,8 +320,8 @@ export default function AdminUsers() {
 
                         {/* Profile Customization */}
                         {(selectedUser.banner || selectedUser.bio || selectedUser.themeColor) && (
-                            <div style={{ background: '#fff', border: '2px solid #000', padding: '1rem' }}>
-                                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>PROFILE CUSTOMIZATION</h3>
+                            <div style={{ background: 'var(--color-surface)', border: '2px solid var(--color-border)', padding: '1rem' }}>
+                                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid var(--color-border)', paddingBottom: '0.5rem' }}>PROFILE CUSTOMIZATION</h3>
                                 <table style={{ width: '100%', fontSize: '0.9rem', fontFamily: 'monospace' }}>
                                     <tbody>
                                         <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>Banner:</td><td style={{ wordBreak: 'break-all', fontSize: '0.75rem' }}>{selectedUser.banner || 'N/A'}</td></tr>
@@ -338,9 +340,9 @@ export default function AdminUsers() {
                         )}
 
                         {/* Raw JSON (Collapsed) */}
-                        <details style={{ background: '#f5f5f5', border: '2px solid #000', padding: '1rem' }}>
+                        <details style={{ background: 'var(--color-surface)', border: '2px solid var(--color-border)', padding: '1rem' }}>
                             <summary style={{ fontFamily: 'var(--font-heading)', fontWeight: 'bold', cursor: 'pointer' }}>📄 VIEW RAW JSON</summary>
-                            <pre style={{ marginTop: '1rem', fontSize: '0.75rem', overflow: 'auto', background: '#fff', padding: '1rem', border: '1px solid #ccc' }}>
+                            <pre style={{ marginTop: '1rem', fontSize: '0.75rem', overflow: 'auto', background: 'var(--color-surface-hover)', padding: '1rem', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}>
                                 {JSON.stringify(selectedUser, null, 2)}
                             </pre>
                         </details>

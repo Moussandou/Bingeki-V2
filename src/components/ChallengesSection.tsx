@@ -176,7 +176,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
 
     if (!user) {
         return (
-            <div className="manga-panel" style={{ padding: '2rem', textAlign: 'center', background: '#fff' }}>
+            <div className="manga-panel" style={{ padding: '2rem', textAlign: 'center', background: 'var(--color-surface)' }}>
                 <p style={{ opacity: 0.6 }}>{t('components.challenges_section.login_required')}</p>
             </div>
         );
@@ -196,7 +196,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
             {isLoading ? (
                 <p style={{ textAlign: 'center', opacity: 0.6 }}>{t('components.challenges_section.loading')}</p>
             ) : challenges.length === 0 ? (
-                <div className="manga-panel" style={{ padding: '2rem', textAlign: 'center', background: '#fff' }}>
+                <div className="manga-panel" style={{ padding: '2rem', textAlign: 'center', background: 'var(--color-surface)' }}>
                     <Trophy size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
                     <p style={{ fontWeight: 600 }}>{t('components.challenges_section.no_challenges')}</p>
                     <p style={{ opacity: 0.6, fontSize: '0.9rem', marginTop: '0.5rem' }}>{t('components.challenges_section.no_challenges_hint')}</p>
@@ -204,7 +204,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {challenges.map(challenge => (
-                        <div key={challenge.id} className="manga-panel" style={{ padding: '1.25rem', background: '#fff' }}>
+                        <div key={challenge.id} className="manga-panel" style={{ padding: '1.25rem', background: 'var(--color-surface)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                                 <div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
@@ -249,7 +249,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                                             <span style={{ fontWeight: 900, fontSize: '1.1rem', width: '24px', color: index === 0 ? '#ffd700' : '#666' }}>
                                                 #{index + 1}
                                             </span>
-                                            <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                            <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border-heavy)' }}>
                                                 <img
                                                     src={p.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.name}`}
                                                     alt=""
@@ -322,9 +322,11 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                             style={{
                                 width: '100%',
                                 padding: '0.75rem',
-                                border: '2px solid #000',
+                                border: '2px solid var(--color-border-heavy)',
                                 fontSize: '1rem',
-                                fontFamily: 'inherit'
+                                fontFamily: 'inherit',
+                                background: 'var(--color-surface)',
+                                color: 'var(--color-text)'
                             }}
                         />
                     </div>
@@ -338,9 +340,9 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                                     onClick={() => setNewChallenge(prev => ({ ...prev, type }))}
                                     style={{
                                         padding: '0.5rem 1rem',
-                                        border: '2px solid #000',
-                                        background: newChallenge.type === type ? '#000' : '#fff',
-                                        color: newChallenge.type === type ? '#fff' : '#000',
+                                        border: '2px solid var(--color-border-heavy)',
+                                        background: newChallenge.type === type ? 'var(--color-border-heavy)' : 'var(--color-surface)',
+                                        color: newChallenge.type === type ? 'var(--color-text-inverse)' : 'var(--color-text)',
                                         fontWeight: 700,
                                         cursor: 'pointer',
                                         display: 'flex',
@@ -376,7 +378,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                                             width: 70,
                                             cursor: 'pointer',
                                             opacity: newChallenge.workId === work.id ? 1 : 0.6,
-                                            border: newChallenge.workId === work.id ? '2px solid #000' : '2px solid transparent',
+                                            border: newChallenge.workId === work.id ? '2px solid var(--color-border-heavy)' : '2px solid transparent',
                                             borderRadius: '4px',
                                             padding: '2px'
                                         }}
@@ -409,13 +411,13 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
                                             alignItems: 'center',
                                             gap: '0.75rem',
                                             padding: '0.75rem',
-                                            border: newChallenge.selectedFriends.includes(friend.uid) ? '2px solid #000' : '1px solid #eee',
-                                            background: newChallenge.selectedFriends.includes(friend.uid) ? '#f0f0f0' : '#fff',
+                                            border: newChallenge.selectedFriends.includes(friend.uid) ? '2px solid var(--color-border-heavy)' : '1px solid var(--color-border)',
+                                            background: newChallenge.selectedFriends.includes(friend.uid) ? 'var(--color-surface-hover)' : 'var(--color-surface)',
                                             cursor: 'pointer',
                                             borderRadius: '4px'
                                         }}
                                     >
-                                        <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                        <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border-heavy)' }}>
                                             <img
                                                 src={friend.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${friend.displayName}`}
                                                 alt=""

@@ -58,14 +58,14 @@ function RecursiveComment({
             {/* Comment Card */}
             <div style={{
                 padding: '1rem',
-                background: '#fff',
-                border: '2px solid #000', // Brutalist border
-                boxShadow: '4px 4px 0 rgba(0,0,0,0.1)', // Subtle shadow
+                background: 'var(--color-surface)',
+                border: '2px solid var(--color-border-heavy)',
+                boxShadow: '4px 4px 0 var(--color-shadow)',
                 transition: 'transform 0.2s',
             }}>
                 {/* Header */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                    <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border-heavy)' }}>
                         <img src={comment.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.userName}`}
                             alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div>
@@ -81,8 +81,8 @@ function RecursiveComment({
                         onClick={() => setRevealedSpoilers((prev: any) => [...prev, comment.id])}
                         style={{
                             padding: '0.75rem',
-                            background: '#000',
-                            color: '#fff',
+                            background: 'var(--color-border-heavy)',
+                            color: 'var(--color-text-inverse)',
                             cursor: 'pointer',
                             textAlign: 'center',
                             fontWeight: 700,
@@ -97,7 +97,7 @@ function RecursiveComment({
                 )}
 
                 {/* Actions */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.75rem', borderTop: '1px solid #eee', paddingTop: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.75rem', borderTop: '1px solid var(--color-border)', paddingTop: '0.5rem' }}>
                     <button
                         onClick={() => handleLike(comment.id)}
                         style={{
@@ -107,7 +107,7 @@ function RecursiveComment({
                             display: 'flex',
                             alignItems: 'center',
                             gap: '0.25rem',
-                            color: user && comment.likes.includes(user.uid) ? '#ef4444' : '#000',
+                            color: user && comment.likes.includes(user.uid) ? '#ef4444' : 'var(--color-text)',
                             fontWeight: 700,
                             fontSize: '0.8rem'
                         }}
@@ -133,7 +133,7 @@ function RecursiveComment({
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.25rem',
-                                color: isReplying ? '#3b82f6' : '#000',
+                                color: isReplying ? '#3b82f6' : 'var(--color-text)',
                                 fontWeight: 700,
                                 fontSize: '0.8rem',
                                 opacity: isReplying ? 1 : 0.6
@@ -158,19 +158,20 @@ function RecursiveComment({
                                 style={{
                                     flex: 1,
                                     padding: '0.75rem',
-                                    border: '2px solid #000',
+                                    border: '2px solid var(--color-border-heavy)',
                                     fontWeight: 600,
                                     fontSize: '0.9rem',
                                     outline: 'none',
-                                    background: '#f9f9f9'
+                                    background: 'var(--color-surface-hover)',
+                                    color: 'var(--color-text)'
                                 }}
                                 onKeyDown={(e: any) => e.key === 'Enter' && handleReply(comment.id)}
                             />
                             <button
                                 onClick={() => handleReply(comment.id)}
                                 style={{
-                                    background: '#000',
-                                    color: '#fff',
+                                    background: 'var(--color-border-heavy)',
+                                    color: 'var(--color-text-inverse)',
                                     border: 'none',
                                     padding: '0 1.25rem',
                                     cursor: 'pointer',
@@ -719,7 +720,7 @@ export default function WorkDetails() {
 
                         {activeTab === 'episodes' && (
                             work.type === 'manga' && (!work.totalChapters || work.totalChapters === 0) ? (
-                                <div style={{ textAlign: 'center', padding: '3rem', border: '2px dashed #000' }}>
+                                <div style={{ textAlign: 'center', padding: '3rem', border: '2px dashed var(--color-border-heavy)' }}>
                                     <h3 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>{t('work_details.chapters.unknown_count')}</h3>
                                     <p style={{ marginBottom: '1rem' }}>{t('work_details.chapters.unknown_desc')}</p>
                                     <Button
@@ -846,7 +847,7 @@ export default function WorkDetails() {
                                                     handleEpisodeSelect(nextEp);
                                                     window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} episode ${nextEp} streaming vostfr`, '_blank');
                                                 }}
-                                                style={{ border: '2px solid #000', padding: '0.5rem 1rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center', height: '40px', gap: '0.5rem', fontWeight: 700 }}
+                                                style={{ border: '2px solid var(--color-border-heavy)', padding: '0.5rem 1rem', background: 'var(--color-surface)', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center', height: '40px', gap: '0.5rem', fontWeight: 700, color: 'var(--color-text)' }}
                                                 title={`${t('work_details.streaming.search_episode')} ${(work.currentChapter || 0) + 1}`}
                                             >
                                                 <Tv size={20} />
@@ -860,7 +861,7 @@ export default function WorkDetails() {
                                                 handleEpisodeSelect(nextChap);
                                                 window.open(`https://www.google.com/search?q=${encodeURIComponent(work.title)} chapitre ${nextChap} scan fr`, '_blank');
                                             }}
-                                            style={{ border: '2px solid #22c55e', color: '#22c55e', padding: '0.5rem 1rem', background: '#fff', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700 }}
+                                            style={{ border: '2px solid #22c55e', color: '#22c55e', padding: '0.5rem 1rem', background: 'var(--color-surface)', cursor: 'pointer', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700 }}
                                             title={`${t('work_details.streaming.search_chapter')} ${(work.currentChapter || 0) + 1}`}
                                         >
                                             <FileText size={20} />
@@ -889,7 +890,7 @@ export default function WorkDetails() {
                                                     left: 0,
                                                     right: 0,
                                                     height: '40px',
-                                                    background: 'linear-gradient(transparent, #fff)',
+                                                    background: 'linear-gradient(transparent, var(--color-surface))',
                                                     pointerEvents: 'none'
                                                 }} />
                                             )}
@@ -904,7 +905,8 @@ export default function WorkDetails() {
                                                 marginTop: '0.5rem',
                                                 cursor: 'pointer',
                                                 textDecoration: 'underline',
-                                                padding: 0
+                                                padding: 0,
+                                                color: 'var(--color-text)'
                                             }}
                                         >
                                             {isSynopsisExpanded ? t('work_details.synopsis.show_less') : t('work_details.synopsis.show_more')}
@@ -1148,10 +1150,10 @@ export default function WorkDetails() {
                                                                         width: '100px',
                                                                         height: '100px',
                                                                         borderRadius: '50%',
-                                                                        border: '3px solid #000',
+                                                                        border: '3px solid var(--color-border-heavy)',
                                                                         overflow: 'hidden',
                                                                         marginBottom: '0.5rem',
-                                                                        background: '#f0f0f0',
+                                                                        background: 'var(--color-surface-hover)',
                                                                         cursor: 'pointer',
                                                                         transition: 'transform 0.2s',
                                                                         margin: '0 auto'
@@ -1181,7 +1183,7 @@ export default function WorkDetails() {
                                                                         onClick={() => navigate(`/person/${jpVa.person.mal_id}`)}
                                                                         style={{
                                                                             display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 'auto',
-                                                                            borderTop: '1px dashed #ccc', paddingTop: '4px', width: '100%', cursor: 'pointer'
+                                                                            borderTop: '1px dashed var(--color-border)', paddingTop: '4px', width: '100%', cursor: 'pointer'
                                                                         }}
                                                                         onMouseOver={(e) => e.currentTarget.style.opacity = '0.8'}
                                                                         onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
@@ -1191,12 +1193,12 @@ export default function WorkDetails() {
                                                                             height: '40px',
                                                                             borderRadius: '50%',
                                                                             overflow: 'hidden',
-                                                                            border: '2px solid #555',
+                                                                            border: '2px solid var(--color-border-heavy)',
                                                                             marginBottom: '2px'
                                                                         }}>
                                                                             <img src={jpVa.person.images.jpg.image_url} alt={jpVa.person.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                                         </div>
-                                                                        <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#555', textAlign: 'center', lineHeight: 1.1 }}>
+                                                                        <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--color-text-dim)', textAlign: 'center', lineHeight: 1.1 }}>
                                                                             {jpVa.person.name}
                                                                         </div>
                                                                     </div>
@@ -1212,7 +1214,7 @@ export default function WorkDetails() {
                                                     <Button
                                                         onClick={() => setIsCastingExpanded(!isCastingExpanded)}
                                                         variant="ghost"
-                                                        style={{ border: '1px dashed #000' }}
+                                                        style={{ border: '1px dashed var(--color-border-heavy)', color: 'var(--color-text)' }}
                                                     >
                                                         {isCastingExpanded ? t('work_details.casting.show_less') : t('work_details.casting.show_more', { count: characters.length - 12 })}
                                                     </Button>
@@ -1227,7 +1229,7 @@ export default function WorkDetails() {
 
                                         return (
                                             <div style={{ marginTop: '2rem' }}>
-                                                <h3 className={styles.synopsisTitle} style={{ marginBottom: '1rem', borderTop: '2px solid #EEE', paddingTop: '1rem' }}>{t('work_details.universe.title')}</h3>
+                                                <h3 className={styles.synopsisTitle} style={{ marginBottom: '1rem', borderTop: '2px solid var(--color-border)', paddingTop: '1rem' }}>{t('work_details.universe.title')}</h3>
                                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
                                                     {relations.map((rel, index) => {
                                                         const isExpanded = expandedRelations[index];
@@ -1237,9 +1239,9 @@ export default function WorkDetails() {
 
                                                         return (
                                                             <div key={index} style={{
-                                                                background: '#fff',
-                                                                border: '2px solid #000',
-                                                                boxShadow: '3px 3px 0 #000',
+                                                                background: 'var(--color-surface)',
+                                                                border: '2px solid var(--color-border-heavy)',
+                                                                boxShadow: '3px 3px 0 var(--color-shadow-solid)',
                                                                 padding: '0.75rem',
                                                                 flex: '1 1 250px',
                                                                 maxWidth: '400px',
@@ -1247,7 +1249,7 @@ export default function WorkDetails() {
                                                                 flexDirection: 'column',
                                                                 gap: '0.5rem'
                                                             }}>
-                                                                <div style={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', background: '#000', color: '#fff', padding: '0.25rem 0.5rem', alignSelf: 'flex-start' }}>
+                                                                <div style={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', background: 'var(--color-border-heavy)', color: 'var(--color-text-inverse)', padding: '0.25rem 0.5rem', alignSelf: 'flex-start' }}>
                                                                     {rel.relation}
                                                                 </div>
                                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
@@ -1257,16 +1259,16 @@ export default function WorkDetails() {
                                                                             alignItems: 'center',
                                                                             gap: '0.5rem',
                                                                             textDecoration: 'none',
-                                                                            color: '#000',
+                                                                            color: 'var(--color-text)',
                                                                             fontWeight: 600,
                                                                             padding: '0.2rem',
                                                                             fontSize: '0.9rem',
                                                                             transition: 'background 0.2s'
                                                                         }}
-                                                                            onMouseEnter={(e) => e.currentTarget.style.background = '#f0f0f0'}
+                                                                            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-surface-hover)'}
                                                                             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                                                         >
-                                                                            <div style={{ width: '5px', height: '5px', background: '#000', borderRadius: '50%', flexShrink: 0 }} />
+                                                                            <div style={{ width: '5px', height: '5px', background: 'var(--color-text)', borderRadius: '50%', flexShrink: 0 }} />
                                                                             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.name} ({entry.type})</span>
                                                                         </Link>
                                                                     ))}
@@ -1275,12 +1277,13 @@ export default function WorkDetails() {
                                                                             onClick={() => setExpandedRelations(prev => ({ ...prev, [index]: !prev[index] }))}
                                                                             style={{
                                                                                 background: 'none',
-                                                                                border: '1px dashed #000',
+                                                                                border: '1px dashed var(--color-border-heavy)',
                                                                                 padding: '0.25rem 0.5rem',
                                                                                 cursor: 'pointer',
                                                                                 fontSize: '0.75rem',
                                                                                 fontWeight: 700,
-                                                                                marginTop: '0.25rem'
+                                                                                marginTop: '0.25rem',
+                                                                                color: 'var(--color-text)'
                                                                             }}
                                                                         >
                                                                             {isExpanded ? t('work_details.universe.collapse') : t('work_details.universe.expand', { count: entries.length - MAX_VISIBLE })}
@@ -1301,7 +1304,7 @@ export default function WorkDetails() {
 
                                 <div style={{ marginBottom: '2rem' }}>
                                     {!libraryWork ? (
-                                        <div style={{ padding: '2rem', background: '#f9f9f9', textAlign: 'center', border: '2px dashed #000' }}>
+                                        <div style={{ padding: '2rem', background: 'var(--color-surface-hover)', textAlign: 'center', border: '2px dashed var(--color-border-heavy)' }}>
                                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem' }}>{t('work_details.library.interested_title')}</h3>
                                             <p style={{ marginBottom: '1.5rem' }}>{t('work_details.library.interested_desc')}</p>
                                             <Button
@@ -1322,8 +1325,8 @@ export default function WorkDetails() {
                                         </div>
                                     ) : (
                                         <>
-                                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>{t('work_details.progress.title')}</h3>
-                                            <div style={{ color: '#000' }}>
+                                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: 'var(--color-text)' }}>{t('work_details.progress.title')}</h3>
+                                            <div style={{ color: 'var(--color-text)' }}>
                                                 {isEditing ? (
                                                     <div className={styles.progressContainer}>
                                                         <input
@@ -1342,19 +1345,19 @@ export default function WorkDetails() {
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 5))}
-                                                            style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                            style={{ fontWeight: 700, border: '1px solid var(--color-border)' }}
                                                         >-5</Button>
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 3))}
-                                                            style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                            style={{ fontWeight: 700, border: '1px solid var(--color-border)' }}
                                                         >-3</Button>
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => handleEpisodeSelect(Math.max(0, (work.currentChapter || 0) - 1))}
-                                                            style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                            style={{ fontWeight: 700, border: '1px solid var(--color-border)' }}
                                                         >-1</Button>
 
                                                         {/* Progress display */}
@@ -1367,19 +1370,19 @@ export default function WorkDetails() {
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 1)}
-                                                            style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                            style={{ fontWeight: 700, border: '1px solid var(--color-border)' }}
                                                         >+1</Button>
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 3)}
-                                                            style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                            style={{ fontWeight: 700, border: '1px solid var(--color-border)' }}
                                                         >+3</Button>
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => handleEpisodeSelect((work.currentChapter || 0) + 5)}
-                                                            style={{ fontWeight: 700, border: '1px solid #ccc' }}
+                                                            style={{ fontWeight: 700, border: '1px solid var(--color-border)' }}
                                                         >+5</Button>
                                                         <Button onClick={() => setIsEditing(true)} variant="manga" size="sm">{t('work_details.progress.edit')}</Button>
                                                     </div>
@@ -1391,7 +1394,7 @@ export default function WorkDetails() {
 
                                 {libraryWork && (
                                     <div style={{ marginBottom: '2rem' }}>
-                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>{t('work_details.status.title')}</h3>
+                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: 'var(--color-text)' }}>{t('work_details.status.title')}</h3>
                                         <div className={styles.statusButtons}>
                                             {['reading', 'completed', 'plan_to_read', 'dropped'].map((s) => (
                                                 <button
@@ -1451,7 +1454,7 @@ export default function WorkDetails() {
                                 {/* Rating Section */}
                                 {libraryWork && (
                                     <div style={{ marginBottom: '2rem' }}>
-                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: '#000' }}>{t('work_details.rating.title')}</h3>
+                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: 'var(--color-text)' }}>{t('work_details.rating.title')}</h3>
                                         <div className={styles.ratingContainer}>
                                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
                                                 <button
@@ -1469,8 +1472,8 @@ export default function WorkDetails() {
                                                 >
                                                     <Star
                                                         size={32}
-                                                        fill={(work.rating || 0) >= star ? '#000' : 'none'}
-                                                        color="#000"
+                                                        fill={(work.rating || 0) >= star ? 'var(--color-text)' : 'none'}
+                                                        color="var(--color-text)"
                                                         strokeWidth={2}
                                                     />
                                                 </button>
@@ -1490,7 +1493,7 @@ export default function WorkDetails() {
                                                 fontFamily: 'var(--font-heading)',
                                                 fontSize: '1.5rem',
                                                 marginBottom: '1rem',
-                                                color: '#000',
+                                                color: 'var(--color-text)',
                                                 cursor: 'pointer',
                                                 display: 'flex',
                                                 alignItems: 'center',
@@ -1514,10 +1517,10 @@ export default function WorkDetails() {
                                 {/* Comments Section */}
                                 <div style={{
                                     marginBottom: '2rem',
-                                    border: '2px solid #000',
+                                    border: '2px solid var(--color-border-heavy)',
                                     padding: '1.5rem',
-                                    boxShadow: '8px 8px 0 #000',
-                                    background: '#fff'
+                                    boxShadow: '8px 8px 0 var(--color-shadow-solid)',
+                                    background: 'var(--color-surface)'
                                 }}>
                                     <h3
                                         onClick={() => setIsCommentsExpanded(!isCommentsExpanded)}
@@ -1525,7 +1528,7 @@ export default function WorkDetails() {
                                             fontFamily: 'var(--font-heading)',
                                             fontSize: '1.5rem',
                                             marginBottom: isCommentsExpanded ? '1.5rem' : 0,
-                                            color: '#000',
+                                            color: 'var(--color-text)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             gap: '0.5rem',
@@ -1562,7 +1565,7 @@ export default function WorkDetails() {
                                                                 height: 28,
                                                                 borderRadius: '50%',
                                                                 overflow: 'hidden',
-                                                                border: '2px solid #fff',
+                                                                border: '2px solid var(--color-surface)',
                                                                 marginLeft: '-8px'
                                                             }}>
                                                                 <img src={f.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${f.displayName}`}
@@ -1577,10 +1580,10 @@ export default function WorkDetails() {
                                             {user ? (
                                                 <div style={{
                                                     marginBottom: '2rem',
-                                                    background: '#fff',
+                                                    background: 'var(--color-surface)',
                                                     padding: '1.5rem',
-                                                    border: '3px solid #000',
-                                                    boxShadow: '6px 6px 0 #000', // Brutalist shadow
+                                                    border: '3px solid var(--color-border-heavy)',
+                                                    boxShadow: '6px 6px 0 var(--color-shadow-solid)',
                                                     position: 'relative'
                                                 }}>
                                                     <textarea
@@ -1590,7 +1593,7 @@ export default function WorkDetails() {
                                                         style={{
                                                             width: '100%',
                                                             minHeight: '100px',
-                                                            border: '2px solid #000',
+                                                            border: '2px solid var(--color-border-heavy)',
                                                             padding: '1rem',
                                                             fontFamily: 'inherit',
                                                             fontSize: '1rem',
@@ -1598,7 +1601,8 @@ export default function WorkDetails() {
                                                             resize: 'vertical',
                                                             marginBottom: '1rem',
                                                             outline: 'none',
-                                                            background: '#f9f9f9',
+                                                            background: 'var(--color-surface-hover)',
+                                                            color: 'var(--color-text)',
                                                         }}
                                                     />
                                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1617,8 +1621,8 @@ export default function WorkDetails() {
                                                             size="md"
                                                             icon={<Send size={18} />}
                                                             style={{
-                                                                border: '2px solid #000',
-                                                                boxShadow: '4px 4px 0 #000',
+                                                                border: '2px solid var(--color-border-heavy)',
+                                                                boxShadow: '4px 4px 0 var(--color-shadow-solid)',
                                                                 fontWeight: 900
                                                             }}
                                                         >
@@ -1680,7 +1684,7 @@ export default function WorkDetails() {
 
                                 {/* Danger Zone */}
                                 {libraryWork && (
-                                    <div style={{ borderTop: '2px dashed #000', paddingTop: '2rem' }}>
+                                    <div style={{ borderTop: '2px dashed var(--color-border-heavy)', paddingTop: '2rem' }}>
                                         <Button
                                             onClick={() => setIsDeleteModalOpen(true)}
                                             style={{
@@ -1702,7 +1706,7 @@ export default function WorkDetails() {
                         {activeTab === 'stats' && (
                             <div className="animate-fade-in">
                                 {(!statistics && staff.length === 0) ? (
-                                    <div style={{ padding: '3rem', textAlign: 'center', opacity: 0.6, fontStyle: 'italic', border: '2px dashed #000' }}>
+                                    <div style={{ padding: '3rem', textAlign: 'center', opacity: 0.6, fontStyle: 'italic', border: '2px dashed var(--color-border-heavy)' }}>
                                         {t('work_details.stats.no_data')}
                                     </div>
                                 ) : (
@@ -1726,11 +1730,11 @@ export default function WorkDetails() {
                                                         .slice(0, isStaffExpanded ? undefined : 6)
                                                         .map((s) => (
                                                             <div key={s.person.mal_id} style={{ minWidth: '120px', maxWidth: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                                                                <div style={{ width: '90px', height: '90px', borderRadius: '50%', overflow: 'hidden', border: '3px solid #000', marginBottom: '0.5rem', boxShadow: '3px 3px 0 0px #000' }}>
+                                                                <div style={{ width: '90px', height: '90px', borderRadius: '50%', overflow: 'hidden', border: '3px solid var(--color-border-heavy)', marginBottom: '0.5rem', boxShadow: '3px 3px 0 0px var(--color-shadow-solid)' }}>
                                                                     {s.person.images.jpg.image_url ? (
                                                                         <img src={s.person.images.jpg.image_url} alt={s.person.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                                     ) : (
-                                                                        <div style={{ width: '100%', height: '100%', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 900 }}>?</div>
+                                                                        <div style={{ width: '100%', height: '100%', background: 'var(--color-surface-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 900 }}>?</div>
                                                                     )}
                                                                 </div>
                                                                 <span style={{ fontWeight: 800, fontSize: '0.9rem', lineHeight: 1.2, width: '100%', whiteSpace: 'normal' }}>{s.person.name}</span>
@@ -1747,7 +1751,7 @@ export default function WorkDetails() {
                                                         <Button
                                                             onClick={() => setIsStaffExpanded(!isStaffExpanded)}
                                                             variant="ghost"
-                                                            style={{ border: '1px dashed #000' }}
+                                                            style={{ border: '1px dashed var(--color-border-heavy)' }}
                                                         >
                                                             {isStaffExpanded ? t('work_details.stats.show_less') : t('work_details.stats.show_more')}
                                                         </Button>
@@ -1759,14 +1763,14 @@ export default function WorkDetails() {
                                         {/* STATISTICS SECTION (Moved here) */}
                                         {statistics && (
                                             <div style={{ marginTop: '2rem' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', borderBottom: '2px solid var(--color-border-heavy)', paddingBottom: '0.5rem' }}>
                                                     <BarChart size={24} strokeWidth={2.5} />
                                                     <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', margin: 0 }}>{t('work_details.stats.title')}</h3>
                                                 </div>
 
                                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
                                                     {/* Status Distribution */}
-                                                    <div style={{ border: '2px solid #000', padding: '1rem', background: '#fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.1)' }}>
+                                                    <div style={{ border: '2px solid var(--color-border-heavy)', padding: '1rem', background: 'var(--color-surface)', boxShadow: '4px 4px 0 var(--color-shadow)' }}>
                                                         <h4 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>{t('work_details.stats.library_distribution')}</h4>
                                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                                             {[
@@ -1781,7 +1785,7 @@ export default function WorkDetails() {
                                                                         <span>{stat.label}</span>
                                                                         <span>{(stat.value || 0).toLocaleString()}</span>
                                                                     </div>
-                                                                    <div style={{ height: '8px', background: '#eee', borderRadius: '4px', overflow: 'hidden' }}>
+                                                                    <div style={{ height: '8px', background: 'var(--color-surface-hover)', borderRadius: '4px', overflow: 'hidden' }}>
                                                                         <div style={{
                                                                             height: '100%',
                                                                             width: `${((stat.value || 0) / (statistics.total || 1)) * 100}%`,
@@ -1795,14 +1799,14 @@ export default function WorkDetails() {
 
                                                     {/* Score Distribution */}
                                                     {statistics.scores && statistics.scores.length > 0 && (
-                                                        <div style={{ border: '2px solid #000', padding: '1rem', background: '#fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.1)' }}>
+                                                        <div style={{ border: '2px solid var(--color-border-heavy)', padding: '1rem', background: 'var(--color-surface)', boxShadow: '4px 4px 0 var(--color-shadow)' }}>
                                                             <h4 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>{t('work_details.stats.score_distribution')}</h4>
                                                             <div style={{ display: 'flex', alignItems: 'flex-end', height: '150px', gap: '2px' }}>
                                                                 {statistics.scores.sort((a, b) => a.score - b.score).map((score) => (
                                                                     <div key={score.score} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                                                         <div style={{
                                                                             width: '100%',
-                                                                            background: '#000',
+                                                                            background: 'var(--color-text)',
                                                                             height: `${score.percentage}%`,
                                                                             minHeight: '2px',
                                                                             position: 'relative',
@@ -1827,25 +1831,25 @@ export default function WorkDetails() {
                         {activeTab === 'reviews' as any && (
                             <div className="animate-fade-in">
                                 <h2 className={styles.sectionTitle} style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Star size={24} fill="#000" /> {t('work_details.reviews.title')}
+                                    <Star size={24} fill="currentColor" /> {t('work_details.reviews.title')}
                                 </h2>
 
                                 {reviews.length > 0 ? (
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem', alignContent: 'start' }}>
                                         {reviews.map((review) => (
                                             <div key={review.mal_id} style={{
-                                                background: '#fff',
-                                                border: '3px solid #000',
-                                                boxShadow: '6px 6px 0 #000',
+                                                background: 'var(--color-surface)',
+                                                border: '3px solid var(--color-border-heavy)',
+                                                boxShadow: '6px 6px 0 var(--color-shadow-solid)',
                                                 padding: '1.5rem',
                                                 display: 'flex',
                                                 flexDirection: 'column',
                                                 gap: '1rem'
                                             }}>
                                                 {/* Header: User & Score */}
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #eee', paddingBottom: '1rem' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid var(--color-border)', paddingBottom: '1rem' }}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border-heavy)' }}>
                                                             <img src={review.user.images.jpg.image_url} alt={review.user.username} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                                 onError={(e) => { (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.user.username}`; }}
                                                             />
@@ -1856,8 +1860,8 @@ export default function WorkDetails() {
                                                         </div>
                                                     </div>
                                                     <div style={{
-                                                        background: '#000',
-                                                        color: '#fff',
+                                                        background: 'var(--color-border-heavy)',
+                                                        color: 'var(--color-text-inverse)',
                                                         padding: '0.25rem 0.5rem',
                                                         fontWeight: 900,
                                                         fontSize: '1.1rem',
@@ -1865,7 +1869,7 @@ export default function WorkDetails() {
                                                         alignItems: 'center',
                                                         gap: '0.25rem'
                                                     }}>
-                                                        <Star size={14} fill="#fff" /> {review.score}
+                                                        <Star size={14} fill="currentColor" /> {review.score}
                                                     </div>
                                                 </div>
 
@@ -1875,10 +1879,10 @@ export default function WorkDetails() {
                                                         <span key={tag} style={{
                                                             fontSize: '0.7rem',
                                                             fontWeight: 700,
-                                                            border: '1px solid #000',
+                                                            border: '1px solid var(--color-border-heavy)',
                                                             padding: '2px 6px',
                                                             textTransform: 'uppercase',
-                                                            background: tag.toLowerCase().includes('recommended') ? '#dcfce7' : tag.toLowerCase().includes('mixed') ? '#fef9c3' : '#fff'
+                                                            background: tag.toLowerCase().includes('recommended') ? '#dcfce7' : tag.toLowerCase().includes('mixed') ? '#fef9c3' : 'var(--color-surface)'
                                                         }}>
                                                             {tag}
                                                         </span>
@@ -1901,7 +1905,7 @@ export default function WorkDetails() {
                                                             alignItems: 'center',
                                                             gap: '0.25rem',
                                                             fontWeight: 800,
-                                                            color: '#000',
+                                                            color: 'var(--color-text)',
                                                             textDecoration: 'none',
                                                             fontSize: '0.85rem'
                                                         }}
@@ -1913,7 +1917,7 @@ export default function WorkDetails() {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div style={{ padding: '3rem', textAlign: 'center', border: '2px dashed #000', opacity: 0.7 }}>
+                                    <div style={{ padding: '3rem', textAlign: 'center', border: '2px dashed var(--color-border-heavy)', opacity: 0.7 }}>
                                         <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem' }}>{t('work_details.reviews.none_found')}</h3>
                                         <p>{t('work_details.reviews.be_first')}</p>
                                     </div>
@@ -1932,12 +1936,12 @@ export default function WorkDetails() {
                                     }}>
                                         {pictures.map((pic, idx) => (
                                             <div key={idx} style={{
-                                                border: '2px solid #000',
-                                                boxShadow: '4px 4px 0 #000',
+                                                border: '2px solid var(--color-border-heavy)',
+                                                boxShadow: '4px 4px 0 var(--color-shadow-solid)',
                                                 aspectRatio: '1/1.4',
                                                 overflow: 'hidden',
                                                 cursor: 'pointer',
-                                                background: '#fff',
+                                                background: 'var(--color-surface)',
                                                 transition: 'transform 0.1s'
                                             }}
                                                 onMouseEnter={(e) => e.currentTarget.style.transform = 'translate(-2px, -2px)'}
@@ -1973,16 +1977,16 @@ export default function WorkDetails() {
                                         }}>
                                             {/* Openings */}
                                             <div style={{
-                                                background: '#fff',
-                                                border: '2px solid #000',
-                                                boxShadow: '4px 4px 0 #000',
+                                                background: 'var(--color-surface)',
+                                                border: '2px solid var(--color-border-heavy)',
+                                                boxShadow: '4px 4px 0 var(--color-shadow-solid)',
                                                 padding: '1.5rem'
                                             }}>
                                                 <h3 style={{
                                                     fontFamily: 'var(--font-heading)',
                                                     fontSize: '1.25rem',
                                                     marginBottom: '1rem',
-                                                    borderBottom: '4px solid #000',
+                                                    borderBottom: '4px solid var(--color-border-heavy)',
                                                     paddingBottom: '0.5rem',
                                                     display: 'flex',
                                                     alignItems: 'center',
@@ -1994,24 +1998,24 @@ export default function WorkDetails() {
                                                     {themes.openings.length > 0 ? (
                                                         <ul style={{ listStyle: 'none', padding: 0 }}>
                                                             {themes.openings.map((theme, idx) => (
-                                                                <li key={idx} style={{ marginBottom: '0.75rem', borderBottom: '1px dashed #ccc', paddingBottom: '0.75rem' }}>
+                                                                <li key={idx} style={{ marginBottom: '0.75rem', borderBottom: '1px dashed var(--color-border)', paddingBottom: '0.75rem' }}>
                                                                     <a
                                                                         href={`https://www.youtube.com/results?search_query=${encodeURIComponent(theme + ' ' + work.title)}`}
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
                                                                         style={{
                                                                             textDecoration: 'none',
-                                                                            color: '#000',
+                                                                            color: 'var(--color-text)',
                                                                             display: 'flex',
                                                                             alignItems: 'flex-start',
                                                                             gap: '0.75rem'
                                                                         }}
-                                                                        onMouseEnter={(e) => e.currentTarget.style.color = '#555'}
-                                                                        onMouseLeave={(e) => e.currentTarget.style.color = '#000'}
+                                                                        onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                                                                        onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                                                                     >
                                                                         <span style={{
-                                                                            background: '#000',
-                                                                            color: '#fff',
+                                                                            background: 'var(--color-border-heavy)',
+                                                                            color: 'var(--color-text-inverse)',
                                                                             fontFamily: 'var(--font-heading)',
                                                                             padding: '2px 6px',
                                                                             fontSize: '0.8rem',
@@ -2028,16 +2032,16 @@ export default function WorkDetails() {
 
                                             {/* Endings */}
                                             <div style={{
-                                                background: '#fff',
-                                                border: '2px solid #000',
-                                                boxShadow: '4px 4px 0 #000',
+                                                background: 'var(--color-surface)',
+                                                border: '2px solid var(--color-border-heavy)',
+                                                boxShadow: '4px 4px 0 var(--color-shadow-solid)',
                                                 padding: '1.5rem'
                                             }}>
                                                 <h3 style={{
                                                     fontFamily: 'var(--font-heading)',
                                                     fontSize: '1.25rem',
                                                     marginBottom: '1rem',
-                                                    borderBottom: '4px solid #000',
+                                                    borderBottom: '4px solid var(--color-border-heavy)',
                                                     paddingBottom: '0.5rem',
                                                     display: 'flex',
                                                     alignItems: 'center',
@@ -2049,24 +2053,24 @@ export default function WorkDetails() {
                                                     {themes.endings.length > 0 ? (
                                                         <ul style={{ listStyle: 'none', padding: 0 }}>
                                                             {themes.endings.map((theme, idx) => (
-                                                                <li key={idx} style={{ marginBottom: '0.75rem', borderBottom: '1px dashed #ccc', paddingBottom: '0.75rem' }}>
+                                                                <li key={idx} style={{ marginBottom: '0.75rem', borderBottom: '1px dashed var(--color-border)', paddingBottom: '0.75rem' }}>
                                                                     <a
                                                                         href={`https://www.youtube.com/results?search_query=${encodeURIComponent(theme + ' ' + work.title)}`}
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
                                                                         style={{
                                                                             textDecoration: 'none',
-                                                                            color: '#000',
+                                                                            color: 'var(--color-text)',
                                                                             display: 'flex',
                                                                             alignItems: 'flex-start',
                                                                             gap: '0.75rem'
                                                                         }}
-                                                                        onMouseEnter={(e) => e.currentTarget.style.color = '#555'}
-                                                                        onMouseLeave={(e) => e.currentTarget.style.color = '#000'}
+                                                                        onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                                                                        onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                                                                     >
                                                                         <span style={{
-                                                                            background: '#000',
-                                                                            color: '#fff',
+                                                                            background: 'var(--color-border-heavy)',
+                                                                            color: 'var(--color-text-inverse)',
                                                                             fontFamily: 'var(--font-heading)',
                                                                             padding: '2px 6px',
                                                                             fontSize: '0.8rem',
@@ -2084,7 +2088,7 @@ export default function WorkDetails() {
 
                                     </>
                                 ) : (
-                                    <div style={{ padding: '3rem', textAlign: 'center', opacity: 0.6, fontStyle: 'italic', border: '2px dashed #000' }}>
+                                    <div style={{ padding: '3rem', textAlign: 'center', opacity: 0.6, fontStyle: 'italic', border: '2px dashed var(--color-border-heavy)' }}>
                                         {t('work_details.themes.no_music')}
                                     </div>
                                 )}
@@ -2122,10 +2126,10 @@ export default function WorkDetails() {
                                         <div style={{
                                             position: 'relative',
                                             marginBottom: '0.75rem',
-                                            border: '3px solid #000',
-                                            boxShadow: '6px 6px 0 #000',
+                                            border: '3px solid var(--color-border-heavy)',
+                                            boxShadow: '6px 6px 0 var(--color-shadow-solid)',
                                             transition: 'transform 0.2s',
-                                            background: '#000'
+                                            background: 'var(--color-border-heavy)'
                                         }}
                                             onMouseEnter={(e) => e.currentTarget.style.transform = 'translate(-4px, -4px)'}
                                             onMouseLeave={(e) => e.currentTarget.style.transform = 'translate(0, 0)'}
@@ -2140,8 +2144,8 @@ export default function WorkDetails() {
                                                 bottom: 0,
                                                 left: 0,
                                                 right: 0,
-                                                background: '#000',
-                                                color: '#fff',
+                                                background: 'var(--color-border-heavy)',
+                                                color: 'var(--color-text-inverse)',
                                                 padding: '4px 8px',
                                                 fontSize: '0.7rem',
                                                 fontWeight: 800,
@@ -2178,7 +2182,7 @@ export default function WorkDetails() {
                                 <AlertTriangle size={32} />
                             </div>
                         </div>
-                        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem', color: '#000' }}>
+                        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--color-text)' }}>
                             {t('work_details.danger.confirm_title', { title: work.title })}
                         </h3>
                         <p style={{ marginBottom: '2rem', opacity: 0.7 }}>

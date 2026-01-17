@@ -257,7 +257,7 @@ export default function Profile() {
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
-                        <h1 className="text-outline" style={{ fontSize: 'clamp(1.5rem, 5vw, 3rem)', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', color: '#000', textShadow: '2px 2px 0 rgba(0,0,0,0.1)', wordBreak: 'break-word' }}>
+                        <h1 className="text-outline" style={{ fontSize: 'clamp(1.5rem, 5vw, 3rem)', fontFamily: 'var(--font-heading)', textTransform: 'uppercase', color: 'var(--color-text)', textShadow: '2px 2px 0 var(--color-shadow)', wordBreak: 'break-word' }}>
                             {t('profile.title')}
                         </h1>
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -317,8 +317,8 @@ export default function Profile() {
                         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '3rem' }}>
                                 {/* Chapitres lus */}
-                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
-                                    <div style={{ padding: '0.75rem', background: '#000', color: '#fff' }}>
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--color-surface)', color: 'var(--color-text)' }}>
+                                    <div style={{ padding: '0.75rem', background: 'var(--color-border-heavy)', color: 'var(--color-text-inverse)' }}>
                                         <BookOpen size={24} />
                                     </div>
                                     <div>
@@ -339,7 +339,7 @@ export default function Profile() {
                                 </div>
 
                                 {/* Terminées */}
-                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--color-surface)', color: 'var(--color-text)' }}>
                                     <div style={{ padding: '0.75rem', background: '#22c55e', color: '#fff' }}>
                                         <CheckCircle size={24} />
                                     </div>
@@ -350,7 +350,7 @@ export default function Profile() {
                                 </div>
 
                                 {/* Episodes Vus */}
-                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--color-surface)', color: 'var(--color-text)' }}>
                                     <div style={{ padding: '0.75rem', background: '#0ea5e9', color: '#fff' }}>
                                         <Play size={24} />
                                     </div>
@@ -361,7 +361,7 @@ export default function Profile() {
                                 </div>
 
                                 {/* Films Vus */}
-                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--color-surface)', color: 'var(--color-text)' }}>
                                     <div style={{ padding: '0.75rem', background: '#f43f5e', color: '#fff' }}>
                                         <Film size={24} />
                                     </div>
@@ -372,8 +372,8 @@ export default function Profile() {
                                 </div>
 
                                 {/* Collection */}
-                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
-                                    <div style={{ padding: '0.75rem', background: '#000', color: '#fff' }}>
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--color-surface)', color: 'var(--color-text)' }}>
+                                    <div style={{ padding: '0.75rem', background: 'var(--color-border-heavy)', color: 'var(--color-text-inverse)' }}>
                                         <Library size={24} />
                                     </div>
                                     <div>
@@ -383,7 +383,7 @@ export default function Profile() {
                                 </div>
 
                                 {/* Badges */}
-                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--color-surface)', color: 'var(--color-text)' }}>
                                     <div style={{ padding: '0.75rem', background: '#fbbf24', color: '#000' }}>
                                         <Award size={24} />
                                     </div>
@@ -394,7 +394,7 @@ export default function Profile() {
                                 </div>
 
                                 {/* XP Total */}
-                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: '#fff', color: '#000' }}>
+                                <div className="manga-panel" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--color-surface)', color: 'var(--color-text)' }}>
                                     <div style={{ padding: '0.75rem', background: '#8b5cf6', color: '#fff' }}>
                                         <Trophy size={24} />
                                     </div>
@@ -408,7 +408,7 @@ export default function Profile() {
                             {/* Common Works Section (only for visited profiles) */}
                             {!isOwnProfile && commonWorks && commonWorks.count > 0 && (
                                 <div style={{ marginBottom: '2rem' }}>
-                                    <h3 className="manga-title" style={{ fontSize: '1.2rem', marginBottom: '1rem', background: 'linear-gradient(135deg, #dbeafe, #ede9fe)', color: '#000', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <h3 className="manga-title" style={{ fontSize: '1.2rem', marginBottom: '1rem', background: 'linear-gradient(135deg, #dbeafe, #ede9fe)', color: 'var(--color-text)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <Library size={20} /> {t('profile.common_works', { count: commonWorks.count, context: commonWorks.count > 1 ? 'plural' : '' })}
                                     </h3>
                                     <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -429,7 +429,7 @@ export default function Profile() {
                                                     height: 110,
                                                     borderRadius: '4px',
                                                     overflow: 'hidden',
-                                                    border: '2px solid #000',
+                                                    border: '2px solid var(--color-border-heavy)',
                                                     marginBottom: '0.25rem'
                                                 }}>
                                                     <img
@@ -455,11 +455,12 @@ export default function Profile() {
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
-                                                background: '#f0f0f0',
+                                                background: 'var(--color-surface-hover)',
                                                 borderRadius: '4px',
-                                                border: '2px dashed #ccc',
+                                                border: '2px dashed var(--color-border)',
                                                 fontWeight: 700,
-                                                fontSize: '0.9rem'
+                                                fontSize: '0.9rem',
+                                                color: 'var(--color-text-dim)'
                                             }}>
                                                 +{commonWorks.count - 8}
                                             </div>
@@ -475,7 +476,7 @@ export default function Profile() {
                                     <h3 className="manga-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem', background: '#ffe4e6', color: '#e11d48', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <User size={24} /> {t('profile.favorite_characters') || "Personnages Favoris"}
                                     </h3>
-                                    <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff', display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1.5rem' }}>
+                                    <div className="manga-panel" style={{ padding: '1.5rem', background: 'var(--color-surface)', display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1.5rem' }}>
                                         {displayFavoriteCharacters.map((char: any) => (
                                             <div
                                                 key={char.id}
@@ -521,8 +522,8 @@ export default function Profile() {
                             )}
 
 
-                            <h3 className="manga-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem', background: 'var(--color-secondary)', color: '#000' }}>{t('profile.recent_badges')}</h3>
-                            <div className="manga-panel" style={{ padding: '2rem', background: '#fff', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '2rem' }}>
+                            <h3 className="manga-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem', background: 'var(--color-secondary)', color: 'var(--color-text)' }}>{t('profile.recent_badges')}</h3>
+                            <div className="manga-panel" style={{ padding: '2rem', background: 'var(--color-surface)', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '2rem' }}>
                                 {displayBadges.map((badge: Badge) => (
                                     <motion.div
                                         key={badge.id}
@@ -546,7 +547,7 @@ export default function Profile() {
                                         }}>
                                             {getBadgeIcon(badge.icon)}
                                         </div>
-                                        <p style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', color: '#000' }}>{badge.name}</p>
+                                        <p style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--color-text)' }}>{badge.name}</p>
 
                                         {/* Hover Tooltip */}
                                         <AnimatePresence>
@@ -560,8 +561,8 @@ export default function Profile() {
                                                         bottom: '100%',
                                                         left: '50%',
                                                         transform: 'translateX(-50%)',
-                                                        background: '#000',
-                                                        color: '#fff',
+                                                        background: 'var(--color-border-heavy)',
+                                                        color: 'var(--color-text-inverse)',
                                                         padding: '0.5rem',
                                                         borderRadius: '4px',
                                                         fontSize: '0.7rem',
@@ -579,7 +580,7 @@ export default function Profile() {
                                                         marginLeft: '-6px',
                                                         borderWidth: '6px',
                                                         borderStyle: 'solid',
-                                                        borderColor: 'black transparent transparent transparent'
+                                                        borderColor: 'var(--color-border-heavy) transparent transparent transparent'
                                                     }} />
                                                 </motion.div>
                                             )}
@@ -593,13 +594,13 @@ export default function Profile() {
                                         width: '80px',
                                         height: '80px',
                                         margin: '0 auto',
-                                        background: '#eee',
+                                        background: 'var(--color-surface-hover)',
                                         borderRadius: '50%',
-                                        border: '3px dashed #ccc',
+                                        border: '3px dashed var(--color-border)',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        color: '#ccc',
+                                        color: 'var(--color-text-dim)',
                                         fontWeight: 900,
                                         fontSize: '1.5rem'
                                     }}>
@@ -617,14 +618,14 @@ export default function Profile() {
                             {/* AVATAR & NAME */}
                             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                 <div style={{ position: 'relative', width: '80px', height: '80px', flexShrink: 0 }}>
-                                    <div style={{ width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                    <div style={{ width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border-heavy)' }}>
                                         <img
                                             src={editForm.avatar || 'https://via.placeholder.com/150'}
                                             alt="Avatar"
                                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                         />
                                     </div>
-                                    <label htmlFor="avatar-upload" style={{ position: 'absolute', bottom: 0, right: 0, background: '#000', color: '#fff', borderRadius: '50%', padding: '4px', cursor: 'pointer' }}>
+                                    <label htmlFor="avatar-upload" style={{ position: 'absolute', bottom: 0, right: 0, background: 'var(--color-border-heavy)', color: 'var(--color-text-inverse)', borderRadius: '50%', padding: '4px', cursor: 'pointer' }}>
                                         <PenTool size={12} />
                                     </label>
                                     <input
@@ -657,7 +658,7 @@ export default function Profile() {
                             {/* BANNER URL */}
                             <div>
                                 <label style={{ fontWeight: 900, display: 'block', marginBottom: '0.5rem' }}>{t('profile.edit_modal.banner_label')}</label>
-                                <div style={{ marginBottom: '0.5rem', fontSize: '0.8rem', color: '#666' }}>
+                                <div style={{ marginBottom: '0.5rem', fontSize: '0.8rem', color: 'var(--color-text-dim)' }}>
                                     {t('profile.edit_modal.banner_help')}
                                 </div>
                                 <Input
@@ -666,7 +667,7 @@ export default function Profile() {
                                     onChange={(e) => setEditForm(prev => ({ ...prev, banner: e.target.value }))}
                                 />
                                 {editForm.banner && (
-                                    <div style={{ marginTop: '1rem', width: '100%', height: '100px', border: '2px solid #000', overflow: 'hidden', position: 'relative' }}>
+                                    <div style={{ marginTop: '1rem', width: '100%', height: '100px', border: '2px solid var(--color-border-heavy)', overflow: 'hidden', position: 'relative' }}>
                                         <img
                                             src={editForm.banner}
                                             alt="Aperçu"
@@ -689,15 +690,15 @@ export default function Profile() {
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
                                     <div>
                                         <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>{t('profile.edit_modal.accent')}</span>
-                                        <input type="color" value={editForm.themeColor} onChange={(e) => setEditForm(prev => ({ ...prev, themeColor: e.target.value }))} style={{ width: '100%', height: '40px', border: '2px solid #000' }} />
+                                        <input type="color" value={editForm.themeColor} onChange={(e) => setEditForm(prev => ({ ...prev, themeColor: e.target.value }))} style={{ width: '100%', height: '40px', border: '2px solid var(--color-border-heavy)' }} />
                                     </div>
                                     <div>
                                         <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>{t('profile.edit_modal.background')}</span>
-                                        <input type="color" value={editForm.cardBgColor} onChange={(e) => setEditForm(prev => ({ ...prev, cardBgColor: e.target.value }))} style={{ width: '100%', height: '40px', border: '2px solid #000' }} />
+                                        <input type="color" value={editForm.cardBgColor} onChange={(e) => setEditForm(prev => ({ ...prev, cardBgColor: e.target.value }))} style={{ width: '100%', height: '40px', border: '2px solid var(--color-border-heavy)' }} />
                                     </div>
                                     <div>
                                         <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>{t('profile.edit_modal.border')}</span>
-                                        <input type="color" value={editForm.borderColor} onChange={(e) => setEditForm(prev => ({ ...prev, borderColor: e.target.value }))} style={{ width: '100%', height: '40px', border: '2px solid #000' }} />
+                                        <input type="color" value={editForm.borderColor} onChange={(e) => setEditForm(prev => ({ ...prev, borderColor: e.target.value }))} style={{ width: '100%', height: '40px', border: '2px solid var(--color-border-heavy)' }} />
                                     </div>
                                 </div>
                             </div>
@@ -719,7 +720,7 @@ export default function Profile() {
                                                 }
                                                 setEditForm(prev => ({ ...prev, top3Favorites: newTop3 }));
                                             }}
-                                            style={{ width: '100%', padding: '0.75rem', border: '2px solid #000', fontWeight: 'bold' }}
+                                            style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--color-border-heavy)', fontWeight: 'bold', background: 'var(--color-surface)', color: 'var(--color-text)' }}
                                         >
                                             <option value="">{t('profile.edit_modal.select_favorite', { index: index + 1 })}</option>
                                             {works.sort((a, b) => a.title.localeCompare(b.title)).map(w => (
@@ -737,7 +738,7 @@ export default function Profile() {
                                 <select
                                     value={editForm.featuredBadge}
                                     onChange={(e) => setEditForm(prev => ({ ...prev, featuredBadge: e.target.value }))}
-                                    style={{ width: '100%', padding: '0.75rem', border: '2px solid #000', fontWeight: 'bold' }}
+                                    style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--color-border-heavy)', fontWeight: 'bold', background: 'var(--color-surface)', color: 'var(--color-text)' }}
                                 >
                                     <option value="">{t('profile.edit_modal.none')}</option>
                                     {badges.map(b => (
@@ -757,10 +758,12 @@ export default function Profile() {
                                     style={{
                                         width: '100%',
                                         padding: '0.75rem',
-                                        border: '2px solid #000',
+                                        border: '2px solid var(--color-border-heavy)',
                                         fontFamily: 'inherit',
                                         fontSize: '1rem',
-                                        resize: 'vertical'
+                                        resize: 'vertical',
+                                        background: 'var(--color-surface)',
+                                        color: 'var(--color-text)'
                                     }}
                                 />
                             </div>
@@ -775,7 +778,7 @@ export default function Profile() {
                     <Modal isOpen={showGuide} onClose={() => setShowGuide(false)} title={t('profile.guide_modal.title')}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             <div style={{ display: 'flex', gap: '1rem' }}>
-                                <div style={{ background: '#000', color: '#fff', padding: '1rem', borderRadius: '4px', flex: 1 }}>
+                                <div style={{ background: 'var(--color-border-heavy)', color: 'var(--color-text-inverse)', padding: '1rem', borderRadius: '4px', flex: 1 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                         <Trophy size={20} className="text-primary" />
                                         <h4 style={{ fontSize: '1.2rem', fontWeight: 900 }}>{t('profile.guide_modal.xp_title')}</h4>
@@ -790,7 +793,7 @@ export default function Profile() {
                                         <li>{t('profile.guide_modal.xp_daily')} <strong>+5 XP</strong></li>
                                     </ul>
                                 </div>
-                                <div style={{ background: '#fff', color: '#000', border: '2px solid #000', padding: '1rem', borderRadius: '4px', flex: 1 }}>
+                                <div style={{ background: 'var(--color-surface)', color: 'var(--color-text)', border: '2px solid var(--color-border-heavy)', padding: '1rem', borderRadius: '4px', flex: 1 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                         <Flame size={20} color="var(--color-primary)" />
                                         <h4 style={{ fontSize: '1.2rem', fontWeight: 900 }}>{t('profile.guide_modal.streak_title')}</h4>
@@ -803,7 +806,7 @@ export default function Profile() {
                                     </p>
                                 </div>
                             </div>
-                            <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '4px', borderLeft: '4px solid var(--color-primary)' }}>
+                            <div style={{ background: 'var(--color-surface-hover)', padding: '1rem', borderRadius: '4px', borderLeft: '4px solid var(--color-primary)' }}>
                                 <h4 style={{ fontSize: '1.1rem', fontWeight: 900, marginBottom: '0.5rem' }}>{t('profile.guide_modal.ranks_title')}</h4>
                                 <p style={{ fontSize: '0.9rem' }}>
                                     {t('profile.guide_modal.ranks_desc')}

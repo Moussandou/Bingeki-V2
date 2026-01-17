@@ -174,6 +174,12 @@ function App() {
     return () => clearTimeout(timeout);
   }, [gamificationState, user]);
 
+  // Apply theme to document
+  const theme = useSettingsStore(s => s.theme);
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
   // Apply global accent color
   const accentColor = useSettingsStore(s => s.accentColor);
   useEffect(() => {
@@ -186,8 +192,10 @@ function App() {
     const rgb = hexToRgb(accentColor);
     if (rgb) {
       document.documentElement.style.setProperty('--color-primary-glow', `rgba(${rgb}, 0.5)`);
-      // Update gradient to use the accent color
-      document.documentElement.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${accentColor} 0%, ${accentColor} 100%)`);
+      // Update gradient to use the accent color (using theme-aware end color?)
+      // Note: We keep the hardcoded end colors for now or we could make them dynamic relative to theme
+      // For now, let's just update the start color which is the primary one
+      // document.documentElement.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${accentColor} 0%, ${accentColor} 100%)`);
     }
   }, [accentColor]);
 

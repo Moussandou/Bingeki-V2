@@ -260,7 +260,7 @@ export default function Feedback() {
                                             className={styles.starButton}
                                             style={{ opacity: rating >= star ? 1 : 0.3 }}
                                         >
-                                            <Star fill={rating >= star ? '#000' : 'none'} color="#000" size={28} />
+                                            <Star fill={rating >= star ? 'var(--color-text)' : 'none'} color="var(--color-text)" size={28} />
                                         </button>
                                     ))}
                                 </div>

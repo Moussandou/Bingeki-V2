@@ -39,7 +39,7 @@ export default function Changelog() {
                         <span className={styles.statValue}>{totalUpdates}</span>
                         <span className={styles.statLabel}>{t('changelog.updates')}</span>
                     </div>
-                    <div className={styles.statCard} style={{ transform: 'rotate(2deg)', background: '#fff', color: '#000', border: '3px solid #000' }}>
+                    <div className={styles.statCard} style={{ transform: 'rotate(2deg)' }}>
                         <span className={styles.statValue}>{latestVersion}</span>
                         <span className={styles.statLabel}>{t('changelog.current_version')}</span>
                     </div>
@@ -58,8 +58,8 @@ export default function Changelog() {
                         return (
                             <div key={index} className={styles.timelineEntry}>
                                 {/* Timeline Node */}
-                                <div className={styles.timelineNode} style={{ background: isLatest ? '#000' : '#fff' }}>
-                                    <GitCommit size={24} color={isLatest ? '#fff' : '#000'} />
+                                <div className={`${styles.timelineNode} ${isLatest ? styles.latestNode : ''}`}>
+                                    <GitCommit size={24} className={isLatest ? styles.latestIcon : styles.defaultIcon} />
                                 </div>
 
                                 {/* Content Card */}
