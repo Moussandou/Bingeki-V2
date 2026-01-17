@@ -17,19 +17,19 @@ export function XPBar({ current, max, level }: XPBarProps) {
                 <span style={{
                     fontSize: '1rem',
                     fontWeight: 900,
-                    color: '#000',
+                    color: 'var(--color-text)',
                     fontFamily: 'var(--font-heading)',
                     textTransform: 'uppercase'
                 }}>
                     {t('components.xp_bar.level')} {level}
                 </span>
-                <span style={{ fontSize: '0.85rem', color: '#000', fontWeight: 700 }}>{current} / {max} XP</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--color-text)', fontWeight: 700 }}>{current} / {max} XP</span>
             </div>
 
             <div style={{
                 height: '10px',
-                background: '#eee',
-                border: '2px solid #000',
+                background: 'var(--color-surface-dim)',
+                border: '2px solid var(--color-border-heavy)',
                 overflow: 'hidden',
                 position: 'relative'
             }}>

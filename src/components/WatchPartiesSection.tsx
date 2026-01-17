@@ -152,7 +152,7 @@ export function WatchPartiesSection() {
 
     if (!user) {
         return (
-            <div className="manga-panel" style={{ padding: '2rem', textAlign: 'center', background: '#fff' }}>
+            <div className="manga-panel" style={{ padding: '2rem', textAlign: 'center', background: 'var(--color-surface)' }}>
                 <p style={{ opacity: 0.6 }}>{t('watch_parties.login_required')}</p>
             </div>
         );
@@ -172,7 +172,7 @@ export function WatchPartiesSection() {
             {isLoading ? (
                 <p style={{ textAlign: 'center', opacity: 0.6 }}>{t('common.loading')}</p>
             ) : parties.length === 0 ? (
-                <div className="manga-panel" style={{ padding: '2rem', textAlign: 'center', background: '#fff' }}>
+                <div className="manga-panel" style={{ padding: '2rem', textAlign: 'center', background: 'var(--color-surface)' }}>
                     <Tv size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
                     <p style={{ fontWeight: 600 }}>{t('watch_parties.no_parties')}</p>
                     <p style={{ opacity: 0.6, fontSize: '0.9rem', marginTop: '0.5rem' }}>{t('watch_parties.no_parties_desc')}</p>
@@ -180,11 +180,11 @@ export function WatchPartiesSection() {
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {parties.map(party => (
-                        <div key={party.id} className="manga-panel" style={{ padding: '1.25rem', background: '#fff' }}>
+                        <div key={party.id} className="manga-panel" style={{ padding: '1.25rem', background: 'var(--color-surface)' }}>
                             <div style={{ display: 'flex', gap: '1rem' }}>
                                 {/* Work image */}
                                 <div
-                                    style={{ width: 80, height: 110, borderRadius: '4px', overflow: 'hidden', border: '2px solid #000', cursor: 'pointer', flexShrink: 0 }}
+                                    style={{ width: 80, height: 110, borderRadius: '4px', overflow: 'hidden', border: '2px solid var(--color-border-heavy)', cursor: 'pointer', flexShrink: 0 }}
                                     onClick={() => navigate(`/work/${party.workId}`)}
                                 >
                                     <img
@@ -300,7 +300,7 @@ export function WatchPartiesSection() {
                                             width: 70,
                                             cursor: 'pointer',
                                             opacity: newParty.workId === work.id ? 1 : 0.6,
-                                            border: newParty.workId === work.id ? '2px solid #000' : '2px solid transparent',
+                                            border: newParty.workId === work.id ? '2px solid var(--color-border-heavy)' : '2px solid transparent',
                                             borderRadius: '4px',
                                             padding: '2px'
                                         }}
@@ -325,9 +325,11 @@ export function WatchPartiesSection() {
                             style={{
                                 width: '100%',
                                 padding: '0.75rem',
-                                border: '2px solid #000',
+                                border: '2px solid var(--color-border-heavy)',
                                 fontSize: '1rem',
-                                fontFamily: 'inherit'
+                                fontFamily: 'inherit',
+                                background: 'var(--color-surface)',
+                                color: 'var(--color-text)'
                             }}
                         />
                     </div>
@@ -350,13 +352,13 @@ export function WatchPartiesSection() {
                                             alignItems: 'center',
                                             gap: '0.75rem',
                                             padding: '0.5rem',
-                                            border: newParty.selectedFriends.includes(friend.uid) ? '2px solid #000' : '1px solid #eee',
-                                            background: newParty.selectedFriends.includes(friend.uid) ? '#f0f0f0' : '#fff',
+                                            border: newParty.selectedFriends.includes(friend.uid) ? '2px solid var(--color-border-heavy)' : '1px solid var(--color-border)',
+                                            background: newParty.selectedFriends.includes(friend.uid) ? 'var(--color-surface-hover)' : 'var(--color-surface)',
                                             cursor: 'pointer',
                                             borderRadius: '4px'
                                         }}
                                     >
-                                        <div style={{ width: 28, height: 28, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                        <div style={{ width: 28, height: 28, borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border-heavy)' }}>
                                             <img
                                                 src={friend.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${friend.displayName}`}
                                                 alt=""

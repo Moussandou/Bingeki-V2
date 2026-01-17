@@ -134,8 +134,8 @@ export default function AdminSystem() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
                     {/* Global Broadcast Card */}
-                    <Card variant="manga" style={{ padding: '1.5rem', backgroundColor: 'white' }}>
-                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', textTransform: 'uppercase', borderBottom: '2px solid black', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Card variant="manga" style={{ padding: '1.5rem', backgroundColor: 'var(--color-surface)' }}>
+                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', textTransform: 'uppercase', borderBottom: '2px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Megaphone size={20} /> {t('admin.system.global_announcement')}
                         </h2>
 
@@ -146,7 +146,7 @@ export default function AdminSystem() {
                                     placeholder={t('admin.system.message_placeholder')}
                                     value={broadcastMessage}
                                     onChange={(e) => setBroadcastMessage(e.target.value)}
-                                    style={{ flex: 1, padding: '0.5rem', border: '2px solid black', fontFamily: 'monospace' }}
+                                    style={{ flex: 1, padding: '0.5rem', border: '2px solid var(--color-border)', fontFamily: 'monospace', background: 'var(--color-surface)', color: 'var(--color-text)' }}
                                 />
                             </div>
 
@@ -168,8 +168,8 @@ export default function AdminSystem() {
                                 marginTop: '0.5rem',
                                 width: '100%',
                                 padding: '0.5rem',
-                                backgroundColor: broadcastActive ? '#ef4444' : 'black',
-                                color: 'white',
+                                backgroundColor: broadcastActive ? '#ef4444' : 'var(--color-text)',
+                                color: 'var(--color-surface)',
                                 fontWeight: 'bold',
                                 textTransform: 'uppercase',
                                 cursor: 'pointer',
@@ -182,38 +182,38 @@ export default function AdminSystem() {
                     </Card>
 
                     {/* Jikan API Status Card */}
-                    <Card variant="manga" style={{ padding: '1.5rem', backgroundColor: 'white' }}>
-                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', textTransform: 'uppercase', borderBottom: '2px solid black', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Card variant="manga" style={{ padding: '1.5rem', backgroundColor: 'var(--color-surface)' }}>
+                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', textTransform: 'uppercase', borderBottom: '2px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Activity size={20} /> JIKAN API STATUS
                         </h2>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             {jikanStatus && (
                                 <>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '1rem', border: '2px solid black', backgroundColor: jikanStatus.status === 'online' ? '#d4edda' : jikanStatus.status === 'error' ? '#fff3cd' : '#f8d7da' }}>
-                                        {jikanStatus.status === 'online' && <CheckCircle size={24} color="#28a745" />}
-                                        {jikanStatus.status === 'error' && <AlertCircle size={24} color="#ffc107" />}
-                                        {jikanStatus.status === 'offline' && <XCircle size={24} color="#dc3545" />}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '1rem', border: '2px solid var(--color-border)', backgroundColor: jikanStatus.status === 'online' ? 'rgba(74, 222, 128, 0.2)' : jikanStatus.status === 'error' ? 'rgba(250, 204, 21, 0.2)' : 'rgba(239, 68, 68, 0.2)' }}>
+                                        {jikanStatus.status === 'online' && <CheckCircle size={24} color="#22c55e" />}
+                                        {jikanStatus.status === 'error' && <AlertCircle size={24} color="#eab308" />}
+                                        {jikanStatus.status === 'offline' && <XCircle size={24} color="#ef4444" />}
                                         <div style={{ flex: 1 }}>
-                                            <div style={{ fontWeight: 'bold', fontSize: '1rem', textTransform: 'uppercase' }}>
+                                            <div style={{ fontWeight: 'bold', fontSize: '1rem', textTransform: 'uppercase', color: 'var(--color-text)' }}>
                                                 {jikanStatus.status === 'online' && 'ONLINE'}
                                                 {jikanStatus.status === 'error' && 'ERROR'}
                                                 {jikanStatus.status === 'offline' && 'OFFLINE'}
                                             </div>
-                                            {jikanStatus.responseTime !== undefined && <div style={{ fontSize: '0.85rem', color: '#6b7280', fontFamily: 'monospace' }}>Response: {jikanStatus.responseTime}ms</div>}
-                                            {jikanStatus.message && <div style={{ fontSize: '0.75rem', color: '#6b7280', fontFamily: 'monospace', marginTop: '0.25rem' }}>{jikanStatus.message}</div>}
+                                            {jikanStatus.responseTime !== undefined && <div style={{ fontSize: '0.85rem', color: 'var(--color-text-dim)', fontFamily: 'monospace' }}>Response: {jikanStatus.responseTime}ms</div>}
+                                            {jikanStatus.message && <div style={{ fontSize: '0.75rem', color: 'var(--color-text-dim)', fontFamily: 'monospace', marginTop: '0.25rem' }}>{jikanStatus.message}</div>}
                                         </div>
                                     </div>
-                                    <div style={{ fontSize: '0.75rem', color: '#6b7280', fontFamily: 'monospace' }}>Last checked: {new Date(jikanStatus.timestamp).toLocaleTimeString()}</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-dim)', fontFamily: 'monospace' }}>Last checked: {new Date(jikanStatus.timestamp).toLocaleTimeString()}</div>
                                 </>
                             )}
-                            <button onClick={async () => { setCheckingJikan(true); const s = await checkJikanStatus(); setJikanStatus(s); setCheckingJikan(false); addLog(`[API] Manual check: ${s.status.toUpperCase()} | ${s.responseTime}ms`); }} disabled={checkingJikan} style={{ width: '100%', padding: '0.5rem', backgroundColor: checkingJikan ? '#6b7280' : 'black', color: 'white', fontWeight: 'bold', textTransform: 'uppercase', cursor: checkingJikan ? 'not-allowed' : 'pointer', border: 'none', opacity: checkingJikan ? 0.6 : 1 }}>
+                            <button onClick={async () => { setCheckingJikan(true); const s = await checkJikanStatus(); setJikanStatus(s); setCheckingJikan(false); addLog(`[API] Manual check: ${s.status.toUpperCase()} | ${s.responseTime}ms`); }} disabled={checkingJikan} style={{ width: '100%', padding: '0.5rem', backgroundColor: checkingJikan ? 'var(--color-text-dim)' : 'var(--color-text)', color: 'var(--color-surface)', fontWeight: 'bold', textTransform: 'uppercase', cursor: checkingJikan ? 'not-allowed' : 'pointer', border: 'none', opacity: checkingJikan ? 0.6 : 1 }}>
                                 {checkingJikan ? 'CHECKING...' : 'CHECK NOW'}
                             </button>
                         </div>
                     </Card>
 
-                    <Card variant="manga" style={{ padding: '1.5rem', backgroundColor: 'white' }}>
-                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', textTransform: 'uppercase', borderBottom: '2px solid black', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Card variant="manga" style={{ padding: '1.5rem', backgroundColor: 'var(--color-surface)' }}>
+                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', textTransform: 'uppercase', borderBottom: '2px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Server size={20} /> {t('admin.system.server_config')}
                         </h2>
 
@@ -246,8 +246,8 @@ export default function AdminSystem() {
                         </div>
                     </Card>
 
-                    <Card variant="manga" style={{ padding: '1.5rem', backgroundColor: 'white' }}>
-                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', textTransform: 'uppercase', borderBottom: '2px solid black', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Card variant="manga" style={{ padding: '1.5rem', backgroundColor: 'var(--color-surface)' }}>
+                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', textTransform: 'uppercase', borderBottom: '2px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Database size={20} /> {t('admin.system.database')}
                         </h2>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -259,8 +259,8 @@ export default function AdminSystem() {
                             <button onClick={handleBackup} style={{
                                 width: '100%',
                                 padding: '0.75rem',
-                                backgroundColor: 'black',
-                                color: 'white',
+                                backgroundColor: 'var(--color-text)',
+                                color: 'var(--color-surface)',
                                 transition: 'background-color 0.2s',
                                 fontWeight: 'bold',
                                 textTransform: 'uppercase',
@@ -284,7 +284,7 @@ export default function AdminSystem() {
                     height: '100%',
                     minHeight: '600px',
                     display: 'flex', flexDirection: 'column',
-                    boxShadow: '8px 8px 0 #000'
+                    boxShadow: '8px 8px 0 var(--color-shadow-strong)'
                 }}>
                     <div style={{ backgroundColor: '#1f2937', padding: '0.5rem', borderBottom: '1px solid #374151', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <Terminal size={14} style={{ color: '#9ca3af' }} />

@@ -10,7 +10,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #000;
+    color: var(--color-text);
 }
 
 .uploadGrid {
@@ -23,17 +23,17 @@
 }
 
 .uploadGrid.dragging {
-    background: rgba(0, 0, 0, 0.05);
-    border: 2px dashed #000;
+    background: var(--color-surface-hover);
+    border: 2px dashed var(--color-border-heavy);
 }
 
 .previewContainer {
     position: relative;
     aspect-ratio: 1;
-    border: 2px solid #000;
+    border: 2px solid var(--color-border-heavy);
     border-radius: 8px;
     overflow: hidden;
-    background: #f0f0f0;
+    background: var(--color-surface-hover);
 }
 
 .preview {
@@ -46,8 +46,8 @@
     position: absolute;
     top: 4px;
     right: 4px;
-    background: #000;
-    color: #fff;
+    background: var(--color-border-heavy);
+    color: var(--color-text-inverse);
     border: none;
     border-radius: 50%;
     width: 20px;
@@ -67,10 +67,10 @@
 
 .uploadPlaceholder {
     aspect-ratio: 1;
-    border: 2px dashed rgba(0, 0, 0, 0.2);
+    border: 2px dashed var(--color-border);
     border-radius: 8px;
-    background: rgba(0, 0, 0, 0.02);
-    color: rgba(0, 0, 0, 0.6);
+    background: var(--color-surface);
+    color: var(--color-text-dim);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -88,9 +88,9 @@
 }
 
 .uploadPlaceholder:hover {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: rgba(0, 0, 0, 0.4);
-    color: #000;
+    background: var(--color-surface-hover);
+    border-color: var(--color-border-heavy);
+    color: var(--color-text);
 }
 
 .hiddenInput {

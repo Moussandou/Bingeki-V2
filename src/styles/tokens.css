@@ -1,27 +1,5 @@
+/* Base Variables (Shared) */
 :root {
-  /* Colors - Light Mode Only */
-  --color-primary: #FF2E63;
-  --color-primary-glow: rgba(255, 46, 99, 0.5);
-  --color-secondary: #08D9D6;
-  --color-secondary-glow: rgba(8, 217, 214, 0.5);
-  --color-accent: #1a1a1a;
-  --color-background: #f5f5f5;
-  --color-surface: #ffffff;
-  --color-surface-hover: #e8e8e8;
-  --color-text: #1a1a1a;
-  --color-text-dim: #666666;
-
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #FF2E63 0%, #FF0844 100%);
-  --gradient-secondary: linear-gradient(135deg, #08D9D6 0%, #252A34 100%);
-  --gradient-dark: linear-gradient(180deg, rgba(245, 245, 245, 0) 0%, #f5f5f5 100%);
-
-  /* Glass Effect (light mode) */
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(0, 0, 0, 0.1);
-  --glass-blur: blur(12px);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-
   /* Spacing */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
@@ -41,9 +19,111 @@
   --duration-fast: 0.2s;
   --duration-normal: 0.4s;
   --duration-slow: 0.8s;
+}
 
-  /* Manga / Comic specific */
-  --manga-panel-border: 2px solid #000;
+/* Light Theme (Default) */
+:root,
+[data-theme='light'] {
+  --color-primary: #FF2E63;
+  --color-primary-glow: rgba(255, 46, 99, 0.5);
+  --color-secondary: #08D9D6;
+  --color-secondary-glow: rgba(8, 217, 214, 0.5);
+  --color-accent: #1a1a1a;
+
+  --color-background: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-surface-hover: #e8e8e8;
+  --color-text: #1a1a1a;
+  --color-text-dim: #666666;
+  --color-border: #e5e5e5;
+  --color-border-heavy: #000000;
+  --color-dots: #000000;
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-shadow-strong: rgba(0, 0, 0, 0.4);
+  --color-shadow-solid: #000000;
+  --color-text-contrast: #000000;
+  --color-text-inverse: #ffffff;
+
+  --gradient-primary: linear-gradient(135deg, #FF2E63 0%, #FF0844 100%);
+  --gradient-secondary: linear-gradient(135deg, #08D9D6 0%, #252A34 100%);
+  --gradient-dark: linear-gradient(180deg, rgba(245, 245, 245, 0) 0%, #f5f5f5 100%);
+
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-blur: blur(12px);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+
+  --manga-panel-border: 2px solid var(--color-border-heavy);
+  --manga-halftone-opacity: 0.1;
+}
+
+/* Dark Theme */
+[data-theme='dark'] {
+  --color-primary: #FF2E63;
+  --color-primary-glow: rgba(255, 46, 99, 0.5);
+  --color-secondary: #08D9D6;
+  --color-secondary-glow: rgba(8, 217, 214, 0.5);
+  --color-accent: #f5f5f5;
+
+  --color-background: #121212;
+  --color-surface: #1e1e1e;
+  --color-surface-hover: #2d2d2d;
+  --color-text: #e0e0e0;
+  --color-text-dim: #a0a0a0;
+  --color-border: #333333;
+  --color-border-heavy: #444444;
+  --color-dots: #ffffff;
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-strong: rgba(0, 0, 0, 0.6);
+  --color-shadow-solid: rgba(0, 0, 0, 0.6);
+  --color-text-contrast: #ffffff;
+  --color-text-inverse: #ffffff;
+
+  --gradient-primary: linear-gradient(135deg, #FF2E63 0%, #FF0844 100%);
+  --gradient-secondary: linear-gradient(135deg, #08D9D6 0%, #252A34 100%);
+  --gradient-dark: linear-gradient(180deg, rgba(18, 18, 18, 0) 0%, #121212 100%);
+
+  --glass-bg: rgba(30, 30, 30, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: blur(12px);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+
+  --manga-panel-border: 2px solid var(--color-border-heavy);
+  --manga-halftone-opacity: 0.05;
+}
+
+/* AMOLED Theme (True Black) */
+[data-theme='amoled'] {
+  --color-primary: #FF2E63;
+  --color-primary-glow: rgba(255, 46, 99, 0.5);
+  --color-secondary: #08D9D6;
+  --color-secondary-glow: rgba(8, 217, 214, 0.5);
+  --color-accent: #ffffff;
+
+  --color-background: #000000;
+  --color-surface: #0a0a0a;
+  --color-surface-hover: #1a1a1a;
+  --color-text: #ffffff;
+  --color-text-dim: #888888;
+  --color-border: #222222;
+  --color-border-heavy: #333333;
+  --color-dots: #333333;
+  --color-shadow: rgba(0, 0, 0, 0.5);
+  --color-shadow-strong: rgba(0, 0, 0, 0.8);
+  --color-shadow-solid: rgba(0, 0, 0, 0.8);
+  --color-text-contrast: #ffffff;
+  --color-text-inverse: #ffffff;
+
+  --gradient-primary: linear-gradient(135deg, #FF2E63 0%, #FF0844 100%);
+  --gradient-secondary: linear-gradient(135deg, #08D9D6 0%, #252A34 100%);
+  --gradient-dark: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%);
+
+  --glass-bg: rgba(10, 10, 10, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-blur: blur(12px);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+
+  --manga-panel-border: 2px solid var(--color-border-heavy);
   --manga-halftone-opacity: 0.1;
 }
 

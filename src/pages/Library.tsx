@@ -165,15 +165,15 @@ export default function Library() {
 
                     {/* Public Library Header */}
                     {isReadOnly && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '2px solid #000' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '2px solid var(--color-border-heavy)' }}>
                             <div style={{
-                                width: 50, height: 50, borderRadius: '50%', background: '#000', overflow: 'hidden',
-                                border: '2px solid #000'
+                                width: 50, height: 50, borderRadius: '50%', background: 'var(--color-surface-dim)', overflow: 'hidden',
+                                border: '2px solid var(--color-border-heavy)'
                             }}>
                                 {friendProfile?.photoURL ? (
                                     <img src={friendProfile.photoURL} alt={friendProfile.displayName || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 ) : (
-                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text)' }}>
                                         <User size={24} />
                                     </div>
                                 )}
@@ -268,12 +268,12 @@ export default function Library() {
                                         setSortOpen(false);
                                     }}
                                     style={{
-                                        background: filterOpen ? '#000' : '#fff',
-                                        color: filterOpen ? '#fff' : '#000',
+                                        background: filterOpen ? 'var(--color-border-heavy)' : 'var(--color-surface)',
+                                        color: filterOpen ? 'var(--color-text-inverse)' : 'var(--color-text)',
                                         width: '100%',
                                         justifyContent: 'center',
-                                        border: '3px solid #000',
-                                        boxShadow: filterOpen ? 'none' : '6px 6px 0 #000',
+                                        border: '3px solid var(--color-border-heavy)',
+                                        boxShadow: filterOpen ? 'none' : '6px 6px 0 var(--color-shadow-solid)',
                                         transform: filterOpen ? 'translate(2px, 2px)' : 'none'
                                     }}
                                 >
@@ -285,12 +285,12 @@ export default function Library() {
                                         top: '110%',
                                         left: 0,
                                         zIndex: 50,
-                                        background: '#fff',
+                                        background: 'var(--color-surface)',
                                         padding: '1rem',
                                         width: '280px',
                                         maxWidth: '90vw',
-                                        border: '3px solid #000',
-                                        boxShadow: '6px 6px 0 #000'
+                                        border: '3px solid var(--color-border-heavy)',
+                                        boxShadow: '6px 6px 0 var(--color-shadow-solid)'
                                     }}>
                                         <div style={{ marginBottom: '1rem' }}>
                                             <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.9rem', marginBottom: '0.5rem', opacity: 0.7 }}>{t('library.type')}</h4>
@@ -301,15 +301,15 @@ export default function Library() {
                                                         onClick={() => setFilterType(type as any)}
                                                         style={{
                                                             padding: '0.5rem 1rem',
-                                                            border: '2px solid #000',
-                                                            background: filterType === type ? '#000' : '#fff',
-                                                            color: filterType === type ? '#fff' : '#000',
+                                                            border: '2px solid var(--color-border-heavy)',
+                                                            background: filterType === type ? 'var(--color-border-heavy)' : 'var(--color-surface)',
+                                                            color: filterType === type ? 'var(--color-text-inverse)' : 'var(--color-text)',
                                                             fontWeight: 800,
                                                             textTransform: 'uppercase',
                                                             fontSize: '0.8rem',
                                                             cursor: 'pointer',
                                                             flex: 1,
-                                                            boxShadow: filterType === type ? 'none' : '2px 2px 0 #000',
+                                                            boxShadow: filterType === type ? 'none' : '2px 2px 0 var(--color-shadow-solid)',
                                                             transform: filterType === type ? 'translate(2px, 2px)' : 'none',
                                                             transition: 'all 0.1s'
                                                         }}
@@ -328,14 +328,14 @@ export default function Library() {
                                                         onClick={() => setFilterStatus(s as any)}
                                                         style={{
                                                             padding: '0.4rem 0.8rem',
-                                                            border: '2px solid #000',
-                                                            background: filterStatus === s ? '#000' : '#fff',
-                                                            color: filterStatus === s ? '#fff' : '#000',
+                                                            border: '2px solid var(--color-border-heavy)',
+                                                            background: filterStatus === s ? 'var(--color-border-heavy)' : 'var(--color-surface)',
+                                                            color: filterStatus === s ? 'var(--color-text-inverse)' : 'var(--color-text)',
                                                             fontWeight: 700,
                                                             textTransform: 'uppercase',
                                                             fontSize: '0.75rem',
                                                             cursor: 'pointer',
-                                                            boxShadow: filterStatus === s ? 'none' : '2px 2px 0 #000',
+                                                            boxShadow: filterStatus === s ? 'none' : '2px 2px 0 var(--color-shadow-solid)',
                                                             transform: filterStatus === s ? 'translate(2px, 2px)' : 'none',
                                                             transition: 'all 0.1s'
                                                         }}
@@ -359,12 +359,12 @@ export default function Library() {
                                         setFilterOpen(false);
                                     }}
                                     style={{
-                                        background: sortOpen ? '#000' : '#fff',
-                                        color: sortOpen ? '#fff' : '#000',
+                                        background: sortOpen ? 'var(--color-border-heavy)' : 'var(--color-surface)',
+                                        color: sortOpen ? 'var(--color-text-inverse)' : 'var(--color-text)',
                                         width: '100%',
                                         justifyContent: 'space-between',
-                                        border: '3px solid #000',
-                                        boxShadow: sortOpen ? 'none' : '6px 6px 0 #000',
+                                        border: '3px solid var(--color-border-heavy)',
+                                        boxShadow: sortOpen ? 'none' : '6px 6px 0 var(--color-shadow-solid)',
                                         transform: sortOpen ? 'translate(2px, 2px)' : 'none'
                                     }}
                                 >
@@ -379,11 +379,11 @@ export default function Library() {
                                         top: '110%',
                                         right: 0,
                                         zIndex: 50,
-                                        background: '#fff',
+                                        background: 'var(--color-surface)',
                                         padding: '0.5rem',
                                         width: '200px',
-                                        border: '3px solid #000',
-                                        boxShadow: '6px 6px 0 #000'
+                                        border: '3px solid var(--color-border-heavy)',
+                                        boxShadow: '6px 6px 0 var(--color-shadow-solid)'
                                     }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                             {sortOptions.map(option => (
@@ -395,15 +395,15 @@ export default function Library() {
                                                     }}
                                                     style={{
                                                         padding: '0.75rem 1rem',
-                                                        border: '2px solid #000',
-                                                        background: sortBy === option.value ? '#000' : '#fff',
-                                                        color: sortBy === option.value ? '#fff' : '#000',
+                                                        border: '2px solid var(--color-border-heavy)',
+                                                        background: sortBy === option.value ? 'var(--color-border-heavy)' : 'var(--color-surface)',
+                                                        color: sortBy === option.value ? 'var(--color-text-inverse)' : 'var(--color-text)',
                                                         fontWeight: 800,
                                                         textTransform: 'uppercase',
                                                         fontSize: '0.9rem',
                                                         cursor: 'pointer',
                                                         textAlign: 'left',
-                                                        boxShadow: sortBy === option.value ? 'none' : '2px 2px 0 #000',
+                                                        boxShadow: sortBy === option.value ? 'none' : '2px 2px 0 var(--color-shadow-solid)',
                                                         transform: sortBy === option.value ? 'translate(2px, 2px)' : 'none',
                                                         transition: 'all 0.1s'
                                                     }}
@@ -478,9 +478,9 @@ export default function Library() {
                                         style={{
                                             width: '100%',
                                             justifyContent: 'center',
-                                            background: isSelectionMode ? 'var(--color-primary)' : '#fff',
-                                            color: isSelectionMode ? '#fff' : '#000',
-                                            borderColor: isSelectionMode ? 'var(--color-primary)' : '#000'
+                                            background: isSelectionMode ? 'var(--color-primary)' : 'var(--color-surface)',
+                                            color: isSelectionMode ? '#fff' : 'var(--color-text)',
+                                            borderColor: isSelectionMode ? 'var(--color-primary)' : 'var(--color-border-heavy)'
                                         }}
                                     >
                                         {isSelectionMode ? t('library.cancel') : t('library.select')}
@@ -496,8 +496,8 @@ export default function Library() {
                                 onClick={handleBulkDelete}
                                 style={{
                                     background: '#ef4444',
-                                    borderColor: '#000',
-                                    boxShadow: '4px 4px 0 #000',
+                                    borderColor: 'var(--color-border-heavy)',
+                                    boxShadow: '4px 4px 0 var(--color-shadow-solid)',
                                     color: '#fff',
                                     width: '100%',
                                     justifyContent: 'center'
@@ -574,13 +574,13 @@ export default function Library() {
                                                     backgroundPosition: 'center',
                                                     backgroundSize: viewMode === 'list' ? 'cover' : undefined, // Class handles grid
                                                     flexShrink: 0,
-                                                    borderRight: viewMode === 'list' ? '2px solid #000' : 'none',
-                                                    borderBottom: viewMode === 'grid' ? '2px solid #000' : 'none'
+                                                    borderRight: viewMode === 'list' ? '2px solid var(--color-border-heavy)' : 'none',
+                                                    borderBottom: viewMode === 'grid' ? '2px solid var(--color-border-heavy)' : 'none'
                                                 }}
                                             />
 
                                             {/* Info */}
-                                            <div style={{ padding: '1.25rem', flex: 1, background: '#fff' }}>
+                                            <div style={{ padding: '1.25rem', flex: 1, background: 'var(--color-surface)' }}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
                                                     <h3 style={{
                                                         fontFamily: 'var(--font-heading)',
@@ -598,8 +598,8 @@ export default function Library() {
                                                     <span style={{
                                                         fontSize: '0.75rem',
                                                         padding: '4px 8px',
-                                                        background: '#000',
-                                                        color: '#fff',
+                                                        background: 'var(--color-border-heavy)',
+                                                        color: 'var(--color-text-inverse)',
                                                         fontWeight: 800,
                                                         textTransform: 'uppercase'
                                                     }}>
@@ -609,7 +609,7 @@ export default function Library() {
                                                 </div>
 
                                                 {/* Progress Bar */}
-                                                <div style={{ height: '10px', background: '#f4f4f5', borderRadius: '0', overflow: 'hidden', marginTop: 'auto', border: '1px solid #000' }}>
+                                                <div style={{ height: '10px', background: 'var(--color-surface-hover)', borderRadius: '0', overflow: 'hidden', marginTop: 'auto', border: '1px solid var(--color-border-heavy)' }}>
                                                     <div style={{
                                                         height: '100%',
                                                         width: `${((work.currentChapter || 0) / (work.totalChapters || 1)) * 100}%`,
@@ -637,7 +637,7 @@ export default function Library() {
                                                     top: 10,
                                                     right: 10,
                                                     background: 'rgba(255, 255, 255, 0.9)',
-                                                    border: '2px solid #000',
+                                                    border: '2px solid var(--color-border-heavy)',
                                                     borderRadius: '50%',
                                                     width: '32px',
                                                     height: '32px',
@@ -646,7 +646,7 @@ export default function Library() {
                                                     justifyContent: 'center',
                                                     cursor: 'pointer',
                                                     zIndex: 20,
-                                                    boxShadow: '2px 2px 0 #000',
+                                                    boxShadow: '2px 2px 0 var(--color-shadow-solid)',
                                                     transition: 'transform 0.2s'
                                                 }}
                                                 onMouseEnter={(e) => {
@@ -671,14 +671,14 @@ export default function Library() {
                                                 right: 10,
                                                 width: 24,
                                                 height: 24,
-                                                background: selectedWorks.has(work.id) ? 'var(--color-primary)' : '#fff',
-                                                border: '2px solid #000',
+                                                background: selectedWorks.has(work.id) ? 'var(--color-primary)' : 'var(--color-surface)',
+                                                border: '2px solid var(--color-border-heavy)',
                                                 borderRadius: '50%',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
                                                 zIndex: 20,
-                                                boxShadow: '2px 2px 0 #000'
+                                                boxShadow: '2px 2px 0 var(--color-shadow-solid)'
                                             }}>
                                                 {selectedWorks.has(work.id) && <CheckCircle size={16} color="#fff" />}
                                             </div>

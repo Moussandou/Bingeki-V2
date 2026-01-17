@@ -111,10 +111,10 @@ export default function Dashboard() {
                                 </h1>
                                 <span className="manga-title" style={{
                                     fontSize: '0.9rem',
-                                    background: '#fff',
+                                    background: 'var(--color-surface)',
                                     color: getRankColor(calculateRank(level)),
-                                    border: '2px solid #000',
-                                    boxShadow: '2px 2px 0 #000'
+                                    border: '2px solid var(--color-border)',
+                                    boxShadow: '2px 2px 0 var(--color-shadow)'
                                 }}>
                                     {t('dashboard.rank')} {calculateRank(level)}
                                 </span>
@@ -177,7 +177,7 @@ export default function Dashboard() {
                         </div>
 
                         {/* Streak */}
-                        <div className={styles.statItem} style={{ background: streak > 0 ? '#fff' : '#fef2f2' }}>
+                        <div className={styles.statItem} style={{ background: 'var(--color-surface)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', opacity: 0.7 }}>
                                 <Flame size={20} color={streak > 0 ? 'var(--color-primary)' : 'currentColor'} />
                                 <span style={{ fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>{t('dashboard.streak')}</span>
@@ -322,7 +322,7 @@ export default function Dashboard() {
                                                     fontSize: '0.9rem',
                                                     fontWeight: 700,
                                                     lineHeight: 1.2,
-                                                    color: '#000',
+                                                    color: 'var(--color-text)',
                                                     display: '-webkit-box',
                                                     WebkitLineClamp: 2,
                                                     WebkitBoxOrient: 'vertical',
@@ -343,7 +343,7 @@ export default function Dashboard() {
                             </div>
 
                             <div className="manga-panel" style={{
-                                background: '#fff',
+                                background: 'var(--color-surface)',
                                 padding: '0',
                                 marginBottom: '3rem',
                                 overflow: 'hidden'
@@ -366,13 +366,13 @@ export default function Dashboard() {
                                                 alignItems: 'flex-start',
                                                 gap: '1rem',
                                                 padding: '1rem',
-                                                borderBottom: i < friendsActivity.length - 1 ? '1px solid #f5f5f5' : 'none',
+                                                borderBottom: i < friendsActivity.length - 1 ? '1px solid var(--color-border)' : 'none',
                                                 transition: 'background 0.2s'
                                             }}
-                                                onMouseEnter={(e) => e.currentTarget.style.background = '#fafafa'}
-                                                onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
+                                                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-primary-glow)'}
+                                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                             >
-                                                <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', flexShrink: 0 }}>
+                                                <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border)', boxShadow: '0 2px 4px var(--color-shadow)', flexShrink: 0 }}>
                                                     <img src={activity.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${activity.userName}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                 </div>
                                                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -387,7 +387,7 @@ export default function Dashboard() {
                                                 </div>
                                             </div>
                                         ))}
-                                        <Link to="/social" style={{ textAlign: 'center', padding: '0.75rem', borderTop: '1px solid #f5f5f5' }}>
+                                        <Link to="/social" style={{ textAlign: 'center', padding: '0.75rem', borderTop: '1px solid var(--color-border)' }}>
                                             <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-primary)' }}>{t('dashboard.see_all_activity')}</span>
                                         </Link>
                                     </div>

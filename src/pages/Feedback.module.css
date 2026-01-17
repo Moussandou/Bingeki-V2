@@ -16,7 +16,7 @@
     text-transform: uppercase;
     margin-bottom: 0.5rem;
     line-height: 1;
-    color: #000;
+    color: var(--color-text);
 }
 
 .subtitle {
@@ -24,7 +24,7 @@
     font-size: 1.1rem;
     max-width: 600px;
     margin: 0 auto;
-    color: #000;
+    color: var(--color-text);
 }
 
 /* Tabs */
@@ -37,29 +37,29 @@
 
 .tab {
     padding: 0.75rem 2rem;
-    background: #fff;
-    border: 3px solid #000;
+    background: var(--color-surface);
+    border: 3px solid var(--color-border-heavy);
     font-family: var(--font-heading);
     font-weight: 900;
     text-transform: uppercase;
     cursor: pointer;
-    box-shadow: 4px 4px 0 #000;
+    box-shadow: 4px 4px 0 var(--color-shadow-solid);
     transition: all 0.2s ease;
-    color: #000;
+    color: var(--color-text);
 }
 
 .activeTab {
-    background: #000;
-    color: #fff;
+    background: var(--color-border-heavy);
+    color: var(--color-text-inverse);
     transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 #000;
+    box-shadow: 2px 2px 0 var(--color-shadow-solid);
 }
 
 /* Form Styles */
 .formCard {
-    background: #fff;
-    border: 3px solid #000;
-    box-shadow: 8px 8px 0 #000;
+    background: var(--color-surface);
+    border: 3px solid var(--color-border-heavy);
+    box-shadow: 8px 8px 0 var(--color-shadow-solid);
     padding: clamp(1.5rem, 5vw, 3rem);
 }
 
@@ -80,7 +80,7 @@
     font-weight: 900;
     text-transform: uppercase;
     font-size: 1.1rem;
-    color: #000;
+    color: var(--color-text);
 }
 
 .ratingContainer {
@@ -107,7 +107,7 @@
     font-size: 1.5rem;
     font-weight: 900;
     min-height: 2rem;
-    color: #000;
+    color: var(--color-text);
 }
 
 .selectionRow {
@@ -130,21 +130,21 @@
     align-items: center;
     gap: 0.5rem;
     padding: 1rem;
-    border: 2px solid #000;
-    background: #fff;
+    border: 2px solid var(--color-border-heavy);
+    background: var(--color-surface);
     font-weight: 800;
     cursor: pointer;
     text-transform: uppercase;
     font-size: 0.8rem;
     transition: all 0.2s;
-    color: #000;
+    color: var(--color-text);
 }
 
 .categoryActive,
 .priorityActive {
-    background: #000;
-    color: #fff;
-    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+    background: var(--color-border-heavy);
+    color: var(--color-text-inverse);
+    box-shadow: 4px 4px 0 var(--color-shadow);
 }
 
 .cat-bug.categoryActive {
@@ -163,12 +163,12 @@
     width: 100%;
     min-height: 150px;
     padding: 1.5rem;
-    border: 2px solid #000;
-    background: #fdfdfd;
+    border: 2px solid var(--color-border-heavy);
+    background: var(--color-surface);
     font-family: inherit;
     font-size: 1rem;
     resize: vertical;
-    color: #000;
+    color: var(--color-text);
 }
 
 .inputWrapper {
@@ -181,15 +181,15 @@
     position: absolute;
     left: 1rem;
     opacity: 0.5;
-    color: #000;
+    color: var(--color-text);
 }
 
 .input {
     width: 100%;
     padding: 1rem 1rem 1rem 3rem;
-    border: 2px solid #000;
-    background: #fdfdfd;
-    color: #000;
+    border: 2px solid var(--color-border-heavy);
+    background: var(--color-surface);
+    color: var(--color-text);
 }
 
 /* Tickets Section */
@@ -208,8 +208,8 @@
     display: flex;
     gap: 0.5rem;
     padding: 0.5rem;
-    background: #f0f0f0;
-    border: 3px solid #000;
+    background: var(--color-surface-hover);
+    border: 3px solid var(--color-border-heavy);
     border-radius: 8px;
 }
 
@@ -222,18 +222,18 @@
     font-size: 0.75rem;
     cursor: pointer;
     transition: all 0.2s;
-    color: #666;
+    color: var(--color-text-dim);
     /* FIXED: Visibility */
 }
 
 .filterActive {
-    background: #000;
-    color: #fff;
+    background: var(--color-border-heavy);
+    color: var(--color-text-inverse);
     border-radius: 4px;
 }
 
 .filterBtn:hover:not(.filterActive) {
-    color: #000;
+    color: var(--color-text);
 }
 
 .ticketsGrid {
@@ -249,9 +249,9 @@
 .emptyState {
     text-align: center;
     padding: 4rem;
-    background: #fff;
-    border: 3px dashed #ccc;
-    color: #999;
+    background: var(--color-surface);
+    border: 3px dashed var(--color-border);
+    color: var(--color-text-dim);
 }
 
 /* Detail View */
@@ -267,7 +267,7 @@
     text-transform: uppercase;
     font-size: 0.8rem;
     cursor: pointer;
-    color: #000;
+    color: var(--color-text);
     opacity: 0.6;
 }
 
@@ -276,9 +276,9 @@
 }
 
 .detailCard {
-    background: #fff;
-    border: 3px solid #000;
-    box-shadow: 8px 8px 0 #000;
+    background: var(--color-surface);
+    border: 3px solid var(--color-border-heavy);
+    box-shadow: 8px 8px 0 var(--color-shadow-solid);
     padding: 2rem;
 }
 
@@ -294,7 +294,7 @@
     text-transform: uppercase;
     font-size: 1.8rem;
     margin: 0 0 0.5rem 0;
-    color: #000;
+    color: var(--color-text);
 }
 
 .detailMeta {
@@ -310,13 +310,13 @@
     font-size: 0.7rem;
     font-weight: 900;
     text-transform: uppercase;
-    border: 1px solid #000;
+    border: 1px solid var(--color-border-heavy);
 }
 
 .dateText {
     font-size: 0.8rem;
     opacity: 0.5;
-    color: #000;
+    color: var(--color-text);
 }
 
 .detailContent {
@@ -328,7 +328,7 @@
     line-height: 1.6;
     margin-bottom: 2rem;
     white-space: pre-wrap;
-    color: #000;
+    color: var(--color-text);
 }
 
 .attachmentStrip {
@@ -340,7 +340,7 @@
 .attachmentThumb {
     width: 120px;
     height: 120px;
-    border: 2px solid #000;
+    border: 2px solid var(--color-border-heavy);
     overflow: hidden;
 }
 
@@ -362,7 +362,7 @@
     text-transform: uppercase;
     font-size: 1.4rem;
     margin-bottom: 1.5rem;
-    color: #000;
+    color: var(--color-text);
 }
 
 .timeline {
@@ -373,22 +373,22 @@
 
 .bubble {
     padding: 1.25rem;
-    border: 3px solid #000;
+    border: 3px solid var(--color-border-heavy);
     max-width: 85%;
     position: relative;
 }
 
 .userBubble {
     align-self: flex-start;
-    background: #f9f9f9;
-    color: #000;
+    background: var(--color-surface-hover);
+    color: var(--color-text);
 }
 
 .adminBubble {
     align-self: flex-end;
-    background: #000;
-    color: #fff;
-    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+    background: var(--color-border-heavy);
+    color: var(--color-text-inverse);
+    box-shadow: 4px 4px 0 var(--color-shadow);
 }
 
 .bubbleHeader {
@@ -407,8 +407,8 @@
 }
 
 .adminTag {
-    background: #fff;
-    color: #000;
+    background: var(--color-surface);
+    color: var(--color-text);
     padding: 1px 6px;
     border-radius: 4px;
     font-size: 0.6rem;
@@ -424,9 +424,9 @@
 .successContainer {
     text-align: center;
     padding: 4rem 2rem;
-    background: #fff;
-    border: 3px solid #000;
-    box-shadow: 8px 8px 0 #000;
+    background: var(--color-surface);
+    border: 3px solid var(--color-border-heavy);
+    box-shadow: 8px 8px 0 var(--color-shadow-solid);
 }
 
 .successIcon {
@@ -438,13 +438,13 @@
     font-family: var(--font-heading);
     font-size: 2rem;
     margin-bottom: 1rem;
-    color: #000;
+    color: var(--color-text);
 }
 
 .successMessage {
     opacity: 0.7;
     margin-bottom: 2rem;
-    color: #000;
+    color: var(--color-text);
 }
 
 .successActions {
@@ -463,8 +463,8 @@
 .spinner {
     width: 40px;
     height: 40px;
-    border: 4px solid #eee;
-    border-top-color: #000;
+    border: 4px solid var(--color-border);
+    border-top-color: var(--color-text);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }

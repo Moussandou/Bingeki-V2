@@ -82,10 +82,10 @@
 }
 
 .manga {
-    background: #fff;
-    color: #000;
-    border: 2px solid #000;
-    box-shadow: 4px 4px 0 #000;
+    background: var(--color-surface);
+    color: var(--color-text-contrast);
+    border: 2px solid var(--color-border-heavy);
+    box-shadow: 4px 4px 0 var(--color-shadow-solid);
     border-radius: 0;
 }
 

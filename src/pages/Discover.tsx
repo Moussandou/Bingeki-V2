@@ -219,15 +219,16 @@ export default function Discover() {
                 {/* Guest Banner */}
                 {!user && (
                     <div style={{
-                        background: 'linear-gradient(135deg, #000 0%, #333 100%)',
-                        color: '#fff',
+                        background: 'var(--color-surface)',
+                        color: 'var(--color-text)',
                         padding: '1rem 2rem',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         flexWrap: 'wrap',
                         gap: '1rem',
-                        borderBottom: '3px solid var(--color-primary)'
+                        borderBottom: '3px solid var(--color-primary)',
+                        borderTop: '2px solid var(--color-border-heavy)'
                     }}>
                         <div>
                             <p style={{ fontWeight: 900, fontSize: '1.1rem', marginBottom: '0.25rem' }}>
@@ -334,11 +335,9 @@ export default function Discover() {
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '1rem',
-                                    background: '#fff',
-                                    borderWidth: '3px',
-                                    borderStyle: 'solid',
-                                    borderColor: '#000',
-                                    boxShadow: '8px 8px 0 #000',
+                                    background: 'var(--color-surface)',
+                                    borderColor: 'var(--color-border-heavy)',
+                                    boxShadow: '8px 8px 0 var(--color-shadow-solid)',
                                     flex: 1
                                 }}
                                 whileHover={{
@@ -347,7 +346,7 @@ export default function Discover() {
                                 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <Search size={28} style={{ marginLeft: '1rem', opacity: 0.4 }} />
+                                <Search size={28} style={{ marginLeft: '1rem', opacity: 0.4, color: 'var(--color-text)' }} />
                                 <input
                                     placeholder={t('discover.search.placeholder')}
                                     value={searchQuery}
@@ -360,7 +359,8 @@ export default function Discover() {
                                         background: 'transparent',
                                         fontFamily: 'var(--font-heading)',
                                         fontWeight: 700,
-                                        padding: '1rem 0'
+                                        padding: '1rem 0',
+                                        color: 'var(--color-text)'
                                     }}
                                 />
                             </Card>
@@ -369,9 +369,9 @@ export default function Discover() {
                                 onClick={() => setShowFilters(!showFilters)}
                                 style={{
                                     padding: '0 1.5rem',
-                                    background: showFilters ? '#000' : '#fff',
-                                    color: showFilters ? '#fff' : '#000',
-                                    border: '3px solid #000'
+                                    background: showFilters ? 'var(--color-text)' : 'var(--color-surface)',
+                                    color: showFilters ? 'var(--color-surface)' : 'var(--color-text)',
+                                    border: '3px solid var(--color-border)'
                                 }}
                             >
                                 <SlidersHorizontal size={24} />
@@ -388,9 +388,9 @@ export default function Discover() {
                                     style={{ overflow: 'hidden', padding: '4px' }} // Padding prevents shadow clipping
                                 >
                                     <div style={{
-                                        background: '#fff',
-                                        border: '3px solid #000',
-                                        boxShadow: '8px 8px 0 #000',
+                                        background: 'var(--color-surface)',
+                                        border: '3px solid var(--color-border-heavy)',
+                                        boxShadow: '8px 8px 0 var(--color-shadow-solid)',
                                         padding: '2rem',
                                         display: 'grid',
                                         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -399,19 +399,20 @@ export default function Discover() {
                                     }}>
                                         {/* Status */}
                                         <div>
-                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>{t('discover.filters.status')}</label>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem', color: 'var(--color-text)' }}>{t('discover.filters.status')}</label>
                                             <select
                                                 value={filterStatus}
                                                 onChange={(e) => setFilterStatus(e.target.value)}
                                                 style={{
                                                     width: '100%',
                                                     padding: '0.75rem',
-                                                    border: '2px solid #000',
+                                                    border: '2px solid var(--color-border-heavy)',
                                                     borderRadius: 0,
                                                     fontWeight: 700,
-                                                    background: '#fff',
+                                                    background: 'var(--color-surface)',
+                                                    color: 'var(--color-text-contrast)',
                                                     fontFamily: 'inherit',
-                                                    boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
+                                                    boxShadow: '4px 4px 0 var(--color-shadow)'
                                                 }}
                                             >
                                                 <option value="">{t('discover.filters.all')}</option>
@@ -423,19 +424,20 @@ export default function Discover() {
 
                                         {/* Rating */}
                                         <div>
-                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>{t('discover.filters.rating')}</label>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem', color: 'var(--color-text)' }}>{t('discover.filters.rating')}</label>
                                             <select
                                                 value={filterRating}
                                                 onChange={(e) => setFilterRating(e.target.value)}
                                                 style={{
                                                     width: '100%',
                                                     padding: '0.75rem',
-                                                    border: '2px solid #000',
+                                                    border: '2px solid var(--color-border-heavy)',
                                                     borderRadius: 0,
                                                     fontWeight: 700,
-                                                    background: '#fff',
+                                                    background: 'var(--color-surface)',
+                                                    color: 'var(--color-text-contrast)',
                                                     fontFamily: 'inherit',
-                                                    boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
+                                                    boxShadow: '4px 4px 0 var(--color-shadow)'
                                                 }}
                                             >
                                                 <option value="">{t('discover.filters.all')}</option>
@@ -447,7 +449,7 @@ export default function Discover() {
 
                                         {/* Score */}
                                         <div>
-                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>{t('discover.filters.min_score')} : <span style={{ color: 'var(--color-primary)' }}>{filterScore}</span></label>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem', color: 'var(--color-text)' }}>{t('discover.filters.min_score')} : <span style={{ color: 'var(--color-primary)' }}>{filterScore}</span></label>
                                             <input
                                                 type="range"
                                                 min="0"
@@ -458,11 +460,11 @@ export default function Discover() {
                                                 style={{
                                                     width: '100%',
                                                     height: '10px',
-                                                    accentColor: '#000',
+                                                    accentColor: 'var(--color-primary)',
                                                     cursor: 'pointer'
                                                 }}
                                             />
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', fontWeight: 700 }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', fontWeight: 700, color: 'var(--color-text-dim)' }}>
                                                 <span>0</span>
                                                 <span>5</span>
                                                 <span>10</span>
@@ -471,7 +473,7 @@ export default function Discover() {
 
                                         {/* Year */}
                                         <div>
-                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>{t('discover.filters.year')}</label>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem', color: 'var(--color-text)' }}>{t('discover.filters.year')}</label>
                                             <input
                                                 type="number"
                                                 placeholder={t('discover.filters.year_placeholder')}
@@ -480,30 +482,33 @@ export default function Discover() {
                                                 style={{
                                                     width: '100%',
                                                     padding: '0.75rem',
-                                                    border: '2px solid #000',
+                                                    border: '2px solid var(--color-border-heavy)',
                                                     borderRadius: 0,
                                                     fontWeight: 700,
                                                     fontFamily: 'inherit',
-                                                    boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
+                                                    background: 'var(--color-surface)',
+                                                    color: 'var(--color-text-contrast)',
+                                                    boxShadow: '4px 4px 0 var(--color-shadow)'
                                                 }}
                                             />
                                         </div>
 
                                         {/* Studio */}
                                         <div style={{ gridColumn: '1 / -1' }}>
-                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem' }}>{t('discover.filters.studio')}</label>
+                                            <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem', color: 'var(--color-text)' }}>{t('discover.filters.studio')}</label>
                                             <select
                                                 value={filterStudio}
                                                 onChange={(e) => setFilterStudio(e.target.value)}
                                                 style={{
                                                     width: '100%',
                                                     padding: '0.75rem',
-                                                    border: '2px solid #000',
+                                                    border: '2px solid var(--color-border-heavy)',
                                                     borderRadius: 0,
                                                     fontWeight: 700,
-                                                    background: '#fff',
+                                                    background: 'var(--color-surface)',
+                                                    color: 'var(--color-text-contrast)',
                                                     fontFamily: 'inherit',
-                                                    boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
+                                                    boxShadow: '4px 4px 0 var(--color-shadow)'
                                                 }}
                                             >
                                                 <option value="">{t('discover.filters.all_studios')}</option>
@@ -518,8 +523,8 @@ export default function Discover() {
                                             <button
                                                 onClick={resetFilters}
                                                 style={{
-                                                    background: '#000',
-                                                    color: '#fff',
+                                                    background: 'var(--color-text)',
+                                                    color: 'var(--color-surface)',
                                                     border: 'none',
                                                     padding: '0.5rem 1.5rem',
                                                     cursor: 'pointer',
@@ -553,14 +558,14 @@ export default function Discover() {
                                             style={{
                                                 padding: '0.5rem 1rem',
                                                 borderRadius: '0',
-                                                border: isActive ? 'none' : '2px solid #000',
-                                                background: isActive ? 'var(--color-primary)' : '#fff',
-                                                color: isActive ? '#fff' : '#000',
+                                                border: isActive ? 'none' : '2px solid var(--color-border)',
+                                                background: isActive ? 'var(--color-primary)' : 'var(--color-surface)',
+                                                color: isActive ? '#fff' : 'var(--color-text)',
                                                 fontWeight: 700,
                                                 fontSize: '0.9rem',
                                                 cursor: 'pointer',
                                                 transition: 'all 0.2s',
-                                                boxShadow: isActive ? 'inset 2px 2px 5px rgba(0,0,0,0.2)' : '2px 2px 0 #000',
+                                                boxShadow: isActive ? 'inset 2px 2px 5px rgba(0,0,0,0.2)' : '2px 2px 0 var(--color-shadow)',
                                                 transform: isActive ? 'translate(1px, 1px)' : 'none'
                                             }}
                                         >
@@ -576,7 +581,7 @@ export default function Discover() {
                     {searchQuery.length > 2 || hasFilters ? (
                         /* Search Results */
                         <div>
-                            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '2rem', color: '#000', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '2rem', color: 'var(--color-text-contrast)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 <Search size={32} />
                                 {t('discover.search.results_title')}
                             </h2>
@@ -584,11 +589,11 @@ export default function Discover() {
                             {/* Filter Chips (if any active) */}
                             {hasFilters && (
                                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
-                                    {selectedGenre && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.genre')}: {GENRES.find(g => g.id === selectedGenre)?.label || selectedGenre}</span>}
-                                    {filterStatus && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.status')}: {filterStatus}</span>}
-                                    {filterYear && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.year')}: {filterYear}</span>}
-                                    {filterScore > 0 && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.score')} : {filterScore}</span>}
-                                    {filterStudio && <span style={{ background: '#000', color: '#fff', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.studio')}: {POPULAR_STUDIOS.find(s => s.id === filterStudio)?.name}</span>}
+                                    {selectedGenre && <span style={{ background: 'var(--color-text)', color: 'var(--color-surface)', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.genre')}: {GENRES.find(g => g.id === selectedGenre)?.label || selectedGenre}</span>}
+                                    {filterStatus && <span style={{ background: 'var(--color-text)', color: 'var(--color-surface)', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.status')}: {filterStatus}</span>}
+                                    {filterYear && <span style={{ background: 'var(--color-text)', color: 'var(--color-surface)', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.year')}: {filterYear}</span>}
+                                    {filterScore > 0 && <span style={{ background: 'var(--color-text)', color: 'var(--color-surface)', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.score')} : {filterScore}</span>}
+                                    {filterStudio && <span style={{ background: 'var(--color-text)', color: 'var(--color-surface)', padding: '0.25rem 0.5rem', fontWeight: 700, fontSize: '0.8rem' }}>{t('discover.filters.studio')}: {POPULAR_STUDIOS.find(s => s.id === filterStudio)?.name}</span>}
                                 </div>
                             )}
 
@@ -609,22 +614,23 @@ export default function Discover() {
                                                         padding: 0,
                                                         overflow: 'hidden',
                                                         height: '100%',
-                                                        border: '2px solid #000',
+                                                        border: '2px solid var(--color-border-heavy)',
                                                         cursor: 'pointer',
                                                         display: 'flex',
-                                                        flexDirection: 'column'
+                                                        flexDirection: 'column',
+                                                        background: 'var(--color-surface)'
                                                     }}
                                                     onClick={() => handleWorkClick(work)}
                                                 >
-                                                    <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid #000', flexShrink: 0 }}>
+                                                    <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid var(--color-border-heavy)', flexShrink: 0 }}>
                                                         <img src={work.images.jpg.image_url} alt={work.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                         {isOwned && (
-                                                            <div style={{ position: 'absolute', top: 5, right: 5, background: '#000', color: '#fff', padding: '4px', borderRadius: '0' }}>
+                                                            <div style={{ position: 'absolute', top: 5, right: 5, background: 'var(--color-primary)', color: '#fff', padding: '4px', borderRadius: '0' }}>
                                                                 <Check size={14} strokeWidth={3} />
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <div style={{ padding: '1rem', background: '#fff', flex: 1 }}>
+                                                    <div style={{ padding: '1rem', background: 'var(--color-surface)', flex: 1, color: 'var(--color-text)' }}>
                                                         <h3 style={{
                                                             fontSize: '1rem',
                                                             fontWeight: 800,
@@ -634,7 +640,8 @@ export default function Discover() {
                                                             overflow: 'hidden',
                                                             display: '-webkit-box',
                                                             WebkitLineClamp: 2,
-                                                            WebkitBoxOrient: 'vertical'
+                                                            WebkitBoxOrient: 'vertical',
+                                                            color: 'var(--color-text)'
                                                         }}>{work.title}</h3>
                                                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', opacity: 0.7 }}>
                                                             <span style={{ fontWeight: 600 }}>{work.type}</span>
@@ -683,10 +690,10 @@ export default function Discover() {
                                         style={{
                                             fontSize: '1.2rem',
                                             padding: '1rem 2rem',
-                                            background: '#fff',
+                                            background: 'var(--color-surface)',
                                             border: 'none',
-                                            color: '#000',
-                                            boxShadow: '4px 4px 0 #000',
+                                            color: 'var(--color-text-contrast)',
+                                            boxShadow: '4px 4px 0 var(--color-shadow-solid)',
                                             transition: 'all 0.2s',
                                             opacity: loading ? 0.7 : 1
                                         }}

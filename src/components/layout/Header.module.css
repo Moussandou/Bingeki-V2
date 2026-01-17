@@ -6,11 +6,11 @@
     z-index: 50;
     padding: 0.75rem 0;
     transition: all 0.3s ease;
-    background: #fff;
+    background: var(--color-surface);
     /* Solid white for manga paper look */
-    border-bottom: 3px solid #000;
+    border-bottom: 3px solid var(--color-border);
     /* Heavy border */
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 0 var(--color-shadow);
     /* Slight shadow for depth */
 }
 
@@ -23,12 +23,12 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    color: #000;
+    color: var(--color-text);
     text-transform: uppercase;
 }
 
 .navLink {
-    color: #000;
+    color: var(--color-text);
     font-family: var(--font-heading);
     font-weight: 700;
     text-transform: uppercase;
@@ -44,15 +44,15 @@
 }
 
 .navLink:hover {
-    background: #000;
-    color: #fff;
+    background: var(--color-text);
+    color: var(--color-surface);
     transform: translateY(-2px);
     box-shadow: 2px 2px 0 var(--color-primary);
 }
 
 .activeLink {
-    background: #000;
-    color: #fff;
+    background: var(--color-text);
+    color: var(--color-surface);
     transform: skewX(-10deg);
 }
 
@@ -61,12 +61,12 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.4rem 1rem;
-    background: #fff;
-    border: 2px solid #000;
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
     font-size: 0.85rem;
     font-weight: 900;
-    color: #000;
-    box-shadow: 2px 2px 0 #000;
+    color: var(--color-text);
+    box-shadow: 2px 2px 0 var(--color-shadow);
 }
 
 .levelValue {
@@ -78,7 +78,7 @@
     align-items: center;
     gap: 0.4rem;
     font-weight: 900;
-    color: #000;
+    color: var(--color-text);
     text-transform: uppercase;
     font-family: var(--font-heading);
 }
@@ -91,28 +91,28 @@
     justify-content: center;
     border-radius: 0;
     /* Square buttons */
-    color: #000;
+    color: var(--color-text);
     transition: all 0.2s;
-    background: #fff;
-    border: 2px solid #000;
-    box-shadow: 2px 2px 0 #000;
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    box-shadow: 2px 2px 0 var(--color-shadow);
 }
 
 .actionButton:hover {
     transform: translate(-2px, -2px);
     box-shadow: 4px 4px 0 var(--color-primary);
-    background: #000;
-    color: #fff;
-    border-color: #000;
+    background: var(--color-text);
+    color: var(--color-surface);
+    border-color: var(--color-text);
 }
 
 .kbd {
     font-size: 0.7rem;
-    background: #000;
+    background: var(--color-text);
     padding: 2px 6px;
     border-radius: 2px;
     margin-left: 0.5rem;
-    color: #fff;
+    color: var(--color-surface);
     font-weight: bold;
 }
 
@@ -130,10 +130,10 @@
     bottom: 1.5rem;
     left: 50%;
     transform: translateX(-50%);
-    background: #fff;
+    background: var(--color-surface);
     padding: 0.5rem 1.5rem;
-    border: 3px solid #000;
-    box-shadow: 4px 4px 0 rgba(0, 0, 0, 1);
+    border: 3px solid var(--color-border);
+    box-shadow: 4px 4px 0 var(--color-shadow-strong);
     z-index: 100;
     gap: 1.5rem;
     border-radius: 50px;
@@ -155,15 +155,15 @@
     gap: 0.75rem;
     cursor: pointer;
     padding: 4px;
-    border: 2px solid #000;
-    background: #fff;
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
     transition: background 0.2s;
 }
 
 .profileDropdown:hover {
     box-shadow: 2px 2px 0 var(--color-primary);
     transform: translateY(-2px);
-    border-color: #000;
+    border-color: var(--color-text);
 }
 
 /* Responsive */
@@ -204,9 +204,9 @@
     /* Approx header height */
     left: 0;
     width: 100%;
-    background: #fff;
-    border-bottom: 3px solid #000;
-    box-shadow: 0 6px 0 rgba(0, 0, 0, 1);
+    background: var(--color-surface);
+    border-bottom: 3px solid var(--color-border);
+    box-shadow: 0 6px 0 var(--color-shadow-strong);
     /* Solid shadow */
     z-index: 49;
     overflow: hidden;
@@ -221,8 +221,8 @@
     gap: 1rem;
     font-weight: 900;
     text-decoration: none;
-    color: #000;
-    border-bottom: 2px solid #000;
+    color: var(--color-text);
+    border-bottom: 2px solid var(--color-border);
     /* Brutalist border */
     font-family: var(--font-heading);
     text-transform: uppercase;
@@ -236,8 +236,8 @@
 
 .mobileMenuItem:hover,
 .mobileMenuItem:active {
-    background: #000;
-    color: #fff;
+    background: var(--color-border-heavy);
+    color: var(--color-text-inverse);
     padding-left: 2rem;
     /* Slide effect */
 }

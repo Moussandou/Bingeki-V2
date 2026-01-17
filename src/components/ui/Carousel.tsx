@@ -32,13 +32,13 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
         <div style={{ marginBottom: '3rem' }}>
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', padding: '0 0.5rem' }}>
-                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', fontWeight: 900, textTransform: 'uppercase', color: '#000', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', fontWeight: 900, textTransform: 'uppercase', color: 'var(--color-text-contrast)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     {title}
                 </h2>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button
                         onClick={() => scroll('left')}
-                        style={{ border: '2px solid #000', background: '#fff', cursor: 'pointer', padding: '0.75rem', boxShadow: '4px 4px 0 #000', transition: 'transform 0.1s' }}
+                        style={{ border: '2px solid var(--color-border-heavy)', background: 'var(--color-surface)', color: 'var(--color-text-contrast)', cursor: 'pointer', padding: '0.75rem', boxShadow: '4px 4px 0 var(--color-shadow-solid)', transition: 'transform 0.1s' }}
                         onMouseDown={e => e.currentTarget.style.transform = 'translate(2px, 2px)'}
                         onMouseUp={e => e.currentTarget.style.transform = 'translate(0, 0)'}
                     >
@@ -46,7 +46,7 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
                     </button>
                     <button
                         onClick={() => scroll('right')}
-                        style={{ border: '2px solid #000', background: '#fff', cursor: 'pointer', padding: '0.75rem', boxShadow: '4px 4px 0 #000', transition: 'transform 0.1s' }}
+                        style={{ border: '2px solid var(--color-border-heavy)', background: 'var(--color-surface)', color: 'var(--color-text-contrast)', cursor: 'pointer', padding: '0.75rem', boxShadow: '4px 4px 0 var(--color-shadow-solid)', transition: 'transform 0.1s' }}
                         onMouseDown={e => e.currentTarget.style.transform = 'translate(2px, 2px)'}
                         onMouseUp={e => e.currentTarget.style.transform = 'translate(0, 0)'}
                     >
@@ -72,13 +72,13 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
                 {loading
                     ? Array.from({ length: 6 }).map((_, i) => (
                         <div key={i} style={{ flex: '0 0 220px', scrollSnapAlign: 'start' }}>
-                            <Card variant="manga" style={{ padding: 0, overflow: 'hidden', height: '100%', border: '2px solid #000' }}>
-                                <div style={{ aspectRatio: '2/3', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '4px solid #ddd', borderTopColor: '#000', animation: 'spin 1s linear infinite' }} />
+                            <Card variant="manga" style={{ padding: 0, overflow: 'hidden', height: '100%', border: '2px solid var(--color-border-heavy)', background: 'var(--color-surface)' }}>
+                                <div style={{ aspectRatio: '2/3', background: 'var(--color-surface-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '4px solid var(--color-border)', borderTopColor: 'var(--color-text)', animation: 'spin 1s linear infinite' }} />
                                 </div>
-                                <div style={{ padding: '0.75rem', background: '#fff' }}>
-                                    <div style={{ height: '1rem', background: '#eee', marginBottom: '0.5rem', width: '80%' }}></div>
-                                    <div style={{ height: '0.8rem', background: '#eee', width: '50%' }}></div>
+                                <div style={{ padding: '0.75rem', background: 'var(--color-surface)' }}>
+                                    <div style={{ height: '1rem', background: 'var(--color-surface-dim)', marginBottom: '0.5rem', width: '80%' }}></div>
+                                    <div style={{ height: '0.8rem', background: 'var(--color-surface-dim)', width: '50%' }}></div>
                                 </div>
                             </Card>
                         </div>
@@ -99,10 +99,10 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
                                 <Card
                                     variant="manga"
                                     hoverable
-                                    style={{ padding: 0, overflow: 'hidden', height: '100%', border: '2px solid #000', cursor: 'pointer', background: '#fff' }}
+                                    style={{ padding: 0, overflow: 'hidden', height: '100%', border: '2px solid var(--color-border-heavy)', cursor: 'pointer', background: 'var(--color-surface)' }}
                                     onClick={() => onItemClick(work)}
                                 >
-                                    <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid #000' }}>
+                                    <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid var(--color-border)' }}>
                                         <img
                                             src={work.images.jpg.image_url}
                                             alt={work.title}
@@ -115,8 +115,8 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
                                                 position: 'absolute',
                                                 top: 0,
                                                 left: 0,
-                                                background: index < 3 ? 'var(--color-primary)' : '#000',
-                                                color: '#fff',
+                                                background: index < 3 ? 'var(--color-primary)' : 'var(--color-text)',
+                                                color: 'var(--color-surface)',
                                                 width: '40px',
                                                 height: '40px',
                                                 display: 'flex',
@@ -125,8 +125,8 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
                                                 fontSize: '1.2rem',
                                                 fontWeight: 900,
                                                 fontFamily: 'var(--font-heading)',
-                                                borderRight: '2px solid #000',
-                                                borderBottom: '2px solid #000',
+                                                borderRight: '2px solid var(--color-border-heavy)',
+                                                borderBottom: '2px solid var(--color-border-heavy)',
                                                 zIndex: 10
                                             }}>
                                                 #{index + 1}
@@ -134,7 +134,7 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
                                         )}
 
                                         {isOwned && (
-                                            <div style={{ position: 'absolute', top: 5, right: 5, background: '#000', color: '#fff', padding: '4px', borderRadius: '50%', border: '2px solid #fff', zIndex: 10 }}>
+                                            <div style={{ position: 'absolute', top: 5, right: 5, background: 'var(--color-primary)', color: '#fff', padding: '4px', borderRadius: '50%', border: '2px solid var(--color-border-heavy)', zIndex: 10 }}>
                                                 <Check size={16} strokeWidth={4} />
                                             </div>
                                         )}
@@ -156,14 +156,14 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
                                                         e.stopPropagation();
                                                         onAdd(work);
                                                     }}
-                                                    style={{ padding: '0.5rem', height: 'auto', borderRadius: '50%', aspectRatio: '1/1', boxShadow: '4px 4px 0 #000' }}
+                                                    style={{ padding: '0.5rem', height: 'auto', borderRadius: '50%', aspectRatio: '1/1', boxShadow: '4px 4px 0 var(--color-shadow)' }}
                                                 >
                                                     <Plus size={20} />
                                                 </Button>
                                             </div>
                                         )}
                                     </div>
-                                    <div style={{ padding: '1rem', background: '#fff' }}>
+                                    <div style={{ padding: '1rem', background: 'var(--color-surface)', color: 'var(--color-text)' }}>
                                         <h3 style={{
                                             fontSize: '1rem',
                                             fontWeight: 900,
@@ -174,14 +174,15 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
                                             WebkitBoxOrient: 'vertical',
                                             overflow: 'hidden',
                                             height: '2.2em',
-                                            marginBottom: '0.5rem'
+                                            marginBottom: '0.5rem',
+                                            color: 'var(--color-text)'
                                         }}>
                                             {work.title}
                                         </h3>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', padding: '2px 6px', background: '#000', color: '#fff' }}>{work.type}</span>
+                                            <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', padding: '2px 6px', background: 'var(--color-text)', color: 'var(--color-surface)' }}>{work.type}</span>
                                             {work.score && (
-                                                <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#000', display: 'flex', alignItems: 'center', gap: '2px' }}>
+                                                <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--color-text-contrast)', display: 'flex', alignItems: 'center', gap: '2px' }}>
                                                     ★ {work.score}
                                                 </span>
                                             )}

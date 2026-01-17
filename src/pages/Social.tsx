@@ -222,7 +222,7 @@ export default function Social() {
 
                     {/* ACTIVITY FEED */}
                     {activeTab === 'activity' && (
-                        <div className="manga-panel" style={{ padding: '1.5rem', background: '#fff' }}>
+                        <div className="manga-panel" style={{ padding: '1.5rem', background: 'var(--color-surface)' }}>
                             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <Flame size={24} color="#ef4444" /> {t('social.activity.title')}
                             </h2>
@@ -248,11 +248,11 @@ export default function Social() {
                                                 alignItems: 'center',
                                                 gap: '1rem',
                                                 padding: '1rem',
-                                                background: '#f8f8f8',
+                                                background: 'var(--color-surface-hover)',
                                                 borderRadius: '8px',
-                                                border: '1px solid #eee'
+                                                border: '1px solid var(--color-border)'
                                             }}>
-                                                <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000', flexShrink: 0 }}>
+                                                <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border-heavy)', flexShrink: 0 }}>
                                                     <img src={activity.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${activity.userName}`}
                                                         alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                 </div>
@@ -345,10 +345,10 @@ export default function Social() {
                     {activeTab === 'friends' && (
                         <div>
                             {/* Add Friend Section */}
-                            <div className="manga-panel" style={{ padding: '1.5rem', marginBottom: '2rem', background: '#fff' }}>
+                            <div className="manga-panel" style={{ padding: '1.5rem', marginBottom: '2rem', background: 'var(--color-surface)' }}>
                                 <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1rem' }}>{t('social.friends.add_title')}</h3>
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', border: '2px solid #000', padding: '0.5rem' }}>
+                                    <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', border: '2px solid var(--color-border-heavy)', padding: '0.5rem' }}>
                                         <Search size={20} style={{ marginRight: '0.5rem', opacity: 0.5 }} />
                                         <input
                                             type="email"
@@ -363,9 +363,9 @@ export default function Social() {
 
                                 {/* Search Result */}
                                 {searchResult && (
-                                    <div style={{ marginTop: '1rem', padding: '1rem', border: '2px dashed #000', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div style={{ marginTop: '1rem', padding: '1rem', border: '2px dashed var(--color-border-heavy)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                            <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                            <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border-heavy)' }}>
                                                 <img src={searchResult.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${searchResult.displayName}`} alt="Avatar" style={{ width: '100%', height: '100%' }} />
                                             </div>
                                             <div>
@@ -390,9 +390,9 @@ export default function Social() {
                                     <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '1rem' }}>{t('social.friends.requests_title')}</h3>
                                     <div className="manga-panel" style={{ padding: 0 }}>
                                         {friends.filter(f => f.status === 'pending' && f.direction === 'incoming').map(friend => (
-                                            <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                                    <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                                    <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border-heavy)' }}>
                                                         <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                     </div>
                                                     <div style={{ fontWeight: 700 }}>{friend.displayName}</div>
@@ -422,8 +422,8 @@ export default function Social() {
                                     </div>
                                 ) : (
                                     friends.filter(f => f.status === 'accepted').map(friend => (
-                                        <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => navigate(`/profile/${friend.uid}`)}>
-                                            <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid #000' }}>
+                                        <div key={friend.uid} style={{ padding: '1rem', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => navigate(`/profile/${friend.uid}`)}>
+                                            <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border-heavy)' }}>
                                                 <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                             </div>
                                             <div style={{ flex: 1, fontWeight: 700 }}>{friend.displayName}</div>

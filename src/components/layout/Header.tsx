@@ -11,10 +11,11 @@ import {
     Settings,
     MessageSquare,
     Menu, X,
-    MessageCircle
+    MessageCircle, Sun, Moon
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
+import { useSettingsStore } from '@/store/settingsStore';
 import { auth } from '@/firebase/config';
 import styles from './Header.module.css';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 export function Header() {
     const { user, userProfile } = useAuthStore();
     const { level, xp, streak } = useGamificationStore();
+    const { theme, toggleTheme } = useSettingsStore();
     const location = useLocation();
     const navigate = useNavigate();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -87,28 +89,28 @@ export function Header() {
                                     top: '100%',
                                     left: '50%',
                                     transform: 'translateX(-50%)',
-                                    background: '#fff',
-                                    border: '3px solid #000',
-                                    boxShadow: '4px 4px 0 rgba(0,0,0,1)',
+                                    background: 'var(--color-surface)',
+                                    border: '3px solid var(--color-border)',
+                                    boxShadow: '4px 4px 0 var(--color-shadow-strong)',
                                     padding: '0.5rem',
                                     flexDirection: 'column',
                                     gap: '0.5rem',
                                     zIndex: 100,
                                     minWidth: '180px'
                                 }}>
-                                    <Link to="/social" className={styles.dropdownItem} style={{ color: 'black', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
+                                    <Link to="/social" className={styles.dropdownItem} style={{ color: 'var(--color-text)', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
                                         <MessageSquare size={16} /> {t('header.community')}
                                     </Link>
-                                    <Link to="/schedule" className={styles.dropdownItem} style={{ color: 'black', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
+                                    <Link to="/schedule" className={styles.dropdownItem} style={{ color: 'var(--color-text)', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
                                         <Calendar size={16} /> {t('header.agenda')}
                                     </Link>
-                                    <Link to="/changelog" className={styles.dropdownItem} style={{ color: 'black', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
+                                    <Link to="/changelog" className={styles.dropdownItem} style={{ color: 'var(--color-text)', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
                                         <HistoryIcon size={16} /> {t('header.news')}
                                     </Link>
-                                    <Link to="/feedback" className={styles.dropdownItem} style={{ color: 'black', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
+                                    <Link to="/feedback" className={styles.dropdownItem} style={{ color: 'var(--color-text)', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
                                         <MessageCircle size={16} /> {t('header.feedback')}
                                     </Link>
-                                    <Link to="/feedback?tab=tickets" className={styles.dropdownItem} style={{ color: 'black', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
+                                    <Link to="/feedback?tab=tickets" className={styles.dropdownItem} style={{ color: 'var(--color-text)', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
                                         <MessageSquare size={16} /> {t('feedback.my_tickets')}
                                     </Link>
                                 </div>
@@ -143,9 +145,9 @@ export function Header() {
                                 className={styles.mobileHeaderAction}
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                                 style={{
-                                    background: isMobileMenuOpen ? '#000' : 'transparent',
-                                    color: isMobileMenuOpen ? '#fff' : '#000',
-                                    border: '2px solid #000',
+                                    background: isMobileMenuOpen ? 'var(--color-border-heavy)' : 'transparent',
+                                    color: isMobileMenuOpen ? 'var(--color-text-inverse)' : 'var(--color-text)',
+                                    border: '2px solid var(--color-border-heavy)',
                                     borderRadius: '4px',
                                     padding: '4px',
                                     cursor: 'pointer',
@@ -157,6 +159,29 @@ export function Header() {
                         )}
 
 
+                        {/* Theme Switcher */}
+                        <button
+                            onClick={toggleTheme}
+                            className={styles.iconButton}
+                            style={{
+                                padding: '6px',
+                                cursor: 'pointer',
+                                border: '2px solid var(--color-border)',
+                                background: 'transparent',
+                                marginRight: '0.5rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: '32px',
+                                width: '32px',
+                                color: 'var(--color-text)'
+                            }}
+                            title={`Theme: ${theme}`}
+                        >
+                            {theme === 'light' && <Sun size={18} />}
+                            {theme === 'dark' && <Moon size={18} />}
+                        </button>
+
                         {/* Language Switcher */}
                         <button
                             onClick={toggleLanguage}
@@ -167,14 +192,15 @@ export function Header() {
                                 fontSize: '0.9rem',
                                 padding: '4px 8px',
                                 cursor: 'pointer',
-                                border: '2px solid black',
+                                border: '2px solid var(--color-border)',
                                 background: 'transparent',
                                 marginRight: '0.5rem',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 height: '32px',
-                                width: '32px'
+                                width: '32px',
+                                color: 'var(--color-text)'
                             }}
                             title={i18n.language === 'fr' ? 'Switch to English' : 'Passer en Français'}
                         >
@@ -207,12 +233,12 @@ export function Header() {
                                     <button
                                         className={styles.profileDropdown}
                                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '4px', border: '2px solid #000', background: '#fff' }}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '4px', border: '2px solid var(--color-border)', background: 'var(--color-surface)' }}
                                     >
-                                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#333', overflow: 'hidden', border: '2px solid #000' }}>
+                                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#333', overflow: 'hidden', border: '2px solid var(--color-border)' }}>
                                             <img src={userProfile?.photoURL || user?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userProfile?.displayName || user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         </div >
-                                        <ChevronDown size={16} style={{ opacity: 0.7, color: '#000', transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+                                        <ChevronDown size={16} style={{ opacity: 0.7, color: 'var(--color-text)', transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
                                     </button >
 
                                     {/* Dropdown Menu */}
@@ -223,9 +249,9 @@ export function Header() {
                                                 top: '120%',
                                                 right: 0,
                                                 width: '200px',
-                                                background: '#fff',
-                                                border: '3px solid #000',
-                                                boxShadow: '4px 4px 0 rgba(0,0,0,1)',
+                                                background: 'var(--color-surface)',
+                                                border: '3px solid var(--color-border)',
+                                                boxShadow: '4px 4px 0 var(--color-shadow-strong)',
                                                 padding: '0.5rem',
                                                 display: 'flex',
                                                 flexDirection: 'column',
@@ -235,7 +261,7 @@ export function Header() {
                                                 <Link
                                                     to="/profile"
                                                     onClick={() => setIsDropdownOpen(false)}
-                                                    style={{ padding: '0.75rem', fontWeight: 700, color: '#000', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid transparent' }}
+                                                    style={{ padding: '0.75rem', fontWeight: 700, color: 'var(--color-text)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid transparent' }}
                                                     className={styles.dropdownItem}
                                                 >
                                                     <User size={18} /> {t('header.profile')}
@@ -243,7 +269,7 @@ export function Header() {
                                                 <Link
                                                     to="/settings"
                                                     onClick={() => setIsDropdownOpen(false)}
-                                                    style={{ padding: '0.75rem', fontWeight: 700, color: '#000', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid transparent' }}
+                                                    style={{ padding: '0.75rem', fontWeight: 700, color: 'var(--color-text)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid transparent' }}
                                                     className={styles.dropdownItem}
                                                 >
                                                     <Settings size={18} /> {t('header.settings')}
@@ -251,7 +277,7 @@ export function Header() {
                                                 <Link
                                                     to="/feedback?tab=tickets"
                                                     onClick={() => setIsDropdownOpen(false)}
-                                                    style={{ padding: '0.75rem', fontWeight: 700, color: '#000', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid transparent' }}
+                                                    style={{ padding: '0.75rem', fontWeight: 700, color: 'var(--color-text)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid transparent' }}
                                                     className={styles.dropdownItem}
                                                 >
                                                     <MessageSquare size={18} /> {t('feedback.my_tickets')}

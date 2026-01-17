@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-type Theme = 'dark' | 'light' | 'amoled';
+type Theme = 'dark' | 'light';
 
 interface SettingsState {
     theme: Theme;
@@ -36,8 +36,7 @@ export const useSettingsStore = create<SettingsState>()(
 
             setTheme: (theme) => set({ theme }),
             toggleTheme: () => set((state) => {
-                const nextTheme = state.theme === 'dark' ? 'light' : 'dark';
-                // Toggle between dark/light
+                const nextTheme = state.theme === 'light' ? 'dark' : 'light';
                 return { theme: nextTheme };
             }),
             toggleReducedMotion: () => set((state) => ({ reducedMotion: !state.reducedMotion })),

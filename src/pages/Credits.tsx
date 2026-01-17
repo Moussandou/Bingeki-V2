@@ -50,7 +50,7 @@ export default function Credits() {
                         </div>
 
                         <div style={{ textAlign: 'center', margin: '2rem 0', fontStyle: 'italic', opacity: 0.7 }}>
-                            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>{t('credits.made_with')} <Heart size={16} fill="black" /> {t('credits.in_marseille')}</span>
+                            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>{t('credits.made_with')} <Heart size={16} fill="currentColor" /> {t('credits.in_marseille')}</span>
                         </div>
 
                         <div className={styles.socialLinks}>
