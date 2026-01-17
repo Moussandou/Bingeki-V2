@@ -8,6 +8,20 @@ export interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
     {
+        version: 'v3.2',
+        date: '17 Janvier 2026',
+        title: 'Dark Mode Complet',
+        description: 'Refonte massive du thème sombre pour une expérience visuelle optimale.',
+        changes: [
+            'Theme : Refactorisation de 100+ couleurs hardcodées vers des variables CSS.',
+            'WorkDetails : Corrections complètes (Comments, Reviews, Gallery, Themes, Casting).',
+            'Header : Menu mobile hamburger entièrement compatible Dark Mode.',
+            'Pages : Dashboard, Library, Discover, Schedule, Feedback, Profile, Settings.',
+            'Tokens : Nouvelles variables --color-text-inverse, --color-border-heavy, --color-shadow-solid.',
+            'UI : Contrastes améliorés sur tous les composants et sections.'
+        ]
+    },
+    {
         version: 'v3.1',
         date: '16 Janvier 2026',
         title: 'SEO & Global I18n Fix',
