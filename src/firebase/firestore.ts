@@ -1041,11 +1041,11 @@ export async function getUserFeedback(userId: string): Promise<FeedbackData[]> {
     try {
         const q = query(
             collection(db, 'feedback'),
-            where('userId', '==', userId),
-            orderBy('timestamp', 'desc')
+            where('userId', '==', userId)
         );
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as FeedbackData));
+        const feedback = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as FeedbackData));
+        return feedback.sort((a, b) => b.timestamp - a.timestamp);
     } catch (error) {
         console.error('[Firestore] Error getting user feedback:', error);
         return [];
