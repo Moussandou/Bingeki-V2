@@ -77,6 +77,12 @@ const LanguageManager = () => {
 const RootRedirect = () => {
   const { i18n } = useTranslation();
   const location = useLocation();
+
+  // Prevent redirect loops for static files that fell through
+  if (/\.(xml|txt|json|png|jpg|jpeg|svg|ico)$/i.test(location.pathname)) {
+    return <div className="flex h-screen items-center justify-center">404 - File Not Found</div>;
+  }
+
   const lang = i18n.language === 'en' ? 'en' : 'fr';
   return <Navigate to={`/${lang}${location.pathname}${location.search}`} replace />;
 };
