@@ -224,7 +224,7 @@ export default function Profile() {
                 top3Favorites: cleanTop3
             };
 
-            await saveUserProfileToFirestore(profileData);
+            await saveUserProfileToFirestore(profileData, true);
 
             setExtendedProfile({ ...extendedProfile, ...profileData });
             setEditForm(prev => ({ ...prev, banner: bannerUrl, avatar: avatarUrl, top3Favorites: cleanTop3 }));

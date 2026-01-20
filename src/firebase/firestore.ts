@@ -64,7 +64,7 @@ export interface UserProfile {
 
 // Save user profile to Firestore
 // Save user profile to Firestore
-export async function saveUserProfileToFirestore(user: Partial<UserProfile>): Promise<void> {
+export async function saveUserProfileToFirestore(user: Partial<UserProfile>, forceUpdate: boolean = false): Promise<void> {
     try {
         if (!user.uid) return;
 
@@ -88,7 +88,8 @@ export async function saveUserProfileToFirestore(user: Partial<UserProfile>): Pr
 
         allowedFields.forEach(field => {
             // Prevent overwriting custom profile data with Auth provider data on subsequent logins
-            if (exists && (field === 'displayName' || field === 'photoURL')) {
+            // UNLESS forceUpdate is true (manual edit)
+            if (exists && !forceUpdate && (field === 'displayName' || field === 'photoURL')) {
                 return;
             }
 
