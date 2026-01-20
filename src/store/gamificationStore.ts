@@ -29,6 +29,7 @@ interface GamificationState {
 
 const LEVEL_BASE = 100;
 const LEVEL_MULTIPLIER = 1.5;
+const MAX_LEVEL = 100;
 
 // XP Rewards
 export const XP_REWARDS = {
@@ -58,12 +59,14 @@ export const useGamificationStore = create<GamificationState>()(
 
             addXp: (amount) => {
                 const { xp, xpToNextLevel, level } = get();
+
+                // If already at max level, we can still add XP for fun, but no leveling up
                 let newXp = Math.max(0, xp + amount);
                 let newLevel = level;
                 let newXpToNext = xpToNextLevel;
 
                 // Level up logic
-                while (newXp >= newXpToNext) {
+                while (newXp >= newXpToNext && newLevel < MAX_LEVEL) {
                     newXp = newXp - newXpToNext;
                     newLevel++;
                     newXpToNext = Math.floor(newXpToNext * LEVEL_MULTIPLIER);

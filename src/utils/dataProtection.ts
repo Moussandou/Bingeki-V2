@@ -67,7 +67,8 @@ export function mergeGamificationData(
     const cloudTimestamp = cloud.lastUpdated || 0;
 
     // For cumulative stats, always take the HIGHER value
-    const mergedLevel = Math.max(local.level || 1, cloud.level || 1);
+    const MAX_LEVEL = 100;
+    const mergedLevel = Math.min(MAX_LEVEL, Math.max(local.level || 1, cloud.level || 1));
     const mergedXp = Math.max(local.xp || 0, cloud.xp || 0);
     const mergedTotalChapters = Math.max(local.totalChaptersRead || 0, cloud.totalChaptersRead || 0);
     const mergedTotalEpisodes = Math.max(local.totalAnimeEpisodesWatched || 0, cloud.totalAnimeEpisodesWatched || 0);
