@@ -104,9 +104,10 @@ export function ContentList({
                             className="manga-panel"
                             style={{
                                 padding: '1rem',
-                                background: isWatched ? '#f0f0f0' : '#fff',
-                                opacity: isWatched ? 0.9 : 1,
-                                transition: 'all 0.2s'
+                                background: isWatched ? 'var(--color-surface-hover)' : 'var(--color-surface)',
+                                opacity: isWatched ? 0.8 : 1,
+                                transition: 'all 0.2s',
+                                border: '1px solid var(--color-border)'
                             }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -114,7 +115,7 @@ export function ContentList({
                                     <div style={{
                                         width: '40px',
                                         height: '40px',
-                                        background: isWatched ? '#000' : 'var(--color-primary)',
+                                        background: isWatched ? 'var(--color-text-dim)' : 'var(--color-primary)',
                                         color: '#fff',
                                         display: 'flex',
                                         alignItems: 'center',
@@ -127,12 +128,12 @@ export function ContentList({
                                     </div>
                                     <div style={{ flex: 1 }}>
                                         <div
-                                            style={{ fontWeight: 700, cursor: 'pointer' }}
+                                            style={{ fontWeight: 700, cursor: 'pointer', color: 'var(--color-text)' }}
                                             onClick={() => toggleExpand(item.id, item.number)}
                                         >
                                             {item.title}
                                         </div>
-                                        <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>
+                                        <div style={{ fontSize: '0.8rem', opacity: 0.8, color: 'var(--color-text-dim)' }}>
                                             {item.date ? new Date(item.date).toLocaleDateString() : t('content_list.unknown_date')} {item.isFiller && '(Filler)'}
                                         </div>
                                     </div>
@@ -174,7 +175,7 @@ export function ContentList({
                                                 size="sm"
                                                 onClick={(e) => openLink(e, `https://www.google.com/search?q=${encodeURIComponent(workTitle)} episode ${item.number} streaming vostfr`)}
                                                 title={t('content_list.search_streaming')}
-                                                style={{ padding: '0.5rem', color: '#64748b' }}
+                                                style={{ padding: '0.5rem', color: 'var(--color-text-dim)' }}
                                             >
                                                 <Tv size={20} />
                                             </Button>
@@ -195,7 +196,7 @@ export function ContentList({
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => toggleExpand(item.id, item.number)}
-                                        style={{ padding: '0.5rem' }}
+                                        style={{ padding: '0.5rem', color: 'var(--color-text)' }}
                                     >
                                         {isExpanded ? <ChevronLeft style={{ transform: 'rotate(-90deg)' }} /> : <ChevronLeft style={{ transform: 'rotate(0deg)' }} />}
                                     </Button>
@@ -205,6 +206,7 @@ export function ContentList({
                                             size="sm"
                                             onClick={() => onSelect(item.number)}
                                             icon={isWatched ? <Check size={16} /> : <Eye size={16} />}
+                                            style={{ color: isWatched ? 'var(--color-text-dim)' : 'var(--color-text)' }}
                                         >
                                             {isWatched ? t('content_list.seen') : t('content_list.see')}
                                         </Button>
@@ -214,7 +216,7 @@ export function ContentList({
 
                             {/* Synopsis Section */}
                             {isExpanded && (
-                                <div style={{ marginTop: '1rem', borderTop: '1px dashed #ccc', paddingTop: '1rem', paddingLeft: '3.5rem' }}>
+                                <div style={{ marginTop: '1rem', borderTop: '1px dashed var(--color-border)', paddingTop: '1rem', paddingLeft: '3.5rem', color: 'var(--color-text)' }}>
                                     {isLoadingDetails ? (
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.6 }}>
                                             <Loader2 size={16} className="spin" /> {t('content_list.loading_summary')}
@@ -237,7 +239,7 @@ export function ContentList({
                     <Button
                         variant="ghost"
                         onClick={() => setVisibleCount(prev => prev + 25)}
-                        style={{ width: '100%', border: '1px dashed #ccc' }}
+                        style={{ width: '100%', border: '1px dashed var(--color-border)' }}
                     >
                         {t('content_list.show_more')}
                     </Button>
@@ -245,7 +247,7 @@ export function ContentList({
             )}
 
             {/* Pagination */}
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '2rem', borderTop: '2px solid #eee', paddingTop: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '2rem', borderTop: '2px solid var(--color-border)', paddingTop: '1rem' }}>
                 <Button
                     variant="ghost"
                     onClick={onPrevPage}
