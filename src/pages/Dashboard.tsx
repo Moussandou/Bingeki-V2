@@ -26,7 +26,7 @@ import styles from './Dashboard.module.css';
 
 export default function Dashboard() {
     const { t } = useTranslation();
-    const { user } = useAuthStore();
+    const { user, userProfile } = useAuthStore();
     const { level, xp, xpToNextLevel, streak, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched } = useGamificationStore();
     const { works } = useLibraryStore();
 
@@ -94,7 +94,7 @@ export default function Dashboard() {
                         className={`manga-panel ${styles.heroPanel}`}
                     >
                         <div className={styles.avatarContainer}>
-                            <img src={user?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <img src={userProfile?.photoURL || user?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </div>
 
                         <div className={styles.heroInfo}>

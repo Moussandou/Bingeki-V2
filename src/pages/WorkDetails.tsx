@@ -1549,14 +1549,14 @@ export default function WorkDetails() {
                                             {/* Friends reading indicator */}
                                             {friendsReading.count > 0 && (
                                                 <div style={{
-                                                    background: 'linear-gradient(135deg, #dbeafe, #ede9fe)',
+                                                    background: 'var(--color-surface-hover)',
                                                     padding: '1rem',
                                                     borderRadius: '8px',
                                                     marginBottom: '1rem',
-                                                    border: '1px solid #c7d2fe'
+                                                    border: '1px solid var(--color-border)'
                                                 }}>
-                                                    <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>
-                                                        👥 <strong>{friendsReading.count} {t('work_details.comments.friends_count', { count: friendsReading.count })}</strong> {work.type === 'anime' ? t('work_details.comments.watching') : t('work_details.comments.reading')}
+                                                    <p style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-text)' }}>
+                                                        👥 <strong>{t('work_details.comments.friends_count', { count: friendsReading.count })}</strong>
                                                     </p>
                                                     <div style={{ display: 'flex', gap: '-8px', marginTop: '0.5rem' }}>
                                                         {friendsReading.friends.slice(0, 5).map(f => (

@@ -1073,7 +1073,8 @@ const resources = {
                     title: "PROGRESSION",
                     edit: "Éditer",
                     saved_toast: "Progression sauvegardée !",
-                    mark_complete_confirm: "Avez-vous terminé cette œuvre ? Votre progression sera mise au maximum."
+                    mark_complete_confirm: "Avez-vous terminé cette œuvre ? Votre progression sera mise au maximum.",
+                    ok: "OK"
                 },
                 status: {
                     title: "STATUT",
@@ -1101,6 +1102,8 @@ const resources = {
                     reply_to: "Répondre à {{name}}...",
                     spoiler: "SPOILER",
                     friends_reading: "{{count}} ami(s) {{action}} aussi cette œuvre",
+
+                    friends_count: "Vous et {{count}} ami(s) lisent aussi cette œuvre",
                     friends_watching: "regarde",
                     friends_reading_action: "lit",
                     share_opinion: "Partagez votre avis...",
@@ -2268,7 +2271,8 @@ const resources = {
                     title: "PROGRESS",
                     edit: "Edit",
                     saved_toast: "Progress saved!",
-                    mark_complete_confirm: "Have you finished this work? Your progress will be set to the maximum."
+                    mark_complete_confirm: "Have you finished this work? Your progress will be set to maximum.",
+                    ok: "OK"
                 },
                 status: {
                     title: "STATUS",
@@ -2296,6 +2300,8 @@ const resources = {
                     reply_to: "Reply to {{name}}...",
                     spoiler: "SPOILER",
                     friends_reading: "{{count}} friend(s) {{action}} this work too",
+
+                    friends_count: "You and {{count}} friend(s) are also reading this work",
                     friends_watching: "is watching",
                     friends_reading_action: "is reading",
                     share_opinion: "Share your opinion...",
