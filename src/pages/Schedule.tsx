@@ -96,7 +96,7 @@ export default function Schedule() {
                                             fontSize: '0.8rem',
                                             fontWeight: 700
                                         }}>
-                                            {anime.broadcast?.time || t('schedule.unknown_time')}
+                                            {anime.broadcast?.time ? `${anime.broadcast.time} (UTC+9)` : t('schedule.unknown_time')}
                                         </div>
                                     </div>
                                     <div className={styles.content}>
