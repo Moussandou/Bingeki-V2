@@ -1,13 +1,8 @@
 
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-
-interface BeforeInstallPromptEvent extends Event {
-    prompt: () => Promise<void>;
-    userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
-}
+import { usePWAStore } from '@/store/pwaStore';
 
 interface InstallPWAProps {
     className?: string;
@@ -16,29 +11,28 @@ interface InstallPWAProps {
 }
 
 export function InstallPWA({ variant = 'icon', className, style }: InstallPWAProps) {
-    const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-    const [isVisible, setIsVisible] = useState(false);
+    const { deferredPrompt, setDeferredPrompt, isInstalled } = usePWAStore();
     const { t } = useTranslation();
 
-    useEffect(() => {
-        const handler = (e: Event) => {
-            e.preventDefault();
-            setDeferredPrompt(e as BeforeInstallPromptEvent);
-            setIsVisible(true);
-        };
+    // Logic: 
+    // - Landing & Footer: Always visible (fallback to manual instructions).
+    // - Full & Icon: Only visible if installable (deferredPrompt exists).
 
-        window.addEventListener('beforeinstallprompt', handler);
+    // If already installed app-wide, hide promotional buttons (optional, but good UX)
+    // However, for Landing/Footer we might still want them as "Open App" links if we could detect it,
+    // but for now let's just respect the "hidden" nature if strictly "install" button.
+    // Actually, per user request, footer/landing are persistent.
 
-        return () => {
-            window.removeEventListener('beforeinstallprompt', handler);
-        };
-    }, []);
+    const isInstallable = !!deferredPrompt;
+
+    // Visibility check
+    if (!isInstallable && variant !== 'footer' && variant !== 'landing') return null;
+    if (isInstalled && variant !== 'footer' && variant !== 'landing') return null;
 
     const handleInstallClick = async () => {
         if (!deferredPrompt) {
-            if (variant === 'footer') {
-                alert("Pour installer l'app : \nSur Chrome : Clic sur l'icône dans la barre d'adresse.\nSur iOS : Partager > Sur l'écran d'accueil.");
-            }
+            // Manual instructions for iOS or if automatic prompt unavailable
+            alert("Pour installer l'app :\n\n📱 iOS (Safari) : Bouton Partager > 'Sur l'écran d'accueil'\n💻 Chrome : Clic sur l'icône dans la barre d'adresse\nℹ️ Autres : Cherchez 'Installer l'application' dans le menu");
             return;
         }
 
@@ -48,7 +42,6 @@ export function InstallPWA({ variant = 'icon', className, style }: InstallPWAPro
 
         if (outcome === 'accepted') {
             setDeferredPrompt(null);
-            setIsVisible(false);
         }
     };
 

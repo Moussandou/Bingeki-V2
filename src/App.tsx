@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useLibraryStore } from '@/store/libraryStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { useSettingsStore } from '@/store/settingsStore';
+import { usePWAStore } from '@/store/pwaStore';
 import { useShallow } from 'zustand/react/shallow';
 import { auth } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -179,6 +180,33 @@ function App() {
 
     return () => clearTimeout(timeout);
   }, [gamificationState, user]);
+
+  // PWA Global Listeners
+  const { setDeferredPrompt, setIsInstalled, clearPrompt } = usePWAStore();
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      setDeferredPrompt(e as any);
+      console.log('👋 PWA Install Prompt captured!');
+    };
+
+    const handleAppInstalled = () => {
+      // Hide the app-provided install promotion
+      clearPrompt();
+      setIsInstalled(true);
+      console.log('✅ PWA Installed successfully!');
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, [setDeferredPrompt, setIsInstalled, clearPrompt]);
 
   // Apply theme to document
   const theme = useSettingsStore(s => s.theme);

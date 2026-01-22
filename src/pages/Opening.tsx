@@ -8,6 +8,7 @@ import { HunterLicenseCard } from '@/components/profile/HunterLicenseCard';
 import { Search, Check, Users, MessageCircle, Heart, TrendingUp, ChevronUp, History as HistoryIcon, Trophy, Star, ArrowRight, Home, User } from 'lucide-react';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
 import { useAuthStore } from '@/store/authStore';
+import { useTranslation } from 'react-i18next';
 
 
 // Counter Component for Animated Numbers
