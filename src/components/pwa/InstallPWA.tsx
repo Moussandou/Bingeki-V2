@@ -45,7 +45,7 @@ export function InstallPWA({ variant = 'icon', className, style }: InstallPWAPro
         }
     };
 
-    if (!isVisible && variant !== 'footer' && variant !== 'landing') return null;
+    if (!isInstallable && variant !== 'footer' && variant !== 'landing') return null;
 
     if (variant === 'full') {
         return (
