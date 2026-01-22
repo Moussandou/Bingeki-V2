@@ -12,7 +12,7 @@ interface BeforeInstallPromptEvent extends Event {
 interface InstallPWAProps {
     className?: string;
     style?: React.CSSProperties;
-    variant?: 'icon' | 'full' | 'footer';
+    variant?: 'icon' | 'full' | 'footer' | 'landing';
 }
 
 export function InstallPWA({ variant = 'icon', className, style }: InstallPWAProps) {
@@ -52,13 +52,50 @@ export function InstallPWA({ variant = 'icon', className, style }: InstallPWAPro
         }
     };
 
-    if (!isVisible && variant !== 'footer') return null;
+    if (!isVisible && variant !== 'footer' && variant !== 'landing') return null;
 
     if (variant === 'full') {
         return (
             <Button onClick={handleInstallClick} variant="primary" icon={<Download size={18} />} className={className} style={style}>
                 {t('pwa.install_app')}
             </Button>
+        );
+    }
+
+    if (variant === 'landing') {
+        return (
+            <button
+                onClick={handleInstallClick}
+                className={className}
+                style={{
+                    marginTop: '2rem',
+                    background: 'var(--color-primary)',
+                    color: '#000',
+                    border: '3px solid #000',
+                    padding: '1rem 2rem',
+                    fontSize: '1.2rem',
+                    fontWeight: 900,
+                    fontFamily: 'var(--font-heading)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    cursor: 'pointer',
+                    boxShadow: '6px 6px 0 #000',
+                    transition: 'transform 0.1s, box-shadow 0.1s',
+                    ...style
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translate(-2px, -2px)';
+                    e.currentTarget.style.boxShadow = '8px 8px 0 #000';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translate(0, 0)';
+                    e.currentTarget.style.boxShadow = '6px 6px 0 #000';
+                }}
+            >
+                <Download size={24} strokeWidth={3} />
+                {t('pwa.install_app_promo') || "INSTALLER L'APP"}
+            </button>
         );
     }
 

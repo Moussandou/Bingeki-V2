@@ -6,7 +6,9 @@ import styles from './Opening.module.css';
 import { Card } from '@/components/ui/Card';
 import { HunterLicenseCard } from '@/components/profile/HunterLicenseCard';
 import { Search, Check, Users, MessageCircle, Heart, TrendingUp, ChevronUp, History as HistoryIcon, Trophy, Star, ArrowRight, Home, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { InstallPWA } from '@/components/pwa/InstallPWA';
 import { useAuthStore } from '@/store/authStore';
 
 
@@ -677,6 +679,7 @@ export default function Opening() {
                                     <span>{t('landing.features.mobile.feature_3') || "Notifications Push (Bientôt)"}</span>
                                 </li>
                             </ul>
+                            <InstallPWA variant="landing" />
                         </div>
                     </div>
 

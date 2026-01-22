@@ -1278,7 +1278,8 @@ const resources = {
                 report_bug: "Report Bug"
             },
             pwa: {
-                install_app: "Install App"
+                install_app: "Install App",
+                install_app_promo: "TÉLÉCHARGER L'APP"
             },
             roles: {
                 admin: "ADMIN"
