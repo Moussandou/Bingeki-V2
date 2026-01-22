@@ -41,8 +41,9 @@ export function NenChart({ stats, themeColor = '#FF2E63' }: NenChartProps) {
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
-                    opacity: 0.5,
-                    zIndex: 10
+                    opacity: 0.7,
+                    zIndex: 10,
+                    color: 'var(--color-text)'
                 }}
                 title="Comment ça marche ?"
             >
@@ -57,7 +58,8 @@ export function NenChart({ stats, themeColor = '#FF2E63' }: NenChartProps) {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    background: 'rgba(255,255,255,0.95)',
+                    background: 'var(--color-surface)',
+                    color: 'var(--color-text)',
                     zIndex: 20,
                     padding: '0.75rem',
                     fontSize: '0.7rem',
@@ -65,11 +67,12 @@ export function NenChart({ stats, themeColor = '#FF2E63' }: NenChartProps) {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '0.3rem',
-                    border: '2px solid #000'
+                    border: '2px solid var(--color-border)',
+                    boxShadow: '4px 4px 0 var(--color-shadow)'
                 }}>
                     <div style={{ fontWeight: 900, marginBottom: '0.25rem', display: 'flex', justifyContent: 'space-between' }}>
                         <span>📊 {t('stats.legend.title')}</span>
-                        <button onClick={() => setShowLegend(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 900 }}>✕</button>
+                        <button onClick={() => setShowLegend(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 900, color: 'var(--color-text)' }}>✕</button>
                     </div>
                     <div><strong>{t('stats.level')}</strong>: {t('stats.legend.level')}</div>
                     <div><strong>{t('stats.passion')}</strong>: {t('stats.legend.passion')}</div>
@@ -82,8 +85,8 @@ export function NenChart({ stats, themeColor = '#FF2E63' }: NenChartProps) {
 
             <ResponsiveContainer width="100%" height="100%">
                 <RadarChart cx="50%" cy="50%" outerRadius="45%" data={data}>
-                    <PolarGrid stroke="#000" strokeOpacity={0.2} />
-                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#000', fontSize: 10, fontWeight: 900 }} />
+                    <PolarGrid stroke="var(--color-border)" strokeOpacity={0.5} />
+                    <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--color-text)', fontSize: 10, fontWeight: 900 }} />
                     <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                     <Radar
                         name="Stats"
@@ -95,7 +98,7 @@ export function NenChart({ stats, themeColor = '#FF2E63' }: NenChartProps) {
                     />
                 </RadarChart>
             </ResponsiveContainer>
-            <div style={{ position: 'absolute', bottom: -10, width: '100%', textAlign: 'center', fontSize: '0.6rem', opacity: 0.5, fontStyle: 'italic' }}>
+            <div style={{ position: 'absolute', bottom: -10, width: '100%', textAlign: 'center', fontSize: '0.6rem', opacity: 0.5, fontStyle: 'italic', color: 'var(--color-text)' }}>
                 {t('stats.chart_title')}
             </div>
         </div>

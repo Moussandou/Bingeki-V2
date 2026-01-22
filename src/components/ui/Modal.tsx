@@ -12,8 +12,12 @@ interface ModalProps {
     variant?: 'glass' | 'manga';
 }
 
+import { createPortal } from 'react-dom';
+
 export function Modal({ isOpen, onClose, title, children, variant = 'glass' }: ModalProps) {
-    return (
+    if (!isOpen) return null;
+
+    return createPortal(
         <AnimatePresence>
             {isOpen && (
                 <>
@@ -27,10 +31,10 @@ export function Modal({ isOpen, onClose, title, children, variant = 'glass' }: M
                             inset: 0,
                             background: variant === 'manga' ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.7)',
                             backdropFilter: variant === 'manga' ? 'none' : 'blur(5px)',
-                            zIndex: 999
+                            zIndex: 9999
                         }}
                     />
-                    <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, pointerEvents: 'none' }}>
+                    <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, pointerEvents: 'none' }}>
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -55,6 +59,7 @@ export function Modal({ isOpen, onClose, title, children, variant = 'glass' }: M
                     </div>
                 </>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     );
 }

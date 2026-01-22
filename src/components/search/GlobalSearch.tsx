@@ -181,7 +181,33 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="" variant="manga">
-            <div style={{ minHeight: '450px', display: 'flex', flexDirection: 'column' }}>
+            <style>{`
+                .search-container {
+                    min-height: 450px;
+                    display: flex;
+                    flex-direction: column;
+                }
+                .search-input {
+                    font-size: 1.5rem;
+                    padding: 1rem;
+                }
+                .search-icon-box {
+                    width: 60px;
+                }
+                @media (max-width: 640px) {
+                    .search-container {
+                        min-height: 60vh;
+                    }
+                    .search-input {
+                        font-size: 1.1rem;
+                        padding: 0.75rem;
+                    }
+                    .search-icon-box {
+                        width: 45px;
+                    }
+                }
+            `}</style>
+            <div className="search-container">
                 {/* Search Header - Stylized */}
                 <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
                     <div style={{
@@ -191,24 +217,22 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                         background: 'var(--color-surface)',
                         boxShadow: '6px 6px 0 var(--color-primary)'
                     }}>
-                        <div style={{
+                        <div className="search-icon-box" style={{
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            width: '60px',
                             background: 'var(--color-primary)',
                             borderRight: '3px solid var(--color-border-heavy)'
                         }}>
-                            <Search size={28} color="#fff" strokeWidth={3} />
+                            <Search size={24} color="#fff" strokeWidth={3} />
                         </div>
                         <input
                             placeholder={t('header.search_placeholder') || "SEARCH..."}
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
+                            className="search-input"
                             style={{
                                 flex: 1,
-                                padding: '1rem',
-                                fontSize: '1.5rem',
                                 border: 'none',
                                 background: 'transparent',
                                 outline: 'none',
@@ -223,13 +247,13 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                 </div>
 
                 {/* Tabs - Brutalist */}
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'none' }}>
                     {(['all', 'anime', 'manga', 'characters'] as const).map(tab => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             style={{
-                                padding: '0.5rem 1.5rem',
+                                padding: '0.5rem 1rem',
                                 border: '2px solid var(--color-border-heavy)',
                                 background: activeTab === tab ? 'var(--color-primary)' : 'var(--color-surface)',
                                 color: activeTab === tab ? '#fff' : 'var(--color-text)',
@@ -237,11 +261,12 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                                 fontWeight: 800,
                                 textTransform: 'uppercase',
                                 cursor: 'pointer',
-                                boxShadow: activeTab === tab ? 'none' : '4px 4px 0 var(--color-shadow-solid)',
+                                boxShadow: activeTab === tab ? 'none' : '3px 3px 0 var(--color-shadow-solid)',
                                 transform: activeTab === tab ? 'translate(2px, 2px)' : 'none',
                                 transition: 'all 0.1s',
-                                fontSize: '0.9rem',
-                                whiteSpace: 'nowrap'
+                                fontSize: '0.8rem',
+                                whiteSpace: 'nowrap',
+                                flexShrink: 0
                             }}
                         >
                             {tab}
