@@ -31,7 +31,16 @@ const resources = {
                 report_bug: "Signaler un bug"
             },
             pwa: {
-                install_app: "Installer l'App"
+                install_app: "Installer l'App",
+                install_app_promo: "TÉLÉCHARGER L'APP",
+                install_modal: {
+                    title: "INSTALLER L'APP",
+                    description: "Installez l'application pour un accès rapide et hors ligne.",
+                    ios_step1: "Appuyez sur le bouton Partager",
+                    ios_step2: "Sélectionnez 'Sur l'écran d'accueil'",
+                    android_step1: "Ouvrez le menu du navigateur",
+                    android_step2: "Appuyez sur 'Installer l'application'"
+                }
             },
             roles: {
                 admin: "ADMIN"
@@ -176,6 +185,7 @@ const resources = {
                 participants: "participants",
                 end_party: "Terminer",
                 leave_party: "Quitter",
+                host: "Hôte",
                 choose_work: "Choisir une œuvre",
                 add_work_first: "Ajoutez d'abord une œuvre à votre bibliothèque",
                 party_name: "Nom de la party (optionnel)",
@@ -259,6 +269,7 @@ const resources = {
                 contribution_msg: "Chaque contribution aide à ajouter de nouvelles fonctionnalités !"
             },
             dashboard: {
+                title: "TABLEAU DE BORD",
                 rank: "RANK",
                 hero_default: "Héros",
                 discover_btn: "Découvrir",
@@ -348,6 +359,9 @@ const resources = {
                 placeholder_pseudo: "Pseudo",
                 placeholder_email: "Email",
                 placeholder_password: "Mot de passe",
+                login_title: "CONNEXION",
+                register_title: "INSCRIPTION",
+                login_required: "Connexion requise",
                 login_btn: "SE CONNECTER",
                 register_btn: "S'INSCRIRE",
                 or: "OU",
@@ -384,6 +398,8 @@ const resources = {
                 toast_success: "Merci pour votre retour !",
                 toast_error: "Erreur lors de l'envoi. Réessayez.",
                 toast_unexpected: "Erreur inattendue.",
+                error_permission: "Permission refusée.",
+                error_loading_detail: "Impossible de charger les détails.",
                 // Enhanced fields
                 priority_label: "Priorité",
                 priority_low: "FAIBLE",
@@ -491,8 +507,9 @@ const resources = {
                 no_anime: "Aucun anime trouvé pour ce jour... C'est calme ! 🍃"
             },
             discover: {
+                title: "DÉCOUVRIR",
                 guest_banner: {
-                    title: "✨ Créez un compte pour débloquer toutes les fonctionnalités !",
+                    title: "Créez un compte pour débloquer toutes les fonctionnalités !",
                     subtitle: "Bibliothèque personnelle, suivi de progression, badges, classements et plus encore...",
                     cta: "S'inscrire gratuitement"
                 },
@@ -563,7 +580,9 @@ const resources = {
                     chapters: "Chapitres",
                     streak: "Streak",
                     anonymous: "Anonyme",
-                    pending: "En attente"
+                    pending: "En attente",
+                    show_less: "Voir moins",
+                    show_more: "Voir plus"
                 },
                 friends: {
                     add_title: "AJOUTER UN AMI",
@@ -582,6 +601,8 @@ const resources = {
                 }
             },
             profile: {
+                seo_title: "Profil Chasseur",
+                seo_description: "Consultez le profil et la progression.",
                 title: "Fiche de Chasseur",
                 view_library: "VOIR LA BIBLIOTHÈQUE",
                 edit: "EDITER",
@@ -1034,7 +1055,8 @@ const resources = {
                     delete: "Supprimer",
                     confirm_delete: "Supprimer ce feedback définitivement ?",
                     delete_error: "Erreur lors de la suppression",
-                    status_error: "Erreur lors de la mise à jour du statut"
+                    status_error: "Erreur lors de la mise à jour du statut",
+                    priority_error: "Erreur lors de la mise à jour de la priorité"
                 },
                 system: {
                     title: "Système & Logs",
@@ -1230,6 +1252,8 @@ const resources = {
                 loading_description: "Récupération des informations du personnage.",
                 back: "RETOUR",
                 not_found: "Personnage introuvable.",
+                removed_from_favorites: "Retiré des favoris",
+                added_to_favorites: "Ajouté aux favoris",
                 favorites: "favoris",
                 identity: "IDENTITÉ",
                 biography: "BIOGRAPHIE",
@@ -1242,6 +1266,8 @@ const resources = {
                 loading_title: "Chargement...",
                 loading_description: "Récupération des informations de la personne.",
                 back: "RETOUR",
+                not_found_title: "Personne Introuvable",
+                not_found_description: "Impossible de trouver cette personne.",
                 not_found: "Personne introuvable.",
                 favorites: "favoris",
                 sheet: "FICHE",
@@ -1294,6 +1320,8 @@ const resources = {
             },
 
             profile: {
+                seo_title: "Hunter Profile",
+                seo_description: "Check out the profile and progress.",
                 title: "Hunter License",
                 view_library: "VIEW LIBRARY",
                 edit: "EDIT",
@@ -1386,6 +1414,7 @@ const resources = {
                 participants: "participants",
                 end_party: "End",
                 leave_party: "Leave",
+                host: "Host",
                 choose_work: "Choose a work",
                 add_work_first: "Add a work to your library first",
                 party_name: "Party name (optional)",
@@ -1507,6 +1536,7 @@ const resources = {
                 }
             },
             discover: {
+                title: "DISCOVER",
                 guest_banner: {
                     title: "✨ Create an account to unlock all features!",
                     subtitle: "Personal library, progress tracking, badges, rankings and more...",
@@ -1579,7 +1609,9 @@ const resources = {
                     chapters: "Chapters",
                     streak: "Streak",
                     anonymous: "Anonymous",
-                    pending: "Pending"
+                    pending: "Pending",
+                    show_less: "Show less",
+                    show_more: "Show more"
                 },
                 friends: {
                     add_title: "ADD A FRIEND",
@@ -1740,6 +1772,7 @@ const resources = {
                 contribution_msg: "Every contribution helps add new features!"
             },
             dashboard: {
+                title: "DASHBOARD",
                 rank: "RANK",
                 hero_default: "Hero",
                 discover_btn: "Discover",
@@ -2082,6 +2115,9 @@ const resources = {
                 placeholder_pseudo: "Username",
                 placeholder_email: "Email",
                 placeholder_password: "Password",
+                login_title: "LOGIN",
+                register_title: "REGISTER",
+                login_required: "Login required",
                 login_btn: "LOG IN",
                 register_btn: "SIGN UP",
                 or: "OR",
@@ -2118,6 +2154,8 @@ const resources = {
                 toast_success: "Thank you for your feedback!",
                 toast_error: "Error while sending. Please try again.",
                 toast_unexpected: "Unexpected error.",
+                error_permission: "Permission denied.",
+                error_loading_detail: "Unable to load details.",
                 // Enhanced fields
                 priority_label: "Priority",
                 priority_low: "LOW",
@@ -2280,6 +2318,7 @@ const resources = {
                     tickets_pending: "{{count}} tickets pending",
                     refresh: "Refresh",
                     loading: "Loading messages...",
+                    load_error: "Failed to load feedback",
                     no_messages: "No messages at the moment.",
                     anonymous: "Anonymous",
                     resolved: "Resolved",
@@ -2290,7 +2329,8 @@ const resources = {
                     delete: "Delete",
                     confirm_delete: "Delete this feedback permanently?",
                     delete_error: "Error during deletion",
-                    status_error: "Error updating status"
+                    status_error: "Error updating status",
+                    priority_error: "Error updating priority"
                 },
                 system: {
                     title: "System & Logs",
@@ -2486,6 +2526,8 @@ const resources = {
                 loading_description: "Retrieving character information.",
                 back: "BACK",
                 not_found: "Character not found.",
+                removed_from_favorites: "Removed from favorites",
+                added_to_favorites: "Added to favorites",
                 favorites: "favorites",
                 identity: "IDENTITY",
                 biography: "BIOGRAPHY",
@@ -2498,6 +2540,8 @@ const resources = {
                 loading_title: "Loading...",
                 loading_description: "Retrieving person information.",
                 back: "BACK",
+                not_found_title: "Person Not Found",
+                not_found_description: "Unable to find this person.",
                 not_found: "Person not found.",
                 favorites: "favorites",
                 sheet: "FACT SHEET",

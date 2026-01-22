@@ -183,11 +183,42 @@ function main() {
             }
         }
 
+        // Check for keys used in code but missing in resources (CRITICAL)
+        console.log(`${colors.cyan}Verifying that all used keys exist in translations...${colors.reset}\n`);
+        const usedKeys = findUsedTranslationKeys();
+        const missingDefinitions: string[] = [];
+
+        for (const key of usedKeys) {
+            // Skip dynamic keys (containing ${)
+            if (key.includes('${')) continue;
+
+            // Check if key exists in either FR or EN (should exist in both ideally, but at least one to start)
+            // Stricter: Must exist in BOTH.
+            if (!frKeys.has(key) && !enKeys.has(key)) {
+                missingDefinitions.push(key);
+            }
+        }
+
+        if (missingDefinitions.length > 0) {
+            console.log(`${colors.red}${colors.bold}❌ Used in code but missing in i18n.ts (${missingDefinitions.length}):${colors.reset}`);
+            for (const key of missingDefinitions.slice(0, 20)) {
+                console.log(`   ${colors.red}• ${key}${colors.reset}`);
+            }
+            if (missingDefinitions.length > 20) {
+                console.log(`   ${colors.yellow}... and ${missingDefinitions.length - 20} more${colors.reset}`);
+            }
+            console.log();
+        }
+
         // Summary
-        if (missingInEn.length === 0 && missingInFr.length === 0) {
-            console.log(`${colors.green}${colors.bold}✅ All translations are in sync!${colors.reset}`);
+        if (missingInEn.length === 0 && missingInFr.length === 0 && missingDefinitions.length === 0) {
+            console.log(`${colors.green}${colors.bold}✅ All translations are in sync and valid!${colors.reset}`);
         } else {
-            console.log(`${colors.yellow}${colors.bold}⚠️  Total missing: ${missingInEn.length + missingInFr.length} keys${colors.reset}`);
+            console.log(`${colors.yellow}${colors.bold}⚠️  Issues found:${colors.reset}`);
+            if (missingInEn.length > 0) console.log(`   - ${missingInEn.length} missing in English`);
+            if (missingInFr.length > 0) console.log(`   - ${missingInFr.length} missing in French`);
+            if (missingDefinitions.length > 0) console.log(`   - ${missingDefinitions.length} missing definitions`);
+
             process.exit(1);
         }
 
