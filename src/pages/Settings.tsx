@@ -6,7 +6,7 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Volume2, Trash2, Palette, HardDrive, Download, Upload, Info, Github, ShieldAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useLibraryStore } from '@/store/libraryStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { getWorkDetails } from '@/services/animeApi';
@@ -36,7 +36,6 @@ function SyncButton() {
         setIsSyncing(true);
         setProgress(0);
         let updatedCount = 0;
-        let errorCount = 0;
 
         try {
             for (let i = 0; i < works.length; i++) {
@@ -52,8 +51,8 @@ function SyncButton() {
                         });
                         updatedCount++;
                     }
-                } catch (e) {
-                    errorCount++;
+                } catch {
+                    // Ignore error
                 }
                 setProgress(Math.round(((i + 1) / works.length) * 100));
             }
@@ -92,12 +91,68 @@ function SyncButton() {
     );
 }
 
+function RecalculateButton() {
+    const { t } = useTranslation();
+    const { works } = useLibraryStore();
+    const { recalculateStats } = useGamificationStore();
+    const { addToast } = useToast();
+    const [isCalculating, setIsCalculating] = useState(false);
+    const { user } = useAuthStore();
+
+    const handleRecalculate = async () => {
+        setIsCalculating(true);
+        try {
+            recalculateStats(works);
+
+            // Force save to Firestore if user is logged in
+            if (user) {
+                const { level, xp, xpToNextLevel, streak, lastActivityDate, badges, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, totalWorksAdded, totalWorksCompleted } = useGamificationStore.getState();
+                await saveGamificationToFirestore(user.uid, {
+                    level, xp, xpToNextLevel, streak, lastActivityDate, badges,
+                    totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, totalWorksAdded, totalWorksCompleted
+                });
+            }
+
+            addToast(t('settings.data.recalculate_success'), 'success');
+        } catch (error) {
+            console.error(error);
+            addToast(t('settings.data.recalculate_error'), 'error');
+        } finally {
+            setTimeout(() => setIsCalculating(false), 500);
+        }
+    };
+
+    return (
+        <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRecalculate}
+            disabled={isCalculating}
+            style={{
+                borderColor: 'var(--color-border-heavy)',
+                color: 'var(--color-text)',
+                minWidth: '130px'
+            }}
+        >
+            {isCalculating ? (
+                <>
+                    <RefreshCw size={16} className="animate-spin" /> ...
+                </>
+            ) : (
+                <>
+                    <RefreshCw size={16} /> {t('settings.data.recalculate_button')}
+                </>
+            )}
+        </Button>
+    );
+}
+
 export default function Settings() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { addToast } = useToast();
     const [showConfirmReset, setShowConfirmReset] = useState(false);
-    const [storageSize, setStorageSize] = useState('0.00');
+    const [storageSize] = useState(() => getLocalStorageSize());
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { user } = useAuthStore();
 
@@ -114,9 +169,7 @@ export default function Settings() {
         setAccentColor
     } = useSettingsStore();
 
-    useEffect(() => {
-        setStorageSize(getLocalStorageSize());
-    }, []);
+
 
     const handleImportClick = () => {
         fileInputRef.current?.click();
@@ -166,7 +219,7 @@ export default function Settings() {
         try {
             await importData(file);
             addToast(t('settings.toast.import_success'), 'success');
-        } catch (error) {
+        } catch {
             addToast(t('settings.toast.import_error'), 'error');
         }
     };
@@ -190,9 +243,9 @@ export default function Settings() {
 
             addToast(t('settings.toast.account_deleted'), 'success');
             navigate('/');
-        } catch (error: any) {
+        } catch (error) {
             console.error('Delete account error:', error);
-            if (error.code === 'auth/requires-recent-login') {
+            if ((error as { code?: string }).code === 'auth/requires-recent-login') {
                 addToast(t('settings.toast.relogin_required'), 'error');
             } else {
                 addToast(t('settings.toast.delete_error'), 'error');
@@ -343,6 +396,13 @@ export default function Settings() {
                                             <p style={{ fontWeight: 700 }}>{t('settings.data.sync_library')}</p>
                                         </div>
                                         <SyncButton />
+                                    </div>
+                                    <div style={{ height: '1px', background: 'var(--color-border)' }} />
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div>
+                                            <p style={{ fontWeight: 700 }}>{t('settings.data.recalculate_button')}</p>
+                                        </div>
+                                        <RecalculateButton />
                                     </div>
                                     <div style={{ height: '1px', background: 'var(--color-border)' }} />
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { type Badge, MOCK_BADGES } from '@/types/badge';
+import { type Work } from './libraryStore';
 
 interface GamificationState {
     level: number;
@@ -25,6 +26,7 @@ interface GamificationState {
     incrementStat: (stat: 'chapters' | 'episodes' | 'movies' | 'works' | 'completed') => void;
     checkBadges: () => void;
     resetStore: () => void;
+    recalculateStats: (works: Work[]) => void;
 }
 
 const LEVEL_BASE = 100;
@@ -177,10 +179,45 @@ export const useGamificationStore = create<GamificationState>()(
                 recentUnlock: null,
                 totalChaptersRead: 0,
                 totalAnimeEpisodesWatched: 0,
-                totalMoviesWatched: 0,
                 totalWorksAdded: 0,
                 totalWorksCompleted: 0
-            })
+            }),
+
+            recalculateStats: (works) => {
+                let chapters = 0;
+                let episodes = 0;
+                let movies = 0;
+                const worksAdded = works.length;
+                let worksCompleted = 0;
+
+                works.forEach(w => {
+                    const progress = w.currentChapter || 0;
+                    const type = w.type ? w.type.toLowerCase() : 'manga';
+
+                    if (type === 'manga') {
+                        chapters += progress;
+                    } else if (type === 'anime') {
+                        if (w.format === 'Movie') {
+                            // Movies are usually 1 unit, but progress tracks it
+                            movies += progress;
+                        } else {
+                            episodes += progress;
+                        }
+                    } else {
+                        chapters += progress;
+                    }
+
+                    if (w.status === 'completed') worksCompleted++;
+                });
+
+                set({
+                    totalChaptersRead: chapters,
+                    totalAnimeEpisodesWatched: episodes,
+                    totalMoviesWatched: movies,
+                    totalWorksAdded: worksAdded,
+                    totalWorksCompleted: worksCompleted
+                });
+            }
         }),
         {
             name: 'bingeki-gamification-storage',

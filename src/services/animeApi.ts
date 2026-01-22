@@ -1,3 +1,5 @@
+import { queuedFetch } from '@/utils/apiQueue';
+
 const BASE_URL = 'https://api.jikan.moe/v4';
 
 // Jikan API Status Response
@@ -12,7 +14,7 @@ export interface JikanStatusResponse {
 export const checkJikanStatus = async (): Promise<JikanStatusResponse> => {
     const startTime = Date.now();
     try {
-        const response = await fetch(`${BASE_URL}/anime/1`, {
+        const response = await queuedFetch(`${BASE_URL}/anime/1`, {
             method: 'HEAD', // Use HEAD to minimize data transfer
             signal: AbortSignal.timeout(5000) // 5 second timeout
         });
@@ -87,31 +89,40 @@ export interface JikanResult {
     };
 }
 
+export interface SearchFilters {
+    min_score?: number;
+    status?: string;
+    genres?: string; // Comma separated IDs
+    order_by?: 'score' | 'popularity' | 'title';
+    sort?: 'desc' | 'asc';
+    rating?: 'g' | 'pg' | 'pg13' | 'r17' | 'r' | 'rx'; // Allow strings generally to avoid conflict if API allows more
+    start_date?: string; // YYYY-MM-DD
+    end_date?: string;
+    producers?: string; // Comma separated IDs
+    limit?: number;
+}
+
 export const searchWorks = async (
     query: string,
     type: 'anime' | 'manga' = 'manga',
-    filters?: {
-        min_score?: number;
-        status?: string;
-        genres?: string; // Comma separated IDs
-        order_by?: 'score' | 'popularity' | 'title';
-        sort?: 'desc' | 'asc';
-        rating?: 'g' | 'pg' | 'pg13' | 'r17' | 'r' | 'rx';
-        start_date?: string; // YYYY-MM-DD
-        end_date?: string;
-        producers?: string; // Comma separated IDs
-        limit?: number;
-    }
+    filters?: SearchFilters
 ) => {
     try {
         const params = new URLSearchParams({
             q: query,
-            limit: '24', // Increased limit for discovery
+            limit: '24',
             sfw: 'true',
-            ...filters,
-        } as any);
+        });
 
-        const response = await fetch(`${BASE_URL}/${type}?${params.toString()}`);
+        if (filters) {
+            Object.entries(filters).forEach(([key, value]) => {
+                if (value !== undefined) {
+                    params.append(key, String(value));
+                }
+            });
+        }
+
+        const response = await queuedFetch(`${BASE_URL}/${type}?${params.toString()}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanResult[];
@@ -127,7 +138,7 @@ export const getTopWorks = async (
     limit: number = 24
 ) => {
     try {
-        const response = await fetch(`${BASE_URL}/top/${type}?filter=${filter}&limit=${limit}&sfw=true`);
+        const response = await queuedFetch(`${BASE_URL}/top/${type}?filter=${filter}&limit=${limit}&sfw=true`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanResult[];
@@ -140,7 +151,7 @@ export const getTopWorks = async (
 export const getSeasonalAnime = async (limit: number = 24) => {
     try {
         // Fetches current season's anime
-        const response = await fetch(`${BASE_URL}/seasons/now?limit=${limit}&sfw=true`);
+        const response = await queuedFetch(`${BASE_URL}/seasons/now?limit=${limit}&sfw=true`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanResult[];
@@ -165,7 +176,7 @@ export interface JikanEpisode {
 
 export const getAnimeEpisodes = async (id: number, page: number = 1) => {
     try {
-        const response = await fetch(`${BASE_URL}/anime/${id}/episodes?page=${page}`);
+        const response = await queuedFetch(`${BASE_URL}/anime/${id}/episodes?page=${page}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return {
@@ -180,7 +191,7 @@ export const getAnimeEpisodes = async (id: number, page: number = 1) => {
 
 export const getAnimeEpisodeDetails = async (id: number, episodeId: number) => {
     try {
-        const response = await fetch(`${BASE_URL}/anime/${id}/episodes/${episodeId}`);
+        const response = await queuedFetch(`${BASE_URL}/anime/${id}/episodes/${episodeId}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as { synopsis: string; duration: number; };
@@ -192,10 +203,8 @@ export const getAnimeEpisodeDetails = async (id: number, episodeId: number) => {
 
 export const getWorkDetails = async (id: number, type: 'anime' | 'manga'): Promise<JikanResult> => {
     try {
-        // Simple delay to help with rate limiting if called in a loop client-side
-        await new Promise(resolve => setTimeout(resolve, 350)); // ~3 requests/sec limit
-
-        const response = await fetch(`${BASE_URL}/${type}/${id}`);
+        // Rate limiting handled by apiQueue
+        const response = await queuedFetch(`${BASE_URL}/${type}/${id}`);
         if (!response.ok) {
             // Handle 429 Too Many Requests specifically if needed
             if (response.status === 429) {
@@ -245,7 +254,7 @@ export interface JikanCharacter {
 
 export const getWorkCharacters = async (id: number, type: 'anime' | 'manga') => {
     try {
-        const response = await fetch(`${BASE_URL}/${type}/${id}/characters`);
+        const response = await queuedFetch(`${BASE_URL}/${type}/${id}/characters`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         // Return top 10 characters to keep UI clean
@@ -268,7 +277,7 @@ export interface JikanRelation {
 
 export const getWorkRelations = async (id: number, type: 'anime' | 'manga') => {
     try {
-        const response = await fetch(`${BASE_URL}/${type}/${id}/relations`);
+        const response = await queuedFetch(`${BASE_URL}/${type}/${id}/relations`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanRelation[];
@@ -295,7 +304,7 @@ export interface JikanRecommendation {
 
 export const getWorkRecommendations = async (id: number, type: 'anime' | 'manga') => {
     try {
-        const response = await fetch(`${BASE_URL}/${type}/${id}/recommendations`);
+        const response = await queuedFetch(`${BASE_URL}/${type}/${id}/recommendations`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return (data.data as JikanRecommendation[]).slice(0, 12); // Limit to 12 recs
@@ -314,7 +323,7 @@ export interface JikanPicture {
 
 export const getWorkPictures = async (id: number, type: 'anime' | 'manga') => {
     try {
-        const response = await fetch(`${BASE_URL}/${type}/${id}/pictures`);
+        const response = await queuedFetch(`${BASE_URL}/${type}/${id}/pictures`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanPicture[];
@@ -331,7 +340,7 @@ export interface JikanTheme {
 
 export const getWorkThemes = async (id: number): Promise<JikanTheme> => {
     try {
-        const response = await fetch(`${BASE_URL}/anime/${id}/themes`);
+        const response = await queuedFetch(`${BASE_URL}/anime/${id}/themes`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanTheme;
@@ -357,7 +366,7 @@ export interface JikanStatistics {
 
 export const getWorkStatistics = async (id: number, type: 'anime' | 'manga') => {
     try {
-        const response = await fetch(`${BASE_URL}/${type}/${id}/statistics`);
+        const response = await queuedFetch(`${BASE_URL}/${type}/${id}/statistics`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanStatistics;
@@ -374,7 +383,7 @@ export interface JikanStreaming {
 
 export const getAnimeStreaming = async (id: number) => {
     try {
-        const response = await fetch(`${BASE_URL}/anime/${id}/streaming`);
+        const response = await queuedFetch(`${BASE_URL}/anime/${id}/streaming`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanStreaming[];
@@ -401,7 +410,7 @@ export interface JikanStaff {
 
 export const getAnimeStaff = async (id: number) => {
     try {
-        const response = await fetch(`${BASE_URL}/anime/${id}/staff`);
+        const response = await queuedFetch(`${BASE_URL}/anime/${id}/staff`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanStaff[];
@@ -417,7 +426,7 @@ export const getAnimeSchedule = async (filter?: string) => {
             ? `${BASE_URL}/schedules?filter=${filter}&sfw=true`
             : `${BASE_URL}/schedules?sfw=true`;
 
-        const response = await fetch(url);
+        const response = await queuedFetch(url);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanResult[];
@@ -429,7 +438,7 @@ export const getAnimeSchedule = async (filter?: string) => {
 
 export const getRandomAnime = async () => {
     try {
-        const response = await fetch(`${BASE_URL}/random/anime?sfw=true`);
+        const response = await queuedFetch(`${BASE_URL}/random/anime?sfw=true`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanResult;
@@ -473,7 +482,7 @@ export interface JikanReview {
 export const getWorkReviews = async (id: number, type: 'anime' | 'manga') => {
     try {
         // Fetch top rated reviews first
-        const response = await fetch(`${BASE_URL}/${type}/${id}/reviews?spoilers=false&preliminary=false`);
+        const response = await queuedFetch(`${BASE_URL}/${type}/${id}/reviews?spoilers=false&preliminary=false`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanReview[];
@@ -521,7 +530,7 @@ export interface JikanCharacterVoice {
 
 export const getCharacterById = async (id: number) => {
     try {
-        const response = await fetch(`${BASE_URL}/characters/${id}`);
+        const response = await queuedFetch(`${BASE_URL}/characters/${id}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanCharacterFull;
@@ -531,14 +540,24 @@ export const getCharacterById = async (id: number) => {
     }
 };
 
+export interface JikanCharacterManga {
+    role: string;
+    manga: {
+        mal_id: number;
+        url: string;
+        images: { jpg: { image_url: string; large_image_url: string } };
+        title: string;
+    };
+}
+
 export const getCharacterFull = async (id: number) => {
     try {
-        const response = await fetch(`${BASE_URL}/characters/${id}/full`);
+        const response = await queuedFetch(`${BASE_URL}/characters/${id}/full`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanCharacterFull & {
             anime: JikanCharacterAnime[];
-            manga: JikanCharacterAnime[];
+            manga: JikanCharacterManga[];
             voices: JikanCharacterVoice[];
         };
     } catch (error) {
@@ -579,7 +598,7 @@ export interface JikanPersonVoice {
 
 export const getPersonById = async (id: number) => {
     try {
-        const response = await fetch(`${BASE_URL}/people/${id}`);
+        const response = await queuedFetch(`${BASE_URL}/people/${id}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanPersonFull;
@@ -591,7 +610,7 @@ export const getPersonById = async (id: number) => {
 
 export const getPersonFull = async (id: number) => {
     try {
-        const response = await fetch(`${BASE_URL}/people/${id}/full`);
+        const response = await queuedFetch(`${BASE_URL}/people/${id}/full`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanPersonFull & {
@@ -606,7 +625,7 @@ export const getPersonFull = async (id: number) => {
 
 export const searchCharacters = async (query: string, limit: number = 15) => {
     try {
-        const response = await fetch(`${BASE_URL}/characters?q=${encodeURIComponent(query)}&limit=${limit}`);
+        const response = await queuedFetch(`${BASE_URL}/characters?q=${encodeURIComponent(query)}&limit=${limit}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanCharacterFull[];
@@ -618,7 +637,7 @@ export const searchCharacters = async (query: string, limit: number = 15) => {
 
 export const searchPeople = async (query: string, limit: number = 15) => {
     try {
-        const response = await fetch(`${BASE_URL}/people?q=${encodeURIComponent(query)}&limit=${limit}`);
+        const response = await queuedFetch(`${BASE_URL}/people?q=${encodeURIComponent(query)}&limit=${limit}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanPersonFull[];

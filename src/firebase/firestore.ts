@@ -74,7 +74,7 @@ export async function saveUserProfileToFirestore(user: Partial<UserProfile>, for
         const exists = docSnap.exists();
 
         // Prepare data to save - filter out undefined but Keep null/empty strings to allow clearing
-        const dataToSave: any = {
+        const dataToSave: Partial<UserProfile> = {
             lastLogin: Date.now()
         };
 
@@ -94,7 +94,8 @@ export async function saveUserProfileToFirestore(user: Partial<UserProfile>, for
             }
 
             if (user[field] !== undefined) {
-                dataToSave[field] = user[field];
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (dataToSave as any)[field] = user[field];
             }
         });
 
@@ -159,11 +160,12 @@ export async function saveLibraryToFirestore(userId: string, works: Work[]): Pro
             version: (existing?.version || 0) + 1
         } as LibraryData);
         console.log('[Firestore] Library saved safely');
-    } catch (error: any) {
+    } catch (error) {
         console.error('[Firestore] Error saving library:', error);
-        if (error.code === 'permission-denied') {
+        if ((error as { code?: string }).code === 'permission-denied') {
             console.error('[Firestore] PERMISSION DENIED: Check your Firestore Security Rules in Firebase Console.');
         }
+        throw error;
     }
 }
 
@@ -234,11 +236,12 @@ export async function saveGamificationToFirestore(
         }, { merge: true });
 
         console.log('[Firestore] Gamification saved safely');
-    } catch (error: any) {
+    } catch (error) {
         console.error('[Firestore] Error saving gamification:', error);
-        if (error.code === 'permission-denied') {
+        if ((error as { code?: string }).code === 'permission-denied') {
             console.error('[Firestore] PERMISSION DENIED: Check your Firestore Security Rules in Firebase Console.');
         }
+        throw error;
     }
 }
 
@@ -249,7 +252,8 @@ export async function loadGamificationFromFirestore(userId: string): Promise<Omi
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            const { lastUpdated, ...data } = docSnap.data() as GamificationData;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { lastUpdated: _ignored, ...data } = docSnap.data() as GamificationData;
             console.log('[Firestore] Gamification loaded');
             return data;
         }
@@ -464,7 +468,8 @@ export async function getFriends(userId: string): Promise<Friend[]> {
 }
 
 // Get Global Leaderboard
-export async function getLeaderboard(limitCount: number = 10): Promise<UserProfile[]> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const getLeaderboard = async (limitCount = 10, _period: 'week' | 'month' | 'all-time' = 'all-time'): Promise<UserProfile[]> => {
     try {
         const q = query(
             collection(db, 'users'),
@@ -574,6 +579,7 @@ export type LeaderboardCategory = 'xp' | 'chapters' | 'streak';
 // Get filtered leaderboard
 export async function getFilteredLeaderboard(
     category: LeaderboardCategory = 'xp',
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _period: LeaderboardPeriod = 'all',
     limitCount: number = 10
 ): Promise<UserProfile[]> {

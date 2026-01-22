@@ -32,8 +32,8 @@ export default function AdminFeedback() {
         try {
             const data = await getAllFeedback();
             setFeedbacks(data);
-        } catch (e) {
-            console.error("Failed to load feedback", e);
+        } catch {
+            console.error("Failed to load feedback");
         } finally {
             setLoading(false);
         }
@@ -44,7 +44,7 @@ export default function AdminFeedback() {
             try {
                 await deleteFeedback(id);
                 setFeedbacks(prev => prev.filter(f => f.id !== id));
-            } catch (e) {
+            } catch {
                 alert(t('admin.feedback.delete_error'));
             }
         }
@@ -54,7 +54,7 @@ export default function AdminFeedback() {
         try {
             await updateFeedbackDetails(id, { status: newStatus });
             setFeedbacks(prev => prev.map(f => f.id === id ? { ...f, status: newStatus, lastUpdated: Date.now() } : f));
-        } catch (e) {
+        } catch {
             alert(t('admin.feedback.status_error'));
         }
     };
@@ -63,7 +63,7 @@ export default function AdminFeedback() {
         try {
             await updateFeedbackDetails(id, { priority: newPriority });
             setFeedbacks(prev => prev.map(f => f.id === id ? { ...f, priority: newPriority, lastUpdated: Date.now() } : f));
-        } catch (e) {
+        } catch {
             alert(t('admin.feedback.priority_error'));
         }
     };

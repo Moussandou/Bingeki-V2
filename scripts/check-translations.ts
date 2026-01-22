@@ -24,6 +24,7 @@ const colors = {
 };
 
 // Read i18n.ts and extract the resources object
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractResources(): { fr: Record<string, any>, en: Record<string, any> } {
     const i18nPath = path.join(process.cwd(), 'src', 'i18n.ts');
     const content = fs.readFileSync(i18nPath, 'utf-8');
@@ -34,11 +35,6 @@ function extractResources(): { fr: Record<string, any>, en: Record<string, any> 
         throw new Error('Could not find resources object in i18n.ts');
     }
 
-    // Evaluate the object (simplified - in production use a proper parser)
-    const resourcesStr = resourcesMatch[1];
-
-    // Parse manually by extracting fr and en blocks
-    const result = { fr: { translation: {} }, en: { translation: {} } };
 
     // Use a different approach - import the actual file
     try {
@@ -60,6 +56,7 @@ function extractResources(): { fr: Record<string, any>, en: Record<string, any> 
 }
 
 // Recursively get all keys from an object
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getAllKeys(obj: Record<string, any>, prefix = ''): string[] {
     const keys: string[] = [];
 

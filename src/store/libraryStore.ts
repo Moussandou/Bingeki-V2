@@ -19,6 +19,14 @@ export interface Work {
     lastUpdated?: number; // Timestamp of last progress update
     dateAdded?: number; // Timestamp of creation
     collections?: string[]; // E.g., "Favorites", "Must Read"
+    genres?: { name: string }[];
+    season?: string;
+    year?: number;
+    rank?: number;
+    popularity?: number;
+    duration?: string;
+    ratingString?: string;
+    source?: string;
 }
 
 interface LibraryState {
@@ -33,6 +41,7 @@ interface LibraryState {
     updateWorkDetails: (id: number | string, details: Partial<Work>) => void;
     getWork: (id: number | string) => Work | undefined;
     isFavoriteCharacter: (id: number) => boolean;
+    setFavoriteCharacters: (chars: FavoriteCharacter[]) => void;
     resetStore: () => void;
 }
 
@@ -79,6 +88,7 @@ export const useLibraryStore = create<LibraryState>()(
             })),
             getWork: (id) => get().works.find((w) => w.id === id),
             isFavoriteCharacter: (id: number) => get().favoriteCharacters.some((c) => c.id === id),
+            setFavoriteCharacters: (chars) => set({ favoriteCharacters: chars }),
             resetStore: () => set({ works: [], favoriteCharacters: [] }),
         }),
         {

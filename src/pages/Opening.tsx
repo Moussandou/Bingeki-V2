@@ -1,11 +1,11 @@
 import { Link } from '@/components/routing/LocalizedLink';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Layout } from '@/components/layout/Layout';
-import styles from '@/styles/Opening.module.css';
+import styles from './Opening.module.css';
 import { Card } from '@/components/ui/Card';
-import { HunterLicenseCard } from '@/components/HunterLicenseCard';
-import { Search, Check, Users, MessageCircle, Heart, TrendingUp, ChevronUp, History as HistoryIcon, Trophy, Star, ArrowRight } from 'lucide-react';
+import { HunterLicenseCard } from '@/components/profile/HunterLicenseCard';
+import { Search, Check, Users, MessageCircle, Heart, TrendingUp, ChevronUp, History as HistoryIcon, Trophy, Star, ArrowRight, Home, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 
@@ -49,6 +49,7 @@ interface SearchResult {
 }
 
 import { getTopWorks } from '@/services/animeApi';
+import type { UserProfile } from '@/firebase/firestore';
 
 export default function Opening() {
     const { t } = useTranslation();
@@ -63,18 +64,25 @@ export default function Opening() {
 
     // Refs for scroll trigger animations
     // Refs for scroll trigger animations
-    const progressionRef = useRef(null);
+    const progressionRef = useRef<HTMLDivElement>(null);
     // const isProgressionInView = useInView(progressionRef, { once: true, amount: 0.3 }); // Removed to fix layout shift
 
-    const commentsRef = useRef(null);
+    const commentsRef = useRef<HTMLDivElement>(null);
     const areCommentsInView = useInView(commentsRef, { once: true, amount: 0.3 });
-    const [visibleComments, setVisibleComments] = useState<any[]>([]);
 
-    const mockComments = [
+    interface Comment {
+        user: string;
+        text: string;
+        time: string;
+    }
+
+    const [visibleComments, setVisibleComments] = useState<Comment[]>([]);
+
+    const mockComments = useMemo(() => [
         { user: "Levi", text: "landing.features.community.comments.levi", time: "2m" },
         { user: "Armin", text: "landing.features.community.comments.armin", time: "5m" },
         { user: "Mikasa", text: "landing.features.community.comments.mikasa", time: "12m" }
-    ];
+    ], []);
 
     useEffect(() => {
         if (areCommentsInView && visibleComments.length < mockComments.length) {
@@ -101,7 +109,7 @@ export default function Opening() {
         };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    }, [placeholders.length]);
 
     // Fetch data from API
     // Fetch data from API
@@ -186,7 +194,7 @@ export default function Opening() {
         }, typeSpeed);
 
         return () => clearTimeout(timer);
-    }, [placeholderText, isDeleting, placeholderIndex, fullTextToType]);
+    }, [placeholderText, isDeleting, placeholderIndex, fullTextToType, placeholders.length]);
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -199,6 +207,7 @@ export default function Opening() {
         displayName: 'Eren Jaeger',
         photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Eren',
         createdAt: 0,
+        lastLogin: 0,
         settings: { theme: 'light', notifications: true }
     };
 
@@ -318,7 +327,7 @@ export default function Opening() {
                     <div className={`${styles.visualContent} ${styles.progressionVisual}`}>
                         <div className={`${styles.mockupContainer} ${styles.mockupWrapper}`}>
                             <HunterLicenseCard
-                                user={mockUser as any}
+                                user={mockUser as UserProfile}
                                 stats={{
                                     level: 42,
                                     xp: 2800,
@@ -645,6 +654,86 @@ export default function Opening() {
                     </div>
                 </section>
 
+
+
+                {/* SECTION 5.5: MOBILE APP PROMO (NEW) */}
+                <section className={`${styles.featureSection} ${styles.featureSectionReverse}`}>
+                    <div className={styles.textContent}>
+                        <div className={styles.sfx} style={{ top: -50, right: 0, fontSize: '6rem', color: '#808080', opacity: 0.1, transform: 'rotate(10deg)' }}>POCKET</div>
+                        <h2 className={styles.sectionTitle}>{t('landing.features.mobile.title') || "BINGEKI DANS VOTRE POCHE"}</h2>
+                        <div className={styles.sectionDescription}>
+                            <p>{t('landing.features.mobile.description_1') || "Emportez votre collection partout. Une expérience fluide, rapide et conçue pour le mobile."}</p>
+                            <ul style={{ listStyle: 'none', padding: 0, marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                                <li style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', fontWeight: 800 }}>
+                                    <div style={{ padding: '0.3rem', background: 'var(--color-primary)', borderRadius: '4px', border: '2px solid #000' }}><Check size={16} color="#000" strokeWidth={4} /></div>
+                                    <span>{t('landing.features.mobile.feature_1') || "Installable (PWA)"}</span>
+                                </li>
+                                <li style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', fontWeight: 800 }}>
+                                    <div style={{ padding: '0.3rem', background: 'var(--color-primary)', borderRadius: '4px', border: '2px solid #000' }}><Check size={16} color="#000" strokeWidth={4} /></div>
+                                    <span>{t('landing.features.mobile.feature_2') || "Mode Hors-ligne"}</span>
+                                </li>
+                                <li style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', fontWeight: 800 }}>
+                                    <div style={{ padding: '0.3rem', background: 'var(--color-primary)', borderRadius: '4px', border: '2px solid #000' }}><Check size={16} color="#000" strokeWidth={4} /></div>
+                                    <span>{t('landing.features.mobile.feature_3') || "Notifications Push (Bientôt)"}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className={styles.visualContent}>
+                        <div className={styles.mockupContainer} style={{ width: '80%', display: 'flex', justifyContent: 'center' }}>
+                            <motion.div
+                                initial={{ y: 50, opacity: 0 }}
+                                whileInView={{ y: 0, opacity: 1 }}
+                                transition={{ type: "spring", bounce: 0.4 }}
+                                style={{
+                                    width: '280px',
+                                    height: '560px',
+                                    background: '#000',
+                                    borderRadius: '30px',
+                                    border: '8px solid #333',
+                                    boxShadow: '20px 20px 0 var(--color-shadow-strong)',
+                                    position: 'relative',
+                                    overflow: 'hidden'
+                                }}
+                            >
+                                {/* Phone Notch */}
+                                <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '120px', height: '25px', background: '#333', borderBottomLeftRadius: '15px', borderBottomRightRadius: '15px', zIndex: 20 }}></div>
+
+                                {/* Screen Content */}
+                                <div style={{ width: '100%', height: '100%', background: 'var(--color-surface)', overflow: 'hidden', padding: '3rem 1rem 1rem 1rem', display: 'flex', flexDirection: 'column' }}>
+                                    {/* App Header */}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                        <span style={{ fontWeight: 900, fontSize: '1.2rem', fontFamily: 'var(--font-heading)' }}>BINGEKI</span>
+                                        <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#eee' }}></div>
+                                    </div>
+
+                                    {/* App Cards */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                        <div style={{ height: '140px', background: 'var(--color-surface)', border: '2px solid var(--color-border)', borderRadius: '8px', overflow: 'hidden', position: 'relative' }}>
+                                            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.1, fontSize: '3rem', fontWeight: 900 }}>MANGAS</div>
+                                            <div style={{ position: 'absolute', bottom: '0.5rem', left: '0.5rem', fontWeight: 900, background: 'var(--color-primary)', padding: '0.2rem 0.5rem' }}>CONTINUE</div>
+                                        </div>
+                                        <div style={{ height: '80px', background: 'var(--color-surface-hover)', border: '2px solid var(--color-border)', borderRadius: '8px', padding: '1rem' }}>
+                                            <div style={{ width: '60%', height: '10px', background: 'var(--color-border)', marginBottom: '0.5rem' }}></div>
+                                            <div style={{ width: '40%', height: '10px', background: 'var(--color-border)' }}></div>
+                                        </div>
+                                    </div>
+
+                                    {/* Bottom Nav Mockup */}
+                                    <div style={{ marginTop: 'auto', borderTop: '2px solid var(--color-border)', paddingTop: '1rem', display: 'flex', justifyContent: 'space-around', opacity: 0.5 }}>
+                                        <Home size={24} />
+                                        <Search size={24} />
+                                        <User size={24} />
+                                    </div>
+                                </div>
+
+                                {/* Glare */}
+                                <div style={{ position: 'absolute', top: 0, right: 0, width: '100%', height: '100%', background: 'linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.1) 45%, transparent 50%)', pointerEvents: 'none' }}></div>
+                            </motion.div>
+                        </div>
+                    </div>
+                </section>
 
                 {/* SECTION 6: TIPS FOR DEVS */}
                 <section className={`${styles.featureSection} ${styles.supportSection}`}>

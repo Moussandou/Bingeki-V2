@@ -5,9 +5,21 @@ import { useDraggable } from '@dnd-kit/core';
 import { Search, Info } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { searchCharacters, getWorkCharacters, searchWorks } from '@/services/animeApi';
+import type { JikanCharacter, JikanResult } from '@/services/animeApi';
+
+// Define a unified Character type for the pool that covers both search results and work characters
+interface PoolCharacter {
+    mal_id: number;
+    name: string;
+    images: {
+        jpg: {
+            image_url: string;
+        };
+    };
+}
 
 // Draggable Item for the pool
-function DraggablePoolItem({ character }: { character: any }) {
+function DraggablePoolItem({ character }: { character: PoolCharacter }) {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: `pool-${character.mal_id}`,
         data: { character }
@@ -45,8 +57,8 @@ export function CharacterPool() {
     const { t } = useTranslation();
     const [query, setQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [characters, setCharacters] = useState<any[]>([]);
-    const [works, setWorks] = useState<any[]>([]);
+    const [characters, setCharacters] = useState<PoolCharacter[]>([]);
+    const [works, setWorks] = useState<JikanResult[]>([]);
     const [mode, setMode] = useState<'character' | 'work'>('character');
 
     // Quick Collections
@@ -55,7 +67,7 @@ export function CharacterPool() {
         setCharacters([]);
         setWorks([]);
         try {
-            let results: any[] = [];
+            let results: JikanCharacter[] = [];
             if (type === 'jjk') {
                 results = await getWorkCharacters(40748, 'anime'); // Jujutsu Kaisen
             } else if (type === 'naruto') {
@@ -65,14 +77,14 @@ export function CharacterPool() {
             }
 
             // Map to standard format
-            const formatted = results.map((c: any) => ({
+            const formatted: PoolCharacter[] = results.map((c) => ({
                 mal_id: c.character.mal_id,
                 name: c.character.name,
                 images: c.character.images
             }));
 
             // Deduplicate by mal_id
-            const unique = Array.from(new Map(formatted.map((item: any) => [item.mal_id, item])).values());
+            const unique = Array.from(new Map(formatted.map((item) => [item.mal_id, item])).values());
 
             setCharacters(unique);
             setMode('character'); // Force switch to character view
@@ -95,7 +107,8 @@ export function CharacterPool() {
             if (mode === 'character') {
                 const results = await searchCharacters(query);
                 // Deduplicate
-                const unique = Array.from(new Map(results.map((item: any) => [item.mal_id, item])).values());
+                // JikanCharacterFull is compatible with PoolCharacter
+                const unique = Array.from(new Map(results.map((item) => [item.mal_id, item])).values());
                 setCharacters(unique);
             } else {
                 const results = await searchWorks(query, 'anime');
@@ -116,14 +129,14 @@ export function CharacterPool() {
         setIsLoading(true);
         try {
             const results = await getWorkCharacters(workId, 'anime');
-            const formatted = results.map((c: any) => ({
+            const formatted: PoolCharacter[] = results.map((c) => ({
                 mal_id: c.character.mal_id,
                 name: c.character.name,
                 images: c.character.images
             }));
 
             // Deduplicate
-            const unique = Array.from(new Map(formatted.map((item: any) => [item.mal_id, item])).values());
+            const unique = Array.from(new Map(formatted.map((item) => [item.mal_id, item])).values());
 
             setCharacters(unique);
             setMode('character'); // Switch to view characters

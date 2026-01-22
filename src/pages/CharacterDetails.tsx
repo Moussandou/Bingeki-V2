@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 import { ArrowLeft, Heart, User, Loader2, Mic } from 'lucide-react';
-import { getCharacterFull, type JikanCharacterFull, type JikanCharacterAnime, type JikanCharacterVoice } from '@/services/animeApi';
+import { getCharacterFull, type JikanCharacterFull, type JikanCharacterAnime, type JikanCharacterVoice, type JikanCharacterManga } from '@/services/animeApi'; // Ensure JikanCharacterManga is imported
 import { SEO } from '@/components/layout/SEO';
 import { useLibraryStore } from '@/store/libraryStore';
 import { useAuthStore } from '@/store/authStore';
@@ -13,7 +13,7 @@ import styles from './CharacterDetails.module.css';
 
 type CharacterFullData = JikanCharacterFull & {
     anime: JikanCharacterAnime[];
-    manga: JikanCharacterAnime[];
+    manga: JikanCharacterManga[];
     voices: JikanCharacterVoice[];
 };
 
@@ -32,11 +32,20 @@ export default function CharacterDetails() {
     useEffect(() => {
         if (!id) return;
 
-        setLoading(true);
-        getCharacterFull(Number(id)).then(data => {
-            setCharacter(data);
-            setLoading(false);
-        });
+        let active = true;
+        const loadChar = async () => {
+            setLoading(true);
+            try {
+                const data = await getCharacterFull(Number(id));
+                if (active) setCharacter(data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                if (active) setLoading(false);
+            }
+        };
+        loadChar();
+        return () => { active = false; };
     }, [id]);
 
     if (loading) {
@@ -299,9 +308,9 @@ export default function CharacterDetails() {
                     <div style={{ marginTop: '2rem' }}>
                         <h2 className={styles.sectionTitle}>{t('character_details.manga_appearances')}</h2>
                         <div className={styles.grid}>
-                            {character.manga.slice(0, 12).filter((m: any) => m.manga?.images?.jpg?.image_url).map((m: any) => (
+                            {character.manga.slice(0, 12).filter((m) => m.manga?.images?.jpg?.image_url).map((m, idx) => (
                                 <div
-                                    key={m.manga?.mal_id || Math.random()}
+                                    key={m.manga?.mal_id || idx}
                                     className={styles.card}
                                     onClick={() => navigate(`/work/${m.manga?.mal_id}?type=manga`)}
                                 >

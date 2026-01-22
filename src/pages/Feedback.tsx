@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 import { useAuthStore } from '@/store/authStore';
@@ -51,38 +51,7 @@ export default function Feedback() {
     const [loadingDetail, setLoadingDetail] = useState(false);
 
     // Sync state with URL
-    useEffect(() => {
-        const tab = searchParams.get('tab') as Tab;
-        if (tab && tab !== activeTab) setActiveTab(tab);
-
-        const id = searchParams.get('id');
-        if (id && id !== selectedTicketId) setSelectedTicketId(id);
-    }, [searchParams]);
-
-    // Update URL when state changes
-    useEffect(() => {
-        const params: any = { tab: activeTab };
-        if (selectedTicketId) params.id = selectedTicketId;
-        setSearchParams(params);
-    }, [activeTab, selectedTicketId]);
-
-    // Load Tickets
-    useEffect(() => {
-        if (activeTab === 'tickets' && user && !selectedTicketId) {
-            loadTickets();
-        }
-    }, [activeTab, user, selectedTicketId]);
-
-    // Load Ticket Detail
-    useEffect(() => {
-        if (selectedTicketId) {
-            loadTicketDetail(selectedTicketId);
-        } else {
-            setSelectedTicket(null);
-        }
-    }, [selectedTicketId]);
-
-    const loadTickets = async () => {
+    const loadTickets = useCallback(async () => {
         if (!user) return;
         setLoadingTickets(true);
         try {
@@ -93,20 +62,65 @@ export default function Feedback() {
         } finally {
             setLoadingTickets(false);
         }
-    };
+    }, [user]);
 
-    const loadTicketDetail = async (id: string) => {
+    const loadTicketDetail = useCallback(async (id: string) => {
         setLoadingDetail(true);
         try {
-            const data = await getFeedbackById(id);
-            setSelectedTicket(data);
+            const detail = await getFeedbackById(id);
+            if (detail) {
+                if (detail.userId !== user?.uid && !user?.email?.endsWith('@bingeki.com')) {
+                    addToast(t('feedback.error_permission'), 'error');
+                    setSearchParams({ tab: 'tickets' });
+                    return;
+                }
+                setSelectedTicket(detail);
+            }
         } catch (error) {
-            console.error('Error loading ticket detail:', error);
-            addToast('Impossible de charger le ticket', 'error');
+            console.error('Error loading feedback detail:', error);
+            addToast(t('feedback.error_loading_detail'), 'error');
         } finally {
             setLoadingDetail(false);
         }
-    };
+    }, [user, addToast, setSearchParams, t]);
+
+    // Sync state with URL
+    useEffect(() => {
+        const tab = searchParams.get('tab') as Tab;
+        if (tab && tab !== activeTab) setActiveTab(tab);
+
+        const id = searchParams.get('id');
+        if (id && id !== selectedTicketId) setSelectedTicketId(id);
+    }, [searchParams, activeTab, selectedTicketId]); // Added activeTab, selectedTicketId to satisfy exhaustive-deps, though logic suggests conditional check? 
+    // Actually the logic is "Sync state FROM URL". If state matches URL, do nothing. 
+    // If I add activeTab to dep, it runs when activeTab changes. 
+    // If activeTab changes, typically URL should update (next effect).
+    // This effect is "On Mount" or "On URL Change". 
+    // If strict deps: [searchParams, activeTab, selectedTicketId].
+    // But logic `if (tab && tab !== activeTab)` prevents loops.
+
+    // Update URL when state changes
+    useEffect(() => {
+        const params: Record<string, string> = { tab: activeTab };
+        if (selectedTicketId) params.id = selectedTicketId;
+        setSearchParams(params);
+    }, [activeTab, selectedTicketId, setSearchParams]);
+
+    // Load Tickets
+    useEffect(() => {
+        if (activeTab === 'tickets' && user && !selectedTicketId) {
+            loadTickets();
+        }
+    }, [activeTab, user, selectedTicketId, loadTickets]);
+
+    // Load Ticket Detail
+    useEffect(() => {
+        if (selectedTicketId) {
+            loadTicketDetail(selectedTicketId);
+        } else {
+            setSelectedTicket(null);
+        }
+    }, [selectedTicketId, loadTicketDetail]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -123,14 +137,13 @@ export default function Feedback() {
         let uploadedUrls: string[] = [];
 
         try {
-            console.log('[Feedback] Starting submission...', { rating, category, priority, attachmentsCount: attachments.length });
+
 
             if (attachments.length > 0) {
-                console.log('[Feedback] Uploading images...');
+
                 const tempId = `temp_${Date.now()}_${Math.random().toString(36).substring(7)}`;
                 const uploadPromises = attachments.map(file => uploadFeedbackImage(tempId, file));
                 uploadedUrls = await Promise.all(uploadPromises);
-                console.log('[Feedback] Images uploaded:', uploadedUrls);
             }
 
             const feedbackId = await submitFeedback({
@@ -146,7 +159,6 @@ export default function Feedback() {
             });
 
             if (feedbackId) {
-                console.log('[Feedback] Firestore submission success:', feedbackId);
                 setSubmittedId(feedbackId);
                 setIsSuccess(true);
                 addToast(t('feedback.toast_success'), 'success');

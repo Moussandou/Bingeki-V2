@@ -4,12 +4,18 @@ import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortabl
 import { SortableItem, TierItemDisplay } from './SortableItem';
 import { X } from 'lucide-react';
 
+interface TierItem {
+    id: number | string;
+    name: string;
+    image: string;
+}
+
 interface TierRowProps {
     tier: {
         id: string;
         label: string;
         color: string;
-        items: any[];
+        items: TierItem[];
     };
     onLabelChange?: (newLabel: string) => void;
     onColorChange?: (newColor: string) => void;

@@ -2,7 +2,7 @@ import { LogOut, Star } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { type UserProfile } from '@/firebase/firestore';
 import { BADGE_ICONS } from '@/utils/badges';
-import { NenChart } from './profile/NenChart';
+import { NenChart } from './NenChart';
 import styles from './HunterLicenseCard.module.css';
 import { useTranslation } from 'react-i18next';
 

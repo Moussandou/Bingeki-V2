@@ -9,9 +9,10 @@ interface ModalProps {
     onClose: () => void;
     title?: string;
     children: React.ReactNode;
+    variant?: 'glass' | 'manga';
 }
 
-export function Modal({ isOpen, onClose, title, children }: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, variant = 'glass' }: ModalProps) {
     return (
         <AnimatePresence>
             {isOpen && (
@@ -24,8 +25,8 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
                         style={{
                             position: 'fixed',
                             inset: 0,
-                            background: 'rgba(0,0,0,0.7)',
-                            backdropFilter: 'blur(5px)',
+                            background: variant === 'manga' ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.7)',
+                            backdropFilter: variant === 'manga' ? 'none' : 'blur(5px)',
                             zIndex: 999
                         }}
                     />
@@ -36,11 +37,16 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
                             style={{ pointerEvents: 'auto', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}
                         >
-                            <Card variant="glass" style={{ padding: '1.5rem' }}>
+                            <Card variant={variant} style={{ padding: '1.5rem', background: variant === 'manga' ? 'var(--color-surface)' : undefined, border: variant === 'manga' ? '3px solid var(--color-border-heavy)' : undefined, boxShadow: variant === 'manga' ? '8px 8px 0 var(--color-shadow-solid)' : undefined }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                    {title && <h3 style={{ fontSize: '1.5rem' }}>{title}</h3>}
-                                    <Button variant="ghost" size="icon" onClick={onClose}>
-                                        <X size={20} />
+                                    {title && <h3 style={{ fontSize: '1.5rem', fontFamily: variant === 'manga' ? 'var(--font-heading)' : undefined }}>{title}</h3>}
+                                    <Button
+                                        variant={variant === 'manga' ? 'manga' : 'ghost'}
+                                        size="icon"
+                                        onClick={onClose}
+                                        style={variant === 'manga' ? { width: '40px', height: '40px', borderRadius: '0', border: '2px solid var(--color-border-heavy)' } : undefined}
+                                    >
+                                        <X size={variant === 'manga' ? 24 : 20} strokeWidth={variant === 'manga' ? 3 : 2} />
                                     </Button>
                                 </div>
                                 {children}

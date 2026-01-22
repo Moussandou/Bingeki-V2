@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
@@ -20,8 +20,8 @@ import {
 } from '@/firebase/firestore';
 import type { ActivityEvent } from '@/types/activity';
 import { ACTIVITY_EMOJIS, getActivityLabel } from '@/types/activity';
-import { ChallengesSection } from '@/components/ChallengesSection';
-import { WatchPartiesSection } from '@/components/WatchPartiesSection';
+import { ChallengesSection } from '@/components/gamification/ChallengesSection';
+import { WatchPartiesSection } from '@/components/social/WatchPartiesSection';
 import { Podium } from '@/components/social/Podium';
 import { RankingList } from '@/components/social/RankingList';
 
@@ -47,13 +47,9 @@ export default function Social() {
 
     // Leaderboard filters
     const [leaderboardCategory, setLeaderboardCategory] = useState<LeaderboardCategory>('xp');
-    const [leaderboardPeriod, _setLeaderboardPeriod] = useState<LeaderboardPeriod>('all');
+    const [leaderboardPeriod] = useState<LeaderboardPeriod>('all');
 
-    useEffect(() => {
-        loadData();
-    }, [activeTab, leaderboardCategory, leaderboardPeriod, user]);
-
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         setLoading(true);
         // Always load friends to check status even in ranking
         if (user) {
@@ -69,7 +65,11 @@ export default function Social() {
             setActivities(activityData);
         }
         setLoading(false);
-    };
+    }, [activeTab, leaderboardCategory, leaderboardPeriod, user]);
+
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
 
 
     const handleSearch = async () => {
@@ -236,6 +236,7 @@ export default function Social() {
                             ) : (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     {activities.map((activity) => {
+                                        /* eslint-disable-next-line */
                                         const timeDiff = Date.now() - activity.timestamp;
                                         const hours = Math.floor(timeDiff / (1000 * 60 * 60));
                                         const timeAgo = hours < 1 ? t('social.activity.time.less_than_hour') :

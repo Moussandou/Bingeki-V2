@@ -56,7 +56,7 @@ export default function Auth() {
                     navigate('/dashboard');
                 }
             }
-        } catch (err) {
+        } catch {
             setError(t('auth.error_generic'));
         }
 
@@ -106,15 +106,16 @@ export default function Auth() {
                     top: '1.5rem',
                     left: '1.5rem',
                     zIndex: 20,
-                    background: '#fff',
-                    border: '3px solid #000',
+                    background: 'var(--color-surface)',
+                    border: '3px solid var(--color-border-heavy)',
                     padding: '0.5rem',
-                    boxShadow: '4px 4px 0 #000',
+                    boxShadow: '4px 4px 0 var(--color-shadow)',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.5rem',
-                    fontWeight: 900
+                    fontWeight: 900,
+                    color: 'var(--color-text)'
                 }}
             >
                 <ArrowLeft size={24} />
@@ -138,19 +139,19 @@ export default function Auth() {
                     {/* Logo */}
                     <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
                         <img src="/logo.png" alt="Bingeki Logo" style={{ width: 100, height: 100, objectFit: 'contain' }} />
-                        <span style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000' }}>BINGEKI</span>
+                        <span style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: 'var(--color-text)' }}>BINGEKI</span>
                     </Link>
 
-                    <h1 style={{ fontSize: '3.5rem', lineHeight: 1.1, fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000', textTransform: 'uppercase' }} dangerouslySetInnerHTML={{ __html: t('auth.hero_title') }} />
-                    <p style={{ fontSize: '1.1rem', color: '#666', maxWidth: '400px', lineHeight: 1.6 }}>
+                    <h1 style={{ fontSize: '3.5rem', lineHeight: 1.1, fontFamily: 'var(--font-heading)', fontWeight: 900, color: 'var(--color-text)', textTransform: 'uppercase' }} dangerouslySetInnerHTML={{ __html: t('auth.hero_title') }} />
+                    <p style={{ fontSize: '1.1rem', color: 'var(--color-text-muted)', maxWidth: '400px', lineHeight: 1.6 }}>
                         {t('auth.hero_subtitle')}
                     </p>
 
                     <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                        <div style={{ padding: '0.75rem 1.5rem', background: '#fff', border: '3px solid #000', fontWeight: 900, fontSize: '0.9rem', textTransform: 'uppercase', boxShadow: '4px 4px 0 var(--color-primary)' }}>
+                        <div style={{ padding: '0.75rem 1.5rem', background: 'var(--color-surface)', border: '3px solid var(--color-border-heavy)', fontWeight: 900, fontSize: '0.9rem', textTransform: 'uppercase', boxShadow: '4px 4px 0 var(--color-primary)', color: 'var(--color-text)' }}>
                             {t('auth.feature_rpg')}
                         </div>
-                        <div style={{ padding: '0.75rem 1.5rem', background: '#fff', border: '3px solid #000', fontWeight: 900, fontSize: '0.9rem', textTransform: 'uppercase', boxShadow: '4px 4px 0 var(--color-secondary)' }}>
+                        <div style={{ padding: '0.75rem 1.5rem', background: 'var(--color-surface)', border: '3px solid var(--color-border-heavy)', fontWeight: 900, fontSize: '0.9rem', textTransform: 'uppercase', boxShadow: '4px 4px 0 var(--color-secondary)', color: 'var(--color-text)' }}>
                             {t('auth.feature_progression')}
                         </div>
                     </div>
@@ -176,12 +177,12 @@ export default function Auth() {
                         </p>
                     </div>
 
-                    <div className="manga-panel" style={{ padding: '2.5rem', background: '#fff', boxShadow: '8px 8px 0 rgba(0,0,0,0.1)' }}>
+                    <div className="manga-panel" style={{ padding: '2.5rem', background: 'var(--color-surface)', boxShadow: '8px 8px 0 var(--color-shadow)' }}>
                         <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-                            <h2 style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: '#000', marginBottom: '0.5rem' }}>
+                            <h2 style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: 'var(--color-text)', marginBottom: '0.5rem' }}>
                                 {isLogin ? t('auth.welcome_back') : t('auth.create_account')}
                             </h2>
-                            <p style={{ color: '#666' }}>
+                            <p style={{ color: 'var(--color-text-muted)' }}>
                                 {isLogin ? t('auth.resume_progress') : t('auth.start_legend')}
                             </p>
                         </div>
@@ -239,9 +240,9 @@ export default function Auth() {
                             </Button>
 
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '0.5rem 0' }}>
-                                <div style={{ flex: 1, height: '2px', background: '#000' }} />
-                                <span style={{ color: '#000', fontWeight: 700, fontSize: '0.875rem' }}>{t('auth.or')}</span>
-                                <div style={{ flex: 1, height: '2px', background: '#000' }} />
+                                <div style={{ flex: 1, height: '2px', background: 'var(--color-border-heavy)' }} />
+                                <span style={{ color: 'var(--color-text)', fontWeight: 700, fontSize: '0.875rem' }}>{t('auth.or')}</span>
+                                <div style={{ flex: 1, height: '2px', background: 'var(--color-border-heavy)' }} />
                             </div>
 
                             <Button
@@ -289,7 +290,7 @@ export default function Auth() {
                             <button
                                 onClick={toggleMode}
                                 style={{
-                                    color: '#000',
+                                    color: 'var(--color-text)',
                                     fontSize: '0.9rem',
                                     fontWeight: 600,
                                     textDecoration: 'underline',

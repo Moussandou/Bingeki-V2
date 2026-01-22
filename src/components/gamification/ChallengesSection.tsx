@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
@@ -42,13 +42,7 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
         selectedFriends: [] as string[]
     });
 
-    useEffect(() => {
-        if (user) {
-            loadData();
-        }
-    }, [user]);
-
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         if (!user) return;
         setIsLoading(true);
 
@@ -60,7 +54,14 @@ export function ChallengesSection({ onNavigateToProfile }: ChallengesSectionProp
         setChallenges(challengeData);
         setFriends(friendData.filter(f => f.status === 'accepted'));
         setIsLoading(false);
-    };
+    }, [user]);
+
+    useEffect(() => {
+        if (user) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            loadData();
+        }
+    }, [user, loadData]);
 
     const handleCreateChallenge = async () => {
         if (!user || !newChallenge.title || newChallenge.selectedFriends.length === 0) {

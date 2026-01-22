@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { HunterLicenseCard } from '@/components/HunterLicenseCard';
-import { XPBar } from '@/components/XPBar';
+import { HunterLicenseCard } from '@/components/profile/HunterLicenseCard';
+import { XPBar } from '@/components/gamification/XPBar';
 import { Home, Book, Search, MessageSquare, Calendar, User, Flame, Star, Heart, Zap, Shield } from 'lucide-react';
-import { DeveloperLicenseCard } from '@/components/DeveloperLicenseCard';
+import { DeveloperLicenseCard } from '@/components/profile/DeveloperLicenseCard';
 
 export default function AssetsPage() {
     return (

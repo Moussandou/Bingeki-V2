@@ -14,15 +14,11 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // Hardcoded Super Admin (Moussandou) to prevent lockout
-    function isSuperAdmin() {
-      return request.auth.uid == "N6VKzrkIghaMEYmSM74yaVgLYqa2";
-    }
-
     // Check if the user is an Admin
     function isAdmin() {
-      return isSuperAdmin() || (isAuthenticated() && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+      // Security: Relies solely on database role. Ensure your user doc has isAdmin: true.
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 
     // ==================== USERS COLLECTION ====================
@@ -86,7 +82,7 @@ service cloud.firestore {
     // FEEDBACK
     match /feedback/{feedbackId} {
       // Anyone can create feedback
-      allow create: if true;
+      allow create: if isAuthenticated();
       // Users can read their own feedback, Admins can read all
       allow read: if (isAuthenticated() && resource.data.userId == request.auth.uid) || isAdmin();
       // Only Admins can update/delete (Resolution)

@@ -48,13 +48,14 @@ export const loginWithEmail = async (email: string, password: string): Promise<{
     try {
         const result = await signInWithEmailAndPassword(auth, email, password);
         return { user: result.user, error: null };
-    } catch (error: any) {
+    } catch (error) {
         console.error("Error logging in with email", error);
+        const err = error as { code?: string; message: string };
         let errorMessage = "Une erreur est survenue";
-        if (error.code === 'auth/user-not-found') errorMessage = "Aucun compte trouvé avec cet email";
-        else if (error.code === 'auth/wrong-password') errorMessage = "Mot de passe incorrect";
-        else if (error.code === 'auth/invalid-email') errorMessage = "Email invalide";
-        else if (error.code === 'auth/invalid-credential') errorMessage = "Email ou mot de passe incorrect";
+        if (err.code === 'auth/user-not-found') errorMessage = "Aucun compte trouvé avec cet email";
+        if (err.code === 'auth/wrong-password') errorMessage = "Mot de passe incorrect";
+        if (err.code === 'auth/invalid-email') errorMessage = "Format d'email invalide";
+        if (err.code === 'auth/too-many-requests') errorMessage = "Trop de tentatives, réessayez plus tard";
         return { user: null, error: errorMessage };
     }
 };
@@ -67,12 +68,13 @@ export const registerWithEmail = async (email: string, password: string, display
             await updateProfile(result.user, { displayName });
         }
         return { user: result.user, error: null };
-    } catch (error: any) {
+    } catch (error) {
         console.error("Error registering with email", error);
+        const err = error as { code?: string; message: string };
         let errorMessage = "Une erreur est survenue";
-        if (error.code === 'auth/email-already-in-use') errorMessage = "Cet email est déjà utilisé";
-        else if (error.code === 'auth/weak-password') errorMessage = "Le mot de passe doit contenir au moins 6 caractères";
-        else if (error.code === 'auth/invalid-email') errorMessage = "Email invalide";
+        if (err.code === 'auth/email-already-in-use') errorMessage = "Cet email est déjà utilisé";
+        if (err.code === 'auth/invalid-email') errorMessage = "Format d'email invalide";
+        if (err.code === 'auth/weak-password') errorMessage = "Le mot de passe doit faire au moins 6 caractères";
         return { user: null, error: errorMessage };
     }
 };

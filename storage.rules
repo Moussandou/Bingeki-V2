@@ -10,8 +10,8 @@ service firebase.storage {
 
     // Feedback Attachments
     match /feedback-attachments/{tempId}/{allPaths=**} {
-      // Anyone can upload (guests included)
-      allow write: if true;
+      // Only authenticated users can upload
+      allow write: if request.auth != null;
       // Only owner (if logged in) or Admin can read
       // Note: TempId version is tricky since we don't have the final doc ID yet.
       // But we can allow public read for these specific URLs if needed, OR 

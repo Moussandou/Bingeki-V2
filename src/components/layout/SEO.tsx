@@ -46,7 +46,7 @@ export const SEO = ({ title, description, image, url }: SEOProps) => {
             const canonical = document.querySelector('link[rel="canonical"]');
             if (canonical) canonical.setAttribute('href', url);
         }
-    }, [title, description, image, url, t]);
+    }, [title, description, image, url, defaultDescription, defaultImage, t]);
 
     return null;
 };

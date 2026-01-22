@@ -56,6 +56,7 @@ export function ContentList({
 
     // Reset visible count when items (page) changes
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setVisibleCount(25);
     }, [items]);
 

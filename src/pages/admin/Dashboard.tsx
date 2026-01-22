@@ -2,9 +2,17 @@ import { useState, useEffect } from 'react';
 import { Users, AlertCircle, TrendingUp, Activity, ExternalLink, Shield } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Link } from '@/components/routing/LocalizedLink';
-import { getAdminStats, getAllUsers, getSevenDayActivityStats } from '@/firebase/firestore';
+import { getAdminStats, getAllUsers, getSevenDayActivityStats, type UserProfile } from '@/firebase/firestore';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTranslation } from 'react-i18next';
+
+interface ChartData {
+    name: string;
+    active: number;
+    new: number;
+    activities: number;
+    index: number;
+}
 
 export default function AdminDashboard() {
     const { t } = useTranslation();
@@ -14,8 +22,8 @@ export default function AdminDashboard() {
         newUsersToday: 0,
         pendingFeedback: 0
     });
-    const [recentUsers, setRecentUsers] = useState<any[]>([]);
-    const [chartData, setChartData] = useState<any[]>([]);
+    const [recentUsers, setRecentUsers] = useState<UserProfile[]>([]);
+    const [chartData, setChartData] = useState<ChartData[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -40,7 +48,10 @@ export default function AdminDashboard() {
                 }
 
                 if (results[2].status === 'fulfilled') {
-                    setChartData(results[2].value as any[]);
+                    const data = results[2].value;
+                    if (Array.isArray(data)) {
+                        setChartData(data.filter((item): item is ChartData => item !== undefined));
+                    }
                 } else {
                     console.error("Failed to load chart data:", results[2].reason);
                 }

@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal'; // Assuming Modal exists, verified in previous steps
 
 import { useGamificationStore } from '@/store/gamificationStore';
-import { useLibraryStore } from '@/store/libraryStore';
+import { useLibraryStore, type Work } from '@/store/libraryStore';
+import { type GamificationData } from '@/utils/dataProtection';
 import { useAuthStore } from '@/store/authStore';
 import { logout } from '@/firebase/auth';
 import {
@@ -15,20 +16,26 @@ import {
     X,
     Play,
     Film,
-    User
+    User,
+    Plus,
+    UserPlus,
+    UserCheck,
+    Clock
 } from 'lucide-react';
-import { HunterLicenseCard } from '@/components/HunterLicenseCard';
-import { getUserProfile, saveUserProfileToFirestore, compareLibraries, checkFriendship, type UserProfile } from '@/firebase/firestore';
+import { HunterLicenseCard } from '@/components/profile/HunterLicenseCard';
+import { getUserProfile, saveUserProfileToFirestore, compareLibraries, checkFriendship, sendFriendRequest, type UserProfile } from '@/firebase/firestore';
 import { Input } from '@/components/ui/Input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getBadgeIcon, getBadgeColors } from '@/utils/badges';
 import type { Badge } from '@/types/badge';
+import type { FavoriteCharacter } from '@/types/character';
 import { SEO } from '@/components/layout/SEO';
 import { storage } from '@/firebase/config';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { useToast } from '@/context/ToastContext';
+import { AddFavoriteCharacterModal } from '@/components/profile/AddFavoriteCharacterModal';
 
 export default function Profile() {
     const { user, setUser, loading, userProfile } = useAuthStore();
@@ -48,14 +55,15 @@ export default function Profile() {
 
     // Extended Profile State (for current or visited user)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isAddCharModalOpen, setIsAddCharModalOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [extendedProfile, setExtendedProfile] = useState<Partial<UserProfile>>(userProfile || {});
 
     // Visited Profile Stats (if viewing someone else)
-    const [visitedStats, setVisitedStats] = useState<any>(null);
+    const [visitedStats, setVisitedStats] = useState<Partial<GamificationData> | null>(null);
 
     // Library comparison (for visited profiles)
-    const [commonWorks, setCommonWorks] = useState<{ common: any[]; count: number } | null>(null);
+    const [commonWorks, setCommonWorks] = useState<{ common: Work[]; count: number } | null>(null);
     const [friendshipStatus, setFriendshipStatus] = useState<'accepted' | 'pending' | 'none' | 'loading'>('loading');
 
     // Determine if we are viewing our own profile
@@ -82,7 +90,7 @@ export default function Profile() {
                         xp: profile.xp || 0,
                         xpToNextLevel: 100,
                         streak: profile.streak || 0,
-                        badges: profile.badges || [],
+                        badges: (profile.badges as Badge[]) || [],
                         totalChaptersRead: profile.totalChaptersRead || 0,
                         totalWorksAdded: profile.totalWorksAdded || 0,
                         totalWorksCompleted: profile.totalWorksCompleted || 0
@@ -126,7 +134,7 @@ export default function Profile() {
             setFriendshipStatus('none');
         }
 
-    }, [uid, user?.uid, isOwnProfile]);
+    }, [uid, user?.uid, isOwnProfile, user?.displayName, user?.photoURL]);
 
     // Redirect guest if no UID provided (visiting /profile directly)
     useEffect(() => {
@@ -174,7 +182,7 @@ export default function Profile() {
         favoriteManga: '',
         top3Favorites: [] as string[],
         featuredBadge: '',
-        favoriteCharacters: [] as any[]
+        favoriteCharacters: [] as FavoriteCharacter[]
     });
 
     // --- Drag & Drop Handlers ---
@@ -245,6 +253,33 @@ export default function Profile() {
         navigate('/');
     };
 
+    const handleSendFriendRequest = async () => {
+        if (!user || !uid) return;
+
+        try {
+            await sendFriendRequest(
+                user.uid,
+                {
+                    displayName: user.displayName || 'User',
+                    photoURL: user.photoURL || ''
+                },
+                {
+                    uid: uid,
+                    displayName: extendedProfile.displayName || 'User',
+                    photoURL: extendedProfile.photoURL || '',
+                    email: null,
+                    lastLogin: Date.now(),
+                    ...extendedProfile
+                } as UserProfile
+            );
+            setFriendshipStatus('pending');
+            addToast(t('profile.toast.friend_request_sent'), 'success');
+        } catch (error) {
+            console.error(error);
+            addToast(t('profile.toast.friend_request_error'), 'error');
+        }
+    };
+
     if (loadingProfile && !user) return <div style={{ padding: '2rem' }}>{t('profile.loading')}</div>;
 
     return (
@@ -270,6 +305,22 @@ export default function Profile() {
                             )}
                             {!isOwnProfile && (
                                 <>
+                                    {friendshipStatus === 'none' && (
+                                        <Button variant="primary" onClick={handleSendFriendRequest} icon={<UserPlus size={18} />}>
+                                            {t('profile.add_friend')}
+                                        </Button>
+                                    )}
+                                    {friendshipStatus === 'pending' && (
+                                        <Button variant="ghost" disabled icon={<Clock size={18} />}>
+                                            {t('profile.request_pending')}
+                                        </Button>
+                                    )}
+                                    {friendshipStatus === 'accepted' && (
+                                        <Button variant="ghost" disabled icon={<UserCheck size={18} />}>
+                                            {t('profile.friends')}
+                                        </Button>
+                                    )}
+
                                     {(friendshipStatus === 'accepted' || userProfile?.isAdmin) && (
                                         <Button variant="primary" onClick={() => navigate(`/users/${uid}/library`)} icon={<Library size={18} />}>{t('profile.view_library')}</Button>
                                     )}
@@ -303,7 +354,7 @@ export default function Profile() {
                                 top3FavoritesData={extendedProfile.top3Favorites ? extendedProfile.top3Favorites.map(fid => {
                                     const w = works.find(w => w.id === Number(fid) || w.title === fid);
                                     return w ? { id: String(w.id), title: w.title, image: w.image } : null;
-                                }).filter(Boolean) as any[] : []}
+                                }).filter((item): item is { id: string; title: string; image: string } => item !== null) : []}
                                 stats={{
                                     ...displayStats,
                                     totalChaptersRead: displayTotalChapters,
@@ -408,7 +459,7 @@ export default function Profile() {
                             {/* Common Works Section (only for visited profiles) */}
                             {!isOwnProfile && commonWorks && commonWorks.count > 0 && (
                                 <div style={{ marginBottom: '2rem' }}>
-                                    <h3 className="manga-title" style={{ fontSize: '1.2rem', marginBottom: '1rem', background: 'linear-gradient(135deg, #dbeafe, #ede9fe)', color: 'var(--color-text)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <h3 className="manga-title" style={{ fontSize: '1.2rem', marginBottom: '1rem', background: 'var(--color-surface)', border: '1px solid var(--color-primary)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <Library size={20} /> {t('profile.common_works', { count: commonWorks.count, context: commonWorks.count > 1 ? 'plural' : '' })}
                                     </h3>
                                     <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -471,13 +522,21 @@ export default function Profile() {
 
 
                             {/* Favorite Characters Section */}
-                            {displayFavoriteCharacters && displayFavoriteCharacters.length > 0 && (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', background: '#ffe4e6', padding: '0.5rem', borderRadius: '8px' }}>
+                                <h3 className="manga-title" style={{ fontSize: '1.5rem', marginBottom: 0, background: 'transparent', color: '#e11d48', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <User size={24} /> {t('profile.favorite_characters') || "Personnages Favoris"}
+                                </h3>
+                                {isOwnProfile && (
+                                    <Button size="sm" variant="ghost" onClick={() => setIsAddCharModalOpen(true)} style={{ color: '#e11d48', borderColor: '#e11d48' }}>
+                                        <Plus size={16} /> {t('common.add') || "Ajouter"}
+                                    </Button>
+                                )}
+                            </div>
+
+                            {displayFavoriteCharacters && displayFavoriteCharacters.length > 0 ? (
                                 <>
-                                    <h3 className="manga-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem', background: '#ffe4e6', color: '#e11d48', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <User size={24} /> {t('profile.favorite_characters') || "Personnages Favoris"}
-                                    </h3>
                                     <div className="manga-panel" style={{ padding: '1.5rem', background: 'var(--color-surface)', display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1.5rem' }}>
-                                        {displayFavoriteCharacters.map((char: any) => (
+                                        {displayFavoriteCharacters.map((char) => (
                                             <div
                                                 key={char.id}
                                                 className="character-card"
@@ -519,6 +578,13 @@ export default function Profile() {
                                     </div>
                                     <div style={{ marginBottom: '2rem' }}></div>
                                 </>
+                            ) : (
+                                isOwnProfile && (
+                                    <div style={{ padding: '2rem', border: '2px dashed var(--color-border)', borderRadius: '8px', textAlign: 'center', marginBottom: '2rem' }}>
+                                        <p style={{ marginBottom: '1rem' }}>Vous n'avez pas encore de personnages favoris.</p>
+                                        <Button onClick={() => setIsAddCharModalOpen(true)}>Ajouter des personnages</Button>
+                                    </div>
+                                )
                             )}
 
 
@@ -773,7 +839,12 @@ export default function Profile() {
                             </Button>
                         </div>
                     </Modal>
-
+                    <AddFavoriteCharacterModal
+                        isOpen={isAddCharModalOpen}
+                        onClose={() => setIsAddCharModalOpen(false)}
+                        currentFavorites={extendedProfile.favoriteCharacters || []}
+                        onUpdate={(newFavs) => setExtendedProfile(prev => ({ ...prev, favoriteCharacters: newFavs }))}
+                    />
                     {/* Guide Modal (unchanged) */}
                     <Modal isOpen={showGuide} onClose={() => setShowGuide(false)} title={t('profile.guide_modal.title')}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

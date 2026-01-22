@@ -11,7 +11,13 @@ export default function AdminSystem() {
     const { t } = useTranslation();
     const [maintenanceMode, setMaintenanceMode] = useState(false);
     const [registrationsOpen, setRegistrationsOpen] = useState(true);
-    const [logs, setLogs] = useState<string[]>([]);
+    const [logs, setLogs] = useState<string[]>(() => [
+        `[SYSTEM] Admin console initialized at ${new Date().toLocaleTimeString()}`,
+        `[AUTH] Connected as Administrator`,
+        `[DB] Firestore connection: STABLE`,
+        `[SHIELD] Data Protection Protocol v3.0: ACTIVE`,
+        `[CONNECT] Listening to Global Activity Feed...`
+    ]);
 
     // Broadcast State
     const [broadcastMessage, setBroadcastMessage] = useState('');
@@ -45,16 +51,6 @@ export default function AdminSystem() {
     };
 
     useEffect(() => {
-        // Initial Mock Logs (System Boot)
-        const initialLogs = [
-            `[SYSTEM] Admin console initialized at ${new Date().toLocaleTimeString()}`,
-            `[AUTH] Connected as Administrator`,
-            `[DB] Firestore connection: STABLE`,
-            `[SHIELD] Data Protection Protocol v3.0: ACTIVE`,
-            `[CONNECT] Listening to Global Activity Feed...`
-        ];
-        setLogs(initialLogs);
-
         // Load Global Config
         getGlobalConfig().then(config => {
             if (config) {

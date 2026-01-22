@@ -2,10 +2,12 @@ import { Layout } from '@/components/layout/Layout';
 import { getAllFeedback, type FeedbackData } from '@/firebase/firestore';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/context/ToastContext';
+import { useTranslation } from 'react-i18next';
 import { MessageSquare, Star, User, Calendar, Mail, Bug, Lightbulb } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 
 export default function FeedbackList() {
+    const { t } = useTranslation();
     const [feedbacks, setFeedbacks] = useState<FeedbackData[]>([]);
     const [loading, setLoading] = useState(true);
     const { addToast } = useToast();
@@ -16,15 +18,15 @@ export default function FeedbackList() {
             try {
                 const data = await getAllFeedback();
                 setFeedbacks(data);
-            } catch (error) {
-                addToast('Erreur lors du chargement des avis', 'error');
+            } catch {
+                addToast(t('admin.feedback.load_error'), 'error');
             } finally {
                 setLoading(false);
             }
         };
 
         fetchFeedback();
-    }, [addToast]);
+    }, [addToast, t]);
 
     // Simple auth check (could be more robust)
     if (!user) {
@@ -53,7 +55,7 @@ export default function FeedbackList() {
                     <p>Chargement...</p>
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {feedbacks.map((item: any) => (
+                        {feedbacks.map((item: FeedbackData) => (
                             <div key={item.id} style={{
                                 background: '#fff',
                                 border: '2px solid #000',

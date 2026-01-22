@@ -3,15 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocalizedNavigate } from '@/components/routing/LocalizedLink';
 import { Layout } from '@/components/layout/Layout';
 import { createPortal } from 'react-dom';
-import { useLibraryStore } from '@/store/libraryStore';
+import { useLibraryStore, type Work } from '@/store/libraryStore';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal'; // Import Modal
 import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff, Reply, Video, Calendar, BarChart, Music, Disc, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 
-import { useGamificationStore } from '@/store/gamificationStore';
+
 import { useToast } from '@/context/ToastContext';
-import { ContentList, type ContentItem } from '@/components/ContentList';
+import { ContentList, type ContentItem } from '@/components/library/ContentList';
 import { getAnimeEpisodes, getAnimeEpisodeDetails } from '@/services/animeApi';
 import { getCommentsWithReplies, addComment, toggleCommentLike, getFriendsReadingWork, type UserProfile } from '@/firebase/firestore';
 import { useAuthStore } from '@/store/authStore';
@@ -29,7 +29,68 @@ import { SEO } from '@/components/layout/SEO';
 import styles from './WorkDetails.module.css';
 
 // Helper Component for Recursive Comments
-function RecursiveComment({
+
+interface Comment {
+    id: string;
+    userId: string;
+    userName: string;
+    userPhoto: string;
+    text: string;
+    timestamp: number;
+    likes: string[];
+    spoiler: boolean;
+    replies?: Comment[];
+}
+
+interface RecursiveCommentProps {
+    comment: Comment;
+    user: { uid: string; displayName: string | null; photoURL: string | null } | null;
+    replyingTo: string | null;
+    setReplyingTo: (id: string | null) => void;
+    replyText: string;
+    setReplyText: (text: string) => void;
+    handleReply: (id: string) => void;
+    handleLike: (id: string) => void;
+    revealedSpoilers: string[];
+    setRevealedSpoilers: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+
+interface JikanEntity {
+    mal_id: number;
+    type: string;
+    name: string;
+    url: string;
+}
+
+interface JikanTrailer {
+    youtube_id: string;
+    url: string;
+    embed_url: string;
+    images: {
+        image_url?: string;
+        small_image_url?: string;
+        medium_image_url?: string;
+        large_image_url?: string;
+        maximum_image_url?: string;
+    };
+}
+
+interface DetailedWork extends Omit<Work, 'status'> {
+    status: Work['status'] | string;
+    trailer?: JikanTrailer;
+    studios?: JikanEntity[];
+    genres?: JikanEntity[];
+    season?: string;
+    year?: number;
+    rank?: number;
+    popularity?: number;
+    duration?: string;
+    ratingString?: string;
+    source?: string;
+}
+
+const RecursiveComment = memo(function RecursiveComment({
     comment,
     user,
     replyingTo,
@@ -40,8 +101,9 @@ function RecursiveComment({
     handleLike,
     revealedSpoilers,
     setRevealedSpoilers
-}: any) {
+}: RecursiveCommentProps) {
     const isRevealed = revealedSpoilers.includes(comment.id);
+    /* eslint-disable-next-line */
     const timeDiff = Date.now() - comment.timestamp;
     const hours = Math.floor(timeDiff / (1000 * 60 * 60));
     const { t } = useTranslation();
@@ -78,7 +140,7 @@ function RecursiveComment({
                 {/* Content */}
                 {comment.spoiler && !isRevealed ? (
                     <div
-                        onClick={() => setRevealedSpoilers((prev: any) => [...prev, comment.id])}
+                        onClick={() => setRevealedSpoilers((prev) => [...prev, comment.id])}
                         style={{
                             padding: '0.75rem',
                             background: 'var(--color-border-heavy)',
@@ -152,7 +214,7 @@ function RecursiveComment({
                             <input
                                 type="text"
                                 value={replyText}
-                                onChange={(e: any) => setReplyText(e.target.value)}
+                                onChange={(e) => setReplyText(e.target.value)}
                                 placeholder={t('work_details.comments.reply_to', { name: comment.userName })}
                                 autoFocus
                                 style={{
@@ -165,7 +227,7 @@ function RecursiveComment({
                                     background: 'var(--color-surface-hover)',
                                     color: 'var(--color-text)'
                                 }}
-                                onKeyDown={(e: any) => e.key === 'Enter' && handleReply(comment.id)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleReply(comment.id)}
                             />
                             <button
                                 onClick={() => handleReply(comment.id)}
@@ -194,7 +256,7 @@ function RecursiveComment({
             {/* Nested Replies (Staircase) */}
             {comment.replies && comment.replies.length > 0 && (
                 <div className={styles.commentReplyContainer}>
-                    {comment.replies.map((reply: any) => (
+                    {comment.replies.map((reply) => (
                         <RecursiveComment
                             key={reply.id}
                             comment={reply}
@@ -213,7 +275,7 @@ function RecursiveComment({
             )}
         </div>
     );
-}
+});
 
 export default function WorkDetails() {
     const { id } = useParams();
@@ -221,14 +283,14 @@ export default function WorkDetails() {
     const { t } = useTranslation();
     const { addToast } = useToast(); // Initialize hook
     const { getWork, addWork, updateStatus, updateWorkDetails, removeWork } = useLibraryStore(); // Add removeWork
-    const { } = useGamificationStore(); // Removed unused destructuring
+    // const { } = useGamificationStore(); // Removed unused destructuring
     const { user } = useAuthStore();
     const { spoilerMode } = useSettingsStore();
 
     // Query Params for Public/Guest Access
     const [searchParams] = useSearchParams();
     const typeParam = searchParams.get('type') as 'anime' | 'manga' | null;
-    const [fetchedWork, setFetchedWork] = useState<any | null>(null);
+    const [fetchedWork, setFetchedWork] = useState<DetailedWork | null>(null);
     const [isFetchingDetails, setIsFetchingDetails] = useState(false);
 
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
@@ -269,7 +331,7 @@ export default function WorkDetails() {
     const [isCommentsExpanded, setIsCommentsExpanded] = useState(false);
 
     // Tab & Episodes State
-    const [activeTab, setActiveTab] = useState<'info' | 'episodes' | 'gallery' | 'themes' | 'stats'>('info');
+    const [activeTab, setActiveTab] = useState<'info' | 'episodes' | 'gallery' | 'themes' | 'stats' | 'reviews'>('info');
     const [episodes, setEpisodes] = useState<ContentItem[]>([]);
     const [episodesPage, setEpisodesPage] = useState(1);
     const [hasMoreEpisodes, setHasMoreEpisodes] = useState(false);
@@ -315,20 +377,24 @@ export default function WorkDetails() {
             // Fallback: default to anime
 
             getWorkDetails(Number(id), typeToFetch).then(res => {
+                const workTypeNormalized = res.type ? res.type.toLowerCase() : typeToFetch;
+                // Determine our internal type (anime/manga) based on API type
+                const internalType = (workTypeNormalized === 'manga' || workTypeNormalized === 'manhwa' || workTypeNormalized === 'manhua' || workTypeNormalized === 'novel') ? 'manga' : 'anime';
+
                 // Map JikanResult to compatible format for UI (partial)
-                const mapped = {
+                const mapped: DetailedWork = {
                     id: res.mal_id,
                     title: res.title,
-                    type: res.type ? res.type.toLowerCase() : typeToFetch,
+                    type: internalType, // Use our strictly typed internalType
+                    format: res.type, // Store original specific type (TV, Movie, etc) here if needed, adding to interface
                     image: res.images.jpg.large_image_url,
                     synopsis: res.synopsis,
                     totalChapters: res.chapters || res.episodes || 0,
                     status: res.status ? res.status.toLowerCase().replace(/ /g, '_') : 'unknown',
-                    score: res.score,
+                    score: res.score ?? undefined,
                     currentChapter: 0,
                     rating: 0,
                     notes: '',
-                    isPublic: true,
                     // New Fields
                     trailer: res.trailer,
                     studios: res.studios || [],
@@ -348,19 +414,22 @@ export default function WorkDetails() {
                 setIsFetchingDetails(false);
             });
         }
-    }, [id, libraryWork, fetchedWork, typeParam]);
+    }, [id, libraryWork, fetchedWork, typeParam, isFetchingDetails]);
 
     // Fetch Characters, Relations, Recommendations, Pictures
     // Fetch Characters, Relations, Recommendations, Pictures
     useEffect(() => {
         if (!id || !work) return;
 
-        // Debug Log
-        console.log('WorkDetails Debug State:', { streaming, statistics, staff });
+
 
         const fetchData = async () => {
             const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-            const type = (work.type === 'Manga' || work.type === 'manga' || work.type === 'Manhwa' || work.type === 'Manhua' || work.type === 'Novel') ? 'manga' : 'anime';
+            if (!work.type) return;
+            const workTypeNormalized = work.type.toLowerCase();
+            const type = (workTypeNormalized === 'manga' || workTypeNormalized === 'manhwa' || workTypeNormalized === 'manhua' || workTypeNormalized === 'novel') ? 'manga' : 'anime';
+
+
 
             try {
                 // Sequential fetching to respect Rate Limiting (3 req/sec)
@@ -409,18 +478,20 @@ export default function WorkDetails() {
         };
 
         fetchData();
-    }, [id, work?.type]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id, work?.type]); // work?.type is safe here as it will trigger re-fetch if type changes
 
+    // ... existing ...
 
 
     // Normalize displayWork for UI usage (deprecated activeWork, just use work)
     // const activeWork = displayWork; 
-    // const isInLibrary = !!work; <- This is wrong now, isInLibrary = !!libraryWork
+    // const isInLibrary = !!work;
 
     const handleSave = () => {
-        if (!libraryWork) return; // Guard for guests
+        if (!libraryWork || !work) return; // Guard for guests
         // Use centralized utility for progress & XP logic
-        const success = handleProgressUpdateWithXP(libraryWork.id, progress, work.totalChapters);
+        const success = handleProgressUpdateWithXP(libraryWork.id!, progress, work.totalChapters || 0);
         if (success) {
             addToast(t('work_details.progress.saved_toast'), 'success');
         }
@@ -429,6 +500,7 @@ export default function WorkDetails() {
     };
 
     const handleDelete = () => {
+        if (!work) return;
         removeWork(work.id);
         addToast(t('work_details.danger.deleted_toast', { title: work.title }), 'error');
         navigate('/library');
@@ -436,12 +508,13 @@ export default function WorkDetails() {
 
     // Fetch episodes or generate chapters when tab updates
     useEffect(() => {
-        if (activeTab === 'episodes') {
+        if (activeTab === 'episodes' && work) {
             setIsLoadingEpisodes(true);
+            const workType = work.type?.toLowerCase();
 
-            if (work?.type === 'anime' || work?.type === 'tv' || work?.type === 'movie' || work?.type === 'ova' || work?.type === 'special' || work?.type === 'ona') {
+            if (workType === 'anime') {
                 getAnimeEpisodes(Number(work.id), episodesPage).then(res => {
-                    const mapped = res.data.map((ep: any) => ({
+                    const mapped = res.data.map((ep) => ({
                         id: ep.mal_id,
                         title: ep.title,
                         number: ep.mal_id,
@@ -454,6 +527,7 @@ export default function WorkDetails() {
                     setIsLoadingEpisodes(false);
                 });
             } else {
+
                 // Generate chapters locally with simulated pagination (100 per page to be manageable)
                 const itemsPerPage = 50; // Use 50 as default chunk size for chapters
                 const total = work.totalChapters || 100; // Fallback if unknown
@@ -479,6 +553,7 @@ export default function WorkDetails() {
                 }, 300);
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [work?.id, work?.type, work?.totalChapters, activeTab, episodesPage]);
 
     const [commentError, setCommentError] = useState<string | null>(null);
@@ -511,7 +586,7 @@ export default function WorkDetails() {
                 });
             }
         }
-    }, [work?.id, user?.uid]);
+    }, [work?.id, user?.uid, user, t]);
 
     if (!work) {
         if (isFetchingDetails) {
@@ -622,7 +697,7 @@ export default function WorkDetails() {
     };
 
     const handleExpandEpisode = async (episodeNumber: number) => {
-        if (work.type !== 'anime' && work.type !== 'tv' && work.type !== 'ova' && work.type !== 'movie') return;
+        if (work.type !== 'anime') return;
 
         console.log(`Fetching details for anime ${work.id} episode ${episodeNumber}`);
         try {
@@ -687,10 +762,10 @@ export default function WorkDetails() {
                                     onClick={() => setActiveTab('episodes')}
                                     className={`${styles.tabButton} ${activeTab === 'episodes' ? styles.activeTab : ''}`}
                                 >
-                                    {['manga', 'novel', 'manhwa', 'manhua', 'doujinshi', 'oneshot', 'oel'].includes(work.type?.toLowerCase()) ? t('work_details.tabs.chapters_list') : t('work_details.tabs.episodes_list')}
+                                    {work.type === 'manga' ? t('work_details.tabs.chapters_list') : t('work_details.tabs.episodes_list')}
                                 </button>
                             )}
-                            {!['manga', 'novel', 'manhwa', 'manhua', 'doujinshi', 'oneshot', 'oel'].includes(work.type?.toLowerCase() || '') && (
+                            {work.type !== 'manga' && (
                                 <button
                                     className={`${styles.tabButton} ${activeTab === 'themes' ? styles.activeTab : ''}`}
                                     onClick={() => setActiveTab('themes')}
@@ -699,8 +774,8 @@ export default function WorkDetails() {
                                 </button>
                             )}
                             <button
-                                onClick={() => setActiveTab('reviews' as any)}
-                                className={`${styles.tabButton} ${activeTab === 'reviews' as any ? styles.activeTab : ''}`}
+                                onClick={() => setActiveTab('reviews')}
+                                className={`${styles.tabButton} ${activeTab === 'reviews' ? styles.activeTab : ''}`}
                             >
                                 {t('work_details.tabs.reviews')}
                             </button>
@@ -778,11 +853,11 @@ export default function WorkDetails() {
                                         title={t('work_details.chapters.click_to_edit')}
                                     >
                                         <BookOpen size={20} />
-                                        <span>{work.totalChapters || '?'} {(work.type === 'Manga' || work.type === 'manga' || work.type === 'Manhwa' || work.type === 'Novel') ? t('work_details.meta.chaps') : t('work_details.meta.eps')}</span>
+                                        <span>{work.totalChapters || '?'} {(work.type === 'manga') ? t('work_details.meta.chaps') : t('work_details.meta.eps')}</span>
                                     </div>
 
                                     {/* Minimalist Streaming Buttons */}
-                                    {!(work.type === 'Manga' || work.type === 'manga' || work.type === 'Manhwa' || work.type === 'Novel') ? (
+                                    {!(work.type === 'manga') ? (
                                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                             {/* Dynamic Streaming Links */}
                                             {streaming.map((s) => {
@@ -1140,7 +1215,7 @@ export default function WorkDetails() {
                                                     .filter(c => c.character.images?.jpg?.image_url)
                                                     .slice(0, isCastingExpanded ? undefined : 12)
                                                     .map((c) => {
-                                                        const jpVa = c.voice_actors?.find((va: any) => va.language === 'Japanese');
+                                                        const jpVa = c.voice_actors?.find((va) => va.language === 'Japanese');
                                                         return (
                                                             <div key={c.character.mal_id} className={styles.castingItem} style={{ flex: '1 1 100px', maxWidth: '120px' }}>
                                                                 {/* Character Image - Clickable */}
@@ -1253,7 +1328,7 @@ export default function WorkDetails() {
                                                                     {rel.relation}
                                                                 </div>
                                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                                                                    {visibleEntries.map((entry: any) => (
+                                                                    {visibleEntries.map((entry) => (
                                                                         <Link to={`/work/${entry.mal_id}`} key={entry.mal_id} style={{
                                                                             display: 'flex',
                                                                             alignItems: 'center',
@@ -1309,8 +1384,13 @@ export default function WorkDetails() {
                                             <p style={{ marginBottom: '1.5rem' }}>{t('work_details.library.interested_desc')}</p>
                                             <Button
                                                 onClick={() => {
-                                                    if (user) {
-                                                        addWork(fetchedWork);
+                                                    if (user && fetchedWork) {
+                                                        const workToAdd: Work = {
+                                                            ...fetchedWork,
+                                                            type: fetchedWork.type || 'anime', // Fallback or strict assertion
+                                                            status: 'plan_to_read', // Default status
+                                                        };
+                                                        addWork(workToAdd);
                                                         addToast(t('work_details.library.added_toast'), 'success');
                                                     } else {
                                                         navigate('/auth');
@@ -1403,7 +1483,7 @@ export default function WorkDetails() {
                                                         if (s === 'completed' && work.status !== 'completed') {
                                                             setIsCompleteModalOpen(true);
                                                         } else {
-                                                            updateStatus(work.id, s as any);
+                                                            updateStatus(work.id, s as Work['status']);
                                                         }
                                                     }}
                                                     className={`${styles.statusButton} ${work.status === s ? styles.statusButtonActive : ''}`}
@@ -1828,7 +1908,7 @@ export default function WorkDetails() {
 
 
 
-                        {activeTab === 'reviews' as any && (
+                        {activeTab === 'reviews' && (
                             <div className="animate-fade-in">
                                 <h2 className={styles.sectionTitle} style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                     <Star size={24} fill="currentColor" /> {t('work_details.reviews.title')}

@@ -1,5 +1,6 @@
 import { Mail, MapPin, Github, Linkedin, Globe, Briefcase } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { InstallPWA } from '@/components/pwa/InstallPWA';
 
 export function Footer() {
     const { t } = useTranslation();
@@ -61,8 +62,12 @@ export function Footer() {
                     display: 'flex',
                     justifyContent: 'center',
                     gap: '1.5rem',
-                    marginBottom: '3rem'
+                    marginBottom: '3rem',
+                    alignItems: 'center',
+                    flexWrap: 'wrap'
                 }}>
+                    <InstallPWA variant="footer" />
+                    <div style={{ width: 1, height: 24, background: 'var(--color-border)', margin: '0 0.5rem' }} />
                     <a href="https://github.com/Moussandou" target="_blank" rel="noopener noreferrer"
                         style={{ color: 'var(--color-text)', padding: '0.5rem', border: '2px solid var(--color-text)', borderRadius: '50%', transition: 'transform 0.2s', display: 'flex' }}
                         onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}

@@ -236,7 +236,7 @@ export function validateGamificationWrite(
 export function logDataBackup(
     userId: string,
     dataType: 'gamification' | 'library',
-    data: any
+    data: unknown
 ): void {
     const backup = {
         userId,

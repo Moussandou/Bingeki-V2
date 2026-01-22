@@ -5,13 +5,13 @@ import { Layout } from '@/components/layout/Layout';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Carousel } from '@/components/ui/Carousel';
-import { searchWorks, getTopWorks, getSeasonalAnime, getRandomAnime, type JikanResult } from '@/services/animeApi';
+import { searchWorks, getTopWorks, getSeasonalAnime, getRandomAnime, type JikanResult, type SearchFilters } from '@/services/animeApi';
 import { useLibraryStore } from '@/store/libraryStore';
 import { useAuthStore } from '@/store/authStore';
 import { Search, Check, Loader2, Flame, Sparkles, Star, Dice5, TrendingUp, Plus, SlidersHorizontal, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AddWorkModal } from '@/components/AddWorkModal';
-import { FriendRecommendations } from '@/components/FriendRecommendations';
+import { AddWorkModal } from '@/components/library/AddWorkModal';
+import { FriendRecommendations } from '@/components/social/FriendRecommendations';
 import { SEO } from '@/components/layout/SEO';
 import styles from './Discover.module.css';
 
@@ -111,9 +111,9 @@ export default function Discover() {
             if (searchQuery.length > 2 || hasActiveFilters) {
                 setLoading(true);
 
-                const filters: any = {};
+                const filters: SearchFilters = {};
                 if (filterStatus) filters.status = filterStatus;
-                if (filterRating) filters.rating = filterRating;
+                if (filterRating) filters.rating = filterRating as SearchFilters['rating'];
                 if (filterScore > 0) filters.min_score = filterScore;
                 if (filterYear) filters.start_date = `${filterYear}-01-01`;
                 if (selectedGenre) filters.genres = selectedGenre.toString();

@@ -1,8 +1,8 @@
 import { Layout } from '@/components/layout/Layout';
 // Card component removed as part of redesign
 import { Button } from '@/components/ui/Button';
-import { XPBar } from '@/components/XPBar';
-import { StreakCounter } from '@/components/StreakCounter';
+import { XPBar } from '@/components/gamification/XPBar';
+import { StreakCounter } from '@/components/gamification/StreakCounter';
 import { Play, Plus, ChevronRight, Target, TrendingUp, BookOpen, Users, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/authStore';
@@ -10,7 +10,7 @@ import { useGamificationStore } from '@/store/gamificationStore';
 import { useLibraryStore } from '@/store/libraryStore';
 import { Link } from '@/components/routing/LocalizedLink';
 import { calculateRank, getRankColor } from '@/utils/rankUtils';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getFriendsActivity } from '@/firebase/firestore';
 import type { ActivityEvent } from '@/types/activity';
 import { ACTIVITY_EMOJIS, getActivityLabel } from '@/types/activity';
@@ -19,7 +19,7 @@ import type { JikanResult } from '@/services/animeApi';
 import { Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { AddWorkModal } from '@/components/AddWorkModal';
+import { AddWorkModal } from '@/components/library/AddWorkModal';
 import { Card } from '@/components/ui/Card';
 import { SEO } from '@/components/layout/SEO';
 import styles from './Dashboard.module.css';
@@ -47,26 +47,26 @@ export default function Dashboard() {
     const dailyGoal = 3;
     const todayProgress = Math.min(weeklyChapters % 10, dailyGoal); // Simplified daily tracking
 
-    useEffect(() => {
-        if (user) {
-            loadFriendsActivity();
-        }
-        loadRecommendations();
-    }, [user]);
-
-    const loadFriendsActivity = async () => {
+    const loadFriendsActivity = useCallback(async () => {
         if (!user) return;
         setIsLoadingActivity(true);
         const activity = await getFriendsActivity(user.uid, 5);
         setFriendsActivity(activity);
         setIsLoadingActivity(false);
-    };
+    }, [user]);
 
-    const loadRecommendations = async () => {
+    const loadRecommendations = useCallback(async () => {
         // Fetch top manga by popularity
         const topManga = await getTopWorks('manga', 'bypopularity', 6); // Fetch 6 for a better grid
         setRecommendations(topManga);
-    };
+    }, []);
+
+    useEffect(() => {
+        if (user) {
+            loadFriendsActivity();
+        }
+        loadRecommendations();
+    }, [user, loadFriendsActivity, loadRecommendations]);
 
     const handleRecommendationClick = (work: JikanResult) => {
         setSelectedWork(work);
@@ -74,6 +74,7 @@ export default function Dashboard() {
     };
 
     const formatTimeAgo = (timestamp: number) => {
+        /* eslint-disable-next-line */
         const diff = Date.now() - timestamp;
         const hours = Math.floor(diff / (1000 * 60 * 60));
         if (hours < 1) return t('dashboard.just_now');

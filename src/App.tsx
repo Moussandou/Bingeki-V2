@@ -32,7 +32,7 @@ const Social = lazy(() => import('@/pages/Social'));
 const Legal = lazy(() => import('@/pages/Legal'));
 const Challenges = lazy(() => import('@/pages/Challenges'));
 const Feedback = lazy(() => import('@/pages/Feedback'));
-const FeedbackList = lazy(() => import('@/pages/FeedbackList'));
+const FeedbackList = lazy(() => import('@/pages/admin/FeedbackList'));
 const Changelog = lazy(() => import('@/pages/Changelog'));
 const Schedule = lazy(() => import('@/pages/Schedule'));
 const CharacterDetails = lazy(() => import('@/pages/CharacterDetails'));
@@ -155,7 +155,7 @@ function App() {
     });
 
     return () => unsubscribe();
-  }, [setUser, setLoading]);
+  }, [setUser, setLoading, setUserProfile, syncUserProfile]);
 
   // Auto-save to Firestore when data changes (debounced)
   useEffect(() => {

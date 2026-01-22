@@ -127,7 +127,7 @@ function translateToEnglish(frText: string): string {
 }
 
 // Generate a translation key from text
-function generateKey(text: string, namespace: string): string {
+function generateKey(text: string): string {
     return text
         .toLowerCase()
         .normalize('NFD')
@@ -176,7 +176,7 @@ function scanFile(filePath: string): TranslationFix[] {
             if (text && /[àâäéèêëïîôùûüçœæ]/i.test(text) ||
                 Object.keys(frenchToEnglish).some(fr => text.includes(fr))) {
 
-                let key = generateKey(text, namespace);
+                let key = generateKey(text);
                 while (usedKeys.has(key)) {
                     key = key + '_' + Math.random().toString(36).substring(7, 10);
                 }

@@ -1,7 +1,7 @@
 export const getLocalStorageSize = (): string => {
     let total = 0;
     for (const x in localStorage) {
-        // eslint-disable-next-line
+         
         if (Object.prototype.hasOwnProperty.call(localStorage, x)) {
             total += (localStorage[x].length * 2);
         }

@@ -22,7 +22,7 @@ import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { Save, Download, Trash2 } from 'lucide-react';
 import { useDroppable } from '@dnd-kit/core';
 import { Button } from '@/components/ui/Button';
-import { createTierList } from '@/firebase/firestore';
+import { createTierList, type TierList } from '@/firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 
@@ -30,6 +30,21 @@ import { TierRow } from '@/components/tierlist/TierRow';
 import { CharacterPool } from '@/components/tierlist/CharacterPool';
 import { useToast } from '@/context/ToastContext';
 import styles from './CreateTierList.module.css';
+
+// Types derived from TierList to ensure consistency
+type Tier = TierList['tiers'][number];
+type TierItem = Tier['items'][number];
+
+// Pool Item Type (matches what comes from CharacterPool)
+interface PoolDragItem {
+    mal_id: number;
+    name: string;
+    images: {
+        jpg: {
+            image_url: string;
+        };
+    };
+}
 
 function TrashZone() {
     const { setNodeRef, isOver } = useDroppable({
@@ -58,15 +73,16 @@ export default function CreateTierList() {
 
     // State
     const [title, setTitle] = useState('My Tier List');
-    const [tiers, setTiers] = useState([
-        { id: 'S', label: 'S', color: '#ff7f7f', items: [] as any[] },
-        { id: 'A', label: 'A', color: '#ffbf7f', items: [] as any[] },
-        { id: 'B', label: 'B', color: '#ffdf7f', items: [] as any[] },
-        { id: 'C', label: 'C', color: '#ffff7f', items: [] as any[] },
-        { id: 'D', label: 'D', color: '#bfff7f', items: [] as any[] },
+    const [tiers, setTiers] = useState<Tier[]>([
+        { id: 'S', label: 'S', color: '#ff7f7f', items: [] },
+        { id: 'A', label: 'A', color: '#ffbf7f', items: [] },
+        { id: 'B', label: 'B', color: '#ffdf7f', items: [] },
+        { id: 'C', label: 'C', color: '#ffff7f', items: [] },
+        { id: 'D', label: 'D', color: '#bfff7f', items: [] },
     ]);
     const [activeId, setActiveId] = useState<string | null>(null);
-    const [activeItem, setActiveItem] = useState<any>(null);
+    // Active item can be from Pool (PoolDragItem) or Tier (TierItem)
+    const [activeItem, setActiveItem] = useState<PoolDragItem | TierItem | null>(null);
 
     // Sensors
     const sensors = useSensors(
@@ -87,7 +103,7 @@ export default function CreateTierList() {
         setActiveId(id);
 
         if (id.startsWith('pool-')) {
-            setActiveItem(active.data.current?.character);
+            setActiveItem(active.data.current?.character as PoolDragItem);
         } else {
             // Find item in tiers
             for (const tier of tiers) {
@@ -156,7 +172,7 @@ export default function CreateTierList() {
                         // Coerce IDs to strings to ensure matching works regardless of API return type (number vs string)
                         const isDuplicate = prev.some(t => t.items.some(i => String(i.id) === String(character.mal_id)));
                         if (isDuplicate) {
-                            addToast('Character already in tier list!', 'error');
+                            addToast(t('tierlist.duplicate_character'), 'error');
                             return tier;
                         }
                         return {
@@ -231,10 +247,10 @@ export default function CreateTierList() {
             link.download = `${title.replace(/\s+/g, '_')}_tierlist.png`;
             link.href = canvas.toDataURL();
             link.click();
-            addToast('Image downloaded!', 'success');
+            addToast(t('tierlist.export_success'), 'success');
         } catch (error) {
             console.error(error);
-            addToast('Failed to generate image. Note: Cross-origin images might fail.', 'error');
+            addToast(t('tierlist.export_error'), 'error');
         }
     };
 
@@ -255,12 +271,12 @@ export default function CreateTierList() {
                 isPublic: true,
                 createdAt: Date.now(),
                 tiers: tiers
-            } as any);
-            addToast('Tier list saved successfully!', 'success');
+            });
+            addToast(t('tierlist.save_success'), 'success');
             navigate('/profile');
         } catch (error) {
             console.error(error);
-            addToast('Error saving tier list', 'error');
+            addToast(t('tierlist.save_error'), 'error');
         }
     };
 
@@ -335,7 +351,7 @@ export default function CreateTierList() {
                             <div style={{
                                 width: '80px',
                                 height: '80px',
-                                backgroundImage: `url(${activeItem.images?.jpg?.image_url || activeItem.image})`,
+                                backgroundImage: `url(${('images' in activeItem) ? activeItem.images.jpg.image_url : activeItem.image})`,
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center',
                                 borderRadius: '4px',

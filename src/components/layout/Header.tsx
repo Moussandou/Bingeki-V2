@@ -1,6 +1,6 @@
 import { Link } from '@/components/routing/LocalizedLink';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import {
@@ -11,8 +11,10 @@ import {
     Settings,
     MessageSquare,
     Menu, X,
-    MessageCircle, Sun, Moon
+    MessageCircle, Sun, Moon, Compass
 } from 'lucide-react';
+
+import { GlobalSearch } from '@/components/search/GlobalSearch';
 import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -28,6 +30,12 @@ export function Header() {
     const navigate = useNavigate();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+    // Scroll to top on navigation
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location.pathname]);
 
     // I18n setup
     const { t, i18n } = useTranslation();
@@ -54,7 +62,7 @@ export function Header() {
                     {/* Left: Logo */}
                     <Link to="/" className={`${styles.logo} text-gradient`}>
                         <img src="/logo.png" alt="Bingeki Logo" style={{ width: 50, height: 50, objectFit: 'contain' }} />
-                        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+                        <div className={styles.logoText}>
                             <span style={{ fontSize: '1.2rem', fontFamily: 'var(--font-heading)', letterSpacing: '-1px' }}>BINGEKI</span>
                         </div>
                     </Link>
@@ -67,9 +75,10 @@ export function Header() {
                                 <span className="hidden-tablet">{t('header.dashboard')}</span>
                             </Link>
                             <Link to="/discover" className={`${styles.navLink} ${isActive('/discover') ? styles.activeLink : ''} `}>
-                                <Search size={18} />
+                                <Compass size={18} />
                                 <span className="hidden-tablet">{t('header.discover')}</span>
                             </Link>
+
                             <Link to="/library" className={`${styles.navLink} ${isActive('/library') ? styles.activeLink : ''} `}>
                                 <Book size={18} />
                                 <span className="hidden-tablet">{t('header.library')}</span>
@@ -137,7 +146,31 @@ export function Header() {
                     )}
 
                     {/* Right: Stats & Actions */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div className={styles.headerActions} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+
+
+
+                        {/* Search Button (Mobile) */}
+                        <button
+                            onClick={() => setIsSearchOpen(true)}
+                            className={styles.iconButton}
+                            style={{
+                                padding: '6px',
+                                cursor: 'pointer',
+                                border: '2px solid var(--color-border)',
+                                background: 'transparent',
+                                marginRight: '0.5rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: '32px',
+                                width: '32px',
+                                color: 'var(--color-text)'
+                            }}
+                            title={t('header.search_placeholder') || "Search"}
+                        >
+                            <Search size={18} />
+                        </button>
 
                         {/* Mobile Menu Button - Visible ONLY on Mobile */}
                         {user && (
@@ -353,7 +386,7 @@ export function Header() {
                         </Link>
                         <Link to="/discover">
                             <Button variant={isActive('/discover') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
-                                <Search size={22} />
+                                <Compass size={22} />
                             </Button>
                         </Link>
                         <Link to="/library">
@@ -376,7 +409,7 @@ export function Header() {
                         </Link>
                         <Link to="/discover">
                             <Button variant={isActive('/discover') ? 'primary' : 'ghost'} size="icon" style={{ borderRadius: '12px' }}>
-                                <Search size={22} />
+                                <Compass size={22} />
                             </Button>
                         </Link>
                         <Link to="/schedule">
@@ -397,6 +430,7 @@ export function Header() {
                     </nav>
                 )
             }
+            <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
         </>
     );
 }

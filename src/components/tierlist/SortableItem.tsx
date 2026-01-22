@@ -6,13 +6,13 @@ import { CSS } from '@dnd-kit/utilities';
 interface SortableItemProps {
     id: string; // Unique ID (e.g., "S-1234")
     character: {
-        id: number;
+        id: number | string;
         name: string;
         image: string;
     };
 }
 
-export function TierItemDisplay({ character, style }: { character: any, style?: React.CSSProperties }) {
+export function TierItemDisplay({ character, style }: { character: SortableItemProps['character'], style?: React.CSSProperties }) {
     return (
         <div
             className="tier-item"

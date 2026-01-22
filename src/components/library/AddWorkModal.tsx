@@ -115,7 +115,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
         if (isOpen && initialWork) {
             setQuery(initialWork.title);
             setResults([initialWork]);
-            setType(initialWork.type === 'Manga' ? 'manga' : 'anime' as any); // Simple heuristic
+            setType(initialWork.type === 'Manga' ? 'manga' : 'anime'); // Simple heuristic
         } else if (isOpen && !initialWork) {
             // Reset if opening fresh
             setQuery('');
@@ -183,16 +183,16 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
     const isAdded = (id: number) => works.some(w => w.id === id);
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={t('components.add_work_modal.title')}>
+        <Modal isOpen={isOpen} onClose={onClose} title={t('components.add_work_modal.title')} variant="manga">
             {/* Manga Style Tabs */}
-            <div style={{ display: 'flex', gap: '0', marginBottom: '1.5rem', border: '2px solid #000' }}>
+            <div style={{ display: 'flex', gap: '0', marginBottom: '1.5rem', border: '3px solid var(--color-border-heavy)' }}>
                 <button
                     onClick={() => setMode('api')}
                     style={{
                         flex: 1,
                         padding: '0.75rem',
-                        background: mode === 'api' ? '#000' : '#fff',
-                        color: mode === 'api' ? '#fff' : '#000',
+                        background: mode === 'api' ? 'var(--color-text)' : 'var(--color-surface)',
+                        color: mode === 'api' ? 'var(--color-surface)' : 'var(--color-text)',
                         fontSize: '1rem',
                         fontWeight: 900,
                         textTransform: 'uppercase',
@@ -200,20 +200,22 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '0.5rem',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        border: 'none',
+                        transition: 'all 0.2s'
                     }}
                 >
                     <Globe size={18} />
                     {t('components.add_work_modal.tab_search')}
                 </button>
-                <div style={{ width: '2px', background: '#000' }}></div>
+                <div style={{ width: '3px', background: 'var(--color-border-heavy)' }}></div>
                 <button
                     onClick={() => setMode('manual')}
                     style={{
                         flex: 1,
                         padding: '0.75rem',
-                        background: mode === 'manual' ? '#000' : '#fff',
-                        color: mode === 'manual' ? '#fff' : '#000',
+                        background: mode === 'manual' ? 'var(--color-text)' : 'var(--color-surface)',
+                        color: mode === 'manual' ? 'var(--color-surface)' : 'var(--color-text)',
                         fontSize: '1rem',
                         fontWeight: 900,
                         textTransform: 'uppercase',
@@ -221,7 +223,9 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '0.5rem',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        border: 'none',
+                        transition: 'all 0.2s'
                     }}
                 >
                     <PenTool size={18} />
@@ -234,32 +238,42 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                     <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
                         <select
                             value={type}
-                            onChange={(e) => setType(e.target.value as any)}
+                            onChange={(e) => setType(e.target.value as 'manga' | 'anime')}
                             style={{
-                                background: '#fff',
-                                color: '#000',
-                                border: '2px solid #000',
-                                padding: '0 0.5rem',
-                                fontWeight: 'bold'
+                                background: 'var(--color-surface)',
+                                color: 'var(--color-text)',
+                                border: '3px solid var(--color-border-heavy)',
+                                padding: '0 1rem',
+                                fontWeight: 900,
+                                fontFamily: 'var(--font-heading)',
+                                textTransform: 'uppercase',
+                                height: 'auto',
+                                cursor: 'pointer'
                             }}
                         >
                             <option value="manga">MANGA</option>
                             <option value="anime">ANIME</option>
                         </select>
-                        <div style={{ position: 'relative', flex: 1 }}>
+                        <div style={{ position: 'relative', flex: 1, border: '3px solid var(--color-border-heavy)', background: 'var(--color-surface)', boxShadow: '4px 4px 0 var(--color-primary)' }}>
                             <Input
                                 placeholder={t('components.add_work_modal.search_placeholder')}
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 style={{
-                                    border: '2px solid #000',
+                                    border: 'none',
                                     borderRadius: 0,
-                                    boxShadow: '4px 4px 0 rgba(0,0,0,0.1)'
+                                    height: '100%',
+                                    padding: '1rem',
+                                    fontSize: '1.1rem',
+                                    fontWeight: 700,
+                                    background: 'transparent',
+                                    color: 'var(--color-text)',
+                                    textTransform: 'uppercase'
                                 }}
                             />
                             {loading && (
-                                <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)' }}>
-                                    <Loader2 className="animate-spin" size={16} />
+                                <div style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)' }}>
+                                    <Loader2 className="animate-spin" size={24} color="var(--color-primary)" />
                                 </div>
                             )}
                         </div>
@@ -287,47 +301,53 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                                             display: 'flex',
                                             gap: '1rem',
                                             padding: '0.75rem',
-                                            border: '2px solid #000',
-                                            background: '#fff',
-                                            boxShadow: 'none', // Override global for list items
-                                            alignItems: 'center'
+                                            border: '2px solid var(--color-border)',
+                                            background: 'var(--color-surface)',
+                                            boxShadow: 'none',
+                                            alignItems: 'center',
+                                            transition: 'all 0.2s'
                                         }}
+                                        whileHover={{ borderColor: 'var(--color-primary)', x: 4 }}
                                     >
-                                        <img
-                                            src={work.images.jpg.image_url}
-                                            alt={work.title}
-                                            style={{
-                                                width: '50px',
-                                                height: '70px',
-                                                objectFit: 'cover',
-                                                border: '1px solid #000'
-                                            }}
-                                        />
+                                        <div style={{ width: '50px', height: '70px', border: '2px solid var(--color-border-heavy)', flexShrink: 0 }}>
+                                            <img
+                                                src={work.images.jpg.image_url}
+                                                alt={work.title}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    objectFit: 'cover'
+                                                }}
+                                            />
+                                        </div>
                                         <div style={{ flex: 1 }}>
                                             <h4 style={{
                                                 fontSize: '1rem',
                                                 fontWeight: 900,
-                                                color: '#000',
-                                                marginBottom: '0.25rem'
+                                                color: 'var(--color-text)',
+                                                marginBottom: '0.25rem',
+                                                textTransform: 'uppercase',
+                                                fontFamily: 'var(--font-heading)',
+                                                lineHeight: 1.1
                                             }}>
                                                 {work.title}
                                             </h4>
-                                            <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#666' }}>
-                                                {work.type} • {work.chapters || work.episodes || '?'} {type === 'manga' ? t('components.add_work_modal.chapters_abbr') : t('components.add_work_modal.episodes_abbr')}
+                                            <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-dim)', textTransform: 'uppercase' }}>
+                                                {work.type} • <span style={{ color: 'var(--color-primary)' }}>{work.chapters || work.episodes || '?'} {type === 'manga' ? t('components.add_work_modal.chapters_abbr') : t('components.add_work_modal.episodes_abbr')}</span>
                                                 {work.score && ` • ★ ${work.score}`}
                                             </p>
                                         </div>
                                         <Button
-                                            variant="manga"
+                                            variant={added ? "ghost" : "manga"}
                                             size="sm"
                                             onClick={() => !added && handleAdd(work)}
                                             style={{
                                                 opacity: added ? 0.6 : 1,
-                                                background: added ? '#eee' : '#fff'
+                                                pointerEvents: added ? 'none' : 'auto'
                                             }}
                                             disabled={added}
                                         >
-                                            {added ? <Check size={16} /> : <Plus size={16} />}
+                                            {added ? <Check size={18} strokeWidth={3} /> : <Plus size={18} strokeWidth={3} />}
                                         </Button>
                                     </motion.div>
                                 );
@@ -335,42 +355,47 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                         </AnimatePresence>
 
                         {!loading && results.length === 0 && query.length > 2 && (
-                            <div style={{ textAlign: 'center', padding: '2rem', fontStyle: 'italic', fontWeight: 'bold' }}>
+                            <div style={{ textAlign: 'center', padding: '2rem', border: '2px dashed var(--color-border)', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-dim)' }}>
                                 {t('components.add_work_modal.no_results')}
                             </div>
                         )}
                         {!loading && !query && (
-                            <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.5, fontWeight: 'bold' }}>
-                                {t('components.add_work_modal.search_hint')}
+                            <div style={{ textAlign: 'center', padding: '3rem 1rem', opacity: 0.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                                <Globe size={48} strokeWidth={1} style={{ opacity: 0.2 }} />
+                                <p style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontWeight: 900 }}>
+                                    {t('components.add_work_modal.search_hint')}
+                                </p>
                             </div>
                         )}
                     </div>
                 </div>
             ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em' }}>{t('components.add_work_modal.label_title')}</label>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em', textTransform: 'uppercase', fontFamily: 'var(--font-heading)' }}>{t('components.add_work_modal.label_title')}</label>
                         <Input
                             placeholder={t('components.add_work_modal.title_placeholder')}
                             value={manualTitle}
                             onChange={(e) => setManualTitle(e.target.value)}
-                            style={{ border: '2px solid #000', borderRadius: 0 }}
+                            style={{ border: '3px solid var(--color-border-heavy)', borderRadius: 0, padding: '1rem', fontWeight: 700, background: 'var(--color-surface)', color: 'var(--color-text)' }}
                         />
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em' }}>{t('components.add_work_modal.label_type')}</label>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em', textTransform: 'uppercase', fontFamily: 'var(--font-heading)' }}>{t('components.add_work_modal.label_type')}</label>
                             <select
                                 value={type}
-                                onChange={(e) => setType(e.target.value as any)}
+                                onChange={(e) => setType(e.target.value as 'manga' | 'anime')}
                                 style={{
                                     width: '100%',
-                                    padding: '0.5rem',
-                                    background: '#fff',
-                                    border: '2px solid #000',
-                                    fontWeight: 'bold',
-                                    height: '42px'
+                                    padding: '0.75rem',
+                                    background: 'var(--color-surface)',
+                                    color: 'var(--color-text)',
+                                    border: '3px solid var(--color-border-heavy)',
+                                    fontWeight: 900,
+                                    height: 'auto',
+                                    fontFamily: 'var(--font-heading)'
                                 }}
                             >
                                 <option value="manga">MANGA</option>
@@ -378,7 +403,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                             </select>
                         </div>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em' }}>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em', textTransform: 'uppercase', fontFamily: 'var(--font-heading)' }}>
                                 {type === 'manga' ? t('components.add_work_modal.label_chapters') : t('components.add_work_modal.label_episodes')}
                             </label>
                             <Input
@@ -386,13 +411,13 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                                 placeholder={t('components.add_work_modal.total_placeholder')}
                                 value={manualTotal || ''}
                                 onChange={(e) => setManualTotal(parseInt(e.target.value) || 0)}
-                                style={{ border: '2px solid #000', borderRadius: 0 }}
+                                style={{ border: '3px solid var(--color-border-heavy)', borderRadius: 0, padding: '1rem', fontWeight: 700, background: 'var(--color-surface)', color: 'var(--color-text)' }}
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em' }}>{t('components.add_work_modal.label_image')}</label>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 900, fontSize: '0.9em', textTransform: 'uppercase', fontFamily: 'var(--font-heading)' }}>{t('components.add_work_modal.label_image')}</label>
 
                         {!manualImage ? (
                             <div
@@ -400,8 +425,8 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                                 onDragLeave={handleDragLeave}
                                 onDrop={handleDrop}
                                 style={{
-                                    border: `2px dashed ${isDragging ? 'var(--color-primary)' : '#000'}`,
-                                    background: isDragging ? 'rgba(0,0,0,0.05)' : '#fff',
+                                    border: `3px dashed ${isDragging ? 'var(--color-primary)' : 'var(--color-border-heavy)'}`,
+                                    background: isDragging ? 'var(--color-surface-hover)' : 'var(--color-surface)',
                                     padding: '2rem',
                                     textAlign: 'center',
                                     cursor: 'pointer',
@@ -417,7 +442,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                                     style={{ display: 'none' }}
                                 />
                                 <Upload size={32} style={{ marginBottom: '0.5rem', opacity: 0.5 }} />
-                                <p style={{ fontWeight: 700, fontSize: '0.9rem' }}>
+                                <p style={{ fontWeight: 900, fontSize: '0.9rem', textTransform: 'uppercase' }}>
                                     {t('components.add_work_modal.drag_and_drop')}
                                 </p>
                                 <p style={{ fontSize: '0.8rem', opacity: 0.5, marginTop: '0.25rem' }}>
@@ -425,7 +450,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                                 </p>
                             </div>
                         ) : (
-                            <div style={{ position: 'relative', width: '100px', height: '140px', border: '2px solid #000' }}>
+                            <div style={{ position: 'relative', width: '100px', height: '140px', border: '3px solid var(--color-border-heavy)' }}>
                                 <img
                                     src={isValidImageSrc(manualImage) ? manualImage : ""}
                                     alt="Preview"
@@ -435,21 +460,22 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                                     onClick={() => setManualImage('')}
                                     style={{
                                         position: 'absolute',
-                                        top: -10,
-                                        right: -10,
-                                        background: '#ff0000',
+                                        top: -12,
+                                        right: -12,
+                                        background: 'var(--color-primary)',
                                         color: '#fff',
-                                        border: '2px solid #000',
-                                        borderRadius: '50%',
-                                        width: '24px',
-                                        height: '24px',
+                                        border: '3px solid var(--color-border-heavy)',
+                                        borderRadius: '0',
+                                        width: '30px',
+                                        height: '30px',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        cursor: 'pointer'
+                                        cursor: 'pointer',
+                                        boxShadow: '2px 2px 0 #000'
                                     }}
                                 >
-                                    <X size={14} />
+                                    <X size={18} strokeWidth={3} />
                                 </button>
                             </div>
                         )}
@@ -459,7 +485,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                                 placeholder={t('components.add_work_modal.url_placeholder')}
                                 value={manualImage}
                                 onChange={(e) => setManualImage(e.target.value)}
-                                style={{ border: '2px solid #000', borderRadius: 0, marginTop: '0.5rem' }}
+                                style={{ border: '3px solid var(--color-border-heavy)', borderRadius: 0, marginTop: '0.5rem', padding: '1rem', background: 'var(--color-surface)', color: 'var(--color-text)' }}
                             />
                         )}
                     </div>

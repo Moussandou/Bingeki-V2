@@ -23,11 +23,19 @@ export default function PersonDetails() {
     useEffect(() => {
         if (!id) return;
 
-        setLoading(true);
-        getPersonFull(Number(id)).then(data => {
-            setPerson(data);
-            setLoading(false);
-        });
+        const loadPerson = async () => {
+            setLoading(true);
+            try {
+                const data = await getPersonFull(Number(id));
+                setPerson(data);
+            } catch (error) {
+                console.error("Failed to load person", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadPerson();
     }, [id]);
 
     if (loading) {

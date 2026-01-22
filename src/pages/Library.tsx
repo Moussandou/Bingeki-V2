@@ -3,7 +3,7 @@ import { Layout } from '@/components/layout/Layout';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
-import { AddWorkModal } from '@/components/AddWorkModal';
+import { AddWorkModal } from '@/components/library/AddWorkModal';
 import { useLibraryStore, type Work } from '@/store/libraryStore';
 import { useAuthStore } from '@/store/authStore';
 import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle, BookOpen, CheckCircle, SortAsc, ChevronDown, Download, Upload, TrendingUp, User } from 'lucide-react';
@@ -51,14 +51,14 @@ export default function Library() {
                     setFriendWorks(lib || []);
                 } catch (error) {
                     console.error("Failed to load friend library", error);
-                    addToast("Impossible de charger la bibliothèque", 'error');
+                    addToast(t('library.load_error'), 'error');
                 } finally {
                     setIsLoadingFriend(false);
                 }
             };
             loadFriend();
         }
-    }, [isReadOnly, uid, addToast]);
+    }, [isReadOnly, uid, addToast, t]);
 
 
     // UI State
@@ -116,10 +116,11 @@ export default function Library() {
                         return (b.dateAdded || 0) - (a.dateAdded || 0);
                     case 'alphabetical':
                         return a.title.localeCompare(b.title);
-                    case 'progress':
+                    case 'progress': {
                         const progressA = (a.currentChapter || 0) / (a.totalChapters || 1);
                         const progressB = (b.currentChapter || 0) / (b.totalChapters || 1);
                         return progressB - progressA;
+                    }
                     default:
                         return 0;
                 }
@@ -298,7 +299,7 @@ export default function Library() {
                                                 {['all', 'manga', 'anime'].map(type => (
                                                     <button
                                                         key={type}
-                                                        onClick={() => setFilterType(type as any)}
+                                                        onClick={() => setFilterType(type as 'all' | 'manga' | 'anime')}
                                                         style={{
                                                             padding: '0.5rem 1rem',
                                                             border: '2px solid var(--color-border-heavy)',
@@ -325,7 +326,7 @@ export default function Library() {
                                                 {['all', 'reading', 'completed', 'plan_to_read'].map(s => (
                                                     <button
                                                         key={s}
-                                                        onClick={() => setFilterStatus(s as any)}
+                                                        onClick={() => setFilterStatus(s as 'all' | 'reading' | 'completed' | 'plan_to_read')}
                                                         style={{
                                                             padding: '0.4rem 0.8rem',
                                                             border: '2px solid var(--color-border-heavy)',
@@ -390,7 +391,7 @@ export default function Library() {
                                                 <button
                                                     key={option.value}
                                                     onClick={() => {
-                                                        setSortBy(option.value as any);
+                                                        setSortBy(option.value as 'updated' | 'added' | 'alphabetical' | 'progress');
                                                         setSortOpen(false);
                                                     }}
                                                     style={{

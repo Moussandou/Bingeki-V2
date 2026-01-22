@@ -42,9 +42,10 @@ export const handleProgressUpdateWithXP = (
         // Progressing: Add XP
         addXp(XP_REWARDS.UPDATE_PROGRESS * diff);
         for (let i = 0; i < diff; i++) {
-            if (work.type === 'manga') {
+            const type = work.type ? work.type.toLowerCase() : 'manga';
+            if (type === 'manga') {
                 incrementStat('chapters');
-            } else if (work.type === 'anime') {
+            } else if (type === 'anime') {
                 if (work.format === 'Movie') {
                     incrementStat('movies');
                 } else {

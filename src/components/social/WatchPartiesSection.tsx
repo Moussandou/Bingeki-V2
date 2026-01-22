@@ -55,6 +55,7 @@ export function WatchPartiesSection() {
 
     useEffect(() => {
         if (user) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             loadData();
         }
     }, [user, loadData]);

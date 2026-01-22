@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/layout/Layout';
 import { getTierListById } from '@/firebase/firestore';
 import type { TierList } from '@/firebase/firestore';
@@ -10,6 +11,7 @@ import html2canvas from 'html2canvas'; // Fixed import
 import { useToast } from '@/context/ToastContext';
 
 export default function ViewTierList() {
+    const { t } = useTranslation();
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToast } = useToast();
@@ -25,13 +27,13 @@ export default function ViewTierList() {
                 setTierList(data);
             } catch (error) {
                 console.error(error);
-                addToast('Failed to load tier list', 'error');
+                addToast(t('tierlist.load_error'), 'error');
             } finally {
                 setLoading(false);
             }
         };
         fetchList();
-    }, [id, addToast]);
+    }, [id, addToast, t]);
 
     const handleExportImage = async () => {
         if (!tiersRef.current || !tierList) return;
@@ -46,10 +48,10 @@ export default function ViewTierList() {
             link.download = `${tierList.title.replace(/\s+/g, '_')}_tierlist.png`;
             link.href = canvas.toDataURL();
             link.click();
-            addToast('Image downloaded!', 'success');
+            addToast(t('tierlist.export_success'), 'success');
         } catch (error) {
             console.error(error);
-            addToast('Failed to generate image', 'error');
+            addToast(t('tierlist.export_error'), 'error');
         }
     };
 

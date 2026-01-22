@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Users } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { getFriends, getUserLibrary } from '@/firebase/firestore';
+import { type Work } from '@/store/libraryStore';
 import { useNavigate } from 'react-router-dom';
 
 interface RecommendedWork {
@@ -39,7 +40,7 @@ export function FriendRecommendations() {
             const userWorkIds = new Set(userLibrary.map(w => w.id));
 
             // Collect works from friends' libraries
-            const workCounts: Map<number, { work: any; friends: { name: string; photo: string }[] }> = new Map();
+            const workCounts: Map<number, { work: Work; friends: { name: string; photo: string }[] }> = new Map();
 
             for (const friend of acceptedFriends.slice(0, 10)) { // Limit to 10 friends
                 const friendLibrary = await getUserLibrary(friend.uid);
@@ -78,10 +79,10 @@ export function FriendRecommendations() {
                 }));
 
             setRecommendations(sortedWorks);
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error loading recommendations:', error);
             // If it's a permission error, effectively just hide the section
-            if (error.code === 'permission-denied') {
+            if ((error as { code?: string }).code === 'permission-denied') {
                 console.warn('Social features require updated Firestore rules. Check firestore.rules deployment.');
             }
         }
@@ -91,6 +92,7 @@ export function FriendRecommendations() {
 
     useEffect(() => {
         if (user) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             loadRecommendations();
         }
     }, [user, loadRecommendations]);

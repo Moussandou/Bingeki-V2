@@ -23,8 +23,18 @@ const resources = {
                 profile: "Mon Profil",
                 settings: "Paramètres",
                 logout: "Déconnexion",
-                feedback: "Avis",
-                more: "PLUS"
+                feedback: "Donner un avis",
+                more: "PLUS",
+                title: "AIDE & CHANGELOG",
+                version: "Version {{version}}",
+                see_changelog: "Voir le changelog",
+                report_bug: "Signaler un bug"
+            },
+            pwa: {
+                install_app: "Installer l'App"
+            },
+            roles: {
+                admin: "ADMIN"
             },
             landing: {
                 hero: {
@@ -115,6 +125,13 @@ const resources = {
                         premium: "Support premium",
                         kofi_alt: "Support me on Ko-fi"
                     },
+                    mobile: {
+                        title: "BINGEKI DANS VOTRE POCHE",
+                        description_1: "Emportez votre collection partout. Une expérience fluide, rapide et conçue pour le mobile.",
+                        feature_1: "Installable (PWA)",
+                        feature_2: "Mode Hors-ligne",
+                        feature_3: "Notifications Push (Bientôt)"
+                    },
                     final_cta: {
                         title: "REJOIGNEZ L'ÉLITE",
                         title_logged_in: "PRÊT À REPRENDRE ?",
@@ -202,7 +219,13 @@ const resources = {
                 search_name: "Rechercher un nom...",
                 search_anime: "Rechercher un anime...",
                 no_characters: "Aucun personnage trouvé.",
-                no_anime: "Aucun anime trouvé."
+                no_anime: "Aucun anime trouvé.",
+                load_error: "Échec du chargement de la tier list",
+                export_success: "Image téléchargée !",
+                export_error: "Échec de la génération de l'image",
+                duplicate_character: "Ce personnage est déjà dans la tier list !",
+                save_success: "Tier list sauvegardée !",
+                save_error: "Erreur lors de la sauvegarde"
             },
             stats: {
                 level: "Niveau",
@@ -273,6 +296,7 @@ const resources = {
                 title: "Ma Bibliothèque",
                 friend_title: "Bibliothèque de {{name}}",
                 read_only: "Affichage en lecture seule (pas de modification)",
+                load_error: "Impossible de charger la bibliothèque",
 
                 total: "Total",
                 completed: "Terminées",
@@ -609,8 +633,16 @@ const resources = {
                 },
                 toast: {
                     profile_updated: "Profil mis à jour avec succès !",
-                    save_error: "Erreur lors de la sauvegarde : "
-                }
+                    save_error: "Erreur lors de la sauvegarde : ",
+                    friend_request_sent: "Demande d'ami envoyée !",
+                    friend_request_error: "Erreur lors de l'envoi de la demande",
+                    already_friends: "Vous êtes déjà amis"
+                },
+                add_favorite_character: "Ajouter un personnage favori",
+                add_friend: "AJOUTER EN AMI",
+                request_pending: "DEMANDE EN ATTENTE",
+                friends: "AMIS",
+                remove_friend: "RETIRER DES AMIS"
             },
             settings: {
                 title: "Paramètres",
@@ -642,6 +674,9 @@ const resources = {
                     clear_cache: "Nettoyer Cache",
                     export_backup: "Exporter Backup",
                     import_backup: "Importer Backup",
+                    recalculate_button: "Réparer les stats",
+                    recalculate_success: "Statistiques recalculées avec succès !",
+                    recalculate_error: "Erreur lors du recalcul des statistiques.",
                     sync_library: "Synchroniser la bibliothèque",
                     danger_zone: "Zone de danger",
                     danger_desc: "Actions irréversibles",
@@ -686,6 +721,18 @@ const resources = {
                 new: "NEW",
                 to_be_continued: "À SUIVRE...",
                 entries: {
+                    v3_3: {
+                        date: "22 Janvier 2026",
+                        title: "Expérience Mobile & PWA",
+                        description: "Optimisation majeure pour les appareils mobiles et installation de l'application.",
+                        changes: [
+                            "Nouveau : Application Installable (PWA) avec support hors-ligne.",
+                            "UI : Nouvelle section de promotion mobile sur la Landing Page.",
+                            "UI : Bouton d'installation déplacé dans le footer pour plus de clarté.",
+                            "Ergonomie : Retour en haut de page automatique lors de la navigation.",
+                            "Fix : Résolution des problèmes d'affichage sur mobile (Header, Recherche, Bibliothèque)."
+                        ]
+                    },
                     v3_2: {
                         date: "16 Janvier 2026",
                         title: "Social & Sécurité",
@@ -975,6 +1022,7 @@ const resources = {
                     tickets_pending: "{{count}} tickets en attente",
                     refresh: "Rafraîchir",
                     loading: "Chargement des messages...",
+                    load_error: "Erreur lors du chargement des avis",
                     no_messages: "Aucun message pour le moment.",
                     anonymous: "Anonyme",
                     resolved: "Résolu",
@@ -1213,7 +1261,7 @@ const resources = {
                 agenda: "SCHEDULE",
                 community: "COMMUNITY",
                 news: "WHATS NEW",
-                feedback: "FEEDBACK",
+                feedback: "Give Feedback",
                 login: "LOGIN",
                 search_placeholder: "Search...",
                 discover: "DISCOVER",
@@ -1222,8 +1270,19 @@ const resources = {
                 settings: "Settings",
                 logout: "Logout",
                 more: "MORE",
-                tierlist: "Tier List"
+                tierlist: "Tier List",
+                title: "HELP & CHANGELOG",
+                version: "Version {{version}}",
+                see_changelog: "View Changelog",
+                report_bug: "Report Bug"
             },
+            pwa: {
+                install_app: "Install App"
+            },
+            roles: {
+                admin: "ADMIN"
+            },
+
             profile: {
                 title: "Hunter License",
                 view_library: "VIEW LIBRARY",
@@ -1277,8 +1336,16 @@ const resources = {
                 },
                 toast: {
                     profile_updated: "Profile updated successfully!",
-                    save_error: "Error saving: "
-                }
+                    save_error: "Error saving: ",
+                    friend_request_sent: "Friend request sent!",
+                    friend_request_error: "Error sending friend request",
+                    already_friends: "You are already friends"
+                },
+                add_favorite_character: "Add favorite character",
+                add_friend: "ADD FRIEND",
+                request_pending: "REQUEST PENDING",
+                friends: "FRIENDS",
+                remove_friend: "REMOVE FRIEND"
             },
             content_list: {
                 no_content: "No content available.",
@@ -1352,7 +1419,13 @@ const resources = {
                 search_name: "Search Name...",
                 search_anime: "Search Anime...",
                 no_characters: "No characters found.",
-                no_anime: "No anime found."
+                no_anime: "No anime found.",
+                load_error: "Failed to load tier list",
+                export_success: "Image downloaded!",
+                export_error: "Failed to generate image",
+                duplicate_character: "Character already in tier list!",
+                save_success: "Tier list saved successfully!",
+                save_error: "Error saving tier list"
             },
             settings: {
                 title: "Settings",
@@ -1384,6 +1457,9 @@ const resources = {
                     clear_cache: "Clear Cache",
                     export_backup: "Export Backup",
                     import_backup: "Import Backup",
+                    recalculate_button: "Recalculate Stats",
+                    recalculate_success: "Stats recalculated successfully!",
+                    recalculate_error: "Error recalculating stats.",
                     sync_library: "Sync Library",
                     danger_zone: "Danger Zone",
                     danger_desc: "Irreversible actions",
@@ -1527,6 +1603,13 @@ const resources = {
                         check_chapters: "CHAPTERS",
                         check_episodes: "EPISODES",
                         check_volumes: "VOLUMES"
+                    },
+                    mobile: {
+                        title: "BINGEKI IN YOUR POCKET",
+                        description_1: "Take your collection everywhere. A smooth, fast experience designed for mobile.",
+                        feature_1: "Installable (PWA)",
+                        feature_2: "Offline Mode",
+                        feature_3: "Push Notifications (Soon)"
                     },
                     progression: {
                         title: "PROGRESSION",
@@ -1684,6 +1767,7 @@ const resources = {
                 title: "My Library",
                 friend_title: "{{name}}'s Library",
                 read_only: "Read-only view (no modification)",
+                load_error: "Failed to load library",
 
                 total: "Total",
                 completed: "Completed",
@@ -1729,6 +1813,18 @@ const resources = {
                 new: "NEW",
                 to_be_continued: "TO BE CONTINUED...",
                 entries: {
+                    v3_3: {
+                        date: "January 22, 2026",
+                        title: "Mobile Experience & PWA",
+                        description: "Major optimization for mobile devices and application installation.",
+                        changes: [
+                            "New: Installable App (PWA) with offline support.",
+                            "UI: New mobile promotion section on Landing Page.",
+                            "UI: Install button moved to footer for clarity.",
+                            "UX: Automatic scroll-to-top on navigation.",
+                            "Fix: Resolved mobile display issues (Header, Search, Library)."
+                        ]
+                    },
                     v3_2: {
                         date: "January 16, 2026",
                         title: "Social & Security",

@@ -9,6 +9,7 @@ const genres = {
 };
 
 const run = async () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const results: Record<string, any> = {};
   for (const [name, id] of Object.entries(genres)) {
     const data = await searchWorks('', 'manga', {
