@@ -1279,7 +1279,7 @@ const resources = {
             },
             pwa: {
                 install_app: "Install App",
-                install_app_promo: "TÉLÉCHARGER L'APP"
+                install_app_promo: "DOWNLOAD APP"
             },
             roles: {
                 admin: "ADMIN"
