@@ -59,5 +59,3 @@ Contributions are welcome! Please read our **[Contributing Guide](docs/Contribut
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
-
-*Verified by [Antigravity](https://github.com/google-deepmind/antigravity)*
