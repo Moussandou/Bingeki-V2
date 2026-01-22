@@ -1279,7 +1279,15 @@ const resources = {
             },
             pwa: {
                 install_app: "Install App",
-                install_app_promo: "DOWNLOAD APP"
+                install_app_promo: "DOWNLOAD APP",
+                install_modal: {
+                    title: "INSTALL APP",
+                    description: "Install the app for quick and offline access.",
+                    ios_step1: "Tap the Share button",
+                    ios_step2: "Select 'Add to Home Screen'",
+                    android_step1: "Open the browser menu",
+                    android_step2: "Tap 'Install App'"
+                }
             },
             roles: {
                 admin: "ADMIN"
