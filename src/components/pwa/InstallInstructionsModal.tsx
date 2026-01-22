@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '@/components/ui/Modal';
 import { Smartphone, Share, PlusSquare, Chrome, Menu } from 'lucide-react';
