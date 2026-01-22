@@ -255,6 +255,7 @@ const resources = {
                 changelog: "CHANGELOG",
                 legal: "MENTIONS LÉGALES & RGPD",
                 credits: "CRÉDITS",
+                wiki: "WIKI",
                 contribution_msg: "Chaque contribution aide à ajouter de nouvelles fonctionnalités !"
             },
             dashboard: {
@@ -1726,6 +1727,7 @@ const resources = {
                 changelog: "CHANGELOG",
                 legal: "LEGAL & GDPR",
                 credits: "CREDITS",
+                wiki: "WIKI",
                 contribution_msg: "Every contribution helps add new features!"
             },
             dashboard: {

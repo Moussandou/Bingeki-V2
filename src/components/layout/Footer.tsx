@@ -176,6 +176,9 @@ export function Footer() {
                         <a href="/changelog" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
                             {t('footer.changelog')}
                         </a>
+                        <a href="https://github.com/Moussandou/Bingeki-V2/wiki" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
+                            {t('footer.wiki')}
+                        </a>
                         <a href="/legal" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
                             {t('footer.legal')}
                         </a>
