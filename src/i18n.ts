@@ -232,7 +232,8 @@ const resources = {
                 finish: "Terminer",
                 skip: "Passer",
                 prev: "Précédent",
-                mark_all_read: "Tout marquer comme lu"
+                mark_all_read: "Tout marquer comme lu",
+                view_details: "Voir détails"
             },
             tierlist: {
                 characters: "PERSONNAGES",
@@ -1539,7 +1540,8 @@ const resources = {
                 finish: "Finish",
                 skip: "Skip",
                 prev: "Previous",
-                mark_all_read: "Mark all as read"
+                mark_all_read: "Mark all as read",
+                view_details: "View Details"
             },
             tierlist: {
                 characters: "CHARACTERS",
