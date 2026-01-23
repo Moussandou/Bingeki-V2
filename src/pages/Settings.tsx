@@ -333,7 +333,7 @@ export default function Settings() {
                                     onClick={() => {
                                         useTutorialStore.getState().resetTutorial();
                                         useTutorialStore.getState().startTutorial();
-                                        navigate('/');
+                                        navigate('/dashboard');
                                     }}
                                     style={{ width: '100%', justifyContent: 'center' }}
                                 >

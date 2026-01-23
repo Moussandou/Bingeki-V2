@@ -26,8 +26,9 @@ export default function Feedback() {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // Tab State
-    const [activeTab, setActiveTab] = useState<Tab>((searchParams.get('tab') as Tab) || 'submit');
+    // Derived State from URL
+    const activeTab = (searchParams.get('tab') as Tab) || 'submit';
+    const selectedTicketId = searchParams.get('id');
 
     // Submission State
     const [rating, setRating] = useState(0);
@@ -46,90 +47,80 @@ export default function Feedback() {
     const [ticketFilter, setTicketFilter] = useState<'all' | 'open' | 'resolved'>('all');
 
     // Detail View State
-    const [selectedTicketId, setSelectedTicketId] = useState<string | null>(searchParams.get('id'));
     const [selectedTicket, setSelectedTicket] = useState<FeedbackData | null>(null);
     const [loadingDetail, setLoadingDetail] = useState(false);
 
-    // Sync state with URL
-    const loadTickets = useCallback(async () => {
-        if (!user) return;
-        setLoadingTickets(true);
-        try {
-            const data = await getUserFeedback(user.uid);
-            setTickets(data);
-        } catch (error) {
-            console.error('Error loading tickets:', error);
-        } finally {
-            setLoadingTickets(false);
-        }
-    }, [user]);
+    // Navigation Helpers
+    const switchTab = (tab: Tab) => {
+        setSearchParams({ tab });
+    };
 
-    const loadTicketDetail = useCallback(async (id: string) => {
-        setLoadingDetail(true);
-        try {
-            const detail = await getFeedbackById(id);
-            if (detail) {
-                if (detail.userId !== user?.uid && !user?.email?.endsWith('@bingeki.com')) {
-                    addToast(t('feedback.error_permission'), 'error');
-                    setSearchParams({ tab: 'tickets' });
-                    return;
-                }
-                setSelectedTicket(detail);
-            }
-        } catch (error) {
-            console.error('Error loading feedback detail:', error);
-            addToast(t('feedback.error_loading_detail'), 'error');
-        } finally {
-            setLoadingDetail(false);
-        }
-    }, [user, addToast, setSearchParams, t]);
+    const openTicket = (id: string) => {
+        setSearchParams({ tab: 'tickets', id });
+    };
 
-    // Sync state with URL
-    useEffect(() => {
-        const tab = searchParams.get('tab') as Tab;
-        if (tab && tab !== activeTab) setActiveTab(tab);
+    const closeTicket = () => {
+        setSearchParams({ tab: 'tickets' });
+    };
 
-        const id = searchParams.get('id');
-        if (id && id !== selectedTicketId) setSelectedTicketId(id);
-    }, [searchParams, activeTab, selectedTicketId]); // Added activeTab, selectedTicketId to satisfy exhaustive-deps, though logic suggests conditional check? 
-    // Actually the logic is "Sync state FROM URL". If state matches URL, do nothing. 
-    // If I add activeTab to dep, it runs when activeTab changes. 
-    // If activeTab changes, typically URL should update (next effect).
-    // This effect is "On Mount" or "On URL Change". 
-    // If strict deps: [searchParams, activeTab, selectedTicketId].
-    // But logic `if (tab && tab !== activeTab)` prevents loops.
-
-    // Update URL when state changes
-    useEffect(() => {
-        const params: Record<string, string> = { tab: activeTab };
-        if (selectedTicketId) params.id = selectedTicketId;
-        setSearchParams(params);
-    }, [activeTab, selectedTicketId, setSearchParams]);
-
-    // Load Tickets
+    // Load Tickets using auth user
     useEffect(() => {
         if (activeTab === 'tickets' && user && !selectedTicketId) {
-            loadTickets();
+            setLoadingTickets(true);
+            getUserFeedback(user.uid)
+                .then(setTickets)
+                .catch(err => console.error("Error loading tickets", err))
+                .finally(() => setLoadingTickets(false));
         }
-    }, [activeTab, user, selectedTicketId, loadTickets]);
+    }, [activeTab, user, selectedTicketId]);
 
-    // Load Ticket Detail
+    // Load Single Ticket Detail
     useEffect(() => {
-        if (selectedTicketId) {
-            loadTicketDetail(selectedTicketId);
-        } else {
+        if (!selectedTicketId) {
             setSelectedTicket(null);
+            return;
         }
-    }, [selectedTicketId, loadTicketDetail]);
+
+        const loadDetail = async () => {
+            setLoadingDetail(true);
+            try {
+                const detail = await getFeedbackById(selectedTicketId);
+                if (detail) {
+                    if (user && detail.userId !== user.uid && !user.email?.endsWith('@bingeki.com')) {
+                        addToast(t('feedback.error_permission'), 'error');
+                        closeTicket();
+                        return;
+                    }
+                    setSelectedTicket(detail);
+                }
+            } catch (error) {
+                console.error('Error loading feedback detail:', error);
+                addToast(t('feedback.error_loading_detail'), 'error');
+            } finally {
+                setLoadingDetail(false);
+            }
+        };
+
+        loadDetail();
+    }, [selectedTicketId, user, addToast, t]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (rating === 0) {
+
+        // Rating is optional for bugs
+        if (category !== 'bug' && rating === 0) {
             addToast(t('feedback.toast_select_rating'), 'error');
             return;
         }
-        if (!message.trim()) {
+
+        if (category !== 'bug' && !message.trim()) {
             addToast(t('feedback.toast_write_message'), 'error');
+            return;
+        }
+
+        // For bugs, message is required
+        if (category === 'bug' && !message.trim()) {
+            addToast(t('feedback.toast_write_message'), 'error'); // Or specific message for bug description
             return;
         }
 
@@ -137,17 +128,14 @@ export default function Feedback() {
         let uploadedUrls: string[] = [];
 
         try {
-
-
             if (attachments.length > 0) {
-
                 const tempId = `temp_${Date.now()}_${Math.random().toString(36).substring(7)}`;
                 const uploadPromises = attachments.map(file => uploadFeedbackImage(tempId, file));
                 uploadedUrls = await Promise.all(uploadPromises);
             }
 
             const feedbackId = await submitFeedback({
-                rating,
+                rating: category === 'bug' ? 0 : rating, // 0 means N/A
                 category,
                 priority,
                 message,
@@ -163,8 +151,10 @@ export default function Feedback() {
                 setIsSuccess(true);
                 addToast(t('feedback.toast_success'), 'success');
 
-                // Pre-load tickets to ensure the list is fresh
-                if (user) loadTickets();
+                // Refresh tickets if loaded
+                if (user && activeTab === 'tickets') {
+                    getUserFeedback(user.uid).then(setTickets);
+                }
 
                 setRating(0);
                 setMessage('');
@@ -216,13 +206,20 @@ export default function Feedback() {
                             {user && (
                                 <Button variant="outline" onClick={() => {
                                     setIsSuccess(false);
-                                    setSelectedTicketId(submittedId);
-                                    setActiveTab('tickets');
+                                    // Navigate to ticket details
+                                    if (submittedId) openTicket(submittedId);
                                 }}>
                                     {t('feedback.view_details')}
                                 </Button>
                             )}
                             <Button onClick={() => navigate('/')}>{t('feedback.back_home')}</Button>
+                            <Button variant="ghost" onClick={() => {
+                                setIsSuccess(false);
+                                setRating(0);
+                                setMessage('');
+                            }}>
+                                {t('feedback.submit_another')}
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -243,16 +240,13 @@ export default function Feedback() {
                     <div className={styles.tabs}>
                         <button
                             className={`${styles.tab} ${activeTab === 'submit' ? styles.activeTab : ''}`}
-                            onClick={() => {
-                                setActiveTab('submit');
-                                setSelectedTicketId(null);
-                            }}
+                            onClick={() => switchTab('submit')}
                         >
                             {t('feedback.submit_btn')}
                         </button>
                         <button
                             className={`${styles.tab} ${activeTab === 'tickets' ? styles.activeTab : ''}`}
-                            onClick={() => setActiveTab('tickets')}
+                            onClick={() => switchTab('tickets')}
                         >
                             {t('feedback.my_tickets')}
                         </button>
@@ -262,22 +256,24 @@ export default function Feedback() {
                 {activeTab === 'submit' && (
                     <div className={styles.formCard}>
                         <form onSubmit={handleSubmit} className={styles.form}>
-                            {/* Rating */}
-                            <div className={styles.formSection}>
-                                <label className={styles.sectionLabel}>{t('feedback.rating_label')}</label>
-                                <div className={styles.ratingContainer}>
-                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
-                                        <button
-                                            key={star} type="button" onClick={() => setRating(star)}
-                                            className={styles.starButton}
-                                            style={{ opacity: rating >= star ? 1 : 0.3 }}
-                                        >
-                                            <Star fill={rating >= star ? 'var(--color-text)' : 'none'} color="var(--color-text)" size={28} />
-                                        </button>
-                                    ))}
+                            {/* Rating (Hidden for bugs) */}
+                            {category !== 'bug' && (
+                                <div className={styles.formSection}>
+                                    <label className={styles.sectionLabel}>{t('feedback.rating_label')}</label>
+                                    <div className={styles.ratingContainer}>
+                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
+                                            <button
+                                                key={star} type="button" onClick={() => setRating(star)}
+                                                className={styles.starButton}
+                                                style={{ opacity: rating >= star ? 1 : 0.3 }}
+                                            >
+                                                <Star fill={rating >= star ? 'var(--color-text)' : 'none'} color="var(--color-text)" size={28} />
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className={styles.ratingScore}>{rating > 0 ? `${rating}/10` : ''}</div>
                                 </div>
-                                <div className={styles.ratingScore}>{rating > 0 ? `${rating}/10` : ''}</div>
-                            </div>
+                            )}
 
                             {/* Category & Priority */}
                             <div className={styles.selectionRow}>
@@ -316,7 +312,8 @@ export default function Feedback() {
                                 <label className={styles.sectionLabel}>{t('feedback.message_label')}</label>
                                 <textarea
                                     value={message} onChange={(e) => setMessage(e.target.value)}
-                                    placeholder={t('feedback.message_placeholder')} className={styles.textarea}
+                                    placeholder={category === 'bug' ? "Décrivez le bug..." : t('feedback.message_placeholder')}
+                                    className={styles.textarea}
                                 />
                             </div>
 
@@ -344,7 +341,7 @@ export default function Feedback() {
                     <div className={styles.ticketsSection}>
                         {selectedTicketId ? (
                             <div className={styles.detailView}>
-                                <button className={styles.backBtn} onClick={() => setSelectedTicketId(null)}>
+                                <button className={styles.backBtn} onClick={closeTicket}>
                                     <ArrowLeft size={18} />
                                     <span>Retour à la liste</span>
                                 </button>
@@ -411,6 +408,7 @@ export default function Feedback() {
                             </div>
                         ) : (
                             <div className={styles.listView}>
+                                {/* ... Same list view ... */}
                                 <div className={styles.listControls}>
                                     <div className={styles.filterBar}>
                                         <button
@@ -441,7 +439,7 @@ export default function Feedback() {
                                 ) : filteredTickets.length > 0 ? (
                                     <div className={styles.ticketsGrid}>
                                         {filteredTickets.map(ticket => (
-                                            <div key={ticket.id} onClick={() => setSelectedTicketId(ticket.id)}>
+                                            <div key={ticket.id} onClick={() => openTicket(ticket.id)}>
                                                 <TicketCard ticket={ticket} />
                                             </div>
                                         ))}

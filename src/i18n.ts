@@ -447,7 +447,8 @@ const resources = {
                 last_updated: "Mis à jour",
                 admin_reply: "Réponse Admin",
                 your_message: "Votre Message",
-                view_details: "Voir Détails"
+                view_details: "Voir Détails",
+                submit_another: "Envoyer un autre avis"
             },
             components: {
                 add_work_modal: {
@@ -1713,7 +1714,7 @@ const resources = {
                     community: {
                         title: "COMMUNITY",
                         description_1: "You are not alone in this world.",
-                        description_2: "Follow your friends' activity. Share your reviews without spoilers. Compare your collections and badges.",
+                        description_2: "Follow your friend's activities. Share your reviews without spoilers. Compare your collections and badges.",
                         friends: "FRIENDS",
                         debates: "DEBATES",
                         share: "SHARE",
@@ -2234,7 +2235,8 @@ const resources = {
                 last_updated: "Last updated",
                 admin_reply: "Admin Response",
                 your_message: "Your Message",
-                view_details: "View Details"
+                view_details: "View Details",
+                submit_another: "Submit another feedback"
             },
             components: {
                 add_work_modal: {

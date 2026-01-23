@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeFirestore, memoryLocalCache } from 'firebase/firestore';
 import { getAnalytics } from 'firebase/analytics';
 import { getStorage } from 'firebase/storage';
 import { getMessaging } from 'firebase/messaging';
@@ -17,7 +17,10 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Force memory cache to avoid "Unexpected state" errors from corrupted IndexedDB
+export const db = initializeFirestore(app, {
+    localCache: memoryLocalCache()
+});
 export const storage = getStorage(app);
 export const analytics = getAnalytics(app);
 export const messaging = getMessaging(app);

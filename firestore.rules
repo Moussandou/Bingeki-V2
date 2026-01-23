@@ -76,6 +76,12 @@ service cloud.firestore {
         allow read, write: if isOwner(userId);
         allow create, update: if isAuthenticated() && request.auth.uid == friendId;
       }
+      
+      // --- Subcollection: Notifications ---
+      match /notifications/{notificationId} {
+        allow read, write: if isOwner(userId);
+      }
+
     }
 
     // ==================== FEATURES ====================

@@ -2,53 +2,28 @@ import { Mail, MapPin, Github, Linkedin, Globe, Briefcase } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
 import { Link } from '@/components/routing/LocalizedLink';
+import styles from './Footer.module.css';
 
 export function Footer() {
     const { t } = useTranslation();
     return (
-        <footer style={{
-            marginTop: 'auto',
-            padding: '4rem 0 2rem',
-            background: 'var(--color-surface)',
-            borderTop: '3px solid var(--color-border)',
-            position: 'relative'
-        }}>
+        <footer className={styles.footer}>
             {/* Center "End" marker */}
-            <div style={{
-                position: 'absolute',
-                top: '-1.5rem',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: 'var(--color-text)',
-                color: 'var(--color-surface)',
-                padding: '0.5rem 2rem',
-                fontFamily: 'var(--font-heading)',
-                fontWeight: 900,
-                textTransform: 'uppercase',
-                clipPath: 'polygon(10% 0, 100% 0, 90% 100%, 0% 100%)'
-            }}>
+            <div className={styles.endMarker}>
                 {t('footer.tbc')}
             </div>
 
             <div className="container" style={{ textAlign: 'center', color: 'var(--color-text)' }}>
 
                 {/* Contact Info Row */}
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    gap: '2rem',
-                    flexWrap: 'wrap',
-                    marginBottom: '2rem',
-                    fontSize: '0.9rem',
-                    fontWeight: 600
-                }}>
+                <div className={styles.contactRow}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <MapPin size={18} />
                         <span>Marseille, France</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <Mail size={18} />
-                        <a href="mailto:moussandou.m@gmail.com" style={{ color: 'var(--color-text)', textDecoration: 'none' }}>moussandou.m@gmail.com</a>
+                        <a href="mailto:bingeki.official@gmail.com" style={{ color: 'var(--color-text)', textDecoration: 'none' }}>bingeki.official@gmail.com</a>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -59,70 +34,36 @@ export function Footer() {
                 </div>
 
                 {/* Social Icons Row */}
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    gap: '1.5rem',
-                    marginBottom: '3rem',
-                    alignItems: 'center',
-                    flexWrap: 'wrap'
-                }}>
+                <div className={styles.socialRow}>
                     <InstallPWA variant="footer" />
                     <div style={{ width: 1, height: 24, background: 'var(--color-border)', margin: '0 0.5rem' }} />
                     <a href="https://github.com/Moussandou" target="_blank" rel="noopener noreferrer"
-                        style={{ color: 'var(--color-text)', padding: '0.5rem', border: '2px solid var(--color-text)', borderRadius: '50%', transition: 'transform 0.2s', display: 'flex' }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        className={styles.socialIcon}
                     >
                         <Github size={20} />
                     </a>
                     <a href="https://www.linkedin.com/in/moussandou" target="_blank" rel="noopener noreferrer"
-                        style={{ color: 'var(--color-text)', padding: '0.5rem', border: '2px solid var(--color-text)', borderRadius: '50%', transition: 'transform 0.2s', display: 'flex' }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        className={styles.socialIcon}
                     >
                         <Linkedin size={20} />
                     </a>
                     <a href="https://www.malt.fr/profile/moussandoumroivili" target="_blank" rel="noopener noreferrer"
                         title="Malt"
-                        style={{ color: 'var(--color-text)', padding: '0.5rem', border: '2px solid var(--color-text)', borderRadius: '50%', transition: 'transform 0.2s', display: 'flex' }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        className={styles.socialIcon}
                     >
                         <Briefcase size={20} />
                     </a>
                     <a href="https://moussandou.github.io/Portfolio/" target="_blank" rel="noopener noreferrer"
                         title="Portfolio"
-                        style={{ color: 'var(--color-text)', padding: '0.5rem', border: '2px solid var(--color-text)', borderRadius: '50%', transition: 'transform 0.2s', display: 'flex' }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        className={styles.socialIcon}
                     >
                         <Globe size={20} />
                     </a>
                 </div>
 
                 {/* Tips for Devs Section */}
-                <div style={{
-                    background: 'var(--color-primary)',
-                    border: '4px solid var(--color-text)',
-                    padding: '2rem',
-                    marginBottom: '3rem',
-                    position: 'relative',
-                    boxShadow: '8px 8px 0 var(--color-shadow-strong)'
-                }}>
-                    <div style={{
-                        position: 'absolute',
-                        top: '-1rem',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        background: '#000',
-                        color: '#fff',
-                        padding: '0.5rem 2rem',
-                        fontFamily: 'var(--font-heading)',
-                        fontWeight: 900,
-                        fontSize: '0.9rem',
-                        letterSpacing: '2px'
-                    }}>
+                <div className={styles.supportSection}>
+                    <div className={styles.supportTag}>
                         {t('landing.features.support.tag')}
                     </div>
                     <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
@@ -136,21 +77,7 @@ export function Footer() {
                             href="https://ko-fi.com/moussandou"
                             target="_blank"
                             rel="noopener noreferrer"
-                            style={{
-                                display: 'inline-block',
-                                background: '#fff',
-                                color: '#000',
-                                padding: '0.8rem 3rem', // Increased padding
-                                fontWeight: 900,
-                                fontSize: '1rem',
-                                textDecoration: 'none',
-                                clipPath: 'polygon(3% 0, 100% 0, 97% 100%, 0% 100%)', // Reduced skew
-                                transition: 'transform 0.2s',
-                                border: '3px solid #000',
-                                letterSpacing: '1px'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)'}
-                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1) translateY(0)'}
+                            className={styles.kofiButton}
                         >
                             <img
                                 src="/Ko-fi logo.gif"
@@ -195,3 +122,4 @@ export function Footer() {
         </footer>
     );
 }
+

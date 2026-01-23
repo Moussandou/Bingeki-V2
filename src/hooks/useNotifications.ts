@@ -41,6 +41,9 @@ export function useNotifications(limitCount = 20) {
             setNotifications(notifs);
             setUnreadCount(unread);
             setLoading(false);
+        }, (error) => {
+            console.error('[Firestore] Error fetching notifications:', error);
+            setLoading(false);
         });
 
         // Separate listener for total unread count if needed, but for now this is fine for the dropdown
