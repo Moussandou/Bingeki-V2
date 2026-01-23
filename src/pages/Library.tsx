@@ -6,7 +6,7 @@ import { Modal } from '@/components/ui/Modal';
 import { AddWorkModal } from '@/components/library/AddWorkModal';
 import { useLibraryStore, type Work } from '@/store/libraryStore';
 import { useAuthStore } from '@/store/authStore';
-import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle, BookOpen, CheckCircle, SortAsc, ChevronDown, Download, Upload, TrendingUp, User } from 'lucide-react';
+import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle, BookOpen, CheckCircle, SortAsc, ChevronDown, Download, Upload, TrendingUp, User, FolderPlus } from 'lucide-react';
 import styles from './Library.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -16,6 +16,8 @@ import { useToast } from '@/context/ToastContext';
 import { exportData, importData } from '@/utils/storageUtils';
 import { useTranslation } from 'react-i18next';
 import { loadLibraryFromFirestore, getUserProfile, type UserProfile } from '@/firebase/firestore';
+import { MALImportModal } from '@/components/library/MALImportModal';
+import { FolderModal } from '@/components/library/FolderModal';
 
 export default function Library() {
     const { t } = useTranslation();
@@ -23,7 +25,7 @@ export default function Library() {
     const { uid } = useParams();
     const { user: currentUser } = useAuthStore();
     const { addToast } = useToast();
-    const { works: localWorks, removeWork } = useLibraryStore();
+    const { works: localWorks, removeWork, folders, createFolder } = useLibraryStore();
 
     // Friend Library State
     const [friendWorks, setFriendWorks] = useState<Work[]>([]);
@@ -73,6 +75,9 @@ export default function Library() {
     const [filterStatus, setFilterStatus] = useState<'all' | 'reading' | 'completed' | 'plan_to_read'>('all');
     const [sortBy, setSortBy] = useState<'updated' | 'added' | 'alphabetical' | 'progress'>('updated');
     const [sortOpen, setSortOpen] = useState(false);
+    const [showMALImportModal, setShowMALImportModal] = useState(false);
+    const [showFolderModal, setShowFolderModal] = useState(false);
+    const [activeFolder, setActiveFolder] = useState<string | null>(null);
 
     const sortOptions = [
         { value: 'updated', label: t('library.sort.recent') },
@@ -106,7 +111,8 @@ export default function Library() {
                 const matchesSearch = work.title.toLowerCase().includes(searchQuery.toLowerCase());
                 const matchesType = filterType === 'all' || work.type === filterType;
                 const matchesStatus = filterStatus === 'all' || work.status === filterStatus;
-                return matchesSearch && matchesType && matchesStatus;
+                const matchesFolder = !activeFolder || work.collections?.includes(activeFolder);
+                return matchesSearch && matchesType && matchesStatus && matchesFolder;
             })
             .sort((a, b) => {
                 switch (sortBy) {
@@ -125,7 +131,7 @@ export default function Library() {
                         return 0;
                 }
             });
-    }, [currentWorks, searchQuery, filterType, filterStatus, sortBy]);
+    }, [currentWorks, searchQuery, filterType, filterStatus, sortBy, activeFolder]);
 
     // Selection Handlers
     const toggleSelection = (id: string | number) => {
@@ -242,6 +248,40 @@ export default function Library() {
                             </div>
                         )}
                     </div>
+
+                    {/* Folders Bar */}
+                    {!isReadOnly && (
+                        <div className={styles.foldersBar}>
+                            <button
+                                className={`${styles.folderPill} ${!activeFolder ? styles.folderPillActive : ''}`}
+                                onClick={() => setActiveFolder(null)}
+                            >
+                                {t('folders.all_works')}
+                                <span className={styles.folderPillCount}>{currentWorks.length}</span>
+                            </button>
+                            {folders.map((folder) => {
+                                const count = currentWorks.filter(w => w.collections?.includes(folder.id)).length;
+                                return (
+                                    <button
+                                        key={folder.id}
+                                        className={`${styles.folderPill} ${activeFolder === folder.id ? styles.folderPillActive : ''}`}
+                                        onClick={() => setActiveFolder(activeFolder === folder.id ? null : folder.id)}
+                                    >
+                                        <span style={{ color: folder.color }}>{folder.emoji}</span>
+                                        {folder.name}
+                                        <span className={styles.folderPillCount}>{count}</span>
+                                    </button>
+                                );
+                            })}
+                            <button
+                                className={styles.addFolderBtn}
+                                onClick={() => setShowFolderModal(true)}
+                                title={t('folders.create')}
+                            >
+                                <FolderPlus size={18} />
+                            </button>
+                        </div>
+                    )}
 
                     {/* Controls Bar */}
                     <div className={styles.controlsBar}>
@@ -463,6 +503,14 @@ export default function Library() {
                                                 <Upload size={20} />
                                             </button>
                                         </div>
+                                        <button
+                                            onClick={() => setShowMALImportModal(true)}
+                                            className={styles.controlButton}
+                                            title={t('mal_import.import_mal')}
+                                            style={{ background: 'var(--color-primary)', color: '#fff' }}
+                                        >
+                                            <Upload size={20} />
+                                        </button>
                                     </>
                                 )}
                             </Card>
@@ -726,6 +774,12 @@ export default function Library() {
 
                 </div>
             </div>
+            <MALImportModal isOpen={showMALImportModal} onClose={() => setShowMALImportModal(false)} />
+            <FolderModal
+                isOpen={showFolderModal}
+                onClose={() => setShowFolderModal(false)}
+                onSave={(name, color, emoji) => createFolder(name, color, emoji)}
+            />
         </Layout>
     );
 }

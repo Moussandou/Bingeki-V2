@@ -240,3 +240,108 @@
         border-bottom: 2px solid var(--color-border-heavy);
     }
 }
+
+/* Folder Sidebar */
+.foldersBar {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--color-surface);
+    border: 3px solid var(--color-border);
+    box-shadow: var(--shadow-brutal);
+}
+
+.folderPill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--color-border);
+    background: var(--color-background);
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.folderPill:hover {
+    transform: translateY(-2px);
+    box-shadow: 2px 2px 0 var(--color-shadow-solid);
+}
+
+.folderPillActive {
+    border-color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 15%, var(--color-background));
+    box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+
+.folderPillCount {
+    background: var(--color-border);
+    color: var(--color-text);
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.addFolderBtn {
+    padding: 0.5rem;
+    border: 2px dashed var(--color-border);
+    background: transparent;
+    color: var(--color-text);
+    opacity: 0.6;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.addFolderBtn:hover {
+    opacity: 1;
+    border-style: solid;
+    background: var(--color-surface-hover);
+}
+
+/* Folder Actions Menu */
+.folderMenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--color-surface);
+    border: 3px solid var(--color-border-heavy);
+    box-shadow: 4px 4px 0 var(--color-shadow-solid);
+    z-index: 50;
+    min-width: 180px;
+    padding: 0.5rem;
+}
+
+.folderMenuItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s;
+}
+
+.folderMenuItem:hover {
+    background: var(--color-surface-hover);
+}
+
+@media (max-width: 768px) {
+    .foldersBar {
+        padding: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .folderPill {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+}

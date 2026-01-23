@@ -19,6 +19,7 @@ import { useAuthStore } from '@/store/authStore';
 import { saveLibraryToFirestore, saveGamificationToFirestore, deleteUserData } from '@/firebase/firestore';
 import { deleteUser } from 'firebase/auth';
 import { NotificationTester } from '@/components/debug/NotificationTester';
+import { MALImportModal } from '@/components/library/MALImportModal';
 
 function SyncButton() {
     const { t } = useTranslation();
@@ -227,6 +228,7 @@ export default function Settings() {
     };
 
     const [showConfirmAccountDelete, setShowConfirmAccountDelete] = useState(false);
+    const [showMALImportModal, setShowMALImportModal] = useState(false);
 
     const handleDeleteAccount = async () => {
         if (!user) return;
@@ -406,6 +408,12 @@ export default function Settings() {
                                     </div>
                                 </div>
 
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <Button variant="outline" style={{ width: '100%', justifyContent: 'center' }} icon={<Upload size={18} />} onClick={() => setShowMALImportModal(true)}>
+                                        {t('mal_import.import_mal')}
+                                    </Button>
+                                </div>
+
                                 <div style={{ height: '1px', background: 'var(--color-border)', margin: '1rem 0' }} />
 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -494,6 +502,7 @@ export default function Settings() {
                     </motion.div>
                 </div>
             </div>
+            <MALImportModal isOpen={showMALImportModal} onClose={() => setShowMALImportModal(false)} />
         </Layout>
     );
 }
