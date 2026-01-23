@@ -287,6 +287,16 @@ const resources = {
                 thank_you_desc: "Grâce à vous, Bingeki continue de grandir. Serveurs, domaine, nouvelles features... tout ça, c'est grâce à votre générosité.",
                 become_donor: "DEVENIR DONATEUR"
             },
+            tutorial: {
+                welcome_title: "Bienvenue dans la Hunter Society",
+                welcome_desc: "Bingeki est votre tracker de manga ultime. Faisons un tour rapide.",
+                profile_title: "Votre Profil & Nen",
+                profile_desc: "Ici vous pouvez voir votre XP, Niveau, et votre carte de Nen unique basée sur vos lectures.",
+                discover_title: "Découvrir & Rechercher",
+                discover_desc: "Trouvez facilement de nouveaux mangas et animes à ajouter à votre collection.",
+                library_title: "Votre Bibliothèque",
+                library_desc: "Toutes vos œuvres suivies sont ici. Mettez-les à jour au fur et à mesure."
+            },
             dashboard: {
                 title: "TABLEAU DE BORD",
                 rank: "RANK",
@@ -1808,6 +1818,16 @@ const resources = {
                 thank_you_title: "THANK YOU!",
                 thank_you_desc: "Thanks to you, Bingeki keeps growing. Servers, domain, new features... all this is thanks to your generosity.",
                 become_donor: "BECOME A DONOR"
+            },
+            tutorial: {
+                welcome_title: "Welcome to Hunter Society",
+                welcome_desc: "Bingeki is your ultimate manga tracker. Let's take a quick tour.",
+                profile_title: "Your Profile & Nen",
+                profile_desc: "Here you can see your XP, Level, and your unique Nen chart based on your reading habits.",
+                discover_title: "Discover & Search",
+                discover_desc: "Find new manga and anime to add to your collection easily.",
+                library_title: "Your Library",
+                library_desc: "All your tracked works are here. Update them as you read."
             },
             dashboard: {
                 title: "DASHBOARD",

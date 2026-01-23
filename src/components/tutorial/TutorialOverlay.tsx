@@ -3,31 +3,31 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
-import { Zap, User, Compass, Book } from 'lucide-react';
+import { Zap, User, Compass, Book, Languages } from 'lucide-react'; // Added Languages icon
 
-// Steps definition with visuals
+// Steps definition with keys instead of hardcoded text
 const STEPS = [
     {
-        title: "Welcome to Hunter Society",
-        desc: "Bingeki is your ultimate manga tracker. Let's take a quick tour.",
+        titleKey: "tutorial.welcome_title",
+        descKey: "tutorial.welcome_desc",
         target: null, // Centered
         icon: <Zap size={64} className="text-secondary" />
     },
     {
-        title: "Your Profile & Nen",
-        desc: "Here you can see your XP, Level, and your unique Nen chart based on your reading habits.",
+        titleKey: "tutorial.profile_title",
+        descKey: "tutorial.profile_desc",
         target: "profile-section",
         icon: <User size={64} style={{ color: 'var(--color-primary)' }} />
     },
     {
-        title: "Discover & Search",
-        desc: "Find new manga and anime to add to your collection easily.",
+        titleKey: "tutorial.discover_title",
+        descKey: "tutorial.discover_desc",
         target: "discover-nav",
         icon: <Compass size={64} style={{ color: 'var(--color-secondary)' }} />
     },
     {
-        title: "Your Library",
-        desc: "All your tracked works are here. Update them as you read.",
+        titleKey: "tutorial.library_title",
+        descKey: "tutorial.library_desc",
         target: "library-nav",
         icon: <Book size={64} style={{ color: 'var(--color-accent)' }} />
     }
@@ -35,7 +35,7 @@ const STEPS = [
 
 export function TutorialOverlay() {
     const { isActive, currentStep, nextStep, prevStep, endTutorial } = useTutorialStore();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     // Prevent body scroll when active
     useEffect(() => {
@@ -51,6 +51,11 @@ export function TutorialOverlay() {
 
     const step = STEPS[currentStep];
     const isLast = currentStep === STEPS.length - 1;
+
+    const toggleLanguage = () => {
+        const newLang = i18n.language === 'fr' ? 'en' : 'fr';
+        i18n.changeLanguage(newLang);
+    };
 
     return (
         <AnimatePresence>
@@ -87,6 +92,34 @@ export function TutorialOverlay() {
                     flexDirection: 'column',
                     alignItems: 'center'
                 }}>
+                    {/* Language Switcher */}
+                    <button
+                        onClick={toggleLanguage}
+                        style={{
+                            position: 'absolute',
+                            top: '1rem',
+                            right: '1rem',
+                            background: 'transparent',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: '20px',
+                            padding: '4px 8px',
+                            cursor: 'pointer',
+                            color: 'var(--color-text)',
+                            fontSize: '0.8rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontWeight: 'bold',
+                            opacity: 0.7,
+                            transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.borderColor = 'var(--color-primary)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; e.currentTarget.style.borderColor = 'var(--color-border)'; }}
+                    >
+                        <Languages size={14} />
+                        {i18n.language === 'fr' ? 'EN' : 'FR'}
+                    </button>
+
                     {/* Visual */}
                     <motion.div
                         key={currentStep}
@@ -111,10 +144,10 @@ export function TutorialOverlay() {
                         textTransform: 'uppercase',
                         lineHeight: 1.1
                     }}>
-                        {step.title}
+                        {t(step.titleKey)}
                     </h2>
                     <p style={{ marginBottom: '2.5rem', lineHeight: 1.6, opacity: 0.8, fontSize: '1rem' }}>
-                        {step.desc}
+                        {t(step.descKey)}
                     </p>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
