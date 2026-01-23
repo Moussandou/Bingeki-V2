@@ -17,6 +17,7 @@ import { getLocalStorageSize, exportData, importData, clearImageCache } from '@/
 import { useAuthStore } from '@/store/authStore';
 import { saveLibraryToFirestore, saveGamificationToFirestore, deleteUserData } from '@/firebase/firestore';
 import { deleteUser } from 'firebase/auth';
+import { NotificationTester } from '@/components/debug/NotificationTester';
 
 function SyncButton() {
     const { t } = useTranslation();
@@ -351,6 +352,10 @@ export default function Settings() {
                                     isOn={notifications}
                                     onToggle={toggleNotifications}
                                 />
+
+                                <div style={{ height: '1px', background: 'var(--color-border)' }} />
+                                {/* Notification Debugger */}
+                                <NotificationTester />
                             </div>
                         </section>
 

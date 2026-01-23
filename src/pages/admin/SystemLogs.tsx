@@ -273,18 +273,19 @@ export default function AdminSystem() {
                 {/* Right Column: Real-time Terminal */}
                 <Card variant="manga" style={{
                     padding: 0,
-                    backgroundColor: '#111827',
-                    color: '#4ade80',
+                    backgroundColor: 'var(--color-card-background)', // Was #111827, using card dark
+                    color: '#4ade80', // Keep terminal green for aesthetics
                     fontFamily: 'monospace',
                     fontSize: '0.875rem',
                     height: '100%',
                     minHeight: '600px',
                     display: 'flex', flexDirection: 'column',
-                    boxShadow: '8px 8px 0 var(--color-shadow-strong)'
+                    boxShadow: '8px 8px 0 var(--color-shadow-strong)',
+                    border: '2px solid var(--color-border)'
                 }}>
-                    <div style={{ backgroundColor: '#1f2937', padding: '0.5rem', borderBottom: '1px solid #374151', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <Terminal size={14} style={{ color: '#9ca3af' }} />
-                        <span style={{ color: '#9ca3af', fontSize: '0.75rem' }}>root@bingeki-v2-activity-feed:~</span>
+                    <div style={{ backgroundColor: 'var(--color-surface-hover)', padding: '0.5rem', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Terminal size={14} style={{ color: 'var(--color-text-dim)' }} />
+                        <span style={{ color: 'var(--color-text-dim)', fontSize: '0.75rem' }}>root@bingeki-v2-activity-feed:~</span>
                         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <span style={{ width: '8px', height: '8px', backgroundColor: '#ef4444', borderRadius: '50%', animation: 'pulse 1s infinite' }}></span>
                             <span style={{ color: '#ef4444', fontWeight: 'bold', fontSize: '0.7rem' }}>{t('admin.system.live')}</span>

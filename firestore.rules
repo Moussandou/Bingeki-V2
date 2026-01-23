@@ -35,8 +35,9 @@ service cloud.firestore {
                         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned'])) 
                     || isAdmin();
 
-      // Create: Allow new users to be created by themselves
+      // Create & Delete: Allow new users to be created by themselves, and deleted by owner/admin
       allow create: if isOwner(userId);
+      allow delete: if isOwner(userId) || isAdmin();
       
       // --- Subcollection: Data (Library & Gamification) ---
       

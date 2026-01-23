@@ -96,14 +96,16 @@ export default function AdminDashboard() {
         flexDirection: 'column' as const,
         justifyContent: 'space-between',
         height: '100%',
-        background: 'white'
+        background: 'var(--color-surface)',
+        border: '2px solid var(--color-border)',
+        color: 'var(--color-text)'
     };
 
     const sectionTitleStyle = {
         fontFamily: 'var(--font-heading)',
         fontSize: '1.5rem',
         textTransform: 'uppercase' as const,
-        borderBottom: '2px solid black',
+        borderBottom: '2px solid var(--color-border)',
         paddingBottom: '0.5rem',
         marginBottom: '1rem',
         display: 'flex',
@@ -117,10 +119,10 @@ export default function AdminDashboard() {
             <div>
                 <h1 style={headerStyle}>{t('admin.dashboard.title')}</h1>
                 <p style={{
-                    borderLeft: '4px solid black',
+                    borderLeft: '4px solid var(--color-border)',
                     paddingLeft: '1rem',
                     fontFamily: 'monospace',
-                    color: '#666'
+                    color: 'var(--color-text-dim)'
                 }}>
                     {t('admin.dashboard.subtitle')}
                 </p>
@@ -131,10 +133,10 @@ export default function AdminDashboard() {
                 <Card variant="manga" style={statCardStyle}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                            <p style={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '0.9rem', color: '#666' }}>{t('admin.dashboard.users_label')}</p>
+                            <p style={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '0.9rem', color: 'var(--color-text-dim)' }}>{t('admin.dashboard.users_label')}</p>
                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', lineHeight: 1 }}>{stats.totalUsers}</h3>
                         </div>
-                        <div style={{ background: 'black', color: 'white', padding: '0.5rem', borderRadius: '4px' }}>
+                        <div style={{ background: 'var(--color-text)', color: 'var(--color-surface)', padding: '0.5rem', borderRadius: '4px' }}>
                             <Users size={20} />
                         </div>
                     </div>
@@ -146,10 +148,10 @@ export default function AdminDashboard() {
                 <Card variant="manga" style={statCardStyle}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                            <p style={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '0.9rem', color: '#666' }}>{t('admin.dashboard.feedback_label')}</p>
+                            <p style={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '0.9rem', color: 'var(--color-text-dim)' }}>{t('admin.dashboard.feedback_label')}</p>
                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', lineHeight: 1 }}>{stats.totalFeedback}</h3>
                         </div>
-                        <div style={{ background: 'black', color: 'white', padding: '0.5rem', borderRadius: '4px' }}>
+                        <div style={{ background: 'var(--color-text)', color: 'var(--color-surface)', padding: '0.5rem', borderRadius: '4px' }}>
                             <AlertCircle size={20} />
                         </div>
                     </div>
@@ -161,10 +163,10 @@ export default function AdminDashboard() {
                 <Card variant="manga" style={statCardStyle}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                            <p style={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '0.9rem', color: '#666' }}>{t('admin.dashboard.system_label')}</p>
+                            <p style={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '0.9rem', color: 'var(--color-text-dim)' }}>{t('admin.dashboard.system_label')}</p>
                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', lineHeight: 1 }}>OK</h3>
                         </div>
-                        <div style={{ background: 'black', color: 'white', padding: '0.5rem', borderRadius: '4px' }}>
+                        <div style={{ background: 'var(--color-text)', color: 'var(--color-surface)', padding: '0.5rem', borderRadius: '4px' }}>
                             <Activity size={20} />
                         </div>
                     </div>
@@ -175,15 +177,15 @@ export default function AdminDashboard() {
             </div>
 
             {/* Charts Section */}
-            <Card variant="manga" style={{ padding: '1.5rem', background: 'white' }}>
+            <Card variant="manga" style={{ padding: '1.5rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <Activity className="text-red-500" size={24} />
                         <h3 style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontSize: '1.25rem' }}>{t('admin.dashboard.activity_volume')}</h3>
                     </div>
-                    <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#666', fontFamily: 'monospace' }}>{t('admin.dashboard.last_7_days')}</div>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--color-text-dim)', fontFamily: 'monospace' }}>{t('admin.dashboard.last_7_days')}</div>
                 </div>
-                <div style={{ height: '300px', width: '100%', minWidth: 0 }}>
+                <div style={{ height: '300px', width: '100%', position: 'relative' }}>
                     {chartData.length > 0 && (
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
@@ -250,21 +252,23 @@ export default function AdminDashboard() {
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
-                                background: 'white'
+                                background: 'var(--color-surface)',
+                                border: '2px solid var(--color-border)',
+                                color: 'var(--color-text)'
                             }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                     {/* Avatar placeholder */}
-                                    <div style={{ width: '40px', height: '40px', background: '#eee', borderRadius: '50%', border: '2px solid black', overflow: 'hidden' }}>
+                                    <div style={{ width: '40px', height: '40px', background: 'var(--color-surface-hover)', borderRadius: '50%', border: '2px solid var(--color-border)', overflow: 'hidden' }}>
                                         {user.photoURL && <img src={user.photoURL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                                     </div>
                                     <div>
                                         <div style={{ fontWeight: 'bold' }}>{user.displayName || t('admin.dashboard.anonymous')}</div>
-                                        <div style={{ fontSize: '0.8rem', color: '#666' }}>{user.email}</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-dim)' }}>{user.email}</div>
                                     </div>
                                 </div>
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    {user.isAdmin && <span style={{ background: 'black', color: 'white', padding: '0.2rem 0.5rem', fontSize: '0.6rem', fontWeight: 'bold', textTransform: 'uppercase' }}>ADMIN</span>}
-                                    <Link to={`/admin/users?highlight=${user.uid}`} style={{ padding: '0.5rem', border: '2px solid black', display: 'flex', alignItems: 'center' }}>
+                                    {user.isAdmin && <span style={{ background: 'var(--color-text)', color: 'var(--color-surface)', padding: '0.2rem 0.5rem', fontSize: '0.6rem', fontWeight: 'bold', textTransform: 'uppercase' }}>ADMIN</span>}
+                                    <Link to={`/admin/users?highlight=${user.uid}`} style={{ padding: '0.5rem', border: '2px solid var(--color-border)', color: 'var(--color-text)', display: 'flex', alignItems: 'center' }}>
                                         <ExternalLink size={16} />
                                     </Link>
                                 </div>
@@ -284,7 +288,9 @@ export default function AdminDashboard() {
                                 padding: '2rem',
                                 textAlign: 'center',
                                 cursor: 'pointer',
-                                background: 'white',
+                                background: 'var(--color-surface)',
+                                border: '2px solid var(--color-border)',
+                                color: 'var(--color-text)',
                                 height: '100%',
                                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem'
                             }}>
@@ -297,7 +303,9 @@ export default function AdminDashboard() {
                                 padding: '2rem',
                                 textAlign: 'center',
                                 cursor: 'pointer',
-                                background: 'white',
+                                background: 'var(--color-surface)',
+                                border: '2px solid var(--color-border)',
+                                color: 'var(--color-text)',
                                 height: '100%',
                                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem'
                             }}>

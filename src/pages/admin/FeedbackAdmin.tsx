@@ -130,16 +130,16 @@ export default function AdminFeedback() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', animation: 'fadeIn 0.5s ease' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', textTransform: 'uppercase', color: 'black' }}>
+                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', textTransform: 'uppercase', color: 'var(--color-text)' }}>
                         {t('admin.feedback.title')}
                     </h1>
                     <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
                         <button
                             onClick={() => setFilterStatus('open')}
                             style={{
-                                background: filterStatus === 'open' ? 'black' : 'transparent',
-                                color: filterStatus === 'open' ? 'white' : 'black',
-                                border: '2px solid black',
+                                background: filterStatus === 'open' ? 'var(--color-text)' : 'transparent',
+                                color: filterStatus === 'open' ? 'var(--color-background)' : 'var(--color-text)',
+                                border: '2px solid var(--color-text)',
                                 padding: '4px 12px',
                                 fontWeight: 'bold',
                                 borderRadius: '4px',
@@ -151,9 +151,9 @@ export default function AdminFeedback() {
                         <button
                             onClick={() => setFilterStatus('resolved')}
                             style={{
-                                background: filterStatus === 'resolved' ? 'black' : 'transparent',
-                                color: filterStatus === 'resolved' ? 'white' : 'black',
-                                border: '2px solid black',
+                                background: filterStatus === 'resolved' ? 'var(--color-text)' : 'transparent',
+                                color: filterStatus === 'resolved' ? 'var(--color-background)' : 'var(--color-text)',
+                                border: '2px solid var(--color-text)',
                                 padding: '4px 12px',
                                 fontWeight: 'bold',
                                 borderRadius: '4px',
@@ -165,9 +165,9 @@ export default function AdminFeedback() {
                         <button
                             onClick={() => setFilterStatus('all')}
                             style={{
-                                background: filterStatus === 'all' ? 'black' : 'transparent',
-                                color: filterStatus === 'all' ? 'white' : 'black',
-                                border: '2px solid black',
+                                background: filterStatus === 'all' ? 'var(--color-text)' : 'transparent',
+                                color: filterStatus === 'all' ? 'var(--color-background)' : 'var(--color-text)',
+                                border: '2px solid var(--color-text)',
                                 padding: '4px 12px',
                                 fontWeight: 'bold',
                                 borderRadius: '4px',
@@ -185,7 +185,7 @@ export default function AdminFeedback() {
                         fontSize: '0.875rem',
                         textDecoration: 'underline',
                         cursor: 'pointer',
-                        color: 'black',
+                        color: 'var(--color-text)',
                         background: 'none',
                         border: 'none'
                     }}
@@ -198,7 +198,7 @@ export default function AdminFeedback() {
                 {loading ? (
                     <p style={{ color: 'black' }}>{t('admin.feedback.loading')}</p>
                 ) : filteredFeedbacks.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '3rem', color: '#666', background: 'white', border: '2px dashed black' }}>
+                    <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-dim)', background: 'var(--color-surface)', border: '2px dashed var(--color-border)' }}>
                         {t('admin.feedback.no_messages')}
                     </div>
                 ) : (
@@ -210,11 +210,11 @@ export default function AdminFeedback() {
                                 padding: '1.5rem',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                background: 'white',
-                                border: '3px solid black',
-                                boxShadow: expandedId === item.id ? '8px 8px 0 #000' : '4px 4px 0 #000',
+                                background: 'var(--color-surface)',
+                                border: '3px solid var(--color-border)',
+                                boxShadow: expandedId === item.id ? '8px 8px 0 var(--color-shadow-strong)' : '4px 4px 0 var(--color-shadow-strong)',
                                 transition: 'all 0.2s ease',
-                                color: 'black'
+                                color: 'var(--color-text)'
                             }}
                         >
                             {/* Summary View */}

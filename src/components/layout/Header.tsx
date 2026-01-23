@@ -21,6 +21,146 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { auth } from '@/firebase/config';
 import styles from './Header.module.css';
 import { useTranslation } from 'react-i18next';
+import { useNotifications } from '@/hooks/useNotifications';
+import { Bell } from 'lucide-react';
+
+function NotificationDropdown() {
+    const { t } = useTranslation();
+    const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+    const [isOpen, setIsOpen] = useState(false);
+
+    // Close on outside click could be added here or via a wrapper
+
+    return (
+        <div style={{ position: 'relative' }}>
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className={styles.iconButton}
+                style={{
+                    padding: '6px',
+                    cursor: 'pointer',
+                    border: '2px solid var(--color-border)',
+                    background: 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '32px',
+                    width: '32px',
+                    color: 'var(--color-text)',
+                    position: 'relative'
+                }}
+                title={t('header.notifications') || 'Notifications'}
+            >
+                <Bell size={18} />
+                {unreadCount > 0 && (
+                    <span style={{
+                        position: 'absolute',
+                        top: -5,
+                        right: -5,
+                        background: 'var(--color-primary)',
+                        color: 'white',
+                        fontSize: '0.6rem',
+                        fontWeight: 'bold',
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '2px solid var(--color-surface)'
+                    }}>
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                )}
+            </button>
+
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        style={{
+                            position: 'absolute',
+                            top: '120%',
+                            right: -50, // Slight offset
+                            width: '320px',
+                            background: 'var(--color-surface)',
+                            border: '3px solid var(--color-border)',
+                            boxShadow: '4px 4px 0 var(--color-shadow-strong)',
+                            zIndex: 1000,
+                            maxHeight: '400px',
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
+                        {/* Dropdown Header */}
+                        <div style={{ padding: '0.75rem', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--color-background)' }}>
+                            <span style={{ fontWeight: 900, fontFamily: 'var(--font-heading)', textTransform: 'uppercase' }}>Notifications</span>
+                            {unreadCount > 0 && (
+                                <button
+                                    onClick={() => markAllAsRead()}
+                                    style={{ fontSize: '0.7rem', color: 'var(--color-primary)', fontWeight: 'bold', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                                >
+                                    {t('common.mark_all_read') || 'Mark all read'}
+                                </button>
+                            )}
+                        </div>
+
+                        {/* List */}
+                        <div style={{ overflowY: 'auto', flex: 1 }}>
+                            {notifications.length === 0 ? (
+                                <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.5, fontSize: '0.9rem' }}>
+                                    {t('common.no_notifications') || 'No notifications yet'}
+                                </div>
+                            ) : (
+                                notifications.map(n => (
+                                    <Link
+                                        key={n.id}
+                                        to={n.link || '#'}
+                                        onClick={() => {
+                                            markAsRead(n.id);
+                                            setIsOpen(false);
+                                        }}
+                                        style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}
+                                    >
+                                        <div style={{
+                                            padding: '0.75rem',
+                                            borderBottom: '1px solid var(--color-border-light)',
+                                            background: n.read ? 'transparent' : 'rgba(var(--color-primary-rgb), 0.05)',
+                                            position: 'relative',
+                                            transition: 'background 0.2s'
+                                        }}
+                                            className="hover:bg-black/5 dark:hover:bg-white/5"
+                                        >
+                                            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                                                {!n.read && <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-primary)', marginTop: 6, flexShrink: 0 }} />}
+                                                <div>
+                                                    <p style={{ fontWeight: n.read ? 600 : 800, fontSize: '0.9rem', marginBottom: '0.1rem' }}>{n.title}</p>
+                                                    <p style={{ fontSize: '0.8rem', opacity: 0.7, lineHeight: 1.3 }}>{n.body}</p>
+                                                    <p style={{ fontSize: '0.7rem', opacity: 0.4, marginTop: '0.3rem' }}>
+                                                        {n.createdAt?.seconds ? new Date(n.createdAt.seconds * 1000).toLocaleDateString() : 'Just now'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))
+                            )}
+                        </div>
+
+                        {/* Footer */}
+                        <div style={{ padding: '0.5rem', borderTop: '1px solid var(--color-border)', textAlign: 'center', background: 'var(--color-background)' }}>
+                            <Link to="/notifications" onClick={() => setIsOpen(false)} style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--color-text)' }}>
+                                {t('common.view_all') || 'View All'}
+                            </Link>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
 
 export function Header() {
     const { user, userProfile } = useAuthStore();
@@ -240,6 +380,11 @@ export function Header() {
                             {i18n.language === 'en' ? 'EN' : 'FR'}
                         </button>
 
+                        {/* Notifications (Desktop) */}
+                        <div className="desktopOnly">
+                            <NotificationDropdown />
+                        </div>
+
                         {user ? (
                             <>
                                 {/* Stats (Desktop only mainly) */}
@@ -250,6 +395,15 @@ export function Header() {
                                         <Flame size={20} fill="currentColor" />
                                         <span>{streak}</span>
                                     </div>
+
+                                    {/* Level Pill */}
+                                    <Link to="/profile" style={{ textDecoration: 'none' }}>
+                                        <div className={styles.statusPill} style={{ cursor: 'pointer' }}>
+                                            <span className={styles.levelValue}>Lvl {level}</span>
+                                            <span style={{ opacity: 0.3 }}>|</span>
+                                            <span>{xp} XP</span>
+                                        </div>
+                                    </Link>
 
                                     {/* Level Pill */}
                                     <Link to="/profile" style={{ textDecoration: 'none' }}>

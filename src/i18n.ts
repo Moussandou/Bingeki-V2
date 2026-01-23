@@ -220,7 +220,13 @@ const resources = {
                 close: "Fermer",
                 yes: "Oui",
                 no: "Non",
-                access_denied: "Accès refusé"
+                access_denied: "Accès refusé",
+                no_notifications: "Aucune notification",
+                view_all: "Tout voir",
+                finish: "Terminer",
+                skip: "Passer",
+                prev: "Précédent",
+                mark_all_read: "Tout marquer comme lu"
             },
             tierlist: {
                 characters: "PERSONNAGES",
@@ -266,7 +272,19 @@ const resources = {
                 legal: "MENTIONS LÉGALES & RGPD",
                 credits: "CRÉDITS",
                 wiki: "WIKI",
-                contribution_msg: "Chaque contribution aide à ajouter de nouvelles fonctionnalités !"
+                contribution_msg: "Chaque contribution aide à ajouter de nouvelles fonctionnalités !",
+                donors: "DONATEURS"
+            },
+            donors: {
+                title: "NOS HÉROS",
+                subtitle: "Un immense merci à ceux qui soutiennent le projet financièrement.",
+                top_donor: "TOP DONATEUR",
+                rank_1: "LE ROI DU SUPPORT",
+                creator_desc: "Créateur de Inazuma DB",
+                amount: "Don total",
+                thank_you_title: "MERCI !",
+                thank_you_desc: "Grâce à vous, Bingeki continue de grandir. Serveurs, domaine, nouvelles features... tout ça, c'est grâce à votre générosité.",
+                become_donor: "DEVENIR DONATEUR"
             },
             dashboard: {
                 title: "TABLEAU DE BORD",
@@ -1449,7 +1467,13 @@ const resources = {
                 close: "Close",
                 yes: "Yes",
                 no: "No",
-                access_denied: "Access denied"
+                access_denied: "Access denied",
+                no_notifications: "No notifications",
+                view_all: "View all",
+                finish: "Finish",
+                skip: "Skip",
+                prev: "Previous",
+                mark_all_read: "Mark all as read"
             },
             tierlist: {
                 characters: "CHARACTERS",
@@ -1769,7 +1793,19 @@ const resources = {
                 legal: "LEGAL & GDPR",
                 credits: "CREDITS",
                 wiki: "WIKI",
-                contribution_msg: "Every contribution helps add new features!"
+                contribution_msg: "Every contribution helps add new features!",
+                donors: "DONORS"
+            },
+            donors: {
+                title: "OUR HEROES",
+                subtitle: "A huge thank you to those who support the project financially.",
+                top_donor: "TOP DONOR",
+                rank_1: "THE KING OF SUPPORT",
+                creator_desc: "Creator of Inazuma DB",
+                amount: "Total donation",
+                thank_you_title: "THANK YOU!",
+                thank_you_desc: "Thanks to you, Bingeki keeps growing. Servers, domain, new features... all this is thanks to your generosity.",
+                become_donor: "BECOME A DONOR"
             },
             dashboard: {
                 title: "DASHBOARD",

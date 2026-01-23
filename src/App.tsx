@@ -40,6 +40,7 @@ const CharacterDetails = lazy(() => import('@/pages/CharacterDetails'));
 const PersonDetails = lazy(() => import('@/pages/PersonDetails'));
 const Credits = lazy(() => import('@/pages/Credits'));
 const Assets = lazy(() => import('@/pages/AssetsPage'));
+const Donors = lazy(() => import('@/pages/Donors'));
 // MyTickets and TicketDetail are now merged into Feedback.tsx
 
 import { AdminLayout } from '@/components/admin/AdminLayout';
@@ -293,6 +294,7 @@ function App() {
                 </Suspense>
               } />
               <Route path="assets" element={<Assets />} />
+              <Route path="donors" element={<Donors />} />
 
               <Route path="admin" element={
                 <RequireAdmin>

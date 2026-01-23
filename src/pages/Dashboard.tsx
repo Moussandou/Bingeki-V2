@@ -22,6 +22,8 @@ import { useTranslation } from 'react-i18next';
 import { AddWorkModal } from '@/components/library/AddWorkModal';
 import { Card } from '@/components/ui/Card';
 import { SEO } from '@/components/layout/SEO';
+import { TutorialOverlay } from '@/components/tutorial/TutorialOverlay';
+import { useTutorialStore } from '@/store/tutorialStore';
 import styles from './Dashboard.module.css';
 
 export default function Dashboard() {
@@ -61,9 +63,18 @@ export default function Dashboard() {
         setRecommendations(topManga);
     }, []);
 
+
+
     useEffect(() => {
         if (user) {
             loadFriendsActivity();
+
+            // Trigger Tutorial if not seen
+            const { hasSeenTutorial, startTutorial } = useTutorialStore.getState();
+            if (!hasSeenTutorial) {
+                // Small delay to ensure load
+                setTimeout(() => startTutorial(), 1000);
+            }
         }
         loadRecommendations();
     }, [user, loadFriendsActivity, loadRecommendations]);
@@ -84,6 +95,7 @@ export default function Dashboard() {
 
     return (
         <Layout>
+            <TutorialOverlay />
             <SEO title={t('dashboard.title', 'Q.G.')} />
             <div style={{ minHeight: 'calc(100vh - 80px)' }}>
                 <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>

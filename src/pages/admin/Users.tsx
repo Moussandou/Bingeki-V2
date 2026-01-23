@@ -117,7 +117,7 @@ export default function AdminUsers() {
                     <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
                         {t('admin.users.title')}
                     </h1>
-                    <p style={{ color: '#666', fontFamily: 'monospace' }}>
+                    <p style={{ color: 'var(--color-text-dim)', fontFamily: 'monospace' }}>
                         {t('admin.users.members_count', { count: users.length })}
                     </p>
                 </div>
@@ -139,7 +139,7 @@ export default function AdminUsers() {
                             color: 'var(--color-text)'
                         }}
                     />
-                    <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#666' }} />
+                    <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-dim)' }} />
                 </div>
             </div>
 
@@ -170,7 +170,7 @@ export default function AdminUsers() {
                                     <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', lineHeight: 1 }}>
                                         {user.displayName || t('admin.users.no_name')}
                                     </h3>
-                                    <div style={{ fontSize: '0.8rem', color: '#666' }}>{user.email}</div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-dim)' }}>{user.email}</div>
                                 </div>
                             </div>
                             {user.isAdmin && (
