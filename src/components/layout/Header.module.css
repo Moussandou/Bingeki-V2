@@ -73,6 +73,34 @@
     color: var(--color-primary);
 }
 
+.xpDetails {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+}
+
+.statusPill:hover .xpDetails {
+    max-width: 140px;
+    /* Increased to prevent cut text */
+    opacity: 1;
+    margin-left: 0.5rem;
+}
+
+/* Force visibility on touch devices/mobile */
+@media (max-width: 1024px) {
+    .xpDetails {
+        max-width: 140px;
+        /* Increased to prevent cut text */
+        opacity: 1;
+        margin-left: 0.5rem;
+    }
+}
+
 .streakContainer {
     display: flex;
     align-items: center;
