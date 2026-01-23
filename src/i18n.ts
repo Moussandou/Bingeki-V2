@@ -28,7 +28,8 @@ const resources = {
                 title: "AIDE & CHANGELOG",
                 version: "Version {{version}}",
                 see_changelog: "Voir le changelog",
-                report_bug: "Signaler un bug"
+                report_bug: "Signaler un bug",
+                notifications: "Notifications"
             },
             pwa: {
                 install_app: "Installer l'App",
@@ -1319,7 +1320,8 @@ const resources = {
                 title: "HELP & CHANGELOG",
                 version: "Version {{version}}",
                 see_changelog: "View Changelog",
-                report_bug: "Report Bug"
+                report_bug: "Report Bug",
+                notifications: "Notifications"
             },
             pwa: {
                 install_app: "Install App",
