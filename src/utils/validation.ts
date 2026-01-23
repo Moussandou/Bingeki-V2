@@ -9,6 +9,9 @@ export const isValidImageSrc = (src: string): boolean => {
     // Allow data URIs for image previews (from file uploads)
     if (src.startsWith('data:image/')) return true;
 
+    // Allow blob URIs for local file previews (URL.createObjectURL)
+    if (src.startsWith('blob:')) return true;
+
     try {
         const url = new URL(src);
         // Strictly allow only http and https protocols

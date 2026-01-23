@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Upload } from 'lucide-react';
+import { isValidImageSrc } from '@/utils/validation';
 import styles from './ImageUpload.module.css';
 
 interface ImageUploadProps {
@@ -79,7 +80,11 @@ export const ImageUpload = ({ onImagesChange, maxImages = 3 }: ImageUploadProps)
             >
                 {previews.map((preview, index) => (
                     <div key={index} className={styles.previewContainer}>
-                        <img src={preview} alt="Preview" className={styles.preview} />
+                        <img
+                            src={isValidImageSrc(preview) ? preview : ''}
+                            alt="Preview"
+                            className={styles.preview}
+                        />
                         <button
                             type="button"
                             className={styles.removeBtn}
