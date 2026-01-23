@@ -41,7 +41,7 @@ export default function Profile() {
     const { user, setUser, loading, userProfile } = useAuthStore();
     // Default (local) stats
     const { level, xp, xpToNextLevel, streak, badges, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, totalWorksAdded, totalWorksCompleted } = useGamificationStore();
-    const { works, favoriteCharacters } = useLibraryStore();
+    const { works, favoriteCharacters, setFavoriteCharacters } = useLibraryStore();
     const { addToast } = useToast();
 
     // Router
@@ -540,25 +540,61 @@ export default function Profile() {
                                             <div
                                                 key={char.id}
                                                 className="character-card"
-                                                onClick={() => navigate(`/character/${char.id}`)}
                                                 style={{
                                                     minWidth: '100px',
                                                     maxWidth: '100px',
-                                                    cursor: 'pointer',
                                                     display: 'flex',
                                                     flexDirection: 'column',
                                                     alignItems: 'center',
-                                                    gap: '0.5rem'
+                                                    gap: '0.5rem',
+                                                    position: 'relative'
                                                 }}
                                             >
-                                                <div style={{
-                                                    width: '80px',
-                                                    height: '80px',
-                                                    borderRadius: '50%',
-                                                    overflow: 'hidden',
-                                                    border: '3px solid #e11d48',
-                                                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                                                }}>
+                                                {/* Remove button - only for own profile */}
+                                                {isOwnProfile && (
+                                                    <button
+                                                        onClick={async (e) => {
+                                                            e.stopPropagation();
+                                                            const updated = favoriteCharacters.filter(c => c.id !== char.id);
+                                                            setFavoriteCharacters(updated);
+                                                            setExtendedProfile(prev => ({ ...prev, favoriteCharacters: updated }));
+                                                            if (user) {
+                                                                await saveUserProfileToFirestore({ uid: user.uid, favoriteCharacters: updated }, true);
+                                                            }
+                                                            addToast(t('profile.character_removed') || 'Personnage retiré', 'success');
+                                                        }}
+                                                        style={{
+                                                            position: 'absolute',
+                                                            top: '-4px',
+                                                            right: '6px',
+                                                            background: '#e11d48',
+                                                            border: 'none',
+                                                            borderRadius: '50%',
+                                                            width: '22px',
+                                                            height: '22px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            cursor: 'pointer',
+                                                            color: 'white',
+                                                            zIndex: 10
+                                                        }}
+                                                        title={t('common.remove') || 'Retirer'}
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                )}
+                                                <div
+                                                    onClick={() => navigate(`/character/${char.id}`)}
+                                                    style={{
+                                                        width: '80px',
+                                                        height: '80px',
+                                                        borderRadius: '50%',
+                                                        overflow: 'hidden',
+                                                        border: '3px solid #e11d48',
+                                                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                                                        cursor: 'pointer'
+                                                    }}>
                                                     <img
                                                         src={char.image}
                                                         alt={char.name}

@@ -691,6 +691,7 @@ const resources = {
                     already_friends: "Vous êtes déjà amis"
                 },
                 add_favorite_character: "Ajouter un personnage favori",
+                character_removed: "Personnage retiré des favoris",
                 add_friend: "AJOUTER EN AMI",
                 request_pending: "DEMANDE EN ATTENTE",
                 friends: "AMIS",
@@ -1448,6 +1449,7 @@ const resources = {
                     already_friends: "You are already friends"
                 },
                 add_favorite_character: "Add favorite character",
+                character_removed: "Character removed from favorites",
                 add_friend: "ADD FRIEND",
                 request_pending: "REQUEST PENDING",
                 friends: "FRIENDS",
