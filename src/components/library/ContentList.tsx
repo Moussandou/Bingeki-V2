@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
-import { Check, ChevronLeft, ChevronRight, Eye, Loader2, Tv, FileText } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Eye, Loader2, Tv, FileText } from 'lucide-react';
 
 import logoCrunchyroll from '@/assets/logo_crunchyroll.png';
 import logoADN from '@/assets/logo_adn.png';
@@ -26,6 +26,10 @@ interface ContentListProps {
     hasPrevPage?: boolean;
     onNextPage?: () => void;
     onPrevPage?: () => void;
+    onFirstPage?: () => void;
+    onLastPage?: () => void;
+    onGoToPage?: (page: number) => void;
+    lastPage?: number;
     page?: number;
     workTitle: string;
     workType: 'anime' | 'manga';
@@ -43,7 +47,11 @@ export function ContentList({
     hasPrevPage,
     onNextPage,
     onPrevPage,
+    onFirstPage,
+    onLastPage,
+    onGoToPage,
     page = 1,
+    lastPage,
     workTitle,
     workType,
     readOnly = false,
@@ -53,6 +61,11 @@ export function ContentList({
     const [visibleCount, setVisibleCount] = useState(25);
     const [expandedIds, setExpandedIds] = useState<number[]>([]);
     const [loadingIds, setLoadingIds] = useState<number[]>([]);
+    const [pageInput, setPageInput] = useState('');
+
+    useEffect(() => {
+        setPageInput('');
+    }, [page]);
 
     // Reset visible count when items (page) changes
     useEffect(() => {
@@ -248,22 +261,104 @@ export function ContentList({
             )}
 
             {/* Pagination */}
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '2rem', borderTop: '2px solid var(--color-border)', paddingTop: '1rem' }}>
-                <Button
-                    variant="ghost"
-                    onClick={onPrevPage}
-                    disabled={!hasPrevPage || isLoading}
-                >
-                    <ChevronLeft /> {t('content_list.previous')}
-                </Button>
-                <span style={{ fontWeight: 900 }}>{t('content_list.page')} {page}</span>
-                <Button
-                    variant="ghost"
-                    onClick={onNextPage}
-                    disabled={!hasNextPage || isLoading}
-                >
-                    {t('content_list.next')} <ChevronRight />
-                </Button>
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '1rem',
+                marginTop: '2rem',
+                borderTop: '2px solid var(--color-border)',
+                paddingTop: '1rem'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    {/* First Page */}
+                    {onFirstPage && (
+                        <Button
+                            variant="ghost"
+                            onClick={onFirstPage}
+                            disabled={page <= 1 || isLoading}
+                            title={t('common.first_page') || "Première page"}
+                        >
+                            <ChevronsLeft size={20} />
+                        </Button>
+                    )}
+
+                    <Button
+                        variant="ghost"
+                        onClick={onPrevPage}
+                        disabled={!hasPrevPage || isLoading}
+                    >
+                        <ChevronLeft /> {t('content_list.previous')}
+                    </Button>
+
+                    <span style={{ fontWeight: 900, minWidth: '80px', textAlign: 'center' }}>
+                        {t('content_list.page')} {page} {lastPage ? `/ ${lastPage}` : ''}
+                    </span>
+
+                    <Button
+                        variant="ghost"
+                        onClick={onNextPage}
+                        disabled={!hasNextPage || isLoading}
+                    >
+                        {t('content_list.next')} <ChevronRight />
+                    </Button>
+
+                    {/* Last Page */}
+                    {onLastPage && lastPage && (
+                        <Button
+                            variant="ghost"
+                            onClick={onLastPage}
+                            disabled={page >= lastPage || isLoading}
+                            title={t('common.last_page') || "Dernière page"}
+                        >
+                            <ChevronsRight size={20} />
+                        </Button>
+                    )}
+                </div>
+
+                {/* Go To Page Input */}
+                {onGoToPage && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{t('common.go_to_page') || "Aller à la page"}:</span>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <input
+                                type="number"
+                                min={1}
+                                max={lastPage || 9999}
+                                value={pageInput}
+                                onChange={(e) => setPageInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        const p = parseInt(pageInput);
+                                        if (!isNaN(p) && p > 0) onGoToPage(p);
+                                    }
+                                }}
+                                style={{
+                                    padding: '0.5rem',
+                                    borderRadius: '4px',
+                                    border: '1px solid var(--color-border)',
+                                    background: 'var(--color-surface)',
+                                    color: 'var(--color-text)',
+                                    width: '70px',
+                                    textAlign: 'center',
+                                    fontWeight: 700
+                                }}
+                                placeholder="#"
+                            />
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                    const p = parseInt(pageInput);
+                                    if (!isNaN(p) && p > 0) onGoToPage(p);
+                                }}
+                                disabled={!pageInput}
+                            >
+                                GO
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

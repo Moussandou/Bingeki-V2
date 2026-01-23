@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom';
 import { useLibraryStore, type Work } from '@/store/libraryStore';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal'; // Import Modal
-import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff, Reply, Video, Calendar, BarChart, Music, Disc, X } from 'lucide-react';
+import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff, Reply, Video, Calendar, BarChart, Music, Disc, X, ArrowUp } from 'lucide-react';
 import { useState, useEffect, memo } from 'react';
 
 
@@ -361,6 +361,10 @@ export default function WorkDetails() {
     const [staff, setStaff] = useState<JikanStaff[]>([]);
     const [expandedRelations, setExpandedRelations] = useState<Record<number, boolean>>({});
 
+    // Pagination & UI State
+    const [totalEpisodesPage, setTotalEpisodesPage] = useState(1);
+    const [showScrollTop, setShowScrollTop] = useState(false);
+
 
     // Initial Fetch for non-library items
     useEffect(() => {
@@ -524,6 +528,7 @@ export default function WorkDetails() {
                     }));
                     setEpisodes(mapped);
                     setHasMoreEpisodes(res.pagination.has_next_page);
+                    setTotalEpisodesPage(res.pagination.last_visible_page || 1);
                     setIsLoadingEpisodes(false);
                 });
             } else {
@@ -587,6 +592,22 @@ export default function WorkDetails() {
             }
         }
     }, [work?.id, user?.uid, user, t]);
+
+    // Scroll To Top Visibility
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
+            setShowScrollTop(scrollTop > 400);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        document.body.addEventListener('scroll', handleScroll, { passive: true }); // Catch body scroll
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            document.body.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
     if (!work) {
         if (isFetchingDetails) {
@@ -826,6 +847,10 @@ export default function WorkDetails() {
                                     workTitle={work.title}
                                     workType={work.type === 'manga' ? 'manga' : 'anime'}
                                     readOnly={!libraryWork}
+                                    lastPage={work.type === 'manga' ? Math.ceil((work.totalChapters || 100) / 50) : totalEpisodesPage}
+                                    onFirstPage={() => setEpisodesPage(1)}
+                                    onLastPage={() => setEpisodesPage(work.type === 'manga' ? Math.ceil((work.totalChapters || 100) / 50) : totalEpisodesPage)}
+                                    onGoToPage={(p) => setEpisodesPage(p)}
                                 />
                             )
                         )}
@@ -2394,6 +2419,38 @@ export default function WorkDetails() {
                     )
                 }
             </div >
+            {/* Scroll To Top Button */}
+            <button
+                onClick={() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    document.body.scrollTo({ top: 0, behavior: 'smooth' });
+                    document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                style={{
+                    position: 'fixed',
+                    bottom: '2rem',
+                    right: '2rem',
+                    background: 'var(--color-primary)',
+                    color: '#fff',
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    zIndex: 100,
+                    opacity: showScrollTop ? 1 : 0,
+                    transform: showScrollTop ? 'scale(1)' : 'scale(0.8)',
+                    pointerEvents: showScrollTop ? 'auto' : 'none',
+                    transition: 'all 0.3s ease'
+                }}
+                title={t('common.back_to_top') || "Remonter en haut"}
+            >
+                <ArrowUp size={24} />
+            </button>
         </Layout >
     );
 }
