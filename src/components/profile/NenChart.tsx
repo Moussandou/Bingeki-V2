@@ -19,14 +19,24 @@ export function NenChart({ stats, themeColor = '#FF2E63' }: NenChartProps) {
     const { t } = useTranslation();
     const [showLegend, setShowLegend] = useState(false);
 
+    // Safe defaults to prevent NaN/undefined causing Recharts hook issues
+    const safeStats = {
+        level: stats?.level ?? 0,
+        xp: stats?.xp ?? 0,
+        streak: stats?.streak ?? 0,
+        totalChaptersRead: stats?.totalChaptersRead ?? 0,
+        totalWorksAdded: stats?.totalWorksAdded ?? 0,
+        totalWorksCompleted: stats?.totalWorksCompleted ?? 0,
+    };
+
     // Normalize data for the chart (0-100 scale)
     const data = [
-        { subject: t('stats.level'), A: Math.min(stats.level * 2, 100), fullMark: 100 },
-        { subject: t('stats.passion'), A: Math.min(stats.xp / 100, 100), fullMark: 100 },
-        { subject: t('stats.diligence'), A: Math.min(stats.streak, 100), fullMark: 100 },
-        { subject: t('stats.collection'), A: Math.min(stats.totalWorksAdded / 2, 100), fullMark: 100 },
-        { subject: t('stats.reading'), A: Math.min(stats.totalChaptersRead / 10, 100), fullMark: 100 },
-        { subject: t('stats.completion'), A: Math.min(stats.totalWorksCompleted * 5, 100), fullMark: 100 },
+        { subject: t('stats.level'), A: Math.min(safeStats.level * 2, 100), fullMark: 100 },
+        { subject: t('stats.passion'), A: Math.min(safeStats.xp / 100, 100), fullMark: 100 },
+        { subject: t('stats.diligence'), A: Math.min(safeStats.streak, 100), fullMark: 100 },
+        { subject: t('stats.collection'), A: Math.min(safeStats.totalWorksAdded / 2, 100), fullMark: 100 },
+        { subject: t('stats.reading'), A: Math.min(safeStats.totalChaptersRead / 10, 100), fullMark: 100 },
+        { subject: t('stats.completion'), A: Math.min(safeStats.totalWorksCompleted * 5, 100), fullMark: 100 },
     ];
 
     return (
