@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { useLibraryStore } from '@/store/libraryStore';
 import type { Work } from '@/store/libraryStore';
 import { useToast } from '@/context/ToastContext';
+import { useGamificationStore } from '@/store/gamificationStore';
 import {
     parseMALExport,
     enrichWithJikan,
@@ -35,6 +36,7 @@ export function MALImportModal({ isOpen, onClose }: MALImportModalProps) {
     const { t } = useTranslation();
     const { works, addWork, updateWorkDetails } = useLibraryStore();
     const { addToast } = useToast();
+    const { recalculateStats } = useGamificationStore();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // State
@@ -169,7 +171,11 @@ export function MALImportModal({ isOpen, onClose }: MALImportModalProps) {
 
         setImportResults(results);
         setPhase('complete');
-    }, [entries, duplicates, addWork, updateWorkDetails]);
+
+        // Recalculate XP/stats based on updated library
+        const updatedWorks = useLibraryStore.getState().works;
+        recalculateStats(updatedWorks);
+    }, [entries, duplicates, addWork, updateWorkDetails, recalculateStats]);
 
     // Handle close
     const handleClose = useCallback(() => {

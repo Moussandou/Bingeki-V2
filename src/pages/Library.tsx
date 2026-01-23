@@ -25,7 +25,7 @@ export default function Library() {
     const { uid } = useParams();
     const { user: currentUser } = useAuthStore();
     const { addToast } = useToast();
-    const { works: localWorks, removeWork, folders, createFolder } = useLibraryStore();
+    const { works: localWorks, removeWork, folders, createFolder, addToFolder } = useLibraryStore();
 
     // Friend Library State
     const [friendWorks, setFriendWorks] = useState<Work[]>([]);
@@ -78,6 +78,7 @@ export default function Library() {
     const [showMALImportModal, setShowMALImportModal] = useState(false);
     const [showFolderModal, setShowFolderModal] = useState(false);
     const [activeFolder, setActiveFolder] = useState<string | null>(null);
+    const [folderMenuOpen, setFolderMenuOpen] = useState(false);
 
     const sortOptions = [
         { value: 'updated', label: t('library.sort.recent') },
@@ -540,21 +541,61 @@ export default function Library() {
 
                         {/* Bulk Actions (outside grid) */}
                         {isSelectionMode && selectedWorks.size > 0 && !isReadOnly && (
-                            <Button
-                                variant="primary"
-                                onClick={handleBulkDelete}
-                                style={{
-                                    background: '#ef4444',
-                                    borderColor: 'var(--color-border-heavy)',
-                                    boxShadow: '4px 4px 0 var(--color-shadow-solid)',
-                                    color: '#fff',
-                                    width: '100%',
-                                    justifyContent: 'center'
-                                }}
-                                icon={<Trash2 size={16} />}
-                            >
-                                SUPPRIMER ({selectedWorks.size})
-                            </Button>
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                {/* Add to Folder Dropdown */}
+                                <div style={{ position: 'relative', flex: 1 }}>
+                                    <Button
+                                        variant="primary"
+                                        onClick={() => setFolderMenuOpen(!folderMenuOpen)}
+                                        style={{
+                                            background: 'var(--color-primary)',
+                                            borderColor: 'var(--color-border-heavy)',
+                                            boxShadow: '4px 4px 0 var(--color-shadow-solid)',
+                                            color: '#fff',
+                                            width: '100%',
+                                            justifyContent: 'center'
+                                        }}
+                                        icon={<FolderPlus size={16} />}
+                                    >
+                                        {t('folders.add_to')} ({selectedWorks.size})
+                                    </Button>
+                                    {folderMenuOpen && folders.length > 0 && (
+                                        <div className={styles.folderMenu}>
+                                            {folders.map((folder) => (
+                                                <button
+                                                    key={folder.id}
+                                                    className={styles.folderMenuItem}
+                                                    onClick={() => {
+                                                        selectedWorks.forEach((id) => addToFolder(id, folder.id));
+                                                        setSelectedWorks(new Set());
+                                                        setIsSelectionMode(false);
+                                                        setFolderMenuOpen(false);
+                                                        addToast(t('folders.add_to') + ` ${folder.name}`, 'success');
+                                                    }}
+                                                >
+                                                    <span style={{ color: folder.color }}>{folder.emoji}</span>
+                                                    {folder.name}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                                <Button
+                                    variant="primary"
+                                    onClick={handleBulkDelete}
+                                    style={{
+                                        background: '#ef4444',
+                                        borderColor: 'var(--color-border-heavy)',
+                                        boxShadow: '4px 4px 0 var(--color-shadow-solid)',
+                                        color: '#fff',
+                                        flex: 1,
+                                        justifyContent: 'center'
+                                    }}
+                                    icon={<Trash2 size={16} />}
+                                >
+                                    {t('library.delete_btn')} ({selectedWorks.size})
+                                </Button>
+                            </div>
                         )}
 
                     </div>

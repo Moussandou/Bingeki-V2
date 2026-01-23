@@ -1,7 +1,7 @@
 import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy, limit, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from './config';
-import type { Work } from '@/store/libraryStore';
+import type { Work, Folder } from '@/store/libraryStore';
 import type { Badge } from '@/types/badge';
 import type { FavoriteCharacter } from '@/types/character';
 import type { ActivityEvent } from '@/types/activity';
@@ -13,6 +13,7 @@ import { mergeGamificationData, mergeLibraryData, validateGamificationWrite, log
 // Types for Firestore data
 interface LibraryData {
     works: Work[];
+    folders?: Folder[];
     lastUpdated: number;
     version?: number;
 }
@@ -138,7 +139,7 @@ export async function uploadProfilePicture(uid: string, file: File): Promise<str
 }
 
 // Save library data to Firestore (with safe merge)
-export async function saveLibraryToFirestore(userId: string, works: Work[]): Promise<void> {
+export async function saveLibraryToFirestore(userId: string, works: Work[], folders?: Folder[]): Promise<void> {
     try {
         const docRef = doc(db, 'users', userId, 'data', 'library');
 
@@ -156,6 +157,7 @@ export async function saveLibraryToFirestore(userId: string, works: Work[]): Pro
 
         await setDoc(docRef, {
             works: mergedWorks,
+            folders: folders ?? existing?.folders ?? [],
             lastUpdated: Date.now(),
             version: (existing?.version || 0) + 1
         } as LibraryData);

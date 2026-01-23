@@ -93,6 +93,7 @@ function App() {
   const { setUser, setUserProfile, syncUserProfile, setLoading, user } = useAuthStore();
 
   const libraryWorks = useLibraryStore((s) => s.works);
+  const libraryFolders = useLibraryStore((s) => s.folders);
   const gamificationState = useGamificationStore(useShallow((s) => ({
     level: s.level,
     xp: s.xp,
@@ -165,11 +166,11 @@ function App() {
 
     // Save library changes to Firestore
     const timeout = setTimeout(() => {
-      saveLibraryToFirestore(user.uid, libraryWorks);
+      saveLibraryToFirestore(user.uid, libraryWorks, libraryFolders);
     }, 3000); // Increased to 3s to reduce save conflicts
 
     return () => clearTimeout(timeout);
-  }, [libraryWorks, user]);
+  }, [libraryWorks, libraryFolders, user]);
 
   useEffect(() => {
     if (!user) return;
