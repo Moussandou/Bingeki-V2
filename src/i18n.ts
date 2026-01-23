@@ -703,7 +703,8 @@ const resources = {
                     spoiler_mode: "Mode Spoiler",
                     spoiler_enabled: "Mode Spoiler activé",
                     spoiler_disabled: "Mode Spoiler désactivé",
-                    spoiler_help: "Floute les synopsis pour éviter les révélations."
+                    spoiler_help: "Floute les synopsis pour éviter les révélations.",
+                    restart_tutorial: "Relancer le tutoriel"
                 },
                 colors: {
                     red: "Rouge Bingeki",
@@ -1510,7 +1511,8 @@ const resources = {
                     spoiler_mode: "Spoiler Mode",
                     spoiler_enabled: "Spoiler Mode enabled",
                     spoiler_disabled: "Spoiler Mode disabled",
-                    spoiler_help: "Blurs synopsis to avoid spoilers."
+                    spoiler_help: "Blurs synopsis to avoid spoilers.",
+                    restart_tutorial: "Restart Tutorial"
                 },
                 colors: {
                     red: "Bingeki Red",

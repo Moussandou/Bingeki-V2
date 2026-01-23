@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useRef } from 'react';
 import { useLibraryStore } from '@/store/libraryStore';
 import { useGamificationStore } from '@/store/gamificationStore';
+import { useTutorialStore } from '@/store/tutorialStore';
 import { getWorkDetails } from '@/services/animeApi';
 import { RefreshCw } from 'lucide-react';
 import { SEO } from '@/components/layout/SEO';
@@ -326,6 +327,18 @@ export default function Settings() {
                                 <p style={{ fontSize: '0.85rem', opacity: 0.6, marginTop: '0.5rem' }}>
                                     {t('settings.appearance.spoiler_help')}
                                 </p>
+                                <div style={{ height: '1px', background: 'var(--color-border)', margin: '1rem 0' }} />
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        useTutorialStore.getState().resetTutorial();
+                                        useTutorialStore.getState().startTutorial();
+                                        navigate('/');
+                                    }}
+                                    style={{ width: '100%', justifyContent: 'center' }}
+                                >
+                                    {t('settings.appearance.restart_tutorial')}
+                                </Button>
                             </div>
                         </section>
 

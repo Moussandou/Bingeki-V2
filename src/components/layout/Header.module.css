@@ -92,12 +92,19 @@
 }
 
 /* Force visibility on touch devices/mobile */
-@media (max-width: 1024px) {
+/* Force visibility on touch devices (Tablets only) */
+@media (min-width: 769px) and (max-width: 1024px) {
     .xpDetails {
         max-width: 140px;
-        /* Increased to prevent cut text */
         opacity: 1;
         margin-left: 0.5rem;
+    }
+}
+
+/* Hide XP explicitly on mobile to save space */
+@media (max-width: 768px) {
+    .xpDetails {
+        display: none !important;
     }
 }
 
