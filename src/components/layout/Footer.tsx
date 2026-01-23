@@ -1,6 +1,7 @@
 import { Mail, MapPin, Github, Linkedin, Globe, Briefcase } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
+import { Link } from '@/components/routing/LocalizedLink';
 
 export function Footer() {
     const { t } = useTranslation();
@@ -51,9 +52,9 @@ export function Footer() {
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <a href="/feedback" style={{ color: 'var(--color-text)', textDecoration: 'none', fontWeight: 900, borderBottom: '2px solid var(--color-text)' }}>
+                        <Link to="/feedback" style={{ color: 'var(--color-text)', textDecoration: 'none', fontWeight: 900, borderBottom: '2px solid var(--color-text)' }}>
                             {t('footer.feedback')}
-                        </a>
+                        </Link>
                     </div>
                 </div>
 
@@ -173,21 +174,21 @@ export function Footer() {
                         &copy; {new Date().getFullYear()} {t('footer.copyright')}
                     </p>
                     <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-                        <a href="/changelog" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
+                        <Link to="/changelog" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
                             {t('footer.changelog')}
-                        </a>
+                        </Link>
                         <a href="https://github.com/Moussandou/Bingeki-V2/wiki" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
                             {t('footer.wiki')}
                         </a>
-                        <a href="/legal" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
+                        <Link to="/legal" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
                             {t('footer.legal')}
-                        </a>
-                        <a href="/credits" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
+                        </Link>
+                        <Link to="/credits" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
                             {t('footer.credits')}
-                        </a>
-                        <a href="/donors" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 900, opacity: 1, textShadow: '0 0 10px var(--color-primary-glow)' }}>
+                        </Link>
+                        <Link to="/donors" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 900, opacity: 1, textShadow: '0 0 10px var(--color-primary-glow)' }}>
                             {t('footer.donors')}
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>
