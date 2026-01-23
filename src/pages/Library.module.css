@@ -260,6 +260,7 @@
     padding: 0.5rem 1rem;
     border: 2px solid var(--color-border);
     background: var(--color-background);
+    color: var(--color-text);
     font-weight: 700;
     font-size: 0.85rem;
     cursor: pointer;

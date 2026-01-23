@@ -43,6 +43,7 @@
     font-weight: 900;
     text-transform: uppercase;
     margin-bottom: 1.5rem;
+    color: var(--color-text);
 }
 
 .form {
@@ -62,6 +63,7 @@
     font-size: 0.85rem;
     text-transform: uppercase;
     opacity: 0.7;
+    color: var(--color-text);
 }
 
 .input {
@@ -139,6 +141,7 @@
     border: 2px solid var(--color-border);
     font-weight: 700;
     font-size: 1.1rem;
+    color: var(--color-text);
 }
 
 .actions {
