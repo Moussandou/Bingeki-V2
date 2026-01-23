@@ -711,6 +711,10 @@ const resources = {
                     spoiler_enabled: "Mode Spoiler activé",
                     spoiler_disabled: "Mode Spoiler désactivé",
                     spoiler_help: "Floute les synopsis pour éviter les révélations.",
+                    nsfw_mode: "Contenu sensible (NSFW)",
+                    nsfw_enabled: "Contenu sensible activé",
+                    nsfw_disabled: "Contenu sensible masqué",
+                    nsfw_help: "Autorise l'affichage de contenu potentiellement inapproprié pour un jeune public.",
                     restart_tutorial: "Relancer le tutoriel"
                 },
                 colors: {
@@ -1561,6 +1565,10 @@ const resources = {
                     spoiler_enabled: "Spoiler Mode enabled",
                     spoiler_disabled: "Spoiler Mode disabled",
                     spoiler_help: "Blurs synopsis to avoid spoilers.",
+                    nsfw_mode: "Sensitive Content (NSFW)",
+                    nsfw_enabled: "Sensitive content enabled",
+                    nsfw_disabled: "Sensitive content disabled",
+                    nsfw_help: "Allows displaying content potentially inappropriate for younger audiences.",
                     restart_tutorial: "Restart Tutorial"
                 },
                 colors: {

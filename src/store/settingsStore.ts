@@ -11,6 +11,7 @@ interface SettingsState {
 
     streamingUrlPattern: string;
     spoilerMode: boolean;
+    nsfwMode: boolean;
     accentColor: string;
 
     setTheme: (theme: Theme) => void;
@@ -20,6 +21,7 @@ interface SettingsState {
     toggleNotifications: () => void;
     setStreamingUrlPattern: (pattern: string) => void;
     toggleSpoilerMode: () => void;
+    toggleNsfwMode: () => void;
     setAccentColor: (color: string) => void;
 }
 
@@ -44,6 +46,8 @@ export const useSettingsStore = create<SettingsState>()(
             toggleNotifications: () => set((state) => ({ notifications: !state.notifications })),
             spoilerMode: false,
             toggleSpoilerMode: () => set((state) => ({ spoilerMode: !state.spoilerMode })),
+            nsfwMode: false,
+            toggleNsfwMode: () => set((state) => ({ nsfwMode: !state.nsfwMode })),
             accentColor: '#FF2E63',
             setAccentColor: (color) => set({ accentColor: color }),
         }),

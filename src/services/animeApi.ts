@@ -1,4 +1,5 @@
 import { queuedFetch } from '@/utils/apiQueue';
+import { useSettingsStore } from '@/store/settingsStore';
 
 const BASE_URL = 'https://api.jikan.moe/v4';
 
@@ -107,11 +108,12 @@ export const searchWorks = async (
     type: 'anime' | 'manga' = 'manga',
     filters?: SearchFilters
 ) => {
+    const { nsfwMode } = useSettingsStore.getState();
     try {
         const params = new URLSearchParams({
             q: query,
             limit: '24',
-            sfw: 'true',
+            sfw: (!nsfwMode).toString(),
         });
 
         if (filters) {
@@ -137,8 +139,9 @@ export const getTopWorks = async (
     filter: 'airing' | 'upcoming' | 'bypopularity' | 'favorite' = 'bypopularity',
     limit: number = 24
 ) => {
+    const { nsfwMode } = useSettingsStore.getState();
     try {
-        const response = await queuedFetch(`${BASE_URL}/top/${type}?filter=${filter}&limit=${limit}&sfw=true`);
+        const response = await queuedFetch(`${BASE_URL}/top/${type}?filter=${filter}&limit=${limit}&sfw=${!nsfwMode}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanResult[];
@@ -149,9 +152,10 @@ export const getTopWorks = async (
 };
 
 export const getSeasonalAnime = async (limit: number = 24) => {
+    const { nsfwMode } = useSettingsStore.getState();
     try {
         // Fetches current season's anime
-        const response = await queuedFetch(`${BASE_URL}/seasons/now?limit=${limit}&sfw=true`);
+        const response = await queuedFetch(`${BASE_URL}/seasons/now?limit=${limit}&sfw=${!nsfwMode}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanResult[];
@@ -421,10 +425,11 @@ export const getAnimeStaff = async (id: number) => {
 };
 
 export const getAnimeSchedule = async (filter?: string) => {
+    const { nsfwMode } = useSettingsStore.getState();
     try {
         const url = filter
-            ? `${BASE_URL}/schedules?filter=${filter}&sfw=true`
-            : `${BASE_URL}/schedules?sfw=true`;
+            ? `${BASE_URL}/schedules?filter=${filter}&sfw=${!nsfwMode}`
+            : `${BASE_URL}/schedules?sfw=${!nsfwMode}`;
 
         const response = await queuedFetch(url);
         if (!response.ok) throw new Error('Network response was not ok');
@@ -437,8 +442,9 @@ export const getAnimeSchedule = async (filter?: string) => {
 };
 
 export const getRandomAnime = async () => {
+    const { nsfwMode } = useSettingsStore.getState();
     try {
-        const response = await queuedFetch(`${BASE_URL}/random/anime?sfw=true`);
+        const response = await queuedFetch(`${BASE_URL}/random/anime?sfw=${!nsfwMode}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         return data.data as JikanResult;

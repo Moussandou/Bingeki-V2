@@ -169,6 +169,8 @@ export default function Settings() {
         toggleSound,
         toggleNotifications,
         toggleSpoilerMode,
+        nsfwMode,
+        toggleNsfwMode,
         setAccentColor
     } = useSettingsStore();
 
@@ -328,6 +330,18 @@ export default function Settings() {
                                 />
                                 <p style={{ fontSize: '0.85rem', opacity: 0.6, marginTop: '0.5rem' }}>
                                     {t('settings.appearance.spoiler_help')}
+                                </p>
+                                <div style={{ height: '1px', background: 'var(--color-border)', margin: '1rem 0' }} />
+                                <Switch
+                                    label={t('settings.appearance.nsfw_mode')}
+                                    isOn={nsfwMode}
+                                    onToggle={() => {
+                                        toggleNsfwMode();
+                                        addToast(!nsfwMode ? t('settings.appearance.nsfw_enabled') : t('settings.appearance.nsfw_disabled'), 'info');
+                                    }}
+                                />
+                                <p style={{ fontSize: '0.85rem', opacity: 0.6, marginTop: '0.5rem' }}>
+                                    {t('settings.appearance.nsfw_help')}
                                 </p>
                                 <div style={{ height: '1px', background: 'var(--color-border)', margin: '1rem 0' }} />
                                 <Button
