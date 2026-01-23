@@ -67,7 +67,9 @@ export default function Donors() {
                             display: 'flex',
                             alignItems: 'center',
                             gap: '0.5rem',
-                            boxShadow: '0 4px 10px rgba(0,0,0,0.5)'
+                            boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
+                            width: 'max-content', // Fix truncation
+                            whiteSpace: 'nowrap'
                         }}>
                             <Crown size={16} fill="#000" />
                             {t('donors.top_donor')}
