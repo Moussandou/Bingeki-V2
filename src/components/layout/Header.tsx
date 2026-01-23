@@ -388,24 +388,23 @@ export function Header() {
                         {user ? (
                             <>
                                 {/* Stats (Desktop only mainly) */}
-                                <div className="desktopOnly" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-
-                                    {/* Streak */}
-                                    <div className={styles.streakContainer}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    {/* Streak - Desktop Only */}
+                                    <div className={`${styles.streakContainer} desktopOnly`}>
                                         <Flame size={20} fill="currentColor" />
                                         <span>{streak}</span>
                                     </div>
 
-                                    {/* Level Pill */}
+                                    {/* Level Pill - Responsive & Animated */}
                                     <Link to="/profile" style={{ textDecoration: 'none' }}>
                                         <div className={styles.statusPill} style={{ cursor: 'pointer' }}>
                                             <span className={styles.levelValue}>Lvl {level}</span>
-                                            <span style={{ opacity: 0.3 }}>|</span>
-                                            <span>{xp} XP</span>
+                                            <div className={styles.xpDetails}>
+                                                <span style={{ opacity: 0.3 }}>|</span>
+                                                <span>{xp} XP</span>
+                                            </div>
                                         </div>
                                     </Link>
-
-
                                 </div>
 
                                 {/* Profile Dropdown */}
