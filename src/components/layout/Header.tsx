@@ -405,14 +405,7 @@ export function Header() {
                                         </div>
                                     </Link>
 
-                                    {/* Level Pill */}
-                                    <Link to="/profile" style={{ textDecoration: 'none' }}>
-                                        <div className={styles.statusPill} style={{ cursor: 'pointer' }}>
-                                            <span className={styles.levelValue}>Lvl {level}</span>
-                                            <span style={{ opacity: 0.3 }}>|</span>
-                                            <span>{xp} XP</span>
-                                        </div>
-                                    </Link>
+
                                 </div>
 
                                 {/* Profile Dropdown */}
