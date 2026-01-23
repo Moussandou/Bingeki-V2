@@ -4,8 +4,9 @@
   "version": "3.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build && node scripts/localize-html.cjs",
+    "generate-sw": "npx tsx scripts/generate-sw.ts",
+    "dev": "npm run generate-sw && vite",
+    "build": "npm run generate-sw && tsc -b && vite build && node scripts/localize-html.cjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
