@@ -3,7 +3,101 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
-import { Zap, User, Compass, Book, Languages } from 'lucide-react'; // Added Languages icon
+import { Zap, User, Compass, Book, Languages, Search, TrendingUp } from 'lucide-react'; // Added icons
+import { NenChart } from '@/components/profile/NenChart'; // Import NenChart
+
+// --- MOCK COMPONENTS FOR VISUALS ---
+
+const MockProfileVisual = () => {
+    // Fake stats for a balanced, cool looking chart
+    const mockStats = {
+        level: 25,
+        xp: 6500,
+        streak: 85,
+        totalChaptersRead: 450,
+        totalWorksAdded: 150,
+        totalWorksCompleted: 12
+    };
+
+    return (
+        <div style={{ width: '220px', height: '180px', pointerEvents: 'none' }}>
+            <NenChart stats={mockStats} themeColor="var(--color-primary)" />
+        </div>
+    );
+};
+
+const MockDiscoverVisual = () => (
+    <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: '10px',
+        width: '200px',
+        opacity: 0.9
+    }}>
+        <div style={{
+            background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+            padding: '10px', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px'
+        }}>
+            <Search size={24} color="var(--color-secondary)" />
+            <div style={{ height: '4px', width: '60%', background: 'var(--color-text)', opacity: 0.2, borderRadius: '2px' }} />
+        </div>
+        <div style={{
+            background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+            padding: '10px', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px'
+        }}>
+            <TrendingUp size={24} color="var(--color-accent)" />
+            <div style={{ height: '4px', width: '60%', background: 'var(--color-text)', opacity: 0.2, borderRadius: '2px' }} />
+        </div>
+        <div style={{
+            gridColumn: 'span 2', background: 'linear-gradient(90deg, var(--color-secondary) 0%, transparent 100%)',
+            height: '40px', borderRadius: '6px', display: 'flex', alignItems: 'center', padding: '0 10px',
+            border: '1px solid var(--color-border)'
+        }}>
+            <div style={{ height: '8px', width: '40px', background: '#fff', borderRadius: '4px', opacity: 0.8 }} />
+        </div>
+    </div>
+);
+
+const MockLibraryVisual = () => (
+    <div style={{
+        display: 'flex',
+        gap: '8px',
+        alignItems: 'flex-end',
+        height: '120px',
+        paddingBottom: '10px'
+    }}>
+        {[1, 2, 3].map((i) => (
+            <div key={i} style={{
+                width: '40px',
+                height: `${80 + i * 10}px`,
+                background: `var(--color-surface)`,
+                border: '2px solid var(--color-border)',
+                borderRadius: '4px',
+                position: 'relative',
+                transform: `rotate(${i % 2 === 0 ? 3 : -3}deg)`,
+                boxShadow: '2px 2px 0 var(--color-shadow)'
+            }}>
+                <div style={{
+                    position: 'absolute', top: '5px', left: '5px', right: '5px', bottom: '5px',
+                    background: i === 2 ? 'var(--color-primary)' : 'var(--color-border)',
+                    opacity: 0.3
+                }} />
+            </div>
+        ))}
+        <div style={{
+            marginLeft: '10px', display: 'flex', flexDirection: 'column', gap: '4px', justifyContent: 'center'
+        }}>
+            <div style={{ display: 'flex', gap: '4px', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-success)' }} />
+                <span>One Piece</span>
+            </div>
+            <div style={{ display: 'flex', gap: '4px', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-warning)' }} />
+                <span>Berserk</span>
+            </div>
+        </div>
+    </div>
+);
 
 // Steps definition with keys instead of hardcoded text
 const STEPS = [
@@ -11,25 +105,29 @@ const STEPS = [
         titleKey: "tutorial.welcome_title",
         descKey: "tutorial.welcome_desc",
         target: null, // Centered
-        icon: <Zap size={64} className="text-secondary" />
+        icon: <Zap size={64} className="text-secondary" />,
+        component: null // Default icon usage
     },
     {
         titleKey: "tutorial.profile_title",
         descKey: "tutorial.profile_desc",
         target: "profile-section",
-        icon: <User size={64} style={{ color: 'var(--color-primary)' }} />
+        icon: <User size={64} style={{ color: 'var(--color-primary)' }} />,
+        component: <MockProfileVisual />
     },
     {
         titleKey: "tutorial.discover_title",
         descKey: "tutorial.discover_desc",
         target: "discover-nav",
-        icon: <Compass size={64} style={{ color: 'var(--color-secondary)' }} />
+        icon: <Compass size={64} style={{ color: 'var(--color-secondary)' }} />,
+        component: <MockDiscoverVisual />
     },
     {
         titleKey: "tutorial.library_title",
         descKey: "tutorial.library_desc",
         target: "library-nav",
-        icon: <Book size={64} style={{ color: 'var(--color-accent)' }} />
+        icon: <Book size={64} style={{ color: 'var(--color-accent)' }} />,
+        component: <MockLibraryVisual />
     }
 ];
 
@@ -120,22 +218,37 @@ export function TutorialOverlay() {
                         {i18n.language === 'fr' ? 'EN' : 'FR'}
                     </button>
 
-                    {/* Visual */}
-                    <motion.div
-                        key={currentStep}
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                        style={{
-                            marginBottom: '1.5rem',
-                            padding: '1.5rem',
-                            background: 'rgba(var(--color-primary-rgb), 0.05)',
-                            borderRadius: '50%',
-                            border: '1px solid var(--color-border)'
-                        }}
-                    >
-                        {step.icon}
-                    </motion.div>
+                    {/* Visual Area - Dynamic Content */}
+                    <div style={{
+                        marginBottom: '1.5rem',
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '180px' // Fixed height for visuals
+                    }}>
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={currentStep}
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                                style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                            >
+                                {step.component || (
+                                    <div style={{
+                                        padding: '2rem',
+                                        background: 'rgba(var(--color-primary-rgb), 0.05)',
+                                        borderRadius: '50%',
+                                        border: '1px solid var(--color-border)'
+                                    }}>
+                                        {step.icon}
+                                    </div>
+                                )}
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
 
                     <h2 style={{
                         fontSize: '1.8rem',
