@@ -134,7 +134,16 @@ export function AddFavoriteCharacterModal({ isOpen, onClose, currentFavorites, o
                     background: 'var(--color-surface)',
                     boxShadow: '6px 6px 0 var(--color-primary)'
                 }}>
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={24} style={{ color: 'var(--color-primary)' }} />
+                    <Search
+                        size={24}
+                        style={{
+                            position: 'absolute',
+                            left: '1rem',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            color: 'var(--color-primary)'
+                        }}
+                    />
                     <input
                         placeholder={t('components.add_work_modal.search_placeholder') || "SEARCH..."}
                         value={query}
@@ -148,7 +157,8 @@ export function AddFavoriteCharacterModal({ isOpen, onClose, currentFavorites, o
                             outline: 'none',
                             fontFamily: 'var(--font-heading)',
                             fontWeight: 900,
-                            textTransform: 'uppercase'
+                            textTransform: 'uppercase',
+                            color: 'var(--color-text)'
                         }}
                         autoFocus
                     />
