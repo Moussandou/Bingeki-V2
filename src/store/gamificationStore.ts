@@ -190,6 +190,7 @@ export const useGamificationStore = create<GamificationState>()(
                 const worksAdded = works.length;
                 let worksCompleted = 0;
 
+                // Calculate raw stats
                 works.forEach(w => {
                     const progress = w.currentChapter || 0;
                     const type = w.type ? w.type.toLowerCase() : 'manga';
@@ -198,7 +199,6 @@ export const useGamificationStore = create<GamificationState>()(
                         chapters += progress;
                     } else if (type === 'anime') {
                         if (w.format === 'Movie') {
-                            // Movies are usually 1 unit, but progress tracks it
                             movies += progress;
                         } else {
                             episodes += progress;
@@ -210,12 +210,36 @@ export const useGamificationStore = create<GamificationState>()(
                     if (w.status === 'completed') worksCompleted++;
                 });
 
+                // Calculate Total XP
+                // 1. Works Added
+                let calculatedXp = worksAdded * XP_REWARDS.ADD_WORK;
+                // 2. Progress check
+                calculatedXp += (chapters + episodes + movies) * XP_REWARDS.UPDATE_PROGRESS;
+                // 3. Completed
+                calculatedXp += worksCompleted * XP_REWARDS.COMPLETE_WORK;
+
+                // Calculate Level from XP
+                // We restart from level 1 and simulate leveling up
+                let simLevel = 1;
+                let simXp = calculatedXp;
+                let simXpToNext = LEVEL_BASE;
+
+                while (simXp >= simXpToNext && simLevel < MAX_LEVEL) {
+                    simXp -= simXpToNext;
+                    simLevel++;
+                    simXpToNext = Math.floor(simXpToNext * LEVEL_MULTIPLIER);
+                }
+
                 set({
                     totalChaptersRead: chapters,
                     totalAnimeEpisodesWatched: episodes,
                     totalMoviesWatched: movies,
                     totalWorksAdded: worksAdded,
-                    totalWorksCompleted: worksCompleted
+                    totalWorksCompleted: worksCompleted,
+                    // Update XP and Level
+                    xp: simXp,
+                    level: simLevel,
+                    xpToNextLevel: simXpToNext
                 });
             }
         }),
