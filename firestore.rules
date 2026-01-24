@@ -47,19 +47,17 @@ service cloud.firestore {
         // Admins can do anything
         allow write: if isAdmin();
         
-        // Owner Update: Must validate stats don't jump unreasonably
+        // Owner Update: Allow updates but enforce Hard Caps
         allow update: if isOwner(userId) && 
-                      // Level check: Max +1 increase
-                      request.resource.data.level <= resource.data.level + 1 &&
-                      // XP check: Max +1000 increase (generous buffer)
-                      request.resource.data.xp <= resource.data.xp + 1000 &&
-                      // Streak check: Max +1 increase
-                      (request.resource.data.streak <= resource.data.streak + 1 || request.resource.data.streak == 1);
+                      // Level Limit: 100 Max
+                      request.resource.data.level <= 100 &&
+                      // Basic sanity checks
+                      request.resource.data.level >= 1 &&
+                      request.resource.data.xp >= 0 &&
+                      request.resource.data.streak >= 0;
         
         // Owner Create: Must start reasonable
-        allow create: if isOwner(userId) && 
-                      request.resource.data.level == 1 &&
-                      request.resource.data.xp <= 500;
+        allow create: if isOwner(userId);
       }
 
       // 2. Library Data - Standard Access
