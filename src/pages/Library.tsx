@@ -510,7 +510,7 @@ export default function Library() {
                                             title={t('mal_import.import_mal')}
                                             style={{ background: '#2E51A2', color: '#fff', padding: '0.4rem' }}
                                         >
-                                            <img src="/mal-logo.png" alt="MAL" style={{ width: '24px', height: '24px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+                                            <img src="/mal-logo.png" alt="MAL" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
                                         </button>
                                     </>
                                 )}
