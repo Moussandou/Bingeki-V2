@@ -8,6 +8,20 @@ export interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
     {
+        version: 'v3.3',
+        date: '24 Janvier 2026',
+        title: 'Library & NSFW Update',
+        description: 'Import MAL, Gestion des dossiers, Mode NSFW et corrections de gamification.',
+        changes: [
+            'Library : Import MyAnimeList et gestion avancée des dossiers.',
+            'Settings : Nouveau mode NSFW et bascule API.',
+            'Profile : Suppression des favoris et recalcul d\'XP.',
+            'UI : Amélioration du tutoriel avec visuels réels.',
+            'WorkDetails : Pagination avancée et retour en haut de page.',
+            'Fix : Recalcul d\'XP, redirections de notifications et règles de sécurité.'
+        ]
+    },
+    {
         version: 'v3.2',
         date: '17 Janvier 2026',
         title: 'Dark Mode Complet',

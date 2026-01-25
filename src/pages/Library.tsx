@@ -508,9 +508,9 @@ export default function Library() {
                                             onClick={() => setShowMALImportModal(true)}
                                             className={styles.controlButton}
                                             title={t('mal_import.import_mal')}
-                                            style={{ background: 'var(--color-primary)', color: '#fff' }}
+                                            style={{ background: '#2E51A2', color: '#fff', padding: '0.4rem' }}
                                         >
-                                            <Upload size={20} />
+                                            <img src="/mal-logo.png" alt="MAL" style={{ width: '24px', height: '24px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
                                         </button>
                                     </>
                                 )}

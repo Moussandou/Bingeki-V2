@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
-import { Zap, User, Compass, Book, Languages, Search, TrendingUp } from 'lucide-react'; // Added icons
+import { Zap, User, Compass, Book, Languages, Search, TrendingUp, Upload, FileJson, ArrowUp } from 'lucide-react'; // Added icons
 import { NenChart } from '@/components/profile/NenChart'; // Import NenChart
 
 // --- MOCK COMPONENTS FOR VISUALS ---
@@ -99,6 +99,41 @@ const MockLibraryVisual = () => (
     </div>
 );
 
+const MockImportVisual = () => (
+    <div style={{
+        position: 'relative', width: '140px', height: '100px',
+        background: 'var(--color-surface)',
+        border: '2px dashed var(--color-primary)',
+        borderRadius: '12px',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        gap: '10px',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+    }}>
+        <div style={{
+            width: '40px', height: '40px', background: 'var(--color-primary)',
+            borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 4px 10px rgba(var(--color-primary-rgb), 0.4)'
+        }}>
+            <ArrowUp size={24} color="#fff" strokeWidth={3} />
+        </div>
+        <div style={{
+            fontSize: '0.8rem', fontWeight: '800', opacity: 0.8,
+            fontFamily: 'var(--font-heading)', letterSpacing: '0.5px'
+        }}>
+            MAL / JSON
+        </div>
+
+        {/* Floating elements */}
+        <div style={{
+            position: 'absolute', top: -10, right: -10,
+            background: '#2E51A2', color: 'white', padding: '4px 8px', borderRadius: '4px',
+            fontSize: '0.6rem', fontWeight: 'bold'
+        }}>
+            MAL
+        </div>
+    </div>
+);
+
 // Steps definition with keys instead of hardcoded text
 const STEPS = [
     {
@@ -128,6 +163,13 @@ const STEPS = [
         target: "library-nav",
         icon: <Book size={64} style={{ color: 'var(--color-accent)' }} />,
         component: <MockLibraryVisual />
+    },
+    {
+        titleKey: "tutorial.import_title",
+        descKey: "tutorial.import_desc",
+        target: "import-btn",
+        icon: <Upload size={64} style={{ color: 'var(--color-success)' }} />,
+        component: <MockImportVisual />
     }
 ];
 

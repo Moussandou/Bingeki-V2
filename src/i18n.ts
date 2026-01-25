@@ -301,7 +301,9 @@ const resources = {
                 discover_title: "Découvrir & Rechercher",
                 discover_desc: "Trouvez facilement de nouveaux mangas et animes à ajouter à votre collection.",
                 library_title: "Votre Bibliothèque",
-                library_desc: "Toutes vos œuvres suivies sont ici. Mettez-les à jour au fur et à mesure."
+                library_desc: "Toutes vos œuvres suivies sont ici. Mettez-les à jour au fur et à mesure.",
+                import_title: "Importation facile",
+                import_desc: "Déjà une liste sur MyAnimeList ? Importez-la en un clic et récupérez tout votre historique."
             },
             dashboard: {
                 title: "TABLEAU DE BORD",
@@ -1924,7 +1926,9 @@ const resources = {
                 discover_title: "Discover & Search",
                 discover_desc: "Find new manga and anime to add to your collection easily.",
                 library_title: "Your Library",
-                library_desc: "All your tracked works are here. Update them as you read."
+                library_desc: "All your tracked works are here. Update them as you read.",
+                import_title: "Easy Import",
+                import_desc: "Already have a list on MyAnimeList? Import it in one click and recover your history."
             },
             dashboard: {
                 title: "DASHBOARD",
