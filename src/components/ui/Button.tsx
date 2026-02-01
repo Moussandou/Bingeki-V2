@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, type HTMLMotionProps } from 'framer-motion';
 import { cn } from '@/utils/cn';
+import { useHaptics } from '@/hooks/useHaptics';
 import styles from './Button.module.css';
 
 interface ButtonProps extends HTMLMotionProps<"button"> {
@@ -12,7 +13,14 @@ interface ButtonProps extends HTMLMotionProps<"button"> {
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant = 'primary', size = 'md', isLoading, icon, children, ...props }, ref) => {
+    ({ className, variant = 'primary', size = 'md', isLoading, icon, children, onClick, ...props }, ref) => {
+        const { triggerHaptic } = useHaptics();
+
+        const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+            triggerHaptic('light');
+            onClick?.(e);
+        };
+
         return (
             <motion.button
                 ref={ref}
@@ -20,6 +28,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 whileTap={{ scale: 0.95 }}
                 whileHover={{ scale: 1.02 }}
                 initial={false}
+                onClick={handleClick}
                 {...props}
             >
                 {isLoading ? (
