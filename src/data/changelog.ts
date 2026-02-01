@@ -8,6 +8,17 @@ export interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
     {
+        version: 'v3.4',
+        date: '01 Février 2026',
+        title: 'Retour Haptique',
+        description: 'Une expérience tactile améliorée pour plus d\'immersion.',
+        changes: [
+            'Haptique : Retour haptique sur tous les boutons pour une sensation physique.',
+            'UI : Meilleure réactivité via vibrations légères.',
+            'Tech : Nouveau hook useHaptics pour gérer les vibrations.'
+        ]
+    },
+    {
         version: 'v3.3',
         date: '24 Janvier 2026',
         title: 'Library & NSFW Update',

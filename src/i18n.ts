@@ -823,6 +823,16 @@ const resources = {
                 new: "NEW",
                 to_be_continued: "À SUIVRE...",
                 entries: {
+                    v3_4: {
+                        date: "01 Février 2026",
+                        title: "Retour Haptique",
+                        description: "Une expérience tactile améliorée pour plus d'immersion.",
+                        changes: [
+                            "Haptique : Retour haptique sur tous les boutons pour une sensation physique.",
+                            "UI : Meilleure réactivité via vibrations légères.",
+                            "Tech : Nouveau hook useHaptics pour gérer les vibrations."
+                        ]
+                    },
                     v3_3: {
                         date: "22 Janvier 2026",
                         title: "Expérience Mobile & PWA",
@@ -2016,6 +2026,16 @@ const resources = {
                 new: "NEW",
                 to_be_continued: "TO BE CONTINUED...",
                 entries: {
+                    v3_4: {
+                        date: "February 01, 2026",
+                        title: "Haptic Feedback",
+                        description: "Enhanced tactile experience for better immersion.",
+                        changes: [
+                            "Haptic: Tactile feedback on all buttons for a physical feel.",
+                            "UI: Better responsiveness via light vibrations.",
+                            "Tech: New useHaptics hook to manage vibrations."
+                        ]
+                    },
                     v3_3: {
                         date: "January 22, 2026",
                         title: "Mobile Experience & PWA",
