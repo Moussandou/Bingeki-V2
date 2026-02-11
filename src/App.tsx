@@ -258,7 +258,10 @@ function App() {
 
   // Show maintenance screen if active and user is not admin
   // We allow the check to pass if userProfile.isAdmin is true
-  if (isMaintenance && userProfile?.isAdmin !== true) {
+  // We also allow access to the auth page so admins can log in
+  const isAuthPage = window.location.pathname.includes('/auth');
+
+  if (isMaintenance && userProfile?.isAdmin !== true && !isAuthPage) {
     return <MaintenanceScreen />;
   }
 

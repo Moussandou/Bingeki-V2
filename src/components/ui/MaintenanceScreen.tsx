@@ -64,6 +64,11 @@ export const MaintenanceScreen = () => {
 
                 <div className={styles.footer}>
                     &copy; {new Date().getFullYear()} Bingeki
+                    <div style={{ marginTop: '1rem' }}>
+                        <a href="/fr/auth" style={{ fontSize: '0.8rem', color: 'var(--color-text-dim)', textDecoration: 'none', opacity: 0.7 }}>
+                            Admin Login
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
