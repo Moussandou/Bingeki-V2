@@ -1524,3 +1524,33 @@ export async function toggleTierListLike(listId: string, userId: string): Promis
         console.error('[Firestore] Error toggling tier list like:', error);
     }
 }
+
+// --- DEPLOYMENTS ---
+
+export interface DeploymentEvent {
+    id: string;
+    channelId: string;
+    url: string;
+    createdAt: any; // Timestamp
+    expiresAt: any; // Timestamp
+    type: 'preview' | 'live';
+    status: 'active' | 'expired';
+}
+
+export async function getDeployments(limitCount = 10): Promise<DeploymentEvent[]> {
+    try {
+        const q = query(
+            collection(db, 'deployments'),
+            orderBy('createdAt', 'desc'),
+            limit(limitCount)
+        );
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        } as DeploymentEvent));
+    } catch (error) {
+        console.error('[Firestore] Error fetching deployments:', error);
+        return [];
+    }
+}
