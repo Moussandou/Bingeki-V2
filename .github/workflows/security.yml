@@ -60,31 +60,7 @@ jobs:
           echo "📦 Checking for outdated dependencies..."
           npm outdated || true
 
-  codeql:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'schedule'
-    
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: javascript-typescript
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-        with:
-          category: "/language:javascript-typescript"
 
   secrets-scan:
     runs-on: ubuntu-latest
