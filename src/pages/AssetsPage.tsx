@@ -8,8 +8,8 @@ import { DeveloperLicenseCard } from '@/components/profile/DeveloperLicenseCard'
 
 import { BingekiBanner } from '@/components/ui/BingekiBanner';
 import { ComparisonTable } from '@/components/ui/ComparisonTable';
-import { MockupBrowser } from '@/components/mockups/MockupBrowser';
-import { MockupDashboard, MockupProfile } from '@/components/mockups/PageLayouts';
+import { MockupBrowser, MockupPhone } from '@/components/mockups/MockupBrowser';
+import { MockupDashboard, MockupProfile, MockupDashboardMobile, MockupProfileMobile, MockupDiscover, MockupDiscoverMobile, MockupDetails, MockupDetailsMobile } from '@/components/mockups/PageLayouts';
 
 export default function AssetsPage() {
     return (
@@ -454,6 +454,70 @@ export default function AssetsPage() {
                             <MockupBrowser url="bingeki.app/profile/moussandou">
                                 <MockupProfile />
                             </MockupBrowser>
+                        </div>
+                    </div>
+                </section>
+
+                {/* SECTION: MOBILE MOCKUPS */}
+                <section style={{ marginBottom: '4rem' }}>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>Maquettes Mobile</h2>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3rem', justifyContent: 'center' }}>
+                        <div>
+                            <h3 style={{ marginBottom: '1rem', fontSize: '1rem', textAlign: 'center' }}>Dashboard Mobile</h3>
+                            <MockupPhone>
+                                <MockupDashboardMobile />
+                            </MockupPhone>
+                        </div>
+
+                        <div>
+                            <h3 style={{ marginBottom: '1rem', fontSize: '1rem', textAlign: 'center' }}>Profil Mobile</h3>
+                            <MockupPhone>
+                                <MockupProfileMobile />
+                            </MockupPhone>
+                        </div>
+                    </div>
+                </section>
+
+                {/* SECTION: DISCOVER MOCKUPS */}
+                <section style={{ marginBottom: '4rem' }}>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>Maquettes Découverte</h2>
+                    <div style={{ display: 'grid', gap: '3rem' }}>
+                        <div>
+                            <h3 style={{ marginBottom: '1rem', fontSize: '1rem' }}>Discover View (Desktop)</h3>
+                            <MockupBrowser url="bingeki.app/discover">
+                                <MockupDiscover />
+                            </MockupBrowser>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <div>
+                                <h3 style={{ marginBottom: '1rem', fontSize: '1rem', textAlign: 'center' }}>Discover Mobile</h3>
+                                <MockupPhone>
+                                    <MockupDiscoverMobile />
+                                </MockupPhone>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* SECTION: DETAILS MOCKUPS */}
+                <section style={{ marginBottom: '4rem' }}>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>Maquettes Détails (Anime/Manga)</h2>
+                    <div style={{ display: 'grid', gap: '3rem' }}>
+                        <div>
+                            <h3 style={{ marginBottom: '1rem', fontSize: '1rem' }}>Details View (Desktop)</h3>
+                            <MockupBrowser url="bingeki.app/manga/attack-on-titan">
+                                <MockupDetails />
+                            </MockupBrowser>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <div>
+                                <h3 style={{ marginBottom: '1rem', fontSize: '1rem', textAlign: 'center' }}>Details Mobile</h3>
+                                <MockupPhone>
+                                    <MockupDetailsMobile />
+                                </MockupPhone>
+                            </div>
                         </div>
                     </div>
                 </section>
