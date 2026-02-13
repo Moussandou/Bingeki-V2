@@ -9,7 +9,7 @@ import { DeveloperLicenseCard } from '@/components/profile/DeveloperLicenseCard'
 import { BingekiBanner } from '@/components/ui/BingekiBanner';
 import { ComparisonTable } from '@/components/ui/ComparisonTable';
 import { MockupBrowser, MockupPhone } from '@/components/mockups/MockupBrowser';
-import { MockupDashboard, MockupProfile, MockupDashboardMobile, MockupProfileMobile, MockupDiscover, MockupDiscoverMobile, MockupDetails, MockupDetailsMobile } from '@/components/mockups/PageLayouts';
+import { MockupDashboard, MockupProfile, MockupDashboardMobile, MockupProfileMobile, MockupDiscover, MockupDiscoverMobile, MockupDetails, MockupDetailsMobile, MockupLibrary, MockupLibraryMobile } from '@/components/mockups/PageLayouts';
 
 export default function AssetsPage() {
     return (
@@ -516,6 +516,28 @@ export default function AssetsPage() {
                                 <h3 style={{ marginBottom: '1rem', fontSize: '1rem', textAlign: 'center' }}>Details Mobile</h3>
                                 <MockupPhone>
                                     <MockupDetailsMobile />
+                                </MockupPhone>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* SECTION: LIBRARY MOCKUPS */}
+                <section style={{ marginBottom: '4rem' }}>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', borderBottom: '2px solid #000', paddingBottom: '0.5rem' }}>Maquettes Bibliothèque</h2>
+                    <div style={{ display: 'grid', gap: '3rem' }}>
+                        <div>
+                            <h3 style={{ marginBottom: '1rem', fontSize: '1rem' }}>Library View (Desktop)</h3>
+                            <MockupBrowser url="bingeki.app/library">
+                                <MockupLibrary />
+                            </MockupBrowser>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <div>
+                                <h3 style={{ marginBottom: '1rem', fontSize: '1rem', textAlign: 'center' }}>Library Mobile</h3>
+                                <MockupPhone>
+                                    <MockupLibraryMobile />
                                 </MockupPhone>
                             </div>
                         </div>

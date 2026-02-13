@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/Card';
 import { XPBar } from '@/components/gamification/XPBar';
 import { StreakCounter } from '@/components/gamification/StreakCounter';
 import { HunterLicenseCard } from '@/components/profile/HunterLicenseCard';
-import { Target, TrendingUp, BookOpen, Users, Flame, ChevronRight, Play, Plus, Star, Award, Library, Image as ImageIcon, Home, Compass, Book, Search, Menu, SlidersHorizontal, ArrowLeft } from 'lucide-react';
+import { Target, TrendingUp, BookOpen, Users, Flame, ChevronRight, Play, Plus, Star, Award, Library, Image as ImageIcon, Home, Compass, Book, Search, Menu, SlidersHorizontal, ArrowLeft, LayoutGrid, List } from 'lucide-react';
 import styles from '../../pages/Dashboard.module.css';
 
 // --- PLACEHOLDER UTILS ---
@@ -830,6 +830,147 @@ export function MockupDetailsMobile() {
                     </div>
                 </div>
             </div>
+        </MockupContentWrapperMobile>
+    );
+}
+
+
+// --- LIBRARY MOCKUPS ---
+
+export function MockupLibrary() {
+    return (
+        <MockupContentWrapper>
+            <div style={{ padding: '2rem' }}>
+                {/* Stats Panel */}
+                <div style={{ display: 'flex', background: 'var(--color-surface)', border: '2px solid var(--color-border)', marginBottom: '2rem' }}>
+                    <div style={{ flex: 1, padding: '1.5rem', borderRight: '2px solid var(--color-border)', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: 0.6, marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 800 }}>
+                            <BookOpen size={16} /> TOTAL
+                        </div>
+                        <div style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>42</div>
+                    </div>
+                    <div style={{ flex: 1, padding: '1.5rem', borderRight: '2px solid var(--color-border)', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: 0.6, marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 800 }}>
+                            <div style={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid currentColor' }}></div> TERMINÉS
+                        </div>
+                        <div style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>12</div>
+                    </div>
+                    <div style={{ flex: 1, padding: '1.5rem', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: 0.6, marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 800 }}>
+                            <TrendingUp size={16} /> PROGRESSION
+                        </div>
+                        <div style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>65%</div>
+                    </div>
+                    <div style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', borderLeft: '2px solid var(--color-border)' }}>
+                        <Button variant="primary" icon={<Plus size={20} />}>AJOUTER</Button>
+                    </div>
+                </div>
+
+                {/* Folders Bar */}
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                    <button style={{ padding: '0.5rem 1rem', background: 'var(--color-primary)', color: '#fff', fontWeight: 800, border: '2px solid var(--color-primary)' }}>TOUT <span style={{ background: 'rgba(0,0,0,0.2)', padding: '0 4px', fontSize: '0.8em' }}>42</span></button>
+                    <button style={{ padding: '0.5rem 1rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)', fontWeight: 800 }}>FAVORIS</button>
+                    <button style={{ padding: '0.5rem 1rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)', fontWeight: 800 }}>A LIRE</button>
+                </div>
+
+                {/* Controls Bar */}
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)', boxShadow: '4px 4px 0 var(--color-shadow)' }}>
+                        <Search size={20} style={{ opacity: 0.5 }} />
+                        <span style={{ opacity: 0.5, fontWeight: 700 }}>Rechercher...</span>
+                    </div>
+                    <Button variant="outline" icon={<SlidersHorizontal size={18} />}>FILTRES</Button>
+                    <div style={{ display: 'flex', border: '2px solid var(--color-border)', background: 'var(--color-surface)' }}>
+                        <button style={{ padding: '0.5rem', background: 'var(--color-text)', color: '#fff', border: 'none' }}><LayoutGrid size={20} /></button>
+                        <button style={{ padding: '0.5rem', background: 'transparent', border: 'none' }}><List size={20} /></button>
+                    </div>
+                </div>
+
+                {/* Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                        <div key={i} style={{ background: 'var(--color-surface)', border: '2px solid var(--color-border)', boxShadow: '4px 4px 0 var(--color-shadow)' }}>
+                            <div style={{ height: '200px', background: '#ccc', borderBottom: '2px solid var(--color-border)', position: 'relative' }}>
+                                <PlaceholderImage height="100%" text="" />
+                                <span style={{ position: 'absolute', top: 8, left: 8, background: '#000', color: '#fff', padding: '2px 6px', fontSize: '0.7rem', fontWeight: 800 }}>MANGA</span>
+                            </div>
+                            <div style={{ padding: '1rem' }}>
+                                <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 900, fontSize: '1rem', marginBottom: '0.5rem' }}>TITRE DU MANGA {i}</h4>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem', opacity: 0.7 }}>
+                                    <span>EN COURS</span>
+                                    <span>CH. 45/120</span>
+                                </div>
+                                <div style={{ height: '6px', background: '#eee', border: '1px solid #000' }}>
+                                    <div style={{ width: '40%', height: '100%', background: 'var(--color-primary)' }}></div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </MockupContentWrapper>
+    );
+}
+
+export function MockupLibraryMobile() {
+    return (
+        <MockupContentWrapperMobile>
+            <MockupMobileHeader />
+
+            {/* Stats Panel Mobile */}
+            <div style={{ display: 'flex', flexDirection: 'column', background: 'var(--color-surface)', border: '2px solid var(--color-border)', marginBottom: '1.5rem' }}>
+                <div style={{ padding: '1rem', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', fontSize: '0.8rem', fontWeight: 800, opacity: 0.7 }}><BookOpen size={16} /> TOTAL</div>
+                    <div style={{ fontWeight: 900, fontFamily: 'var(--font-heading)', fontSize: '1.2rem' }}>42</div>
+                </div>
+                <div style={{ padding: '1rem', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', fontSize: '0.8rem', fontWeight: 800, opacity: 0.7 }}>TERMINÉS</div>
+                    <div style={{ fontWeight: 900, fontFamily: 'var(--font-heading)', fontSize: '1.2rem' }}>12</div>
+                </div>
+                <div style={{ padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', fontSize: '0.8rem', fontWeight: 800, opacity: 0.7 }}><TrendingUp size={16} /> PROGRESSION</div>
+                    <div style={{ fontWeight: 900, fontFamily: 'var(--font-heading)', fontSize: '1.2rem' }}>65%</div>
+                </div>
+            </div>
+
+            {/* Folders Mobile */}
+            <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '1rem', marginBottom: '0.5rem', scrollbarWidth: 'none' }}>
+                <button style={{ padding: '0.5rem 1rem', background: 'var(--color-primary)', color: '#fff', fontWeight: 800, border: '2px solid var(--color-primary)', flexShrink: 0 }}>TOUT <span style={{ background: 'rgba(0,0,0,0.2)', padding: '0 4px', fontSize: '0.8em' }}>42</span></button>
+                <button style={{ padding: '0.5rem 1rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)', fontWeight: 800, flexShrink: 0 }}>FAVORIS</button>
+                <button style={{ padding: '0.5rem 1rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)', fontWeight: 800, flexShrink: 0 }}>A LIRE</button>
+            </div>
+
+            {/* Controls Mobile */}
+            <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)', marginBottom: '0.5rem' }}>
+                    <Search size={18} style={{ opacity: 0.5 }} />
+                    <span style={{ opacity: 0.5, fontWeight: 700, fontSize: '0.9rem' }}>Rechercher...</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                    <button style={{ padding: '0.5rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)', fontWeight: 800, display: 'flex', justifyContent: 'center', gap: '0.5rem' }}><SlidersHorizontal size={16} /> FILTRES</button>
+                    <button style={{ padding: '0.5rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)', fontWeight: 800, display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>TRIER</button>
+                </div>
+            </div>
+
+            {/* Grid Mobile */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', paddingBottom: '5rem' }}>
+                {[1, 2, 3, 4].map(i => (
+                    <div key={i} style={{ background: 'var(--color-surface)', border: '2px solid var(--color-border)' }}>
+                        <div style={{ height: '150px', background: '#ccc', borderBottom: '2px solid var(--color-border)', position: 'relative' }}>
+                            <PlaceholderImage height="100%" text="" />
+                            <span style={{ position: 'absolute', top: 4, left: 4, background: '#000', color: '#fff', padding: '2px 4px', fontSize: '0.6rem', fontWeight: 800 }}>MANGA</span>
+                        </div>
+                        <div style={{ padding: '0.5rem' }}>
+                            <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 900, fontSize: '0.8rem', marginBottom: '0.25rem' }}>TITRE {i}</h4>
+                            <div style={{ height: '4px', background: '#eee', border: '1px solid #000' }}>
+                                <div style={{ width: '40%', height: '100%', background: 'var(--color-primary)' }}></div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <MockupBottomNav />
         </MockupContentWrapperMobile>
     );
 }
