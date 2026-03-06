@@ -51,6 +51,9 @@ const Contact = lazy(() => import('@/pages/Contact'));
 const About = lazy(() => import('@/pages/About'));
 // MyTickets and TicketDetail are now merged into Feedback.tsx
 
+const NewsIndex = lazy(() => import('@/pages/NewsIndex'));
+const NewsArticle = lazy(() => import('@/pages/NewsArticle'));
+
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { RequireAdmin } from '@/components/admin/RequireAdmin';
 
@@ -356,6 +359,16 @@ function App() {
                 </RequireAdmin>
               } />
               <Route path="donors" element={<Donors />} />
+              <Route path="news" element={
+                <Suspense fallback={<LoadingScreen />}>
+                  <NewsIndex />
+                </Suspense>
+              } />
+              <Route path="news/article/:slug" element={
+                <Suspense fallback={<LoadingScreen />}>
+                  <NewsArticle />
+                </Suspense>
+              } />
 
               <Route path="admin" element={
                 <RequireAdmin>

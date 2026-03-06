@@ -136,6 +136,9 @@ export function Footer() {
                         <Link to="/about" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
                             {t('footer.about')}
                         </Link>
+                        <Link to="/news" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
+                            Anime News
+                        </Link>
                         <Link to="/credits" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
                             {t('footer.credits')}
                         </Link>

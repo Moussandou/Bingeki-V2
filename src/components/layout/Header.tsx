@@ -11,7 +11,8 @@ import {
     Settings,
     MessageSquare,
     Menu, X,
-    MessageCircle, Sun, Moon, Compass
+    MessageCircle, Sun, Moon, Compass,
+    Newspaper
 } from 'lucide-react';
 
 import { GlobalSearch } from '@/components/search/GlobalSearch';
@@ -254,7 +255,10 @@ export function Header() {
                                         <Calendar size={16} /> {t('header.agenda')}
                                     </Link>
                                     <Link to="/changelog" className={styles.dropdownItem} style={{ color: 'var(--color-text)', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
-                                        <HistoryIcon size={16} /> {t('header.news')}
+                                        <HistoryIcon size={16} /> {t('header.changelog')}
+                                    </Link>
+                                    <Link to="/news" className={styles.dropdownItem} style={{ color: 'var(--color-text)', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
+                                        <Newspaper size={16} /> Anime News
                                     </Link>
                                     <Link to="/feedback" className={styles.dropdownItem} style={{ color: 'var(--color-text)', textDecoration: 'none', fontWeight: 'bold', display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.5rem' }}>
                                         <MessageCircle size={16} /> {t('header.feedback')}
@@ -278,9 +282,13 @@ export function Header() {
                                 <Calendar size={18} />
                                 <span className="hidden-tablet">{t('header.agenda')}</span>
                             </Link>
-                            <Link to="/changelog" className={`${styles.navLink} ${isActive('/changelog') ? styles.activeLink : ''} `} title={t('header.news')}>
+                            <Link to="/changelog" className={`${styles.navLink} ${isActive('/changelog') ? styles.activeLink : ''} `} title={t('header.changelog')}>
                                 <HistoryIcon size={18} />
                                 <span className="hidden-tablet">{t('header.changelog')}</span>
+                            </Link>
+                            <Link to="/news" className={`${styles.navLink} ${isActive('/news') ? styles.activeLink : ''} `} title="Anime News">
+                                <Newspaper size={18} />
+                                <span className="hidden-tablet">Anime News</span>
                             </Link>
                         </nav>
                     )}
@@ -506,7 +514,11 @@ export function Header() {
                             </Link>
                             <Link to="/changelog" className={styles.mobileMenuItem} onClick={() => setIsMobileMenuOpen(false)}>
                                 <HistoryIcon size={20} />
-                                <span>{t('header.news')}</span>
+                                <span>{t('header.changelog')}</span>
+                            </Link>
+                            <Link to="/news" className={styles.mobileMenuItem} onClick={() => setIsMobileMenuOpen(false)}>
+                                <Newspaper size={20} />
+                                <span>Anime News</span>
                             </Link>
                             <Link to="/feedback" className={styles.mobileMenuItem} onClick={() => setIsMobileMenuOpen(false)}>
                                 <MessageCircle size={20} />

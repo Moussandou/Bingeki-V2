@@ -1,0 +1,27 @@
+name: Fetch Anime News
+
+on:
+  schedule:
+    # Run twice a day (e.g., at 08:00 and 20:00 UTC)
+    - cron: '0 8,20 * * *'
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  fetch-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Fetch News Script
+        env:
+          FIREBASE_SERVICE_ACCOUNT_BINGEKI: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BINGEKI }}
+        run: npx tsx scripts/fetch-news.ts
