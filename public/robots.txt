@@ -8,6 +8,7 @@ Sitemap: https://bingeki.web.app/sitemap.xml
 # Disallow admin pages for search engines
 Disallow: /admin
 Disallow: /admin/*
+Disallow: /assets
 
 # Allow all other pages
 Allow: /discover

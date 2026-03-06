@@ -69,12 +69,6 @@
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://bingeki.web.app/assets</loc>
-    <lastmod>2026-01-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  <url>
     <loc>https://bingeki.web.app/privacy</loc>
     <lastmod>2026-03-06</lastmod>
     <changefreq>yearly</changefreq>

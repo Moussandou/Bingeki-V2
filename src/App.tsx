@@ -350,7 +350,11 @@ function App() {
                   <Credits />
                 </Suspense>
               } />
-              <Route path="assets" element={<Assets />} />
+              <Route path="assets" element={
+                <RequireAdmin>
+                  <Assets />
+                </RequireAdmin>
+              } />
               <Route path="donors" element={<Donors />} />
 
               <Route path="admin" element={
