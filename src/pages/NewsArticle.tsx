@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Helmet } from 'react-helmet-async';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/firebase/config';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
+import { Layout } from '@/components/layout/Layout';
+import { SEO } from '@/components/layout/SEO';
+import { Link } from '@/components/routing/LocalizedLink';
+import { Button } from '@/components/ui/Button';
+import { ArrowLeft, ExternalLink, Calendar, Link as LinkIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr, enUS } from 'date-fns/locale';
 
@@ -22,7 +26,7 @@ interface NewsItem {
 
 export default function NewsArticle() {
     const { slug } = useParams<{ slug: string }>();
-    const { i18n } = useTranslation();
+    const { i18n, t } = useTranslation();
     const [article, setArticle] = useState<NewsItem | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -47,16 +51,21 @@ export default function NewsArticle() {
             }
         }
         fetchArticle();
+        window.scrollTo(0, 0);
     }, [slug]);
 
     if (loading) return <LoadingScreen />;
 
     if (error || !article) {
         return (
-            <div className="container" style={{ paddingTop: '100px', textAlign: 'center' }}>
-                <h2>Article introuvable</h2>
-                <Link to={`/${i18n.language}/news`}>Retour aux actus</Link>
-            </div>
+            <Layout>
+                <div className="container" style={{ paddingTop: '4rem', textAlign: 'center', minHeight: '60vh' }}>
+                    <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', marginBottom: '2rem' }}>{t('news.not_found', 'Article introuvable')}</h2>
+                    <Link to="/news">
+                        <Button variant="manga" icon={<ArrowLeft size={18} />}>{t('news.back', 'Retour aux actus')}</Button>
+                    </Link>
+                </div>
+            </Layout>
         );
     }
 
@@ -67,88 +76,213 @@ export default function NewsArticle() {
     } catch (e) { }
 
     return (
-        <>
-            <Helmet>
-                <title>{article.title} - Bingeki News</title>
-                <meta name="description" content={article.contentSnippet ? article.contentSnippet.substring(0, 150) + '...' : article.title} />
-                {article.imageUrl && <meta property="og:image" content={article.imageUrl} />}
-                {/* Canonical link to original source is REQUIRED for SEO since we aggregate */}
+        <Layout>
+            <SEO
+                title={`${article.title} - Bingeki News`}
+                description={article.contentSnippet ? article.contentSnippet.substring(0, 150) + '...' : article.title}
+                image={article.imageUrl}
+            />
+            {/* Inject canonical link manually since SEO component might not support it directly */}
+            <head>
                 <link rel="canonical" href={article.sourceUrl} />
-            </Helmet>
+            </head>
 
-            <div className="container" style={{ paddingTop: '100px', maxWidth: '800px', paddingBottom: '4rem' }}>
+            <div className="container" style={{ paddingTop: '2rem', maxWidth: '900px', paddingBottom: '6rem' }}>
 
-                <Link to={`/${i18n.language}/news`} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600, marginBottom: '2rem' }}>
-                    &larr; Retour
+                <Link to="/news">
+                    <Button variant="ghost" icon={<ArrowLeft size={20} />} style={{ marginBottom: '2rem', padding: '0.5rem 0' }}>
+                        {t('news.back', 'Retour')}
+                    </Button>
                 </Link>
 
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '1rem', flexWrap: 'wrap' }}>
-                    {article.tags?.map(tag => (
-                        <span key={tag} style={{
-                            background: 'var(--color-surface)',
-                            border: '1px solid var(--color-border)',
-                            padding: '4px 12px',
-                            borderRadius: '16px',
-                            fontSize: '0.8rem',
-                            fontWeight: 600,
+                <article style={{
+                    background: 'var(--color-surface)',
+                    border: '3px solid var(--color-border-heavy)',
+                    boxShadow: '12px 12px 0 var(--color-shadow-solid)',
+                    overflow: 'hidden',
+                    position: 'relative'
+                }}>
+                    {/* Header Image */}
+                    {article.imageUrl && (
+                        <div style={{ width: '100%', height: '400px', borderBottom: '3px solid var(--color-border-heavy)', position: 'relative' }}>
+                            <img
+                                src={article.imageUrl}
+                                alt={article.title}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '50%', background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }} />
+
+                            <div style={{ position: 'absolute', bottom: '1rem', left: '1.5rem', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                {article.tags?.map(tag => (
+                                    <span key={tag} style={{
+                                        background: 'var(--color-primary)',
+                                        color: '#fff',
+                                        padding: '4px 12px',
+                                        fontSize: '0.8rem',
+                                        fontWeight: 900,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.5px',
+                                        boxShadow: '2px 2px 0 #000'
+                                    }}>
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <div style={{ padding: '2.5rem' }}>
+                        {!article.imageUrl && article.tags && article.tags.length > 0 && (
+                            <div style={{ display: 'flex', gap: '8px', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                                {article.tags.map(tag => (
+                                    <span key={tag} style={{
+                                        background: 'var(--color-primary)',
+                                        color: '#fff',
+                                        padding: '4px 12px',
+                                        fontSize: '0.8rem',
+                                        fontWeight: 900,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.5px'
+                                    }}>
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+
+                        <h1 style={{
+                            fontSize: '2.5rem',
+                            fontWeight: 900,
+                            fontFamily: 'var(--font-heading)',
+                            lineHeight: 1.2,
+                            marginBottom: '1.5rem',
+                            color: 'var(--color-text)'
+                        }}>
+                            {article.title}
+                        </h1>
+
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '16px',
+                            color: 'var(--color-text-dim)',
+                            fontWeight: 700,
+                            fontSize: '0.9rem',
+                            marginBottom: '2.5rem',
+                            paddingBottom: '1.5rem',
+                            borderBottom: '2px dashed var(--color-border)',
                             textTransform: 'uppercase'
                         }}>
-                            {tag}
-                        </span>
-                    ))}
-                </div>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-primary)' }}>
+                                <LinkIcon size={16} /> {article.sourceName}
+                            </span>
+                            <span>•</span>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Calendar size={16} /> {formattedDate}
+                            </span>
+                        </div>
 
-                <h1 style={{
-                    fontSize: '2.5rem',
-                    fontWeight: 900,
-                    lineHeight: 1.2,
-                    marginBottom: '1.5rem',
-                    color: 'var(--color-text)'
-                }}>
-                    {article.title}
-                </h1>
+                        {/* Article Content */}
+                        <div
+                            className="article-content"
+                            style={{
+                                lineHeight: 1.8,
+                                fontSize: '1.1rem',
+                                color: 'var(--color-text)',
+                            }}
+                            dangerouslySetInnerHTML={{ __html: article.content }}
+                        />
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '1px solid var(--color-border)' }}>
-                    <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>Source: {article.sourceName}</span>
-                    <span>•</span>
-                    <span>{formattedDate}</span>
-                </div>
-
-                {article.imageUrl && (
-                    <div style={{ width: '100%', borderRadius: '12px', overflow: 'hidden', marginBottom: '2rem', backgroundColor: 'var(--color-surface)' }}>
-                        <img src={article.imageUrl} alt={article.title} style={{ width: '100%', height: 'auto', display: 'block' }} />
+                        {/* CTA Source */}
+                        <div style={{
+                            marginTop: '4rem',
+                            padding: '2.5rem',
+                            background: 'var(--color-surface-hover)',
+                            border: '3px solid var(--color-border-heavy)',
+                            textAlign: 'center',
+                            position: 'relative'
+                        }}>
+                            <div style={{ position: 'absolute', top: '-15px', left: '50%', transform: 'translateX(-50%)', background: 'var(--color-primary)', color: '#fff', padding: '4px 16px', fontWeight: 900, textTransform: 'uppercase' }}>
+                                {t('news.source_badge', 'Source Officielle')}
+                            </div>
+                            <h3 style={{ marginBottom: '1rem', fontSize: '1.5rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>
+                                {t('news.read_full', 'Lire l\'information complète')}
+                            </h3>
+                            <p style={{ marginBottom: '2rem', color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>
+                                {t('news.disclaimer', 'Cet extrait est proposé par Bingeki. Pour la version intégrale, consultez')} <strong>{article.sourceName}</strong>.
+                            </p>
+                            <a
+                                href={article.sourceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    padding: '16px 32px',
+                                    background: 'var(--color-text)',
+                                    color: 'var(--color-surface)',
+                                    fontWeight: 900,
+                                    fontFamily: 'var(--font-heading)',
+                                    textTransform: 'uppercase',
+                                    fontSize: '1.1rem',
+                                    textDecoration: 'none',
+                                    boxShadow: '6px 6px 0 var(--color-primary)',
+                                    transition: 'transform 0.1s, box-shadow 0.1s'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translate(2px, 2px)';
+                                    e.currentTarget.style.boxShadow = '4px 4px 0 var(--color-primary)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translate(0, 0)';
+                                    e.currentTarget.style.boxShadow = '6px 6px 0 var(--color-primary)';
+                                }}
+                            >
+                                {t('news.go_to_source', 'Voir l\'article original')} <ExternalLink size={20} />
+                            </a>
+                        </div>
                     </div>
-                )}
-
-                {/* Since data is sanitized during scraping, we use dangerouslySetInnerHTML safely */}
-                <div
-                    style={{ lineHeight: 1.8, fontSize: '1.1rem', color: 'var(--color-text)' }}
-                    dangerouslySetInnerHTML={{ __html: article.content }}
-                />
-
-                <div style={{ marginTop: '3rem', padding: '2rem', background: 'var(--color-surface-hover)', borderRadius: '12px', textAlign: 'center', border: '1px dashed var(--color-primary)' }}>
-                    <h3 style={{ marginBottom: '1rem', fontSize: '1.2rem', fontWeight: 800 }}>Lire l'information complète originelle</h3>
-                    <p style={{ marginBottom: '1.5rem', color: 'var(--color-text-muted)' }}>Cet article est un extrait informatif public relayant l'information issue de <strong>{article.sourceName}</strong>.</p>
-                    <a
-                        href={article.sourceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                            display: 'inline-block',
-                            padding: '12px 24px',
-                            background: 'var(--color-primary)',
-                            color: '#fff',
-                            borderRadius: '8px',
-                            fontWeight: 800,
-                            textDecoration: 'none',
-                            boxShadow: '0 4px 14px rgba(255, 94, 91, 0.4)'
-                        }}
-                    >
-                        Voir l'article source &rarr;
-                    </a>
-                </div>
-
+                </article>
             </div>
-        </>
+
+            {/* Inject Global Styles for Article inside this component just to ensure images scale properly */}
+            <style>
+                {`
+                .article-content img {
+                    max-width: 100%;
+                    height: auto;
+                    border-radius: 4px;
+                    border: 2px solid var(--color-border);
+                    margin: 1.5rem 0;
+                }
+                .article-content a {
+                    color: var(--color-primary);
+                    font-weight: 700;
+                    text-decoration: underline;
+                    text-underline-offset: 4px;
+                }
+                .article-content h2, .article-content h3 {
+                    font-family: var(--font-heading);
+                    font-weight: 900;
+                    margin-top: 2.5rem;
+                    margin-bottom: 1rem;
+                }
+                .article-content ul, .article-content ol {
+                    margin-left: 1.5rem;
+                    margin-bottom: 1.5rem;
+                }
+                .article-content blockquote {
+                    border-left: 4px solid var(--color-primary);
+                    padding-left: 1rem;
+                    margin: 1.5rem 0;
+                    font-style: italic;
+                    color: var(--color-text-muted);
+                    background: var(--color-surface-hover);
+                    padding: 1rem;
+                }
+                `}
+            </style>
+        </Layout>
     );
 }

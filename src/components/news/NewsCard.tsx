@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { fr, enUS } from 'date-fns/locale';
+import { Link } from '@/components/routing/LocalizedLink';
+import { Flame } from 'lucide-react';
 
 interface NewsCardProps {
     title: string;
@@ -10,9 +11,10 @@ interface NewsCardProps {
     sourceName?: string;
     publishedAt: string;
     tags?: string[];
+    featured?: boolean;
 }
 
-export function NewsCard({ title, slug, imageUrl, sourceName, publishedAt, tags = [] }: NewsCardProps) {
+export function NewsCard({ title, slug, imageUrl, sourceName, publishedAt, tags = [], featured = false }: NewsCardProps) {
     const { i18n } = useTranslation();
     const dateLocale = i18n.language === 'fr' ? fr : enUS;
 
@@ -24,33 +26,46 @@ export function NewsCard({ title, slug, imageUrl, sourceName, publishedAt, tags 
     }
 
     const primaryTag = tags.length > 0 ? tags[0] : 'News';
-    const langPrefix = i18n.language === 'fr' ? '/fr' : '/en';
 
     return (
-        <Link to={`${langPrefix}/news/article/${slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link to={`/news/article/${slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
             <div
                 style={{
                     display: 'flex',
-                    flexDirection: 'column',
+                    flexDirection: featured ? 'row' : 'column',
                     background: 'var(--color-surface)',
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    border: '1px solid var(--color-border)',
+                    border: '3px solid var(--color-border-heavy)',
+                    boxShadow: '8px 8px 0 var(--color-shadow-solid)',
                     transition: 'transform 0.2s, box-shadow 0.2s',
                     height: '100%',
+                    position: 'relative',
                     cursor: 'pointer'
                 }}
                 onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-4px)';
-                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)';
+                    e.currentTarget.style.transform = 'translate(-4px, -4px)';
+                    e.currentTarget.style.boxShadow = '12px 12px 0 var(--color-primary)';
+                    const titleEl = e.currentTarget.querySelector('.news-title') as HTMLElement;
+                    if (titleEl) titleEl.style.color = 'var(--color-primary)';
                 }}
                 onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.transform = 'translate(0, 0)';
+                    e.currentTarget.style.boxShadow = '8px 8px 0 var(--color-shadow-solid)';
+                    const titleEl = e.currentTarget.querySelector('.news-title') as HTMLElement;
+                    if (titleEl) titleEl.style.color = 'var(--color-text)';
                 }}
             >
                 {/* Thumbnail */}
-                <div style={{ width: '100%', aspectRatio: '16/9', backgroundColor: 'var(--color-surface-hover)', position: 'relative', overflow: 'hidden' }}>
+                <div style={{
+                    position: 'relative',
+                    flexShrink: 0,
+                    width: featured ? '50%' : '100%',
+                    height: featured ? '100%' : 'auto',
+                    borderRight: featured ? '3px solid var(--color-border-heavy)' : 'none',
+                    borderBottom: !featured ? '3px solid var(--color-border-heavy)' : 'none',
+                    backgroundColor: 'var(--color-border)',
+                    overflow: 'hidden',
+                    aspectRatio: featured ? 'auto' : '16/9'
+                }}>
                     {imageUrl ? (
                         <img
                             src={imageUrl}
@@ -59,48 +74,57 @@ export function NewsCard({ title, slug, imageUrl, sourceName, publishedAt, tags 
                             loading="lazy"
                         />
                     ) : (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-muted)' }}>
-                            News
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-dim)', fontFamily: 'var(--font-heading)', background: 'repeating-linear-gradient(45deg, var(--color-surface-hover), var(--color-surface-hover) 10px, var(--color-border) 10px, var(--color-border) 20px)' }}>
+                            <Flame size={48} opacity={0.3} />
                         </div>
                     )}
                     {/* Tag Badge */}
                     <div style={{
                         position: 'absolute',
-                        top: '8px',
-                        right: '8px',
+                        top: '12px',
+                        right: '12px',
                         background: 'var(--color-primary)',
                         color: '#fff',
-                        padding: '4px 8px',
-                        borderRadius: '16px',
+                        padding: '4px 10px',
                         fontSize: '0.75rem',
-                        fontWeight: 700,
+                        fontWeight: 900,
                         textTransform: 'uppercase',
-                        letterSpacing: '0.5px'
+                        letterSpacing: '0.5px',
+                        boxShadow: '2px 2px 0 #000'
                     }}>
                         {primaryTag}
                     </div>
                 </div>
 
                 {/* Content */}
-                <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                    <h3 style={{
-                        fontSize: '1.1rem',
-                        fontWeight: 700,
-                        marginBottom: '12px',
+                <div style={{ padding: featured ? '2rem' : '1.25rem', display: 'flex', flexDirection: 'column', flex: 1, background: 'var(--color-surface)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--color-text-dim)', marginBottom: '12px' }}>
+                        <span style={{ color: 'var(--color-text)' }}>{sourceName || 'Anime News'}</span>
+                        <span>•</span>
+                        <span>{timeAgo}</span>
+                    </div>
+
+                    <h3 className="news-title" style={{
+                        fontSize: featured ? '2rem' : '1.2rem',
+                        fontWeight: 900,
+                        fontFamily: 'var(--font-heading)',
+                        marginBottom: 'auto',
                         color: 'var(--color-text)',
                         display: '-webkit-box',
-                        WebkitLineClamp: 3,
+                        WebkitLineClamp: featured ? 4 : 3,
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
-                        lineHeight: 1.4
+                        lineHeight: 1.3,
+                        transition: 'color 0.2s'
                     }}>
                         {title}
                     </h3>
 
-                    <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-                        <span style={{ fontWeight: 600 }}>{sourceName || 'Anime News'}</span>
-                        <span>{timeAgo}</span>
-                    </div>
+                    {featured && (
+                        <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 900, color: 'var(--color-primary)', textTransform: 'uppercase', fontSize: '0.9rem' }}>
+                            Lire l'article &rarr;
+                        </div>
+                    )}
                 </div>
             </div>
         </Link>
