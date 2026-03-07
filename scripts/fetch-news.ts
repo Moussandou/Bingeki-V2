@@ -79,15 +79,20 @@ async function processItem(item: any, feedConfig: any, forceUpdate: boolean) {
         const html = await response.text();
 
         // 1. Better Image Scraping (og:image or twitter:image)
+        const genericLogos = ['crunchyroll-logo', 'mal-logo', 'ann-logo', 'logo-full', 'default-meta'];
         const ogMatch = html.match(/<meta[^>]+property="og:image"[^>]+content="([^">]+)"/) ||
             html.match(/<meta[^>]+name="twitter:image"[^>]+content="([^">]+)"/);
+
         if (ogMatch) {
-            imageUrl = ogMatch[1];
+            const foundUrl = ogMatch[1];
+            const isGeneric = genericLogos.some(logo => foundUrl.toLowerCase().includes(logo));
+            if (!isGeneric) {
+                imageUrl = foundUrl;
+            }
         }
 
         // 2. Full Content Scraping for ANN (or broad content sites)
-        if (feedConfig.selector && html.includes('id="maincontent"') || html.includes('class="meat"')) {
-            // Find the most appropriate container
+        if (feedConfig.selector && (html.includes('id="maincontent"') || html.includes('class="meat"'))) {
             const bodyMatch = html.match(/<div[^>]+class="meat"[^>]*>([\s\S]*?)<\/div>/) ||
                 html.match(/<div[^>]+id="maincontent"[^>]*>([\s\S]*?)<\/div>/);
 
@@ -103,13 +108,17 @@ async function processItem(item: any, feedConfig: any, forceUpdate: boolean) {
             }
         }
 
-        // 3. Fallback Image from RSS
+        // 3. Fallback Image from body if metadata was generic or missing
         if (!imageUrl) {
-            if (item['media:content'] && item['media:content'].$) imageUrl = item['media:content'].$.url;
-            else if (item['media:thumbnail'] && item['media:thumbnail'].$) imageUrl = item['media:thumbnail'].$.url;
-            else {
-                const imgMatch = fullContent.match(/<img[^>]+src="([^">]+)"/);
-                if (imgMatch) imageUrl = imgMatch[1];
+            // Look for the first large-looking image in the content
+            const imgMatch = fullContent.match(/<img[^>]+src="([^">]+)"/);
+            if (imgMatch) {
+                imageUrl = imgMatch[1];
+            } else {
+                // Last resort: use the generic one if nothing else exists
+                if (ogMatch) imageUrl = ogMatch[1];
+                else if (item['media:content'] && item['media:content'].$) imageUrl = item['media:content'].$.url;
+                else if (item['media:thumbnail'] && item['media:thumbnail'].$) imageUrl = item['media:thumbnail'].$.url;
             }
         }
 
@@ -119,14 +128,25 @@ async function processItem(item: any, feedConfig: any, forceUpdate: boolean) {
 
     function formatContent(html: string): string {
         let clean = html.replace(/\r\n/g, '\n');
-        if (clean.includes('<p>') || clean.includes('<div>')) return clean;
 
-        return clean
-            .split(/\n\n+/)
+        // If it's already structured with MANY paragraphs, return it
+        const pCount = (clean.match(/<p>/g) || []).length;
+        if (pCount > 3) return clean;
+
+        // Otherwise, it might be a block of text or poorly structured
+        // Strip existing basic tags that might interfere with block splitting
+        const textOnly = clean.replace(/<div[^>]*>/gi, '\n').replace(/<\/div>/gi, '\n').replace(/<br\s*\/?>/gi, '\n');
+
+        return textOnly
+            .split(/\n+/)
             .map(para => {
-                const trimmed = para.trim();
-                if (!trimmed) return '';
-                if (trimmed.length < 100 && !trimmed.endsWith('.') && !trimmed.match(/^[a-z]/)) {
+                const trimmed = para.trim()
+                    .replace(/^<[^>]+>/, '') // Strip leading tags
+                    .replace(/<[^>]+>$/, ''); // Strip trailing tags
+                if (!trimmed || trimmed.length < 5) return '';
+
+                // If it looks like a heading (short, no period, starts with caps)
+                if (trimmed.length < 100 && !trimmed.endsWith('.') && trimmed.match(/^[A-Z]/)) {
                     return `<h2>${trimmed}</h2>`;
                 }
                 return `<p>${trimmed}</p>`;
@@ -167,10 +187,37 @@ async function processItem(item: any, feedConfig: any, forceUpdate: boolean) {
     console.log(` + ${docSnap.exists ? 'Refreshed' : 'Saved'}: ${item.title}`);
 }
 
+async function cleanupOldSources() {
+    console.log('Starting cleanup of legacy sources...');
+    const currentSources = FEEDS.map(f => f.name);
+    const snapshot = await db.collection('news').get();
+
+    let deletedCount = 0;
+    const batch = db.batch();
+
+    snapshot.forEach(doc => {
+        const data = doc.data();
+        if (!currentSources.includes(data.sourceName)) {
+            batch.delete(doc.ref);
+            deletedCount++;
+        }
+    });
+
+    if (deletedCount > 0) {
+        await batch.commit();
+        console.log(`Successfully deleted ${deletedCount} legacy articles.`);
+    } else {
+        console.log('No legacy articles to clean up.');
+    }
+}
+
 async function fetchAndSaveNews() {
     // FORCE_UPDATE is now true by default to ensure quality refresh, but can be overridden
     const forceUpdate = process.env.FORCE_UPDATE_NEWS !== 'false';
     console.log(`Starting optimized news fetch (Force Update: ${forceUpdate})`);
+
+    // Clean up old sources first
+    await cleanupOldSources();
 
     for (const feedConfig of FEEDS) {
         console.log(`Processing feed: ${feedConfig.name}`);

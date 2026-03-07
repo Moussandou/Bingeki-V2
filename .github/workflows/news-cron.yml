@@ -2,8 +2,8 @@ name: Fetch Anime News
 
 on:
   schedule:
-    # Run twice a day (e.g., at 08:00 and 20:00 UTC)
-    - cron: '0 8,20 * * *'
+    # Run twice a day (e.g., at 08:00 and 20:00  schedule:
+    - cron: '0 */4 * * *'
   workflow_dispatch: # Allows manual trigger
 
 jobs:

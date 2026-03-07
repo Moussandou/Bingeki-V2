@@ -86,7 +86,7 @@ export default function NewsArticle() {
 
     useEffect(() => {
         const handleScroll = () => {
-            setShowBackToTop(window.scrollY > 400);
+            setShowBackToTop(window.scrollY > 200);
         };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
@@ -369,7 +369,7 @@ export default function NewsArticle() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    zIndex: 9999,
+                    zIndex: 100000,
                     opacity: showBackToTop ? 1 : 0,
                     transform: showBackToTop ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.5)',
                     pointerEvents: showBackToTop ? 'all' : 'none',
@@ -382,7 +382,7 @@ export default function NewsArticle() {
                 }}
                 onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translate(0, 0)';
-                    e.currentTarget.style.boxShadow = '4px 4px 0 #000';
+                    e.currentTarget.style.boxShadow = '6px 6px 0 #000';
                 }}
             >
                 <ArrowUp size={30} strokeWidth={3} />
