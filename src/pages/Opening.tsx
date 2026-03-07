@@ -682,7 +682,7 @@ export default function Opening() {
                                 <InstallPWA variant="landing" />
                                 <div className={styles.qrContainer}>
                                     <img 
-                                        src={"https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://bingeki.app/?install=1&color=000000&bgcolor=ffffff"}
+                                        src={"https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://bingeki.web.app/?install=1&color=000000&bgcolor=ffffff"}
                                         alt="QR Code" 
                                         width="100" 
                                         height="100" 
