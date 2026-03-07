@@ -359,21 +359,21 @@ export default function NewsArticle() {
                     position: 'fixed',
                     bottom: '2rem',
                     right: '2rem',
-                    width: '60px',
-                    height: '60px',
+                    width: '64px',
+                    height: '64px',
                     background: 'var(--color-primary)',
                     color: '#fff',
-                    border: '3px solid #000',
-                    boxShadow: '4px 4px 0 #000',
+                    border: '4px solid #000',
+                    boxShadow: '6px 6px 0 #000',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    zIndex: 100,
+                    zIndex: 9999,
                     opacity: showBackToTop ? 1 : 0,
-                    transform: showBackToTop ? 'translateY(0)' : 'translateY(20px)',
+                    transform: showBackToTop ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.5)',
                     pointerEvents: showBackToTop ? 'all' : 'none',
-                    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                 }}
                 className="back-to-top"
                 onMouseEnter={(e) => {

@@ -36,6 +36,18 @@ const FEEDS = [
     {
         name: "Crunchyroll News",
         url: "https://cr-news-api-service.prd.crunchyrollsvc.com/v1/en-US/rss",
+    },
+    {
+        name: "MyAnimeList News",
+        url: "https://myanimelist.net/rss/news.xml",
+    },
+    {
+        name: "ComicBook Anime",
+        url: "https://comicbook.com/anime/rss",
+    },
+    {
+        name: "SoraNews24",
+        url: "https://soranews24.com/feed/",
     }
 ];
 
@@ -47,7 +59,8 @@ function generateSlug(title: string): string {
 }
 
 async function fetchAndSaveNews() {
-    console.log(`Starting news fetch at ${new Date().toISOString()}`);
+    const forceUpdate = process.env.FORCE_UPDATE_NEWS === 'true';
+    console.log(`Starting news fetch at ${new Date().toISOString()} (Force Update: ${forceUpdate})`);
 
     for (const feedConfig of FEEDS) {
         console.log(`Fetching feed: ${feedConfig.name}`);
@@ -63,80 +76,92 @@ async function fetchAndSaveNews() {
                 // Check if article already exists
                 const docRef = db.collection('news').doc(slug);
                 const docSnap = await docRef.get();
-                if (docSnap.exists) {
+
+                if (docSnap.exists && !forceUpdate) {
                     console.log(` - Skipped: ${item.title} (already exists)`);
                     continue;
                 }
 
-                // Try extracting an image
                 let imageUrl = null;
-                if (item['media:content'] && item['media:content'].$) {
-                    imageUrl = item['media:content'].$.url;
-                } else if (item['media:thumbnail'] && item['media:thumbnail'].$) {
-                    imageUrl = item['media:thumbnail'].$.url;
-                } else if (item['content:encoded']) {
-                    // Basic regex to find first image tag in encoded content
-                    const imgMatch = item['content:encoded'].match(/<img[^>]+src="([^">]+)"/);
-                    if (imgMatch) imageUrl = imgMatch[1];
-                } else if (item.content) {
-                    const imgMatch = item.content.match(/<img[^>]+src="([^">]+)"/);
-                    if (imgMatch) imageUrl = imgMatch[1];
-                }
+                let fullContent = item['content:encoded'] || item.content || item.contentSnippet || '';
 
-                // fallback: if no image found (common for ANN), try to fetch og:image from the source URL
-                if (!imageUrl && item.link) {
-                    try {
-                        console.log(`   - Scraping og:image for: ${item.link}`);
-                        const response = await fetch(item.link);
-                        const html = await response.text();
-                        const ogImageMatch = html.match(/<meta[^>]+property="og:image"[^>]+content="([^">]+)"/);
-                        if (ogImageMatch) {
-                            imageUrl = ogImageMatch[1];
-                            console.log(`     + Found og:image: ${imageUrl}`);
+                // Content & Image Extraction via Scraping
+                try {
+                    console.log(`   - Scraping page: ${item.link}`);
+                    const response = await fetch(item.link, {
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
                         }
-                    } catch (scrapeError) {
-                        console.error(`     ! Error scraping image for ${item.link}:`, scrapeError);
+                    });
+                    const html = await response.text();
+
+                    // 1. Better Image Scraping (og:image or twitter:image)
+                    const ogMatch = html.match(/<meta[^>]+property="og:image"[^>]+content="([^">]+)"/) ||
+                        html.match(/<meta[^>]+name="twitter:image"[^>]+content="([^">]+)"/);
+                    if (ogMatch) {
+                        imageUrl = ogMatch[1];
+                        console.log(`     + Found image: ${imageUrl}`);
                     }
+
+                    // 2. Full Content Scraping for ANN (RSS is too short)
+                    if (feedConfig.name === "Anime News Network" && html.includes('id="bodytext"')) {
+                        // Extract content inside <div id="bodytext">...</div>
+                        const bodyMatch = html.match(/<div[^>]+id="bodytext"[^>]*>([\s\S]*?)<\/div>/);
+                        if (bodyMatch) {
+                            // Basic cleanup of extracted HTML to remove script tags or ads if any
+                            let scrapedBody = bodyMatch[1].replace(/<script[\s\S]*?<\/script>/gi, '');
+                            // If we got significant content, use it
+                            if (scrapedBody.length > fullContent.length) {
+                                fullContent = scrapedBody;
+                                console.log(`     + Scraped full body content (${scrapedBody.length} chars)`);
+                            }
+                        }
+                    }
+
+                    // 3. Fallback Image from RSS if scraping failed
+                    if (!imageUrl) {
+                        if (item['media:content'] && item['media:content'].$) imageUrl = item['media:content'].$.url;
+                        else if (item['media:thumbnail'] && item['media:thumbnail'].$) imageUrl = item['media:thumbnail'].$.url;
+                    }
+
+                } catch (scrapeError) {
+                    console.error(`     ! Error scraping ${item.link}:`, scrapeError);
                 }
 
-                // Clean HTML content
-                let rawContent = item['content:encoded'] || item.content || item.contentSnippet || '';
-
-                // Helper to format content if it's mostly plain text or poorly structured
+                // Helper to format content if it lacks structure
                 function formatContent(html: string): string {
-                    // if it's already got decent HTML structure (multiple p or h tags), don't mess too much
-                    if ((html.match(/<p>/g) || []).length > 1 || (html.match(/<h[1-6]>/g) || []).length > 0) {
-                        return html;
+                    // Normalize line endings
+                    let clean = html.replace(/\r\n/g, '\n');
+
+                    // If it's already HTML structured, just clean up extra newlines
+                    if (clean.includes('<p>') || clean.includes('<div>')) {
+                        return clean;
                     }
 
-                    // Convert double newlines to paragraphs
-                    let formatted = html
-                        .replace(/\r\n/g, '\n')
+                    // For plain text, convert double newlines to paragraphs
+                    return clean
                         .split(/\n\n+/)
                         .map(para => {
                             const trimmed = para.trim();
                             if (!trimmed) return '';
-
-                            // Try to detect if this paragraph is actually a heading
-                            // Condition: short (less than 80 chars), no period at end, not starting with common lowercase words
-                            if (trimmed.length < 80 && !trimmed.endsWith('.') && !trimmed.match(/^[a-z]/)) {
+                            if (trimmed.length < 100 && !trimmed.endsWith('.') && !trimmed.match(/^[a-z]/)) {
                                 return `<h2>${trimmed}</h2>`;
                             }
                             return `<p>${trimmed}</p>`;
                         })
                         .filter(p => p !== '')
                         .join('\n');
-
-                    return formatted;
                 }
 
-                const structuredContent = formatContent(rawContent);
+                const structuredContent = formatContent(fullContent);
 
                 const cleanContent = sanitizeHtml(structuredContent, {
-                    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'h2', 'h3', 'blockquote']),
+                    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'h2', 'h3', 'blockquote', 'div', 'span']),
                     allowedAttributes: {
                         ...sanitizeHtml.defaults.allowedAttributes,
-                        img: ['src', 'alt', 'width', 'height']
+                        img: ['src', 'alt', 'width', 'height'],
+                        div: ['class', 'id'],
+                        span: ['class']
                     }
                 });
 
@@ -155,11 +180,12 @@ async function fetchAndSaveNews() {
                     publishedAt: item.isoDate || item.pubDate || new Date().toISOString(),
                     tags: tags,
                     imageUrl: imageUrl,
-                    createdAt: new Date().toISOString()
+                    createdAt: docSnap.exists ? (docSnap.data()?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
                 };
 
                 await docRef.set(articleData);
-                console.log(` + Saved: ${item.title}`);
+                console.log(` + ${docSnap.exists ? 'Updated' : 'Saved'}: ${item.title}`);
             }
         } catch (error) {
             console.error(`Error fetching feed ${feedConfig.name}:`, error);
