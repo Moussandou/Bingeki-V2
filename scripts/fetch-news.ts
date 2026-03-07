@@ -1,6 +1,5 @@
 import Parser from 'rss-parser';
-import { initializeApp, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import admin from 'firebase-admin';
 import sanitizeHtml from 'sanitize-html';
 import * as dotenv from 'dotenv';
 
@@ -17,11 +16,11 @@ if (!serviceAccountKeyStr) {
 
 const serviceAccount = JSON.parse(serviceAccountKeyStr);
 
-initializeApp({
-    credential: cert(serviceAccount)
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
 });
 
-const db = getFirestore();
+const db = admin.firestore();
 const parser = new Parser({
     customFields: {
         item: ['media:content', 'media:thumbnail', 'content:encoded', 'category'],
