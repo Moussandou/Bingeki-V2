@@ -140,7 +140,8 @@ const resources = {
                         description_1: "Emportez votre collection partout. Une expérience fluide, rapide et conçue pour le mobile.",
                         feature_1: "Installable (PWA)",
                         feature_2: "Mode Hors-ligne",
-                        feature_3: "Notifications Push (Bientôt)"
+                        feature_3: "Notifications Push (Bientôt)",
+                        scan_qr: "Scannez pour installer"
                     },
                     final_cta: {
                         title: "REJOIGNEZ L'ÉLITE",
@@ -1879,7 +1880,8 @@ const resources = {
                         description_1: "Take your collection everywhere. A smooth, fast experience designed for mobile.",
                         feature_1: "Installable (PWA)",
                         feature_2: "Offline Mode",
-                        feature_3: "Push Notifications (Soon)"
+                        feature_3: "Push Notifications (Soon)",
+                        scan_qr: "Scan to install"
                     },
                     progression: {
                         title: "PROGRESSION",

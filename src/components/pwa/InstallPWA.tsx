@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -27,6 +27,21 @@ export function InstallPWA({ variant = 'icon', className, style }: InstallPWAPro
     // Actually, per user request, footer/landing are persistent.
 
     const isInstallable = !!deferredPrompt;
+
+    // Auto-install logic from QR code
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('install') === '1') {
+            // Delay slightly to ensure store is ready and UI has settled
+            const timer = setTimeout(() => {
+                handleInstallClick();
+                // Clean up URL parameter to prevent re-triggering
+                const newUrl = window.location.pathname + window.location.hash;
+                window.history.replaceState({}, '', newUrl);
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [deferredPrompt]); // Re-run if prompt becomes available
 
     // Visibility check
     if (!isInstallable && variant !== 'footer' && variant !== 'landing') return null;

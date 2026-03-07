@@ -678,7 +678,20 @@ export default function Opening() {
                                     <span>{t('landing.features.mobile.feature_3') || "Notifications Push (Bientôt)"}</span>
                                 </li>
                             </ul>
-                            <InstallPWA variant="landing" />
+                            <div className={styles.appPromoActions}>
+                                <InstallPWA variant="landing" />
+                                <div className={styles.qrContainer}>
+                                    <img 
+                                        src={"https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://bingeki.app/?install=1&color=000000&bgcolor=ffffff"}
+                                        alt="QR Code" 
+                                        width="100" 
+                                        height="100" 
+                                    />
+                                    <span style={{ fontSize: '0.8rem', fontWeight: 800, marginTop: '0.5rem', textAlign: 'center' }}>
+                                        {t('landing.features.mobile.scan_qr') || "Scannez pour installer"}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
