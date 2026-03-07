@@ -1,7 +1,7 @@
 {
   "name": "bingeki-v2",
   "private": true,
-  "version": "3.6.0",
+  "version": "3.6.1",
   "type": "module",
   "scripts": {
     "generate-sw": "npx tsx scripts/generate-sw.ts",
@@ -54,7 +54,7 @@
   },
   "overrides": {
     "tmp": "^0.2.4",
-    "google-gax": "^5.0.6",
+    "google-gax": "^4.13.0",
     "serialize-javascript": "^7.0.4"
   },
   "devDependencies": {

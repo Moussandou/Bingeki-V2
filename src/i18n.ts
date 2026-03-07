@@ -766,7 +766,7 @@ const resources = {
                 },
                 about: {
                     title: "À PROPOS",
-                    version: "Version 3.6.0",
+                    version: "Version 3.6.1",
                     made_with: "Développé avec ❤️ pour les fans d'anime et de manga.",
                     credits: "Données fournies par l'API Jikan (MyAnimeList). Les images et titres appartiennent à leurs créateurs respectifs."
                 },
@@ -1706,7 +1706,7 @@ const resources = {
                 },
                 about: {
                     title: "ABOUT",
-                    version: "Version 3.6.0",
+                    version: "Version 3.6.1",
                     made_with: "Developed with ❤️ for anime and manga fans.",
                     credits: "Data provided by Jikan API (MyAnimeList). Images and titles belong to their respective creators."
                 },
