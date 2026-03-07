@@ -766,7 +766,7 @@ const resources = {
                 },
                 about: {
                     title: "À PROPOS",
-                    version: "Version 1.0.0 (Alpha)",
+                    version: "Version 3.6.0",
                     made_with: "Développé avec ❤️ pour les fans d'anime et de manga.",
                     credits: "Données fournies par l'API Jikan (MyAnimeList). Les images et titres appartiennent à leurs créateurs respectifs."
                 },
@@ -831,6 +831,29 @@ const resources = {
                 new: "NEW",
                 to_be_continued: "À SUIVRE...",
                 entries: {
+                    v3_6: {
+                        date: "07 Mars 2026",
+                        title: "Anime News & Security Update",
+                        description: "Flux d'actus complet, optimisations scraper et corrections de sécurité majeures.",
+                        changes: [
+                            "News : Nouvelle section dédiée avec SEO optimisé et sommaire auto.",
+                            "Scraper : Parallélisation du fetch et formatage intelligent pour Crunchyroll/ANN.",
+                            "Security : Résolution de 100% des vulnérabilités critiques via overrides.",
+                            "UI : Amélioration de la visibilité du bouton retour en haut.",
+                            "Automation : Passage à un cycle de mise à jour toutes les 4 heures."
+                        ]
+                    },
+                    v3_5: {
+                        date: "13 Février 2026",
+                        title: "Visual Assets & Core Sync",
+                        description: "Introduction des mockups haute fidélité et synchronisation administrative.",
+                        changes: [
+                            "Assets : Bibliothèque complète de mockups CSS (Discover, Library, Social, Auth).",
+                            "Admin : Synchronisation en temps réel des profils pour accès immédiat.",
+                            "Auth : Accès sécurisé à la page de connexion pendant la maintenance.",
+                            "Core : Nettoyage des scripts de déploiement et optimisation de la logique de maintenance."
+                        ]
+                    },
                     v3_4: {
                         date: "01 Février 2026",
                         title: "Retour Haptique",
@@ -1683,7 +1706,7 @@ const resources = {
                 },
                 about: {
                     title: "ABOUT",
-                    version: "Version 1.0.0 (Alpha)",
+                    version: "Version 3.6.0",
                     made_with: "Developed with ❤️ for anime and manga fans.",
                     credits: "Data provided by Jikan API (MyAnimeList). Images and titles belong to their respective creators."
                 },
@@ -2090,6 +2113,29 @@ const resources = {
                 new: "NEW",
                 to_be_continued: "TO BE CONTINUED...",
                 entries: {
+                    v3_6: {
+                        date: "March 07, 2026",
+                        title: "Anime News & Security Update",
+                        description: "Full news feed, scraper optimizations, and major security fixes.",
+                        changes: [
+                            "News: New dedicated section with optimized SEO and auto summary.",
+                            "Scraper: Fetch parallelization and intelligent formatting for Crunchyroll/ANN.",
+                            "Security: 100% resolution of critical vulnerabilities via overrides.",
+                            "UI: Improved visibility for the back-to-top button.",
+                            "Automation: Switched to a 4-hour update cycle."
+                        ]
+                    },
+                    v3_5: {
+                        date: "February 13, 2026",
+                        title: "Visual Assets & Core Sync",
+                        description: "Introduction of high-fidelity mockups and admin synchronization.",
+                        changes: [
+                            "Assets: Complete library of CSS mockups (Discover, Library, Social, Auth).",
+                            "Admin: Real-time profile synchronization for immediate access.",
+                            "Auth: Secure access to the login page during maintenance.",
+                            "Core: Deployment scripts cleanup and maintenance logic optimization."
+                        ]
+                    },
                     v3_4: {
                         date: "February 01, 2026",
                         title: "Haptic Feedback",

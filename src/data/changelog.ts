@@ -8,14 +8,28 @@ export interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
     {
-        version: 'v3.4',
-        date: '01 Février 2026',
-        title: 'Retour Haptique',
-        description: 'Une expérience tactile améliorée pour plus d\'immersion.',
+        version: 'v3.6',
+        date: '07 Mars 2026',
+        title: 'Anime News & Security Update',
+        description: 'Flux d\'actus complet, optimisations scraper et corrections de sécurité majeures.',
         changes: [
-            'Haptique : Retour haptique sur tous les boutons pour une sensation physique.',
-            'UI : Meilleure réactivité via vibrations légères.',
-            'Tech : Nouveau hook useHaptics pour gérer les vibrations.'
+            'News : Nouvelle section dédiée avec SEO optimisé et sommaire auto.',
+            'Scraper : Parallélisation du fetch et formatage intelligent pour Crunchyroll/ANN.',
+            'Security : Résolution de 100% des vulnérabilités critiques via overrides.',
+            'UI : Amélioration de la visibilité du bouton retour en haut.',
+            'Automation : Passage à un cycle de mise à jour toutes les 4 heures.'
+        ]
+    },
+    {
+        version: 'v3.5',
+        date: '13 Février 2026',
+        title: 'Visual Assets & Core Sync',
+        description: 'Introduction des mockups haute fidélité et synchronisation administrative.',
+        changes: [
+            'Assets : Bibliothèque complète de mockups CSS (Discover, Library, Social, Auth).',
+            'Admin : Synchronisation en temps réel des profils pour accès immédiat.',
+            'Auth : Accès sécurisé à la page de connexion pendant la maintenance.',
+            'Core : Nettoyage des scripts de déploiement et optimisation de la logique de maintenance.'
         ]
     },
     {
