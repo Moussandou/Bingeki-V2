@@ -56,6 +56,7 @@ const NewsArticle = lazy(() => import('@/pages/NewsArticle'));
 
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { RequireAdmin } from '@/components/admin/RequireAdmin';
+import { InstallInstructionsModal } from '@/components/pwa/InstallInstructionsModal';
 
 // Admin Components
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
@@ -235,6 +236,21 @@ function App() {
     };
   }, [setDeferredPrompt, setIsInstalled, clearPrompt]);
 
+  // Global Auto-install check from QR code URL
+  const { triggerInstall, showInstallModal, setShowInstallModal } = usePWAStore();
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('install') === '1') {
+      const timer = setTimeout(() => {
+        triggerInstall();
+        // Clean up URL parameter
+        const newUrl = window.location.pathname + window.location.hash;
+        window.history.replaceState({}, '', newUrl);
+      }, 1500); // 1.5s to ensure app is ready
+      return () => clearTimeout(timer);
+    }
+  }, [triggerInstall]);
+
   // Apply theme to document
   const theme = useSettingsStore(s => s.theme);
   useEffect(() => {
@@ -387,6 +403,10 @@ function App() {
           </Routes>
         </Suspense>
       </BrowserRouter>
+      <InstallInstructionsModal
+        isOpen={showInstallModal}
+        onClose={() => setShowInstallModal(false)}
+      />
     </ToastProvider >
   )
 }

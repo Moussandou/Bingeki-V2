@@ -1,10 +1,8 @@
 
-import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { usePWAStore } from '@/store/pwaStore';
-import { InstallInstructionsModal } from './InstallInstructionsModal';
 
 interface InstallPWAProps {
     className?: string;
@@ -13,54 +11,21 @@ interface InstallPWAProps {
 }
 
 export function InstallPWA({ variant = 'icon', className, style }: InstallPWAProps) {
-    const { deferredPrompt, setDeferredPrompt, isInstalled } = usePWAStore();
+    const { deferredPrompt, isInstalled, triggerInstall } = usePWAStore();
     const { t } = useTranslation();
-    const [showInstructions, setShowInstructions] = useState(false);
 
     // Logic: 
     // - Landing & Footer: Always visible (fallback to manual instructions).
     // - Full & Icon: Only visible if installable (deferredPrompt exists).
 
-    // If already installed app-wide, hide promotional buttons (optional, but good UX)
-    // However, for Landing/Footer we might still want them as "Open App" links if we could detect it,
-    // but for now let's just respect the "hidden" nature if strictly "install" button.
-    // Actually, per user request, footer/landing are persistent.
-
     const isInstallable = !!deferredPrompt;
-
-    // Auto-install logic from QR code
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('install') === '1') {
-            // Delay slightly to ensure store is ready and UI has settled
-            const timer = setTimeout(() => {
-                handleInstallClick();
-                // Clean up URL parameter to prevent re-triggering
-                const newUrl = window.location.pathname + window.location.hash;
-                window.history.replaceState({}, '', newUrl);
-            }, 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [deferredPrompt]); // Re-run if prompt becomes available
 
     // Visibility check
     if (!isInstallable && variant !== 'footer' && variant !== 'landing') return null;
     if (isInstalled && variant !== 'footer' && variant !== 'landing') return null;
 
-    const handleInstallClick = async () => {
-        if (!deferredPrompt) {
-            // Show custom modal instead of alert
-            setShowInstructions(true);
-            return;
-        }
-
-        deferredPrompt.prompt();
-
-        const { outcome } = await deferredPrompt.userChoice;
-
-        if (outcome === 'accepted') {
-            setDeferredPrompt(null);
-        }
+    const handleInstallClick = () => {
+        triggerInstall();
     };
 
     const InstallButton = () => {
@@ -166,12 +131,6 @@ export function InstallPWA({ variant = 'icon', className, style }: InstallPWAPro
     };
 
     return (
-        <>
-            <InstallButton />
-            <InstallInstructionsModal
-                isOpen={showInstructions}
-                onClose={() => setShowInstructions(false)}
-            />
-        </>
+        <InstallButton />
     );
 }

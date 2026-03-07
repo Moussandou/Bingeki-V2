@@ -8,16 +8,41 @@ interface BeforeInstallPromptEvent extends Event {
 interface PWAState {
     deferredPrompt: BeforeInstallPromptEvent | null;
     isInstalled: boolean;
+    showInstallModal: boolean;
     setDeferredPrompt: (prompt: BeforeInstallPromptEvent | null) => void;
     setIsInstalled: (isInstalled: boolean) => void;
+    setShowInstallModal: (show: boolean) => void;
+    triggerInstall: () => Promise<void>;
     clearPrompt: () => void;
 }
 
-export const usePWAStore = create<PWAState>((set) => ({
+export const usePWAStore = create<PWAState>((set, get) => ({
     deferredPrompt: null,
     isInstalled: false,
+    showInstallModal: false,
 
     setDeferredPrompt: (prompt) => set({ deferredPrompt: prompt, isInstalled: false }),
     setIsInstalled: (isInstalled) => set({ isInstalled }),
+    setShowInstallModal: (showInstallModal) => set({ showInstallModal }),
+    
+    triggerInstall: async () => {
+        const { deferredPrompt } = get();
+        if (deferredPrompt) {
+            try {
+                await deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    set({ deferredPrompt: null });
+                }
+            } catch (err) {
+                console.error('Error triggering PWA prompt:', err);
+                set({ showInstallModal: true });
+            }
+        } else {
+            // Fallback to instructions modal if no native prompt is available
+            set({ showInstallModal: true });
+        }
+    },
+
     clearPrompt: () => set({ deferredPrompt: null }),
 }));
