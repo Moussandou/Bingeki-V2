@@ -293,6 +293,16 @@ async function fetchAndSaveNews() {
         }
     }
     console.log('News fetch completed successfully.');
+    
+    // Explicitly close the admin app to release its resources/connections
+    await admin.app().delete();
+    process.exit(0);
 }
 
-fetchAndSaveNews().catch(console.error);
+fetchAndSaveNews().catch(async (error) => {
+    console.error('Fatal error in fetchAndSaveNews:', error);
+    try {
+        await admin.app().delete();
+    } catch (e) {}
+    process.exit(1);
+});
