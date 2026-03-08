@@ -68,7 +68,7 @@ async function processItem(item: any, feedConfig: any, forceUpdate: boolean) {
 
     // 0. High Priority: RSS Metadata Image (media:thumbnail or media:content)
     // Crunchyroll provides high-quality images directly in the feed
-    let imageUrl = null;
+    let imageUrl: string | null = null;
     if (item['media:thumbnail'] && item['media:thumbnail'].$) imageUrl = item['media:thumbnail'].$.url;
     else if (item['media:content'] && item['media:content'].$) imageUrl = item['media:content'].$.url;
 
@@ -90,7 +90,7 @@ async function processItem(item: any, feedConfig: any, forceUpdate: boolean) {
         ];
         
         // Only try scraping if we don't have an image OR the current one looks generic
-        const currentIsGeneric = imageUrl && genericLogos.some(logo => imageUrl.toLowerCase().includes(logo));
+        const currentIsGeneric = !!(imageUrl && genericLogos.some(logo => imageUrl!.toLowerCase().includes(logo)));
         
         if (!imageUrl || currentIsGeneric) {
             const ogMatch = html.match(/<meta[^>]+property="og:image"[^>]+content="([^">]+)"/) ||
@@ -141,7 +141,7 @@ async function processItem(item: any, feedConfig: any, forceUpdate: boolean) {
         }
 
         // 3. Fallback Image from body if metadata was generic or missing
-        if (!imageUrl || genericLogos.some(logo => imageUrl.toLowerCase().includes(logo))) {
+        if (!imageUrl || genericLogos.some(logo => imageUrl!.toLowerCase().includes(logo))) {
             const imgMatch = fullContent.match(/<img[^>]+src="([^">]+)"/);
             if (imgMatch) {
                 imageUrl = imgMatch[1];
