@@ -126,7 +126,9 @@ async function processItem(item: any, feedConfig: any, forceUpdate: boolean) {
     }
 
     function formatContent(html: string): string {
-        let clean = html.replace(/\r\n/g, '\n');
+        // Remove hidden spans used for layout preservation (common in ANN)
+        let clean = html.replace(/<span[^>]+style="display:\s*none;?"[^>]*>[\s\S]*?<\/span>/gi, '');
+        clean = clean.replace(/\r\n/g, '\n');
 
         // If it's already structured with MANY paragraphs, return it
         const pCount = (clean.match(/<p>/g) || []).length;

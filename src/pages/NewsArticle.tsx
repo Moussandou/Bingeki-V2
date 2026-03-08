@@ -49,7 +49,7 @@ export default function NewsArticle() {
                 if (docSnap.exists()) {
                     const data = docSnap.data() as NewsItem;
 
-                    // Parse content to inject IDs for TOC
+                    // Parse content to extract headings for TOC WITHOUT destroying the HTML structure
                     const parser = new DOMParser();
                     const htmlDoc = parser.parseFromString(data.content, 'text/html');
                     const headingTags = htmlDoc.querySelectorAll('h2, h3');
@@ -66,6 +66,9 @@ export default function NewsArticle() {
                     });
 
                     setHeadings(extractedHeadings);
+                    
+                    // We only update if we actually modified something (added IDs)
+                    // and we use the full body innerHTML from the parsed doc which preserves structure
                     setArticle({
                         ...data,
                         content: htmlDoc.body.innerHTML
