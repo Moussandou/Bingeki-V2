@@ -51,6 +51,8 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
             <div style={{
                 height: '120px',
                 background: user.banner ? `url(${user.banner}) center / cover` : accentColor,
+                backgroundPosition: `center ${user.bannerPosition || 'center'}`,
+                backgroundSize: 'cover',
                 borderBottom: `2px solid ${borderColor} `,
                 position: 'relative'
             }}>

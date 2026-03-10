@@ -50,6 +50,7 @@ export interface UserProfile {
     totalWorksAdded?: number;
     totalWorksCompleted?: number;
     banner?: string;
+    bannerPosition?: string;
     bio?: string;
     themeColor?: string;
     cardBgColor?: string;
@@ -81,7 +82,7 @@ export async function saveUserProfileToFirestore(user: Partial<UserProfile>, for
 
         // List of allowed fields to sync
         const allowedFields: (keyof UserProfile)[] = [
-            'uid', 'email', 'displayName', 'photoURL', 'banner', 'bio',
+            'uid', 'email', 'displayName', 'photoURL', 'banner', 'bannerPosition', 'bio',
             'themeColor', 'cardBgColor', 'borderColor',
             'favoriteManga', 'top3Favorites', 'featuredBadge',
             'favoriteCharacters'

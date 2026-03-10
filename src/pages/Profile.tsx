@@ -20,7 +20,9 @@ import {
     Plus,
     UserPlus,
     UserCheck,
-    Clock
+    Clock,
+    MoveUp,
+    MoveDown
 } from 'lucide-react';
 import { HunterLicenseCard } from '@/components/profile/HunterLicenseCard';
 import { getUserProfile, saveUserProfileToFirestore, compareLibraries, checkFriendship, sendFriendRequest, type UserProfile } from '@/firebase/firestore';
@@ -109,6 +111,7 @@ export default function Profile() {
                         displayName: p.displayName || user?.displayName || '',
                         avatar: p.photoURL || user?.photoURL || '',
                         banner: p.banner || '',
+                        bannerPosition: p.bannerPosition || 'center',
                         bio: p.bio || '',
                         themeColor: p.themeColor || '#000000',
                         cardBgColor: p.cardBgColor || '#ffffff',
@@ -175,6 +178,7 @@ export default function Profile() {
         displayName: '',
         avatar: '', // URL or Data URL
         banner: '',
+        bannerPosition: 'center',
         bio: '',
         themeColor: '#000000',
         cardBgColor: '#ffffff',
@@ -229,13 +233,14 @@ export default function Profile() {
                 displayName: editForm.displayName,
                 photoURL: avatarUrl,
                 banner: bannerUrl,
+                bannerPosition: editForm.bannerPosition,
                 top3Favorites: cleanTop3
             };
 
             await saveUserProfileToFirestore(profileData, true);
 
             setExtendedProfile({ ...extendedProfile, ...profileData });
-            setEditForm(prev => ({ ...prev, banner: bannerUrl, avatar: avatarUrl, top3Favorites: cleanTop3 }));
+            setEditForm(prev => ({ ...prev, banner: bannerUrl, avatar: avatarUrl, bannerPosition: editForm.bannerPosition, top3Favorites: cleanTop3 }));
 
             addToast(t('profile.toast.profile_updated'), 'success');
             setIsEditModalOpen(false);
@@ -769,19 +774,60 @@ export default function Profile() {
                                     onChange={(e) => setEditForm(prev => ({ ...prev, banner: e.target.value }))}
                                 />
                                 {editForm.banner && (
-                                    <div style={{ marginTop: '1rem', width: '100%', height: '100px', border: '2px solid var(--color-border-heavy)', overflow: 'hidden', position: 'relative' }}>
+                                    <div style={{ marginTop: '1rem', width: '100%', height: '180px', border: '3px solid var(--color-border)', overflow: 'hidden', position: 'relative', boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)', background: '#222' }}>
                                         <img
                                             src={editForm.banner}
                                             alt="Aperçu"
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                            style={{ 
+                                                width: '100%', 
+                                                height: '100%', 
+                                                objectFit: 'cover',
+                                                objectPosition: `center ${editForm.bannerPosition || '50%'}`
+                                            }}
                                             onError={(e) => (e.currentTarget.style.display = 'none')}
                                         />
+                                        <div className="manga-title" style={{ position: 'absolute', bottom: 10, left: 10, background: 'rgba(0,0,0,0.7)', padding: '2px 8px', fontSize: '0.6rem', color: '#fff', border: '1px solid var(--color-border)' }}>
+                                            APERCU BANNIIERE
+                                        </div>
                                         <button
                                             onClick={() => setEditForm(prev => ({ ...prev, banner: '' }))}
-                                            style={{ position: 'absolute', top: 5, right: 5, background: 'rgba(0,0,0,0.7)', color: 'white', border: 'none', borderRadius: '50%', width: 24, height: 24, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                            style={{ position: 'absolute', top: 5, right: 5, background: 'rgba(255,0,0,0.8)', color: 'white', border: 'none', borderRadius: '50%', width: 24, height: 24, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
                                         >
                                             <X size={14} />
                                         </button>
+                                    </div>
+                                )}
+                                {editForm.banner && (
+                                    <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(var(--color-primary-rgb), 0.05)', border: '1px dashed var(--color-border)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                                            <label style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                                Ajustement Vertical
+                                            </label>
+                                            <span style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--color-primary)' }}>
+                                                {editForm.bannerPosition?.includes('%') ? editForm.bannerPosition : '50%'}
+                                            </span>
+                                        </div>
+                                        <div style={{ position: 'relative', height: '30px', display: 'flex', alignItems: 'center' }}>
+                                            <input 
+                                                type="range" 
+                                                min="0" 
+                                                max="100" 
+                                                value={parseInt(editForm.bannerPosition?.replace('%', '') || '50')} 
+                                                onChange={(e) => setEditForm(prev => ({ ...prev, bannerPosition: `${e.target.value}%` }))}
+                                                style={{ 
+                                                    width: '100%',
+                                                    height: '6px',
+                                                    appearance: 'none',
+                                                    background: 'var(--color-border)',
+                                                    outline: 'none',
+                                                    borderRadius: '3px'
+                                                }}
+                                            />
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', fontWeight: 700, opacity: 0.6, marginTop: '2px' }}>
+                                            <span style={{ display: 'flex', alignItems: 'center', gap: '2px' }}><MoveUp size={10} /> HAUT</span>
+                                            <span style={{ display: 'flex', alignItems: 'center', gap: '2px' }}><MoveDown size={10} /> BAS</span>
+                                        </div>
                                     </div>
                                 )}
                             </div>
