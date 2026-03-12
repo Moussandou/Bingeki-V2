@@ -21,6 +21,7 @@ import {
 } from '@/firebase/firestore';
 import { mergeLibraryData, mergeGamificationData } from '@/utils/dataProtection';
 import { ToastProvider } from '@/context/ToastContext';
+import { isBot } from '@/utils/isBot';
 
 // Lazy load pages
 const Opening = lazy(() => import('@/pages/Opening'));
@@ -287,8 +288,22 @@ function App() {
     return () => unsubscribe();
   }, []);
 
+  // Safety timeout: force loading to finish if it hangs too long (5s)
+  // This ensures bots and slow connections eventually see the app
+  useEffect(() => {
+    if (loading || !configLoaded) {
+      const timer = setTimeout(() => {
+        console.warn('[App] Loading timeout reached - forcing render');
+        if (loading) setLoading(false);
+        if (!configLoaded) setConfigLoaded(true);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, configLoaded, setLoading]);
+
   // Show loading screen while initializing auth or config
-  if (loading || !configLoaded) {
+  // Skip loading screen for bots to ensure they capture the actual content/meta tags
+  if ((loading || !configLoaded) && !isBot()) {
     return <LoadingScreen />;
   }
 
