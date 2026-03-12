@@ -73,7 +73,6 @@ app.listen(PORT, async () => {
         // Inject language and prerender info
         await page.evaluate((l) => {
           document.body.classList.add('is-prerendered');
-          document.body.classList.add('is-bot');
           document.documentElement.setAttribute('data-lang', l);
         }, langCode);
 

@@ -27,11 +27,10 @@ html {
 }
 
 /* 
- * Disable all animations and transitions for bots and prerendered pages.
+ * Disable all animations and transitions for bots.
  * This ensures screenshot tools capture the final state immediately.
  */
-body.is-bot *,
-body.is-prerendered * {
+body.is-bot * {
     animation: none !important;
     transition: none !important;
 }

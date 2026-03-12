@@ -61,8 +61,7 @@ import { InstallInstructionsModal } from '@/components/pwa/InstallInstructionsMo
 
 // Bot aware suspense to avoid blank screen during hydration for screenshot tools
 const BotAwareSuspense = ({ children }: { children: React.ReactNode }) => {
-  const isPrerendered = typeof document !== 'undefined' && document.body.classList.contains('is-prerendered');
-  const fallback = (isBot() || isPrerendered) ? null : <LoadingScreen />;
+  const fallback = isBot() ? null : <LoadingScreen />;
   return <Suspense fallback={fallback}>{children}</Suspense>;
 };
 
