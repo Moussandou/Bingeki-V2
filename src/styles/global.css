@@ -26,6 +26,16 @@ html {
     /* Anchor for absolute background */
 }
 
+/* 
+ * Disable all animations and transitions for bots and prerendered pages.
+ * This ensures screenshot tools capture the final state immediately.
+ */
+body.is-bot *,
+body.is-prerendered * {
+    animation: none !important;
+    transition: none !important;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;

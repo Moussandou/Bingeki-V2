@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
@@ -129,6 +129,13 @@ function App() {
     totalAnimeEpisodesWatched: s.totalAnimeEpisodesWatched,
     totalMoviesWatched: s.totalMoviesWatched,
   })));
+
+  // Detect bot and apply class to body for CSS targeting (e.g. disabling animations)
+  useEffect(() => {
+    if (isBot()) {
+      document.body.classList.add('is-bot');
+    }
+  }, []);
 
   // Auth state listener + Firestore sync
   useEffect(() => {
