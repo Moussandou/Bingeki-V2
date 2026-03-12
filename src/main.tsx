@@ -1,5 +1,5 @@
 import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import { hydrateRoot, createRoot } from 'react-dom/client'
 import { HelmetProvider } from 'react-helmet-async'
 import './styles/global.css'
 import './i18n'
@@ -11,10 +11,19 @@ window.addEventListener('vite:preloadError', (event) => {
   window.location.reload();
 });
 
-createRoot(document.getElementById('root')!).render(
+const container = document.getElementById('root')!;
+const isPrerendered = document.body.classList.contains('is-prerendered');
+
+const rootElement = (
   <StrictMode>
     <HelmetProvider>
       <App />
     </HelmetProvider>
-  </StrictMode>,
-)
+  </StrictMode>
+);
+
+if (isPrerendered) {
+  hydrateRoot(container, rootElement);
+} else {
+  createRoot(container).render(rootElement);
+}

@@ -67,10 +67,14 @@ app.listen(PORT, async () => {
       try {
         await page.goto(`http://localhost:${PORT}${route}`, { waitUntil: 'domcontentloaded', timeout: 30000 });
         
-        // Inject a class to body so the client knows it was prerendered
-        await page.evaluate(() => {
+        // Detect language from route
+        const langCode = route.startsWith('/en') ? 'en' : (route.startsWith('/fr') ? 'fr' : 'fr');
+        
+        // Inject language and prerender info
+        await page.evaluate((l) => {
           document.body.classList.add('is-prerendered');
-        });
+          document.documentElement.setAttribute('data-lang', l);
+        }, langCode);
 
         const html = await page.content();
         

@@ -2925,8 +2925,9 @@ i18n
         resources,
         fallbackLng: 'fr',
         detection: {
-            order: ['path', 'localStorage', 'navigator'],
-            lookupFromPathIndex: 0
+            order: ['htmlTag', 'path', 'localStorage', 'navigator'],
+            lookupFromPathIndex: 0,
+            htmlTag: document.documentElement
         },
         supportedLngs: ['fr', 'en'],
         interpolation: {

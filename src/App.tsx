@@ -59,6 +59,13 @@ import { AdminLayout } from '@/components/admin/AdminLayout';
 import { RequireAdmin } from '@/components/admin/RequireAdmin';
 import { InstallInstructionsModal } from '@/components/pwa/InstallInstructionsModal';
 
+// Bot aware suspense to avoid blank screen during hydration for screenshot tools
+const BotAwareSuspense = ({ children }: { children: React.ReactNode }) => {
+  const isPrerendered = typeof document !== 'undefined' && document.body.classList.contains('is-prerendered');
+  const fallback = (isBot() || isPrerendered) ? null : <LoadingScreen />;
+  return <Suspense fallback={fallback}>{children}</Suspense>;
+};
+
 // Admin Components
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
 const AdminUsers = lazy(() => import('@/pages/admin/Users'));
@@ -322,7 +329,7 @@ function App() {
   return (
     <ToastProvider>
       <BrowserRouter>
-        <Suspense fallback={<LoadingScreen />}>
+        <BotAwareSuspense>
           <Routes>
             {/* Root redirect to language prefix */}
             <Route path="/" element={<RootRedirect />} />
@@ -330,21 +337,9 @@ function App() {
             {/* Language-prefixed routes */}
             <Route path="/:lang" element={<LanguageManager />}>
               <Route index element={<Opening />} />
-              <Route path="challenges" element={
-                <Suspense fallback={<LoadingScreen />}>
-                  <Challenges />
-                </Suspense>
-              } />
-              <Route path="feedback" element={
-                <Suspense fallback={<LoadingScreen />}>
-                  <Feedback />
-                </Suspense>
-              } />
-              <Route path="feedback-admin" element={
-                <Suspense fallback={<LoadingScreen />}>
-                  <FeedbackList />
-                </Suspense>
-              } />
+              <Route path="challenges" element={<Challenges />} />
+              <Route path="feedback" element={<Feedback />} />
+              <Route path="feedback-admin" element={<FeedbackList />} />
               <Route path="changelog" element={<Changelog />} />
               <Route path="auth" element={<Auth />} />
               <Route path="dashboard" element={<Dashboard />} />
@@ -356,53 +351,25 @@ function App() {
               <Route path="profile" element={<Profile />} />
               <Route path="profile/:uid" element={<Profile />} />
               <Route path="settings" element={<Settings />} />
-              <Route path="notifications" element={
-                <Suspense fallback={<LoadingScreen />}>
-                  <Notifications />
-                </Suspense>
-              } />
-              <Route path="schedule" element={
-                <Suspense fallback={<LoadingScreen />}>
-                  <Schedule />
-                </Suspense>
-              } />
-              <Route path="character/:id" element={
-                <Suspense fallback={<LoadingScreen />}>
-                  <CharacterDetails />
-                </Suspense>
-              } />
-              <Route path="person/:id" element={
-                <Suspense fallback={<LoadingScreen />}>
-                  <PersonDetails />
-                </Suspense>
-              } />
+              <Route path="notifications" element={<Notifications />} />
+              <Route path="schedule" element={<Schedule />} />
+              <Route path="character/:id" element={<CharacterDetails />} />
+              <Route path="person/:id" element={<PersonDetails />} />
 
               <Route path="legal" element={<Legal />} />
               <Route path="privacy" element={<Privacy />} />
               <Route path="terms" element={<Terms />} />
               <Route path="contact" element={<Contact />} />
               <Route path="about" element={<About />} />
-              <Route path="credits" element={
-                <Suspense fallback={<LoadingScreen />}>
-                  <Credits />
-                </Suspense>
-              } />
+              <Route path="credits" element={<Credits />} />
               <Route path="assets" element={
                 <RequireAdmin>
                   <Assets />
                 </RequireAdmin>
               } />
               <Route path="donors" element={<Donors />} />
-              <Route path="news" element={
-                <Suspense fallback={<LoadingScreen />}>
-                  <NewsIndex />
-                </Suspense>
-              } />
-              <Route path="news/article/:slug" element={
-                <Suspense fallback={<LoadingScreen />}>
-                  <NewsArticle />
-                </Suspense>
-              } />
+              <Route path="news" element={<NewsIndex />} />
+              <Route path="news/article/:slug" element={<NewsArticle />} />
 
               <Route path="admin" element={
                 <RequireAdmin>
@@ -419,7 +386,7 @@ function App() {
             {/* Fallback for non-prefixed paths */}
             <Route path="*" element={<RootRedirect />} />
           </Routes>
-        </Suspense>
+        </BotAwareSuspense>
       </BrowserRouter>
       <InstallInstructionsModal
         isOpen={showInstallModal}
