@@ -46,6 +46,9 @@ const Assets = lazy(() => import('@/pages/AssetsPage'));
 const Donors = lazy(() => import('@/pages/Donors'));
 const Notifications = lazy(() => import('@/pages/Notifications')); // Added
 
+const FormSurvey = lazy(() => import('@/pages/FormSurvey'));
+const FormSurveyThankYou = lazy(() => import('@/pages/FormSurveyThankYou'));
+
 const Privacy = lazy(() => import('@/pages/Privacy'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const Contact = lazy(() => import('@/pages/Contact'));
@@ -71,6 +74,7 @@ const AdminUsers = lazy(() => import('@/pages/admin/Users'));
 const AdminFeedback = lazy(() => import('@/pages/admin/FeedbackAdmin'));
 const AdminSystem = lazy(() => import('@/pages/admin/SystemLogs'));
 const AdminSocialGenerator = lazy(() => import('@/pages/admin/SocialGenerator'));
+const AdminSurvey = lazy(() => import('@/pages/admin/SurveyDashboard'));
 
 // Language Manager Component
 const LanguageManager = () => {
@@ -344,6 +348,8 @@ function App() {
             {/* Language-prefixed routes */}
             <Route path="/:lang" element={<LanguageManager />}>
               <Route index element={<Opening />} />
+              <Route path="form" element={<FormSurvey />} />
+              <Route path="form/thank-you" element={<FormSurveyThankYou />} />
               <Route path="challenges" element={<Challenges />} />
               <Route path="feedback" element={<Feedback />} />
               <Route path="feedback-admin" element={<FeedbackList />} />
@@ -384,6 +390,7 @@ function App() {
                 <Route path="feedback" element={<AdminFeedback />} />
                 <Route path="system" element={<AdminSystem />} />
                 <Route path="social-generator" element={<AdminSocialGenerator />} />
+                <Route path="survey" element={<AdminSurvey />} />
                 <Route path="assets" element={<Assets />} />
               </Route>
             </Route>

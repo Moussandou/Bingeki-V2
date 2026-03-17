@@ -3,13 +3,15 @@
     flex-direction: column;
     gap: 2rem;
     padding: 2rem;
-    height: 100%;
+    height: 100vh;
+    max-height: 100vh;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .header h1 {
@@ -30,6 +32,7 @@
     flex-direction: column;
     padding: 1.5rem;
     overflow-y: auto;
+    max-height: 100%;
 }
 
 .tabsMenu {
@@ -151,6 +154,7 @@
     transition: all 0.2s ease;
     background: rgba(0,0,0,0.02);
     font-weight: 700;
+    display: block;
 }
 
 .imageUpload:hover {
@@ -236,16 +240,25 @@
 .baseBgPattern {
     position: absolute;
     inset: 0;
-    background-color: var(--color-background);
     z-index: 0;
 }
 
-.overlayGradient {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
-    z-index: 0;
-    pointer-events: none;
+.baseBgPattern.themeDark {
+    background-color: var(--color-background); /* Dark by default */
+    --color-dots: rgba(255,255,255,0.1);
+}
+
+.baseBgPattern.themeLight {
+    background-color: #f0f0f0;
+    --color-dots: rgba(0,0,0,0.1);
+}
+
+.themeDark .manga-halftone {
+    opacity: 0.15;
+}
+
+.themeLight .manga-halftone {
+    opacity: 0.3;
 }
 
 /* Canvas Area */
@@ -254,11 +267,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.2);
+    background: repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.1) 10px, rgba(0,0,0,0.1) 20px);
     border: 1px solid var(--glass-border);
-    padding: 2rem;
+    padding: 0;
     overflow: hidden;
     position: relative;
+    border-radius: 8px;
 }
 
 .canvasWrapper {
@@ -314,14 +328,25 @@
     z-index: 10;
 }
 
+.presetImage {
+    cursor: grab;
+    z-index: 10;
+}
+
 .presetBasicTitle:active,
-.presetBasicText:active {
+.presetBasicText:active,
+.presetImage:active {
     cursor: grabbing;
 }
 
 .selectedElement {
     outline: 4px dashed var(--color-primary);
     outline-offset: 4px;
+}
+
+.isDragging {
+    cursor: grabbing !important;
+    opacity: 0.8 !important;
 }
 
 .brandWatermark {
@@ -336,6 +361,15 @@
     letter-spacing: 2px;
     text-shadow: 0 2px 10px rgba(0,0,0,0.3);
     z-index: 20;
+    display: flex;
+    align-items: center;
+}
+
+.brandLogo {
+    height: 60px;
+    width: 60px;
+    object-fit: contain;
+    margin-right: 20px;
 }
 
 @media (max-width: 1024px) {

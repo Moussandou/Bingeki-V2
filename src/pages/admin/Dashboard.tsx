@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, AlertCircle, TrendingUp, Activity, ExternalLink, Shield } from 'lucide-react';
+import { Users, AlertCircle, TrendingUp, Activity, ExternalLink, Shield, Clipboard } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Link } from '@/components/routing/LocalizedLink';
 import { getAdminStats, getAllUsers, getSevenDayActivityStats, type UserProfile } from '@/firebase/firestore';
@@ -20,7 +20,8 @@ export default function AdminDashboard() {
         totalUsers: 0,
         totalFeedback: 0,
         newUsersToday: 0,
-        pendingFeedback: 0
+        pendingFeedback: 0,
+        totalSurveyResponses: 0
     });
     const [recentUsers, setRecentUsers] = useState<UserProfile[]>([]);
     const [chartData, setChartData] = useState<ChartData[]>([]);
@@ -171,8 +172,23 @@ export default function AdminDashboard() {
                         </div>
                     </div>
                     <div style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#666' }}>
-                        Version 3.0.0
+                        Version 3.0.1
                     </div>
+                </Card>
+
+                <Card variant="manga" style={statCardStyle}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                            <p style={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '0.9rem', color: 'var(--color-text-dim)' }}>{t('admin.dashboard.survey_label', 'Questionnaires')}</p>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', lineHeight: 1 }}>{stats.totalSurveyResponses}</h3>
+                        </div>
+                        <div style={{ background: 'var(--color-text)', color: 'var(--color-surface)', padding: '0.5rem', borderRadius: '4px' }}>
+                            <Clipboard size={20} />
+                        </div>
+                    </div>
+                    <Link to="/admin/survey" style={{ marginTop: '1rem', fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--color-text)', textDecoration: 'underline' }}>
+                        {t('admin.dashboard.view_survey_details', 'Voir les détails')}
+                    </Link>
                 </Card>
             </div>
 

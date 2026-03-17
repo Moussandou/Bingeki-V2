@@ -852,6 +852,19 @@ const resources = {
                 new: "NEW",
                 to_be_continued: "À SUIVRE...",
                 entries: {
+                    v3_7: {
+                        date: "17 Mars 2026",
+                        title: "Survey & Admin Revolution",
+                        description: "Refonte complète du questionnaire, tableau de bord admin et intégration sociale.",
+                        changes: [
+                            "Survey : UX repensée avec affichage séquentiel et auto-scroll fluide.",
+                            "Admin : Nouveau Dashboard pour visualiser les résultats du questionnaire en temps réel.",
+                            "Social : Intégration complète d'Instagram et TikTok (Footer + Survey).",
+                            "I18n : Ajout d'un sélecteur de langue dynamique sur le formulaire.",
+                            "Security : Mise à jour des règles Firestore pour sécuriser les réponses.",
+                            "Fix : Correction du lien Discord officiel sur toute la plateforme."
+                        ]
+                    },
                     v3_6: {
                         date: "07 Mars 2026",
                         title: "Anime News & Security Update",
@@ -1476,6 +1489,156 @@ const resources = {
                 filter_all_sources: "Toutes les sources",
                 results_found: "{{count}} actualité trouvée",
                 results_found_plural: "{{count}} actualités trouvées"
+            },
+            survey: {
+                title: "Questionnaire Bingeki",
+                brand: "Bingeki",
+                step_indicator: "Étape {{current}} sur {{total}}",
+                landing: {
+                    title: "Construisons le suivi parfait des <span>Animés</span>",
+                    desc: "Bingeki est une future plateforme sociale et gamifiée pour ta consommation d'animés et de mangas. Donne-nous ton avis pour créer la plateforme dont tu rêves."
+                },
+                steps: {
+                    profil: { title: "Profil", desc: "Mieux te connaître" },
+                    habitudes: { title: "Habitudes", desc: "Ta consommation" },
+                    problemes: { title: "Frustrations", desc: "Les problèmes actuels" },
+                    interet: { title: "Bingeki", desc: "Ton intérêt pour le projet" },
+                    gamification: { title: "Gamification", desc: "Ta motivation" },
+                    monetisation: { title: "Premium", desc: "Et si on allait plus loin ?" },
+                    communaute: { title: "Social", desc: "Toi et tes amis" },
+                    libre: { title: "Avis libre", desc: "Ton mot de la fin" },
+                    lead: { title: "Rester en contact", desc: "Pour ne rien rater" }
+                },
+                questions: {
+                    age: "Quel âge as-tu ?",
+                    status: "Quel est ton statut ?",
+                    consumption_frequency: "À quelle fréquence consommes-tu des animés ou mangas ?",
+                    anime_count: "Combien d’animés suis-tu en parallèle ?",
+                    reads_manga: "Lis-tu aussi des mangas ?",
+                    devices: "Quels appareils utilises-tu principalement ? (Plusieurs choix possibles)",
+                    forgets_progress: "Oublies-tu parfois où tu en es dans une série ?",
+                    current_tracking: "Comment suis-tu ta progression aujourd’hui ?",
+                    frustrations: "Qu’est-ce qui te frustre dans les solutions actuelles ?",
+                    interest_level: "Une plateforme de suivi plus sociale et gamifiée t’intéresserait-elle ?",
+                    attractive_features: "Qu’est-ce qui t’attire le plus ? (Plusieurs choix)",
+                    likes_gamification: "Aimes-tu les systèmes de progression (niveaux, XP) ?",
+                    motivation_drivers: "Qu’est-ce qui te motiverait le plus ? (Plusieurs choix)",
+                    premium_interest: "Serais-tu prêt à payer pour des fonctionnalités premium (sur une alternative gratuite sans pub) ?",
+                    premium_features: "Que voudrais-tu en premium ? (Plusieurs choix)",
+                    acceptable_price: "Quel prix mensuel te semblerait acceptable ?",
+                    shares_friends: "Partages-tu souvent tes découvertes avec tes amis ?",
+                    social_platforms: "Sur quels réseaux interagis-tu le plus autour des animés/mangas ?",
+                    social_interest: "Serais-tu intéressé par des fonctions sociales (Feed amis, réactions, commentaires) ?",
+                    must_have: "Quelle fonctionnalité aimerais-tu ABSOLUMENT voir dans Bingeki ?",
+                    daily_return: "Qu’est-ce qui te ferait utiliser l'application tous les jours ?",
+                    stay_in_touch: "Ne manque pas le lancement 🎉",
+                    stay_in_touch_desc: "Laisse ton e-mail pour être prévenu de la sortie officielle de l'application (pas de spam, promis).",
+                    wants_news: "Oui, je veux être recontacté !",
+                    no_news: "Non merci."
+                },
+                options: {
+                    status: {
+                        etudiant: "Étudiant / Lycéen",
+                        salarie: "Salarié / Actif",
+                        autre: "Autre"
+                    },
+                    frequency: {
+                        quotidien: "Tous les jours",
+                        hebdomadaire: "Plusieurs fois par semaine",
+                        mensuel: "Quelques fois par mois"
+                    },
+                    manga: {
+                        oui_beaucoup: "Oui, beaucoup",
+                        oui_un_peu: "Oui, de temps en temps",
+                        non: "Non, pas du tout"
+                    },
+                    devices: {
+                        smartphone: "📱 Smartphone",
+                        pc: "💻 PC / Mac",
+                        tv: "📺 TV / Console",
+                        tablette: "📱 Tablette"
+                    },
+                    forget: {
+                        souvent: "Oui, très souvent",
+                        parfois: "De temps en temps",
+                        jamais: "Non, je gère parfaitement"
+                    },
+                    tracking: {
+                        myanimelist: "MyAnimeList / Anilist",
+                        notes: "Bloc note / Notion / Excel",
+                        memoire: "De tête (ma mémoire me suffit)",
+                        autre: "Autre"
+                    },
+                    interest: {
+                        beaucoup: "Oui, carrément !",
+                        un_peu: "Pourquoi pas, à tester.",
+                        pas_du_tout: "Non, aucun intérêt pour moi."
+                    },
+                    features: {
+                        design: "🎨 Une interface moderne et mobile-first",
+                        gamification: "🎮 Gagner de l'XP et monter de niveau",
+                        social: "👥 Voir l'activité et le profil des amis",
+                        statistiques: "📊 Des statistiques poussées sur mon visionnage"
+                    },
+                    gamification: {
+                        like_much: "J'adore ça !",
+                        like_some: "C'est sympa mais secondaire",
+                        no_interest: "Je n'y prête pas attention"
+                    },
+                    motivation: {
+                        badges: "🏆 Collectionner des badges (ex: Regardé 50 Isekai)",
+                        niveau: "⭐ Monter de niveau avec mon compte",
+                        classement: "📈 Un classement (Leaderboard) avec mes amis",
+                        defis: "🎯 Des défis (Objectifs hebdo pour bonus)"
+                    },
+                    premium: {
+                        oui: "Oui, si la valeur ajoutée est là",
+                        peut_etre: "Peut-être, tout dépend du prix",
+                        non: "Non, jamais"
+                    },
+                    premium_features: {
+                        personnalisation: "🎨 Personnalisation max de mon profil de ouf",
+                        badges_exclusifs: "💎 Des badges/titres exclusifs",
+                        stats_avancees: "📊 Statistiques de visionnage super avancées",
+                        soutien: "❤️ Juste soutenir le projet Bingeki"
+                    },
+                    social: {
+                        often: "Oui, tout le temps !",
+                        sometimes: "De temps en temps",
+                        solo: "Je vis ma passion en solo"
+                    },
+                    social_interest: {
+                        feed: "Oui, un vrai fil d'actu de mes potes !",
+                        maybe: "Un peu, à voir.",
+                        no: "Pas spécialement."
+                    }
+                },
+                placeholders: {
+                    frustrations: "Interfaces vieillissantes, trop compliqué, manque de fonctionnalités...",
+                    must_have: "La fonctionnalité de rêve que tu n'as vue nulle part ailleurs...",
+                    daily_return: "Des notifs de sortie ? Le fil d'actu de mes amis ? Les défis ?",
+                    email: "ton@email.com"
+                },
+                footer: {
+                    start: "Commencer",
+                    next: "Suivant",
+                    back: "Retour",
+                    finish: "Terminer",
+                    submitting: "Envoi..."
+                },
+                errors: {
+                    submit: "Une erreur est survenue. Veuillez réessayer."
+                },
+                thank_you: {
+                    title: "Merci beaucoup !",
+                    message: "Tes réponses ont bien été enregistrées. Grâce à toi, nous allons pouvoir construire la plateforme dont nous rêvons tous pour suivre nos animés et mangas préférés.",
+                    next_steps: "Tu veux aller plus loin ?",
+                    join_site: "Rejoindre Bingeki",
+                    discord: "Rejoindre le Discord",
+                    instagram: "Nous suivre sur Instagram",
+                    tiktok: "Nous suivre sur TikTok",
+                    home: "Retour à l'accueil"
+                }
             }
         },
     },
@@ -2168,6 +2331,19 @@ const resources = {
                 new: "NEW",
                 to_be_continued: "TO BE CONTINUED...",
                 entries: {
+                    v3_7: {
+                        date: "March 17, 2026",
+                        title: "Survey & Admin Revolution",
+                        description: "Complete survey redesign, admin dashboard, and social integration.",
+                        changes: [
+                            "Survey: Redesigned UX with sequential display and smooth auto-scroll.",
+                            "Admin: New Dashboard for real-time visualization of survey results.",
+                            "Social: Full Instagram and TikTok integration (Footer + Survey).",
+                            "I18n: Added a dynamic language switcher to the form.",
+                            "Security: Updated Firestore rules to secure responses.",
+                            "Fix: Correction of the official Discord link across the platform."
+                        ]
+                    },
                     v3_6: {
                         date: "March 07, 2026",
                         title: "Anime News & Security Update",
@@ -2953,6 +3129,156 @@ const resources = {
                 filter_all_sources: "All sources",
                 results_found: "{{count}} news item found",
                 results_found_plural: "{{count}} news items found"
+            },
+            survey: {
+                title: "Bingeki Survey",
+                brand: "Bingeki",
+                step_indicator: "Step {{current}} of {{total}}",
+                landing: {
+                    title: "Let's build the perfect <span>Anime</span> tracker",
+                    desc: "Bingeki is a future social and gamified platform for your anime and manga consumption. Give us your opinion to create the platform of your dreams."
+                },
+                steps: {
+                    profil: { title: "Profile", desc: "Getting to know you" },
+                    habitudes: { title: "Habits", desc: "Your consumption" },
+                    problemes: { title: "Frustrations", desc: "Current issues" },
+                    interet: { title: "Bingeki", desc: "Your interest in the project" },
+                    gamification: { title: "Gamification", desc: "Your motivation" },
+                    monetisation: { title: "Premium", desc: "Going further?" },
+                    communaute: { title: "Social", desc: "You and your friends" },
+                    libre: { title: "Open feedback", desc: "Your final word" },
+                    lead: { title: "Stay in touch", desc: "Don't miss out" }
+                },
+                questions: {
+                    age: "How old are you?",
+                    status: "What is your status?",
+                    consumption_frequency: "How often do you consume anime or manga?",
+                    anime_count: "How many animes do you follow in parallel?",
+                    reads_manga: "Do you also read manga?",
+                    devices: "What devices do you mainly use? (Multiple choices possible)",
+                    forgets_progress: "Do you sometimes forget where you are in a series?",
+                    current_tracking: "How do you track your progress today?",
+                    frustrations: "What frustrates you in current solutions?",
+                    interest_level: "Would a more social and gamified tracking platform interest you?",
+                    attractive_features: "What attracts you the most? (Multiple choices)",
+                    likes_gamification: "Do you like progression systems (levels, XP)?",
+                    motivation_drivers: "What would motivate you the most? (Multiple choices)",
+                    premium_interest: "Would you be willing to pay for premium features (on a free alternative without ads)?",
+                    premium_features: "What would you want in premium? (Multiple choices)",
+                    acceptable_price: "What monthly price would seem acceptable to you?",
+                    shares_friends: "Do you often share your discoveries with your friends?",
+                    social_platforms: "On which networks do you interact most around anime/manga?",
+                    social_interest: "Would you be interested in social functions (Friend feed, reactions, comments)?",
+                    must_have: "What feature would you ABSOLUTELY want to see in Bingeki?",
+                    daily_return: "What would make you use the app every day?",
+                    stay_in_touch: "Don't miss the launch 🎉",
+                    stay_in_touch_desc: "Leave your email to be notified of the official release of the app (no spam, promised).",
+                    wants_news: "Yes, I want to be contacted!",
+                    no_news: "No thanks."
+                },
+                options: {
+                    status: {
+                        etudiant: "Student",
+                        salarie: "Employee / Worker",
+                        autre: "Other"
+                    },
+                    frequency: {
+                        quotidien: "Every day",
+                        hebdomadaire: "Several times a week",
+                        mensuel: "A few times a month"
+                    },
+                    manga: {
+                        oui_beaucoup: "Yes, a lot",
+                        oui_un_peu: "Yes, once in a while",
+                        non: "No, not at all"
+                    },
+                    devices: {
+                        smartphone: "📱 Smartphone",
+                        pc: "💻 PC / Mac",
+                        tv: "📺 TV / Console",
+                        tablette: "📱 Tablet"
+                    },
+                    forget: {
+                        souvent: "Yes, very often",
+                        parfois: "From time to time",
+                        jamais: "No, I manage perfectly"
+                    },
+                    tracking: {
+                        myanimelist: "MyAnimeList / Anilist",
+                        notes: "Notepad / Notion / Excel",
+                        memoire: "From memory (my memory is enough)",
+                        autre: "Other"
+                    },
+                    interest: {
+                        beaucoup: "Yes, definitely!",
+                        un_peu: "Why not, to be tested.",
+                        pas_du_tout: "No, no interest for me."
+                    },
+                    features: {
+                        design: "🎨 A modern and mobile-first interface",
+                        gamification: "🎮 Earn XP and level up",
+                        social: "👥 See friends' activity and profile",
+                        statistiques: "📊 Advanced statistics on my viewing"
+                    },
+                    gamification: {
+                        like_much: "I love it!",
+                        like_some: "It's nice but secondary",
+                        no_interest: "I don't pay attention to it"
+                    },
+                    motivation: {
+                        badges: "🏆 Collect badges (ex: Watched 50 Isekai)",
+                        niveau: "⭐ Level up with my account",
+                        classement: "📈 A leaderboard with my friends",
+                        defis: "🎯 Challenges (Weekly goals for bonus)"
+                    },
+                    premium: {
+                        oui: "Yes, if the added value is there",
+                        peut_etre: "Maybe, it all depends on the price",
+                        non: "No, never"
+                    },
+                    premium_features: {
+                        personnalisation: "🎨 Max customization of my profile",
+                        badges_exclusifs: "💎 Exclusive badges/titles",
+                        stats_avancees: "📊 Super advanced viewing statistics",
+                        soutien: "❤️ Just supporting the Bingeki project"
+                    },
+                    social: {
+                        often: "Yes, all the time!",
+                        sometimes: "From time to time",
+                        solo: "I live my passion solo"
+                    },
+                    social_interest: {
+                        feed: "Yes, a real news feed of my buddies!",
+                        maybe: "A little, we'll see.",
+                        no: "Not specifically."
+                    }
+                },
+                placeholders: {
+                    frustrations: "Aging interfaces, too complicated, lack of features...",
+                    must_have: "The dream feature you haven't seen anywhere else...",
+                    daily_return: "Release notifications? Friend feed? Challenges?",
+                    email: "your@email.com"
+                },
+                footer: {
+                    start: "Start",
+                    next: "Next",
+                    back: "Back",
+                    finish: "Finish",
+                    submitting: "Sending..."
+                },
+                errors: {
+                    submit: "An error occurred. Please try again."
+                },
+                thank_you: {
+                    title: "Thank you very much!",
+                    message: "Your responses have been saved. Thanks to you, we will be able to build the platform we all dream of to follow our favorite anime and manga.",
+                    next_steps: "Want to go further?",
+                    join_site: "Join Bingeki",
+                    discord: "Join Discord",
+                    instagram: "Follow us on Instagram",
+                    tiktok: "Follow us on TikTok",
+                    home: "Back to home"
+                }
             }
         }
     }

@@ -11,11 +11,10 @@ export function RequireAdmin({ children }: { children: ReactNode }) {
         return null;
     }
 
-    // Hardcoded admin email for safety first approach
-    const ADMIN_EMAILS = ['moussandou.m@gmail.com', 'bingeki.official@gmail.com'];
-    const isAdmin = user && (ADMIN_EMAILS.includes(user.email || '') || userProfile?.isAdmin);
+    // Verify if the user has admin privileges in their Firestore profile
+    const isAdmin = user && userProfile?.isAdmin;
 
-    if (!user || !isAdmin) {
+    if (!isAdmin) {
         // Redirect to home page if not admin
         return <Navigate to="/" state={{ from: location }} replace />;
     }

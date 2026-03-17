@@ -150,6 +150,19 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    // SURVEYS
+    match /survey_responses/{responseId} {
+      // Public create, Admin read/write
+      allow create: if true;
+      allow read, write: if isAdmin();
+    }
+
+    match /survey_waitlist/{waitlistId} {
+      // Public create, Admin read/write
+      allow create: if true;
+      allow read, write: if isAdmin();
+    }
+
     // ==================== LEGACY / ROOT ACCESS ====================
     // DELETED: Legacy root collections removed for security.
     // All data must go through users/{userId}/data/ subcollections.

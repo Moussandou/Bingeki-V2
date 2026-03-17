@@ -1287,6 +1287,7 @@ export async function getAdminStats(): Promise<{
     totalFeedback: number;
     newUsersToday: number;
     pendingFeedback: number;
+    totalSurveyResponses: number;
 }> {
     try {
         const usersSnap = await getDocs(collection(db, 'users'));
@@ -1307,15 +1308,18 @@ export async function getAdminStats(): Promise<{
             return data.status === 'open' || data.status === 'in_progress';
         }).length;
 
+        const surveySnap = await getDocs(collection(db, 'survey_responses'));
+
         return {
             totalUsers: usersSnap.size,
             totalFeedback: feedbackSnap.size,
+            totalSurveyResponses: surveySnap.size,
             newUsersToday,
             pendingFeedback
         };
     } catch (error) {
         console.error('[Firestore] Error getting admin stats:', error);
-        return { totalUsers: 0, totalFeedback: 0, newUsersToday: 0, pendingFeedback: 0 };
+        return { totalUsers: 0, totalFeedback: 0, totalSurveyResponses: 0, newUsersToday: 0, pendingFeedback: 0 };
     }
 }
 
@@ -1677,6 +1681,31 @@ export async function getDeployments(limitCount = 10): Promise<DeploymentEvent[]
         } as DeploymentEvent));
     } catch (error) {
         console.error('[Firestore] Error fetching deployments:', error);
+        return [];
+    }
+}
+
+// ==================== SURVEY DASHBOARD ====================
+
+export interface SurveyResponse {
+    id: string;
+    surveyId: string;
+    answers: Record<string, any>;
+    submittedAt: number;
+    userAgent: string;
+    language: string;
+}
+
+export async function getSurveyResponses(): Promise<SurveyResponse[]> {
+    try {
+        const q = query(collection(db, 'survey_responses'), orderBy('submittedAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        } as SurveyResponse));
+    } catch (error) {
+        console.error('[Firestore] Error getting survey responses:', error);
         return [];
     }
 }
