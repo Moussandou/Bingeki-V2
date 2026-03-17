@@ -18,7 +18,8 @@ export const changelogData: ChangelogEntry[] = [
             'Social : Intégration complète d\'Instagram et TikTok (Footer + Survey).',
             'I18n : Ajout d\'un sélecteur de langue dynamique sur le formulaire.',
             'Security : Mise à jour des règles Firestore pour sécuriser les réponses.',
-            'Fix : Correction du lien Discord officiel sur toute la plateforme.'
+            'Fix : Correction du lien Discord officiel sur toute la plateforme.',
+            'I18n : Correction des clés de traduction pour le Dashboard Admin et le Questionnaire.'
         ]
     },
     {

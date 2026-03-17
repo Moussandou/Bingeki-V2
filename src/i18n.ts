@@ -1192,6 +1192,7 @@ const resources = {
                     users: "Utilisateurs",
                     feedback: "Feedback",
                     system: "Système",
+                    survey: "Questionnaire",
                     back_to_site: "Retour au site",
                     exit: "Exit"
                 },
@@ -1274,6 +1275,16 @@ const resources = {
                     data_shield: "Data Shield Protocol v3.0 Active",
                     manual_backup: "Lancer Backup Manuel",
                     live: "LIVE"
+                },
+                survey: {
+                    title: "Analyses du Questionnaire",
+                    loading: "Chargement des réponses...",
+                    total_responses: "réponses",
+                    raw_data: "Données brutes",
+                    date: "Date",
+                    email: "Email",
+                    profile: "Profil",
+                    interest: "Intérêt"
                 }
             },
             work_details: {
@@ -2792,6 +2803,7 @@ const resources = {
                     users: "Users",
                     feedback: "Feedback",
                     system: "System",
+                    survey: "Survey",
                     back_to_site: "Back to site",
                     exit: "Exit"
                 },
@@ -2874,6 +2886,16 @@ const resources = {
                     data_shield: "Data Shield Protocol v3.0 Active",
                     manual_backup: "Start Manual Backup",
                     live: "LIVE"
+                },
+                survey: {
+                    title: "Survey Analytics",
+                    loading: "Loading responses...",
+                    total_responses: "responses",
+                    raw_data: "Raw Data",
+                    date: "Date",
+                    email: "Email",
+                    profile: "Profile",
+                    interest: "Interest"
                 }
             },
             work_details: {
