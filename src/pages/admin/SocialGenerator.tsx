@@ -5,7 +5,6 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import styles from './SocialGenerator.module.css';
-import bgDashboard from '@/assets/theme/bg_dashboard.png';
 
 type FormatData = {
     id: string;
@@ -46,7 +45,10 @@ export default function SocialGenerator() {
     const [format, setFormat] = useState<string>('square');
     const [scale, setScale] = useState(0.4);
     const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
-    const [isDarkTheme, setIsDarkTheme] = useState(true);
+    const [isDarkTheme, setIsDarkTheme] = useState(false);
+    const [showHalftone, setShowHalftone] = useState(true);
+    const [showSpeedLines, setShowSpeedLines] = useState(false);
+    const [showDashboardBg, setShowDashboardBg] = useState(true);
     
     const [elements, setElements] = useState<DynamicElement[]>([
         {
@@ -55,7 +57,7 @@ export default function SocialGenerator() {
             content: 'DÉCOUVREZ BINGEKI !',
             x: 0,
             y: 0,
-            color: '#FFFFFF',
+            color: '#000000',
             fontSize: 80,
             fontWeight: 900,
             shadow: true,
@@ -68,11 +70,11 @@ export default function SocialGenerator() {
             content: 'La plateforme ultime pour suivre vos animés.',
             x: 0,
             y: 0,
-            color: '#FFFFFF',
+            color: '#000000',
             fontSize: 40,
             fontWeight: 700,
             shadow: true,
-            bgColor: 'rgba(0,0,0,0.6)',
+            bgColor: 'transparent',
             isTitle: false
         }
     ]);
@@ -130,7 +132,11 @@ export default function SocialGenerator() {
     // --- Actions ---
 
     const handlePointerDown = (e: React.PointerEvent, id: string) => {
-        // e.stopPropagation();
+        // Only trigger drag if we are not currently editing this text
+        if (selectedElementId === id && document.activeElement?.getAttribute('contenteditable')) {
+            return;
+        }
+
         setSelectedElementId(id);
         setDraggingId(id);
         setDragStartPos({ x: e.clientX, y: e.clientY });
@@ -142,11 +148,14 @@ export default function SocialGenerator() {
     const handlePointerMove = (e: React.PointerEvent) => {
         if (!draggingId) return;
         
-        // Prevent default text selection during drag
-        e.preventDefault();
-
+        // Prevent default text selection during drag if not in edit mode
         const el = elements.find(el => el.id === draggingId);
         if (!el) return;
+
+        // If it's a text element and currently being edited, don't drag
+        if (el.type === 'text' && selectedElementId === el.id && document.activeElement?.getAttribute('contenteditable')) {
+            return;
+        }
 
         const dx = (e.clientX - dragStartPos.x) / scale;
         const dy = (e.clientY - dragStartPos.y) / scale;
@@ -160,9 +169,9 @@ export default function SocialGenerator() {
     };
 
     const handlePointerUp = (e: React.PointerEvent) => {
-        if (draggingId) {
-            (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-            setDraggingId(null);
+        setDraggingId(null);
+        if (e.currentTarget instanceof HTMLElement) {
+            e.currentTarget.releasePointerCapture(e.pointerId);
         }
     };
 
@@ -188,47 +197,48 @@ export default function SocialGenerator() {
         }
     };
 
-    const handleImageUploadAsElement = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const url = URL.createObjectURL(file);
-            const newEl: DynamicElement = {
-                id: `el-${Date.now()}`,
-                type: 'image',
-                content: url,
-                x: 100,
-                y: 100,
-                color: '#FFFFFF', // Not used for images but required by type
-                fontSize: 100, // Used as width % for images initially, or px size
-                fontWeight: 400,
-                shadow: true,
-                bgColor: 'transparent',
-                isTitle: false
-            };
-            setElements([...elements, newEl]);
-            setSelectedElementId(newEl.id);
-            setActiveTab('elements');
-        }
-        // Reset the input value so user can upload the same image again if needed
-        e.target.value = '';
+
+    const addElement = (type: 'text' | 'image', content: string = 'NOUVEAU TEXTE') => {
+        const newElement: DynamicElement = { // Changed SocialElement to DynamicElement
+            id: Math.random().toString(36).substr(2, 9),
+            type,
+            content,
+            x: 50,
+            y: 50,
+            color: isDarkTheme ? '#ffffff' : '#000000',
+            fontSize: type === 'text' ? 40 : 200,
+            fontWeight: 400, // Added fontWeight
+            shadow: true,
+            bgColor: 'transparent', // Added bgColor
+            isTitle: false // Added isTitle
+        };
+        setElements([...elements, newElement]);
+        setSelectedElementId(newElement.id);
     };
 
-    const addTextElement = (isTitle: boolean) => {
-        const newEl: DynamicElement = {
-            id: `el-${Date.now()}`,
-            type: 'text',
-            content: isTitle ? 'NOUVEAU TITRE' : 'Nouveau texte',
-            x: 100,
-            y: 100,
-            color: '#FFFFFF',
-            fontSize: isTitle ? 80 : 40,
-            fontWeight: isTitle ? 900 : 700,
-            shadow: true,
-            bgColor: isTitle ? 'transparent' : 'rgba(0,0,0,0.6)',
-            isTitle
+    const addTemplate = (templateType: 'title' | 'subtitle' | 'body') => {
+        const templates = {
+            title: { content: 'TITRE CAPTIVANT', fontSize: 80, color: 'var(--color-primary)', fontWeight: 900, isTitle: true }, // Added fontWeight, isTitle
+            subtitle: { content: 'Sous-titre explicatif ici', fontSize: 40, color: isDarkTheme ? '#ffffff' : '#000000', fontWeight: 700, isTitle: false }, // Added fontWeight, isTitle
+            body: { content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', fontSize: 24, color: isDarkTheme ? '#cccccc' : '#333333', fontWeight: 400, isTitle: false } // Added fontWeight, isTitle
         };
-        setElements([...elements, newEl]);
-        setSelectedElementId(newEl.id);
+        
+        const config = templates[templateType];
+        const newElement: DynamicElement = { // Changed SocialElement to DynamicElement
+            id: Math.random().toString(36).substr(2, 9),
+            type: 'text',
+            content: config.content,
+            x: 50,
+            y: elements.length * 60 + 100,
+            color: config.color,
+            fontSize: config.fontSize,
+            fontWeight: config.fontWeight, // Used config.fontWeight
+            shadow: true,
+            bgColor: 'transparent', // Added bgColor
+            isTitle: config.isTitle // Used config.isTitle
+        };
+        setElements([...elements, newElement]);
+        setSelectedElementId(newElement.id);
         setActiveTab('elements');
     };
 
@@ -365,7 +375,7 @@ export default function SocialGenerator() {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <h1 style={{fontSize: '3rem', fontWeight: 900, textTransform: 'uppercase'}}>Social Generator <span style={{color: 'var(--color-primary)'}}>V2.1</span></h1>
+                <h1 style={{fontSize: '3rem', fontWeight: 900, textTransform: 'uppercase'}}>BINGEKI <span style={{color: 'var(--color-primary)'}}>GENERATOR</span></h1>
                 <Button 
                     variant="manga"
                     onClick={handleDownload}
@@ -462,25 +472,46 @@ export default function SocialGenerator() {
                             )}
 
                             {!backgroundImage && (
-                                <div className={styles.controlGroup} style={{marginTop: '1rem'}}>
-                                    <label>Thème du fond par défaut</label>
-                                    <div style={{display: 'flex', gap: '0.5rem'}}>
-                                        <Button 
-                                            variant={isDarkTheme ? 'manga' : 'outline'} 
-                                            onClick={() => setIsDarkTheme(true)}
-                                            style={{flex: 1}}
-                                        >
-                                            <Moon size={16} style={{marginRight: 6}} /> Sombre
-                                        </Button>
-                                        <Button 
-                                            variant={!isDarkTheme ? 'manga' : 'outline'} 
-                                            onClick={() => setIsDarkTheme(false)}
-                                            style={{flex: 1}}
-                                        >
-                                            <Sun size={16} style={{marginRight: 6}} /> Clair
-                                        </Button>
+                                <>
+                                    <div className={styles.controlGroup}>
+                                        <label>Thème du fond</label>
+                                        <div style={{display: 'flex', gap: '0.5rem'}}>
+                                            <Button 
+                                                variant={isDarkTheme ? 'manga' : 'outline'} 
+                                                onClick={() => setIsDarkTheme(true)}
+                                                style={{flex: 1}}
+                                            >
+                                                <Moon size={16} style={{marginRight: 6}} /> Sombre
+                                            </Button>
+                                            <Button 
+                                                variant={!isDarkTheme ? 'manga' : 'outline'} 
+                                                onClick={() => setIsDarkTheme(false)}
+                                                style={{flex: 1}}
+                                            >
+                                                <Sun size={16} style={{marginRight: 6}} /> Clair
+                                            </Button>
+                                        </div>
                                     </div>
-                                </div>
+
+                                    <div className={styles.checkboxGroup}>
+                                        <label>
+                                            <input type="checkbox" checked={showHalftone} onChange={e => setShowHalftone(e.target.checked)} />
+                                            Trame à points (Halftone)
+                                        </label>
+                                    </div>
+                                    <div className={styles.checkboxGroup}>
+                                        <label>
+                                            <input type="checkbox" checked={showSpeedLines} onChange={e => setShowSpeedLines(e.target.checked)} />
+                                            Lignes d'action (Speed Lines)
+                                        </label>
+                                    </div>
+                                    <div className={styles.checkboxGroup}>
+                                        <label>
+                                            <input type="checkbox" checked={showDashboardBg} onChange={e => setShowDashboardBg(e.target.checked)} />
+                                            Fond Dashboard Bingeki
+                                        </label>
+                                    </div>
+                                </>
                             )}
 
                         </div>
@@ -488,25 +519,60 @@ export default function SocialGenerator() {
 
                     {activeTab === 'elements' && (
                         <div className={styles.tabContent}>
-                            <div style={{display: 'flex', gap: '0.5rem', marginBottom: '1rem'}}>
-                                <Button variant="secondary" onClick={() => addTextElement(true)} style={{flex: 1}}>
-                                    <Plus size={16}/> Gros Titre
-                                </Button>
-                                <Button variant="secondary" onClick={() => addTextElement(false)} style={{flex: 1}}>
-                                    <Plus size={16}/> Texte
-                                </Button>
-                            </div>
-                            
-                            <label className={styles.imageUpload} style={{ border: '2px dashed var(--color-primary)', color: 'var(--color-primary)', padding: '0.75rem', marginBottom: '1rem' }}>
-                                <input 
-                                    type="file" 
-                                    accept="image/*" 
-                                    onChange={handleImageUploadAsElement} 
-                                    style={{ display: 'none' }} 
-                                />
-                                <ImageIcon size={16} style={{display: 'inline', marginRight: 8}}/> Ajouter Image Élément
-                            </label>
+                            {activeTab === 'elements' && (
+                                <div className={styles.controlsGrid}>
+                                    <div className={styles.sectionHeader}>Templates</div>
+                                    <div className={styles.templateGrid}>
+                                        <Button variant="outline" size="sm" onClick={() => addTemplate('title')} className={styles.templateBtn}>
+                                            <Type size={16} /> Titre
+                                        </Button>
+                                        <Button variant="outline" size="sm" onClick={() => addTemplate('subtitle')} className={styles.templateBtn}>
+                                            <Type size={14} /> Sous-titre
+                                        </Button>
+                                    </div>
 
+                                    <div className={styles.sectionHeader}>Ajouter</div>
+                                    <Button onClick={() => addElement('text')}>
+                                        <Plus size={18} /> Texte Libre
+                                    </Button>
+                                    
+                                    <div className={styles.uploadZone}>
+                                        <input
+                                            type="file"
+                                            id="image-upload"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) {
+                                                    const url = URL.createObjectURL(file);
+                                                    const newEl: DynamicElement = {
+                                                        id: `el-${Date.now()}`,
+                                                        type: 'image',
+                                                        content: url,
+                                                        x: 100,
+                                                        y: 100,
+                                                        color: '#FFFFFF',
+                                                        fontSize: 200,
+                                                        fontWeight: 400,
+                                                        shadow: true,
+                                                        bgColor: 'transparent',
+                                                        isTitle: false
+                                                    };
+                                                    setElements([...elements, newEl]);
+                                                    setSelectedElementId(newEl.id);
+                                                    setActiveTab('elements');
+                                                }
+                                                e.target.value = '';
+                                            }}
+                                            hidden
+                                        />
+                                        <label htmlFor="image-upload" className={styles.uploadLabel}>
+                                            <ImageIcon size={24} />
+                                            <span>Uploader Image</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            )}
                             <hr className={styles.divider} />
 
                             {renderPropertiesPanel()}
@@ -538,28 +604,18 @@ export default function SocialGenerator() {
                         >
                             {/* Base Theme Wrapper, visible if no valid image is set */}
                             {!backgroundImage && (
-                                <div 
-                                    className={`${styles.baseBgPattern} ${isDarkTheme ? styles.themeDark : styles.themeLight}`}
-                                    style={{
-                                        backgroundImage: `url(${bgDashboard})`,
-                                        backgroundSize: 'cover',
-                                        backgroundPosition: 'center',
-                                        backgroundBlendMode: isDarkTheme ? 'color-burn' : 'overlay',
-                                    }}
-                                >
+                                <div className={`${styles.baseBgPattern} ${isDarkTheme ? styles.themeDark : styles.themeLight}`}>
+                                    {showDashboardBg && <div className={styles.dashboardBg} />}
+                                    {showHalftone && <div className={styles.halftoneOverlay} />}
+                                    {showSpeedLines && <div className={styles.speedLinesOverlay} />}
                                 </div>
                             )}
 
-                            <div className={styles.brandWatermark} style={{color: !backgroundImage && !isDarkTheme ? '#000' : 'var(--color-primary)'}}>
-                                <img src="/logo.png" alt="Bingeki" className={styles.brandLogo} />
-                                BINGEKI
-                            </div>
-                            
                             {/* Dynamic Elements */}
                             {elements.map(el => (
                                 <div 
                                     key={el.id}
-                                    className={`${el.type === 'image' ? styles.presetImage : (el.isTitle ? styles.presetBasicTitle : styles.presetBasicText)} ${selectedElementId === el.id ? styles.selectedElement : ''} ${draggingId === el.id ? styles.isDragging : ''}`}
+                                    className={`${styles.element} ${selectedElementId === el.id ? styles.selected : ''} ${draggingId === el.id ? styles.dragging : ''}`}
                                     onPointerDown={(e) => handlePointerDown(e, el.id)}
                                     onPointerMove={handlePointerMove}
                                     onPointerUp={handlePointerUp}
@@ -567,47 +623,67 @@ export default function SocialGenerator() {
                                         left: el.x, 
                                         top: el.y,
                                         position: 'absolute',
-                                        color: el.type === 'text' ? el.color : undefined,
-                                        fontSize: el.type === 'text' ? `${el.fontSize}px` : undefined,
-                                        fontWeight: el.type === 'text' ? el.fontWeight : undefined,
-                                        textShadow: el.type === 'text' && el.shadow ? (el.isTitle ? '4px 4px 0 var(--color-primary), 0 4px 12px rgba(0,0,0,0.5)' : '2px 2px 0 #000, 0 2px 8px rgba(0,0,0,0.8)') : 'none',
-                                        background: el.bgColor
+                                        zIndex: el.id === selectedElementId ? 999 : 10,
+                                        backgroundColor: el.type === 'text' ? el.bgColor : 'transparent',
                                     }}
                                 >
                                     {el.type === 'text' ? (
                                         <div 
-                                            contentEditable={selectedElementId === el.id} // Only editable when selected so we can drag it easily
+                                            contentEditable={selectedElementId === el.id} 
                                             suppressContentEditableWarning
+                                            className={el.isTitle ? styles.presetBasicTitle : styles.presetBasicText}
                                             onBlur={(e) => updateElement(el.id, { content: e.currentTarget.innerText })}
                                             onPointerDown={(e) => {
-                                                if (selectedElementId === el.id) e.stopPropagation(); // If already selected, let user click to put cursor without dragging
+                                                if (selectedElementId === el.id) e.stopPropagation(); 
+                                            }}
+                                            onDoubleClick={(e) => {
+                                                const target = e.currentTarget;
+                                                setTimeout(() => target.focus(), 0);
                                             }}
                                             style={{
                                                 outline: 'none',
                                                 minWidth: '50px',
-                                                cursor: selectedElementId === el.id ? 'text' : 'inherit',
+                                                cursor: selectedElementId === el.id ? 'text' : 'grab',
                                                 display: 'inline-block',
                                                 width: '100%',
                                                 whiteSpace: 'pre-wrap',
                                                 wordBreak: 'break-word',
+                                                fontSize: `${el.fontSize}px`,
+                                                color: el.color,
+                                                fontWeight: el.fontWeight,
+                                                textTransform: el.isTitle ? 'uppercase' : 'none',
+                                                lineHeight: 1.1,
+                                                letterSpacing: el.isTitle ? '-0.02em' : 'normal',
+                                                textShadow: el.shadow ? '4px 4px 0px rgba(0,0,0,0.3)' : 'none',
                                             }}
                                         >
                                             {el.content}
                                         </div>
                                     ) : (
                                         <div style={{
-                                            filter: el.shadow ? 'drop-shadow(6px 6px 0px var(--color-primary)) drop-shadow(0 4px 12px rgba(0,0,0,0.5))' : 'none'
+                                            filter: el.shadow ? 'drop-shadow(10px 10px 0px var(--color-primary))' : 'none',
+                                            transition: 'filter 0.2s ease',
+                                            backgroundColor: 'transparent'
                                         }}>
                                             <img 
                                                 src={el.content} 
                                                 alt="Uploaded Element" 
-                                                style={{ width: `${el.fontSize}px`, height: 'auto', display: 'block', pointerEvents: 'none' }}
+                                                style={{ width: `${el.fontSize}px`, height: 'auto', display: 'block', pointerEvents: 'none', backgroundColor: 'transparent' }}
                                                 crossOrigin="anonymous"
                                             />
                                         </div>
                                     )}
                                 </div>
                             ))}
+
+                            {/* Brand Watermark (Integrated in export) */}
+                            <div className={styles.brandWatermark} style={{
+                                color: (isDarkTheme || backgroundImage) ? 'white' : 'black',
+                                opacity: 0.8
+                            }}>
+                                <img src="/logo.png" alt="Bingeki Logo" className={styles.brandLogo} />
+                                <span className={styles.watermarkText}>BINGEKI</span>
+                            </div>
                         </div>
                     </div>
                 </div>

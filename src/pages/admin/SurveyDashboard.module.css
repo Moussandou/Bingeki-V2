@@ -63,9 +63,46 @@
     margin-right: 0.25rem;
 }
 
+.summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.summaryCard {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.summaryIcon {
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    opacity: 0.1;
+    transform: rotate(-15deg);
+}
+
+.summaryLabel {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--color-text-dim);
+    font-family: var(--font-mono);
+}
+
+.summaryValue {
+    font-size: 2.5rem;
+    font-family: var(--font-heading);
+    line-height: 1;
+}
+
 .chartsGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
     gap: 1.5rem;
 }
 
@@ -87,18 +124,21 @@
 .chartCard h3 {
     font-family: var(--font-heading);
     text-transform: uppercase;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     border-bottom: 2px solid var(--color-border);
     padding-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .chartContainer {
-    height: 300px;
+    height: 280px;
     width: 100%;
 }
 
 .responsesSection {
-    margin-top: 2rem;
+    margin-top: 1rem;
 }
 
 .sectionTitle {
@@ -114,9 +154,9 @@
 }
 
 .tableContainer {
-    overflow-x: auto;
     border: 2px solid var(--color-border);
     background: var(--color-surface);
+    overflow-x: auto;
 }
 
 .responsesTable {
@@ -124,6 +164,7 @@
     border-collapse: collapse;
     font-family: var(--font-mono);
     font-size: 0.9rem;
+    min-width: 800px; /* Ensure table doesn't cramp */
 }
 
 .responsesTable th {
@@ -133,44 +174,59 @@
     padding: 1rem;
     text-transform: uppercase;
     font-family: var(--font-heading);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
 }
+
+/* Explicit column widths for alignment */
+.responsesTable th:nth-child(1), .responsesTable td:nth-child(1) { width: 140px; }
+.responsesTable th:nth-child(2), .responsesTable td:nth-child(2) { width: auto; }
+.responsesTable th:nth-child(3), .responsesTable td:nth-child(3) { width: 220px; }
+.responsesTable th:nth-child(4), .responsesTable td:nth-child(4) { width: 180px; }
+.responsesTable th:nth-child(5), .responsesTable td:nth-child(5) { width: 60px; text-align: right; }
 
 .responsesTable tr {
     border-bottom: 1px solid var(--color-border);
-    cursor: pointer;
     transition: background 0.2s;
 }
 
-.responsesTable tr:hover {
+.responsesTable tbody tr:not(.detailsRow):hover {
     background: var(--color-surface-hover);
+    cursor: pointer;
 }
 
 .responsesTable td {
     padding: 1rem;
+    vertical-align: middle;
 }
 
 .expandedRow {
     background: var(--color-surface-hover);
-    border-bottom: none;
 }
 
 .dateTime, .emailCell {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .tag {
-    padding: 0.25rem 0.5rem;
+    padding: 0.25rem 0.6rem;
     font-weight: bold;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     border-radius: 2px;
+    display: inline-block;
 }
 
-.interest_Extr_mement_int_ress_ { background: #fee2e2; color: #ef4444; border: 1px solid #ef4444; }
-.interest_Int_ress_ { background: #dcfce7; color: #10b981; border: 1px solid #10b981; }
-.interest_Curieux { background: #fef3c7; color: #f59e0b; border: 1px solid #f59e0b; }
+.interest_Extr_mement_int_ress_ { background: #ef4444; color: #fff; border: 1px solid #ef4444; }
+.interest_Int_ress_ { background: #10b981; color: #fff; border: 1px solid #10b981; }
+.interest_Curieux { background: #f59e0b; color: #fff; border: 1px solid #f59e0b; }
+.interest_Pas_vraiment { background: #94a3b8; color: #fff; border: 1px solid #94a3b8; }
+.interest_Unknown { background: #64748b; color: #fff; }
 
 .detailsRow {
     background: var(--color-surface-hover);
@@ -239,4 +295,22 @@
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+.emptyState {
+    padding: 4rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    font-family: var(--font-mono);
+    border: 2px dashed var(--color-border);
+    background: transparent;
+    color: var(--color-text-dim);
+}
+
+.emptyState p {
+    font-size: 1.2rem;
+    text-transform: uppercase;
 }

@@ -10,11 +10,12 @@ export const changelogData: ChangelogEntry[] = [
     {
         version: 'v3.7',
         date: '17 Mars 2026',
-        title: 'Survey & Admin Revolution',
+        title: 'Survey & Dashboard Revolution',
         description: 'Refonte complète du questionnaire, tableau de bord admin et intégration sociale.',
         changes: [
             'Survey : UX repensée avec affichage séquentiel et auto-scroll fluide.',
-            'Admin : Nouveau Dashboard pour visualiser les résultats du questionnaire en temps réel.',
+            'Admin : Nouveau Dashboard avec cards de statistiques (Total, Waitlist, Intérêt).',
+            'Admin : Visualisation enrichie via graphiques Donuts et meilleure lisibilité des données brutes.',
             'Social : Intégration complète d\'Instagram et TikTok (Footer + Survey).',
             'I18n : Ajout d\'un sélecteur de langue dynamique sur le formulaire.',
             'Security : Mise à jour des règles Firestore pour sécuriser les réponses.',
