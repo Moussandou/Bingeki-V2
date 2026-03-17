@@ -93,7 +93,18 @@ const LanguageManager = () => {
   // If language is invalid or missing, redirect to detection
   if (!lang || !['fr', 'en'].includes(lang)) {
     const detectedLang = i18n.language || 'fr';
-    const cleanPath = location.pathname === '/' ? '' : location.pathname;
+    let cleanPath = location.pathname;
+
+    // If path already starts with a valid language but LanguageManager matched something else
+    // (e.g. /fr/form but lang parameter was captured as something else, which shouldn't happen
+    // with :lang route but let's be safe), or if it's already prefixed in general.
+    if (cleanPath.startsWith('/fr/') || cleanPath.startsWith('/en/') || cleanPath === '/fr' || cleanPath === '/en') {
+      // In this case, we're likely in a loop if we stay here, 
+      // but let's just make sure we don't ADD another prefix.
+      return <div className="flex h-screen items-center justify-center">404 - Page Not Found</div>;
+    }
+
+    if (cleanPath === '/') cleanPath = '';
     return <Navigate to={`/${detectedLang}${cleanPath}${location.search}`} replace />;
   }
 
@@ -110,7 +121,14 @@ const RootRedirect = () => {
   }
 
   const lang = i18n.language === 'en' ? 'en' : 'fr';
-  return <Navigate to={`/${lang}${location.pathname}${location.search}`} replace />;
+  const currentPath = location.pathname;
+
+  // If already prefixed, don't re-prefix (this happens if a route falls through)
+  if (currentPath.startsWith('/fr/') || currentPath.startsWith('/en/') || currentPath === '/fr' || currentPath === '/en') {
+    return <div className="flex h-screen items-center justify-center">404 - Page Not Found</div>;
+  }
+
+  return <Navigate to={`/${lang}${currentPath}${location.search}`} replace />;
 };
 
 function App() {

@@ -19,6 +19,7 @@ export const changelogData: ChangelogEntry[] = [
             'I18n : Ajout d\'un sélecteur de langue dynamique sur le formulaire.',
             'Security : Mise à jour des règles Firestore pour sécuriser les réponses.',
             'Fix : Correction du lien Discord officiel sur toute la plateforme.',
+            'Fix : Résolution de la boucle de redirection infinie sur les URLs localisées.',
             'I18n : Correction des clés de traduction pour le Dashboard Admin et le Questionnaire.'
         ]
     },
