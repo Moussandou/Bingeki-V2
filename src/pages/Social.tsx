@@ -62,14 +62,15 @@ export default function Social() {
         if (activeTab === 'ranking') {
             const data = await getFilteredLeaderboard(leaderboardCategory, leaderboardPeriod, 20);
             setLeaderboard(data);
-            // Check if current user is in the top 20, if not fetch their rank
+            // Always fetch user rank so we can show it if they're not in the visible top 8
+            // (top 3 podium + 5 initially displayed in list)
             if (user) {
-                const isInTop20 = data.some(u => u.uid === user.uid);
-                if (!isInTop20) {
+                const isInTop3 = data.slice(0, 3).some(u => u.uid === user.uid);
+                if (isInTop3) {
+                    setCurrentUserRank(null);
+                } else {
                     const rankData = await getUserRank(user.uid, leaderboardCategory);
                     setCurrentUserRank(rankData);
-                } else {
-                    setCurrentUserRank(null);
                 }
             }
         } else if (activeTab === 'activity' && user) {

@@ -116,8 +116,8 @@ export const RankingList: React.FC<RankingListProps> = ({
                 </div>
             )}
 
-            {/* Current user rank when outside the displayed list */}
-            {currentUserRank && (
+            {/* Current user rank when not visible in the currently displayed items */}
+            {currentUserRank && !displayedUsers.some(u => u.uid === currentUserRank.profile.uid) && (
                 <div className={styles.currentUserSection}>
                     <div className={styles.separator}>
                         <div className={styles.separatorLine} />
