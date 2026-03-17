@@ -70,6 +70,7 @@ const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
 const AdminUsers = lazy(() => import('@/pages/admin/Users'));
 const AdminFeedback = lazy(() => import('@/pages/admin/FeedbackAdmin'));
 const AdminSystem = lazy(() => import('@/pages/admin/SystemLogs'));
+const AdminSocialGenerator = lazy(() => import('@/pages/admin/SocialGenerator'));
 
 // Language Manager Component
 const LanguageManager = () => {
@@ -368,11 +369,7 @@ function App() {
               <Route path="contact" element={<Contact />} />
               <Route path="about" element={<About />} />
               <Route path="credits" element={<Credits />} />
-              <Route path="assets" element={
-                <RequireAdmin>
-                  <Assets />
-                </RequireAdmin>
-              } />
+
               <Route path="donors" element={<Donors />} />
               <Route path="news" element={<NewsIndex />} />
               <Route path="news/article/:slug" element={<NewsArticle />} />
@@ -386,6 +383,8 @@ function App() {
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="feedback" element={<AdminFeedback />} />
                 <Route path="system" element={<AdminSystem />} />
+                <Route path="social-generator" element={<AdminSocialGenerator />} />
+                <Route path="assets" element={<Assets />} />
               </Route>
             </Route>
 
