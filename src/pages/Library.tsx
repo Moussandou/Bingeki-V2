@@ -15,7 +15,7 @@ import { statusToFrench } from '@/utils/statusTranslation';
 import { useToast } from '@/context/ToastContext';
 import { exportData, importData } from '@/utils/storageUtils';
 import { useTranslation } from 'react-i18next';
-import { loadLibraryFromFirestore, loadFullLibraryData, getUserProfile, updateFolderSharing, updateLibrarySharing, checkFriendship, type UserProfile } from '@/firebase/firestore';
+import { loadFullLibraryData, getUserProfile, updateFolderSharing, updateLibrarySharing, checkFriendship, type UserProfile } from '@/firebase/firestore';
 import { MALImportModal } from '@/components/library/MALImportModal';
 import { FolderModal } from '@/components/library/FolderModal';
 import { ShareModal } from '@/components/library/ShareModal';
@@ -34,7 +34,7 @@ export default function Library() {
     const [friendWorks, setFriendWorks] = useState<Work[]>([]);
     const [friendFolders, setFriendFolders] = useState<Folder[]>([]);
     const [friendProfile, setFriendProfile] = useState<UserProfile | null>(null);
-    const [friendLibrarySharing, setFriendLibrarySharing] = useState<FolderSharing | undefined>(undefined);
+    const [, setFriendLibrarySharing] = useState<FolderSharing | undefined>(undefined);
     const [isLoadingFriend, setIsLoadingFriend] = useState(false);
     const [accessDenied, setAccessDenied] = useState<string | null>(null);
 

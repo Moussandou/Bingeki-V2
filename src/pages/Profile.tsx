@@ -23,8 +23,7 @@ import {
     Clock,
     Share2,
     Copy,
-    Check,
-    Link2
+    Check
 } from 'lucide-react';
 import { HunterLicenseCard } from '@/components/profile/HunterLicenseCard';
 import { getUserProfile, saveUserProfileToFirestore, compareLibraries, checkFriendship, sendFriendRequest, type UserProfile } from '@/firebase/firestore';
