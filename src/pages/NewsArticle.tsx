@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { ArrowLeft, ExternalLink, Calendar, Link as LinkIcon, List, BookOpen, ArrowUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr, enUS } from 'date-fns/locale';
+import DOMPurify from 'dompurify';
 
 interface NewsItem {
     slug: string;
@@ -287,7 +288,7 @@ export default function NewsArticle() {
                                         color: 'var(--color-text)',
                                         flex: 1
                                     }}
-                                    dangerouslySetInnerHTML={{ __html: article.content }}
+                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content) }}
                                 />
 
                                 {/* Sidebar Sticky TOC */}

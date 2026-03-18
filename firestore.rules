@@ -96,8 +96,14 @@ service cloud.firestore {
 
     // WATCH PARTIES
     match /watchparties/{partyId} {
-      allow read, create: if isAuthenticated();
-      allow update: if isAuthenticated();
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        resource.data.creatorId == request.auth.uid || 
+        isAdmin() ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['participants', 'lastAction', 'actions']))
+      );
+      allow delete: if isAuthenticated() && (resource.data.creatorId == request.auth.uid || isAdmin());
     }
 
     // ACTIVITY FEED
@@ -152,15 +158,15 @@ service cloud.firestore {
     
     // SURVEYS
     match /survey_responses/{responseId} {
-      // Public create, Admin read/write
-      allow create: if true;
-      allow read, write: if isAdmin();
+      allow read: if isAdmin();
+      allow create: if true; // Public can submit
+      allow update, delete: if isAdmin();
     }
 
-    match /survey_waitlist/{waitlistId} {
-      // Public create, Admin read/write
-      allow create: if true;
-      allow read, write: if isAdmin();
+    match /survey_waitlist/{entryId} {
+      allow read: if isAdmin();
+      allow create: if true; // Public can join waitlist
+      allow update, delete: if isAdmin();
     }
 
     // ==================== LEGACY / ROOT ACCESS ====================
