@@ -1669,7 +1669,10 @@ const resources = {
                     next: "Suivant",
                     back: "Retour",
                     finish: "Terminer",
-                    submitting: "Envoi..."
+                    submitting: "Envoi...",
+                    join_title: "PRÊT À REJOINDRE L'AVENTURE ?",
+                    join_button: "REJOINDRE BINGEKI",
+                    follow_insta: "Retrouvez-nous sur Instagram"
                 },
                 errors: {
                     submit: "Une erreur est survenue. Veuillez réessayer."
@@ -3346,7 +3349,10 @@ const resources = {
                     next: "Next",
                     back: "Back",
                     finish: "Finish",
-                    submitting: "Sending..."
+                    submitting: "Sending...",
+                    join_title: "READY TO JOIN THE ADVENTURE?",
+                    join_button: "JOIN BINGEKI",
+                    follow_insta: "Follow us on Instagram"
                 },
                 errors: {
                     submit: "An error occurred. Please try again."

@@ -400,3 +400,92 @@
     width: 100% !important;
   }
 }
+
+.joinSection {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: var(--color-surface);
+  border: 3px solid var(--color-border-heavy);
+  box-shadow: 8px 8px 0 var(--color-shadow);
+  text-align: center;
+  position: relative;
+}
+
+.joinSection::before {
+  content: "BINGEKI NETWORK";
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: var(--color-primary);
+  color: white;
+  padding: 2px 10px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.joinDivider {
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-border-heavy),
+    var(--color-border-heavy) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  margin-bottom: 2rem;
+}
+
+.joinTitle {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+
+.joinActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.joinBtn {
+  background: var(--color-primary) !important;
+  color: white !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 1rem 2rem !important;
+  border-radius: 0 !important;
+  box-shadow: 4px 4px 0 var(--color-shadow);
+  transition: all 0.2s ease;
+}
+
+.joinBtn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--color-shadow);
+}
+
+.instaLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text);
+  font-weight: 700;
+  text-decoration: none;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  padding: 0.8rem 1.5rem;
+  border: 3px solid var(--color-border-heavy);
+  transition: all 0.2s ease;
+}
+
+.instaLink:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}

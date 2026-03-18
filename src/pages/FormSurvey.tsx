@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Globe } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Globe, Instagram } from 'lucide-react';
 import { db, analytics } from '@/firebase/config';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { logEvent } from 'firebase/analytics';
@@ -606,6 +606,29 @@ export default function FormSurvey() {
                         />
                       </motion.div>
                     )}
+                  </div>
+                </div>
+
+                <div className={styles.joinSection}>
+                  <div className={styles.joinDivider} />
+                  <h3 className={styles.joinTitle}>{t('survey.footer.join_title')}</h3>
+                  <div className={styles.joinActions}>
+                    <Button 
+                      type="button" 
+                      className={styles.joinBtn}
+                      onClick={() => localizedNavigate('/auth')}
+                    >
+                      {t('survey.footer.join_button')}
+                    </Button>
+                    <a 
+                      href="https://www.instagram.com/bingeki.fr" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={styles.instaLink}
+                    >
+                      <Instagram size={20} />
+                      <span>{t('survey.footer.follow_insta')}</span>
+                    </a>
                   </div>
                 </div>
               </div>
