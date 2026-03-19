@@ -38,6 +38,7 @@ interface FormData {
   dailyReturnReason: string;
   wantsLaunchNews: string;
   email: string;
+  referralSource: string;
 }
 
 const slideVariants = {
@@ -365,6 +366,18 @@ export default function FormSurvey() {
                     <RadioOption name="status" value="etudiant" label={t('survey.options.status.etudiant')} questionIndex={2} watch={watch} setValue={setValue} visibleQuestions={visibleQuestions} setVisibleQuestions={setVisibleQuestions} />
                     <RadioOption name="status" value="salarie" label={t('survey.options.status.salarie')} questionIndex={2} watch={watch} setValue={setValue} visibleQuestions={visibleQuestions} setVisibleQuestions={setVisibleQuestions} />
                     <RadioOption name="status" value="autre" label={t('survey.options.status.autre')} questionIndex={2} watch={watch} setValue={setValue} visibleQuestions={visibleQuestions} setVisibleQuestions={setVisibleQuestions} />
+                  </QuestionContainer>
+
+                  <QuestionContainer isVisible={visibleQuestions >= 3}>
+                    <h3 className={styles.questionTitle}>{t('survey.questions.referral_source')}</h3>
+                    <div className={styles.optionsGrid}>
+                      <RadioOption name="referralSource" value="tiktok" label={t('survey.options.referral.tiktok')} questionIndex={3} watch={watch} setValue={setValue} visibleQuestions={visibleQuestions} setVisibleQuestions={setVisibleQuestions} />
+                      <RadioOption name="referralSource" value="instagram" label={t('survey.options.referral.instagram')} questionIndex={3} watch={watch} setValue={setValue} visibleQuestions={visibleQuestions} setVisibleQuestions={setVisibleQuestions} />
+                      <RadioOption name="referralSource" value="discord" label={t('survey.options.referral.discord')} questionIndex={3} watch={watch} setValue={setValue} visibleQuestions={visibleQuestions} setVisibleQuestions={setVisibleQuestions} />
+                      <RadioOption name="referralSource" value="bouche_a_oreille" label={t('survey.options.referral.word_of_mouth')} questionIndex={3} watch={watch} setValue={setValue} visibleQuestions={visibleQuestions} setVisibleQuestions={setVisibleQuestions} />
+                      <RadioOption name="referralSource" value="recherche" label={t('survey.options.referral.search')} questionIndex={3} watch={watch} setValue={setValue} visibleQuestions={visibleQuestions} setVisibleQuestions={setVisibleQuestions} />
+                      <RadioOption name="referralSource" value="autre" label={t('survey.options.referral.other')} questionIndex={3} watch={watch} setValue={setValue} visibleQuestions={visibleQuestions} setVisibleQuestions={setVisibleQuestions} />
+                    </div>
                   </QuestionContainer>
                 </div>
               </div>

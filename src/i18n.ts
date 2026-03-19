@@ -1577,6 +1577,7 @@ const resources = {
                     stay_in_touch_desc: "Laisse ton e-mail pour être prévenu de la sortie officielle de l'application (pas de spam, promis).",
                     wants_news: "Oui, je veux être recontacté !",
                     no_news: "Non merci.",
+                    referral_source: "Comment nous as-tu connu ?",
                     ageRange: "Tranches d'âge",
                     interestLevel: "Niveau d'intérêt",
                     mostAttractiveFeatures: "Fonctionnalités"
@@ -1651,6 +1652,14 @@ const resources = {
                         often: "Oui, tout le temps !",
                         sometimes: "De temps en temps",
                         solo: "Je vis ma passion en solo"
+                    },
+                    referral: {
+                        tiktok: "📱 TikTok",
+                        instagram: "📸 Instagram",
+                        discord: "👾 Discord",
+                        word_of_mouth: "🗣️ Bouche à oreille",
+                        search: "🔍 Recherche (Google...)",
+                        other: "✨ Autre"
                     },
                     social_interest: {
                         feed: "Oui, un vrai fil d'actu de mes potes !",
@@ -3265,6 +3274,7 @@ const resources = {
                     stay_in_touch_desc: "Leave your email to be notified of the official release of the app (no spam, promised).",
                     wants_news: "Yes, I want to be contacted!",
                     no_news: "No thanks.",
+                    referral_source: "How did you hear about us?",
                     ageRange: "Age Range",
                     interestLevel: "Interest Level",
                     mostAttractiveFeatures: "Attractive Features"
@@ -3339,6 +3349,14 @@ const resources = {
                         often: "Yes, all the time!",
                         sometimes: "From time to time",
                         solo: "I live my passion solo"
+                    },
+                    referral: {
+                        tiktok: "📱 TikTok",
+                        instagram: "📸 Instagram",
+                        discord: "👾 Discord",
+                        word_of_mouth: "🗣️ Word of mouth",
+                        search: "🔍 Search (Google...)",
+                        other: "✨ Other"
                     },
                     social_interest: {
                         feed: "Yes, a real news feed of my buddies!",

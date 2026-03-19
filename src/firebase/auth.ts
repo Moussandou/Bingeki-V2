@@ -27,7 +27,10 @@ export const loginWithDiscord = async (): Promise<User | null> => {
 
         return result.user;
     } catch (error) {
-        console.error("Error logging in with Discord", error);
+        console.error("Error logging in with Discord:", error);
+        if (error && typeof error === 'object' && 'code' in error) {
+            console.error("Discord Auth Error Code:", (error as any).code);
+        }
         return null;
     }
 };
@@ -39,7 +42,12 @@ export const loginWithGoogle = async (): Promise<User | null> => {
         const result = await signInWithPopup(auth, googleProvider);
         return result.user;
     } catch (error) {
-        console.error("Error logging in with Google", error);
+        console.error("Error logging in with Google:", error);
+        if (error && typeof error === 'object' && 'code' in error) {
+            const err = error as { code: string; message: string };
+            console.error("Google Auth Error Code:", err.code);
+            console.error("Google Auth Error Message:", err.message);
+        }
         return null;
     }
 };
