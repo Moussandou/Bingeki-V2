@@ -1,10 +1,29 @@
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
+
+admin.initializeApp();
+const app = express();
+
+function escapeHtml(unsafe) {
+    if (!unsafe) return '';
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 // SVG Template Helper - Hunter License Style
 function generateProfileSVG(userData, stats, lang) {
     const displayName = escapeHtml(userData.displayName || 'Chasseur');
     const level = stats.level || 1;
     const xp = stats.xp || 0;
     const xpToNextLevel = stats.xpToNextLevel || 100;
-    const streak = stats.streak || 0;
+    const streak = stats.streak || 1;
     const uid = userData.uid ? userData.uid.slice(0, 8).toUpperCase() : 'BINGEKI';
     const accentColor = userData.themeColor || '#FF2E63';
     
@@ -50,7 +69,7 @@ function generateProfileSVG(userData, stats, lang) {
         <!-- XP -->
         <text x="370" y="340" font-family="sans-serif" font-weight="700" font-size="18" fill="#a0a0a0" text-transform="uppercase">${labelXp}</text>
         <rect x="370" y="355" width="580" height="20" rx="10" fill="#333333" />
-        <rect x="370" y="355" width="${Math.min((xp / xpToNextLevel) * 580, 580)}" height="20" rx="10" fill="${accentColor}" />
+        <rect x="370" y="355" width="${Math.min(((xp || 0) / (xpToNextLevel || 100)) * 580, 580)}" height="20" rx="10" fill="${accentColor}" />
         <text x="950" y="340" text-anchor="end" font-family="sans-serif" font-weight="700" font-size="18" fill="white">${xp} / ${xpToNextLevel} XP</text>
         
         <!-- Streak & Others -->
@@ -93,31 +112,28 @@ function generateNewsSVG(newsData, lang) {
         <!-- Title Box -->
         <rect x="60" y="250" width="1080" height="250" rx="10" fill="rgba(0,0,0,0.8)" stroke="#FF2E63" stroke-width="4" />
         
-        <!-- Multi-line Title Support (Simple split) -->
+        <!-- Multi-line Title Support -->
         <text x="100" y="330" font-family="sans-serif" font-weight="900" font-size="50" fill="white">
             ${title.length > 40 ? title.substring(0, 40) + '...' : title}
         </text>
         
-        <text x="100" y="420" font-family="sans-serif" font-weight="700" font-size="24" fill="#FF2E63">${source}</text>
-        <text x="100" y="460" font-family="sans-serif" font-weight="400" font-size="20" fill="#a0a0a0">${date}</text>
+        <text x="100" y="420" font-family="sans-serif" font-weight="700" font-size="24" fill="#FF2E63">${source} • ${date}</text>
         
-        <text x="1100" y="580" text-anchor="end" font-family="sans-serif" font-weight="700" font-size="20" fill="#666666">bingeki.web.app</text>
+        <!-- Footer -->
+        <text x="1100" y="580" text-anchor="end" font-family="sans-serif" font-weight="700" font-size="20" fill="white" opacity="0.3">bingeki.web.app</text>
     </svg>`;
 }
 
 // SVG Template for Generic Pages
 function generateGenericSVG(title, description, lang) {
-    const finalTitle = escapeHtml(title || (lang === 'en' ? 'Your Manga Adventure' : 'Votre aventure Manga'));
+    const cleanTitle = escapeHtml(title || 'Bingeki');
     const finalDesc = escapeHtml(description || '');
-    
-    // Clean up title (remove | Bingeki if present)
-    const cleanTitle = finalTitle.split('|')[0].trim();
 
     return `
     <svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <linearGradient id="genBg" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:#FF2E63" />
+                <stop offset="0%" style="stop-color:#1a1a1a" />
                 <stop offset="100%" style="stop-color:#080808" />
             </linearGradient>
             <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
@@ -163,8 +179,6 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
     const title = req.query.title || '';
     const desc = req.query.desc || '';
     
-    console.log(`[OG-IMAGE] Request: ${type}/${id} (lang: ${lang})`);
-
     try {
         let svg = '';
         if (type === 'profile' && id) {
@@ -179,7 +193,6 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
             }
         }
         
-        // Fallback to generic if no specific data found or type is generic
         if (!svg) {
             svg = generateGenericSVG(title, desc, lang);
         }
@@ -195,7 +208,6 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
 
 app.get('/*', async (req, res) => {
     const url = req.url;
-    console.log('[SEO] Handling request:', url);
 
     // Default values
     let title = "Bingeki | Votre aventure Manga";
@@ -226,7 +238,6 @@ app.get('/*', async (req, res) => {
     // Load Data based on Route
     if (profileUid) {
         try {
-            console.log(`[SEO] Fetching user: ${profileUid}`);
             const userDoc = await admin.firestore().collection('users').doc(profileUid).get();
             if (userDoc.exists) {
                 const userData = userDoc.data();
@@ -239,7 +250,6 @@ app.get('/*', async (req, res) => {
         }
     } else if (articleSlug) {
         try {
-            console.log(`[SEO] Fetching article: ${articleSlug}`);
             const newsSnapshot = await admin.firestore().collection('news').doc(articleSlug).get();
             if (newsSnapshot.exists) {
                 const newsData = newsSnapshot.data();
@@ -251,25 +261,21 @@ app.get('/*', async (req, res) => {
             console.error('[SEO] Firestore error (News):', e);
         }
     } else {
-        // Handle other routes for better titles
-        const path = parts[parts.length - 1];
-        if (path === 'leaderboard') {
+        const pathSuffix = parts[parts.length - 1];
+        if (pathSuffix === 'leaderboard') {
             title = lang === 'en' ? "Leaderboard | Bingeki" : "Classement | Bingeki";
             description = lang === 'en' ? "Who are the top hunters? Check the global ranking!" : "Qui sont les meilleurs chasseurs ? Consultez le classement mondial !";
-        } else if (path === 'badges') {
+        } else if (pathSuffix === 'badges') {
             title = lang === 'en' ? "Badges Gallery | Bingeki" : "Galerie des Badges | Bingeki";
             description = lang === 'en' ? "Discover all collectable badges and their requirements." : "Découvrez tous les badges à collectionner et comment les obtenir.";
-        } else if (path === 'manga' || path === 'search') {
+        } else if (pathSuffix === 'manga' || pathSuffix === 'search') {
             title = lang === 'en' ? "Search Manga | Bingeki" : "Rechercher un Manga | Bingeki";
-        } else if (path === 'survey') {
+        } else if (pathSuffix === 'survey') {
             title = lang === 'en' ? "Manga Survey | Bingeki" : "Sondage Manga | Bingeki";
         }
-
-        // Use dynamic generic image for all other pages
         image = `https://bingeki.web.app/api/og-image?title=${encodeURIComponent(title)}&desc=${encodeURIComponent(description)}&lang=${lang}`;
     }
 
-    // Load index.html
     const indexFileName = lang === 'en' ? 'index-en.html' : 'index.html';
     const indexPath = path.join(__dirname, indexFileName);
     let html;
@@ -283,12 +289,10 @@ app.get('/*', async (req, res) => {
         }
     }
 
-    // Inject Meta Tags
     const finalTitle = escapeHtml(title);
     const finalDesc = escapeHtml(description);
     const finalImage = image;
-    const siteUrl = `https://bingeki.web.app${url}`;
-    const finalUrl = escapeHtml(siteUrl);
+    const finalUrl = escapeHtml(`https://bingeki.web.app${url}`);
 
     html = html
         .replace(/<title>[^]*?<\/title>/g, `<title>${finalTitle}</title>`)
