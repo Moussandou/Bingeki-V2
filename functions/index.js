@@ -117,6 +117,8 @@ app.get('/*', async (req, res) => {
         .replace(/<meta name="twitter:description" content="[^]*?" \/>/g, `<meta name="twitter:description" content="${finalDesc}" />`)
         .replace(/<meta name="twitter:image" content="[^]*?" \/>/g, `<meta name="twitter:image" content="${finalImage}" />`);
 
+    res.set('X-SEO-Handler', 'true');
+    res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
     res.send(html);
 });
 
