@@ -19,6 +19,7 @@ Detailed documentation of the core modules:
 - **[Social](./Features/Social.md)**: Friends, Watch Parties, Challenges.
 - **[Library & API](./Features/Library%20&%20API.md)**: Jikan integration, Search, Offline support.
 - **[PWA & Mobile](./Features/PWA%20&%20Mobile.md)**: Installation, Service Workers, Mobile UX.
+- **[SEO & Social Sharing](./Features/SEO-Social-Sharing.md)**: Dynamic OG images, Microlink, and Bot optimization.
 
 ### [Design System](./Design-System.md)
 Understanding the "Brutalist Manga" aesthetic, design tokens, and component guidelines.

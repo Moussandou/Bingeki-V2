@@ -20,3 +20,16 @@ Real-time synchronized viewing/reading sessions.
 ## Challenges (WIP)
 Competitive goals between friends.
 - *Examples*: "Read 50 chapters this week", "Finish 'Bleach' before your friend".
+
+## Social Sharing & Generator 📸
+
+Bingeki V2 provides tools to share your progress beautifully on social media.
+
+### Social Generator (Admin)
+The admin panel includes a **Social Generator** tool (`src/pages/admin/SocialGenerator.tsx`) that allows admins to create high-quality preview images for the app's promotional content.
+- **Dynamic Previews**: Generates layouts based on current user data or news articles.
+- **Customizable**: Allows tweaking text, backgrounds, and shadows before exporting.
+
+### Profile Sharing
+Every user profile has a unique SEO-optimized URL. When shared on Discord, Twitter, or WhatsApp, it displays a dynamic "Hunter License" card.
+- **Dynamic SEO**: See [SEO & Social Sharing](./SEO-Social-Sharing.md) for technical details on how these cards are generated.
