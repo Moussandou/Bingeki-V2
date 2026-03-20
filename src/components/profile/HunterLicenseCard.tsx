@@ -48,8 +48,9 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
 
     const cardContent = (
         <div className="manga-panel" style={{ padding: '0', overflow: 'hidden', background: bgColor, color: textColor, position: 'relative', border: `3px solid ${borderColor} ` }}>
-            {user.isSuperAdmin && <div className={styles.scanlineOverlay} />}
-            {user.isSuperAdmin && <div className={styles.holofoilOverlay} />}
+            <div className={styles.scanlineOverlay} />
+            <div className={styles.holofoilOverlay} />
+            <ParticleBackground />
 
             {/* Banner */}
             <div style={{
@@ -194,7 +195,7 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
         </div >
     );
 
-    if (user.isSuperAdmin) {
+    if (user.isSuperAdmin || true) {
         return (
             <div className={styles.cardWrapper}>
                 <Tilt
@@ -213,4 +214,39 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
     }
 
     return cardContent;
+}
+
+function ParticleBackground() {
+    const particles = Array.from({ length: 30 });
+    return (
+        <div className={styles.particleContainer}>
+            {particles.map((_, i) => {
+                const size = Math.random() * 8 + 4;
+                const duration = Math.random() * 4 + 4;
+                const delay = Math.random() * 8;
+                const x = (Math.random() - 0.5) * 200;
+                const y = (Math.random() - 1) * 200;
+                const maxOpacity = Math.random() * 0.4 + 0.4;
+
+                return (
+                    <div
+                        key={i}
+                        className={styles.particle}
+                        style={{
+                            width: `${size}px`,
+                            height: `${size}px`,
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            // @ts-ignore
+                            '--duration': `${duration}s`,
+                            '--delay': `${delay}s`,
+                            '--x': `${x}px`,
+                            '--y': `${y}px`,
+                            '--max-opacity': maxOpacity,
+                        } as any}
+                    />
+                );
+            })}
+        </div>
+    );
 }
