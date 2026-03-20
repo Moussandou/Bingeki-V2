@@ -65,6 +65,7 @@ export interface UserProfile {
     favoriteCharacters?: FavoriteCharacter[];
     featuredBadge?: string;
     isAdmin?: boolean;
+    isSuperAdmin?: boolean; // New Super Admin role
     isBanned?: boolean;
     createdAt?: number; // Added for new user stats
 }
@@ -90,7 +91,7 @@ export async function saveUserProfileToFirestore(user: Partial<UserProfile>, for
             'uid', 'email', 'displayName', 'photoURL', 'banner', 'bannerPosition', 'bio',
             'themeColor', 'cardBgColor', 'borderColor',
             'favoriteManga', 'top3Favorites', 'featuredBadge',
-            'favoriteCharacters'
+            'favoriteCharacters', 'isAdmin', 'isSuperAdmin' // Allow syncing admin flags
         ];
 
         allowedFields.forEach(field => {

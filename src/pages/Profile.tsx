@@ -26,7 +26,14 @@ import {
     Check
 } from 'lucide-react';
 import { HunterLicenseCard } from '@/components/profile/HunterLicenseCard';
-import { getUserProfile, saveUserProfileToFirestore, compareLibraries, checkFriendship, sendFriendRequest, type UserProfile } from '@/firebase/firestore';
+import { 
+    getUserProfile, 
+    saveUserProfileToFirestore, 
+    compareLibraries, 
+    checkFriendship, 
+    sendFriendRequest, 
+    type UserProfile
+} from '@/firebase/firestore';
 import { Input } from '@/components/ui/Input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -44,28 +51,32 @@ import { useShare } from '@/hooks/useShare';
 
 export default function Profile() {
     const { user, setUser, loading, userProfile } = useAuthStore();
-    // Default (local) stats
-    const { level, xp, xpToNextLevel, streak, badges, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, totalWorksAdded, totalWorksCompleted } = useGamificationStore();
-    const { works, favoriteCharacters, setFavoriteCharacters } = useLibraryStore();
+    const navigate = useNavigate();
+    const { uid } = useParams<{ uid: string }>();
+    const { i18n, t } = useTranslation();
     const { addToast } = useToast();
     const { share } = useShare();
 
-    // Router
-    const navigate = useNavigate();
-    const { uid } = useParams<{ uid: string }>(); // Get uid from URL if present
+    // Context & Profile Logic
+    const isOwnProfile = !uid || (user && user.uid === uid);
 
-    // Local UI State
+
+    // Default (local) stats
+    const { level, xp, xpToNextLevel, streak, badges, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, totalWorksAdded, totalWorksCompleted } = useGamificationStore();
+    const { works, favoriteCharacters, setFavoriteCharacters } = useLibraryStore();
+
+    // Local States
     const [showGuide, setShowGuide] = useState(false);
     const [hoveredBadgeId, setHoveredBadgeId] = useState<string | null>(null);
     const [loadingProfile, setLoadingProfile] = useState(false);
-    const [shareModalOpen, setShareModalOpen] = useState(false);
-    const [copied, setCopied] = useState(false);
-
-    // Extended Profile State (for current or visited user)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isAddCharModalOpen, setIsAddCharModalOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [shareModalOpen, setShareModalOpen] = useState(false);
+    const [copied, setCopied] = useState(false);
     const [extendedProfile, setExtendedProfile] = useState<Partial<UserProfile>>(userProfile || {});
+    
+
 
     // Visited Profile Stats (if viewing someone else)
     const [visitedStats, setVisitedStats] = useState<Partial<GamificationData> | null>(null);
@@ -73,12 +84,6 @@ export default function Profile() {
     // Library comparison (for visited profiles)
     const [commonWorks, setCommonWorks] = useState<{ common: Work[]; count: number } | null>(null);
     const [friendshipStatus, setFriendshipStatus] = useState<'accepted' | 'pending' | 'none' | 'loading'>('loading');
-
-    // Determine if we are viewing our own profile
-    const isOwnProfile = !uid || (user && user.uid === uid);
-
-    // Translation
-    const { t, i18n } = useTranslation();
 
     // Load Profile Data logic
     useEffect(() => {

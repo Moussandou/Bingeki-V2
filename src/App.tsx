@@ -353,7 +353,7 @@ function App() {
   // We also allow access to the auth page so admins can log in
   const isAuthPage = window.location.pathname.includes('/auth');
 
-  if (isMaintenance && userProfile?.isAdmin !== true && !isAuthPage) {
+  if (isMaintenance && userProfile?.isSuperAdmin !== true && !isAuthPage) {
     return <MaintenanceScreen />;
   }
 
