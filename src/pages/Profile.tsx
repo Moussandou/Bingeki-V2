@@ -130,7 +130,8 @@ export default function Profile() {
                         favoriteManga: p.favoriteManga || '',
                         top3Favorites: p.top3Favorites || [],
                         featuredBadge: p.featuredBadge || '',
-                        favoriteCharacters: p.favoriteCharacters || []
+                        favoriteCharacters: p.favoriteCharacters || [],
+                        isSuperAdmin: p.isSuperAdmin || false
                     });
                 }
             });
@@ -197,7 +198,8 @@ export default function Profile() {
         favoriteManga: '',
         top3Favorites: [] as string[],
         featuredBadge: '',
-        favoriteCharacters: [] as FavoriteCharacter[]
+        favoriteCharacters: [] as FavoriteCharacter[],
+        isSuperAdmin: false
     });
 
     // --- Drag & Drop Handlers ---
@@ -245,7 +247,8 @@ export default function Profile() {
                 photoURL: avatarUrl,
                 banner: bannerUrl,
                 bannerPosition: editForm.bannerPosition,
-                top3Favorites: cleanTop3
+                top3Favorites: cleanTop3,
+                isSuperAdmin: editForm.isSuperAdmin
             };
 
             await saveUserProfileToFirestore(profileData, true);
@@ -936,6 +939,58 @@ export default function Profile() {
                                     </div>
                                 </div>
 
+                                    {/* SECTION: CREATOR PRIVILEGES (Visible for Admins/SuperAdmins to toggle) */}
+                                    {(userProfile?.isSuperAdmin || userProfile?.isAdmin) && (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem', padding: '1.25rem', border: '3px solid var(--color-primary)', background: 'rgba(var(--color-primary-rgb), 0.05)', boxShadow: '6px 6px 0 var(--color-primary)', position: 'relative', overflow: 'hidden' }}>
+                                            <div style={{ position: 'absolute', top: -10, right: -10, opacity: 0.1 }}>
+                                                <Trophy size={60} color="var(--color-primary)" />
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+                                                <div style={{ flex: 1, paddingRight: '1rem' }}>
+                                                    <h3 style={{ fontSize: '1rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '0.3rem', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                        ✨ Mode Légendaire
+                                                    </h3>
+                                                    <p style={{ fontSize: '0.75rem', opacity: 0.8, fontWeight: 700, lineHeight: 1.4 }}>
+                                                        Active les effets visuels exclusifs (particules, holofoil, scanlines et inclinaison 3D) sur votre carte. Ces effets sont visibles par tous les visiteurs.
+                                                    </p>
+                                                </div>
+                                                <div 
+                                                    onClick={() => setEditForm(prev => ({ ...prev, isSuperAdmin: !prev.isSuperAdmin }))}
+                                                    style={{ 
+                                                        width: '64px', 
+                                                        height: '34px', 
+                                                        background: editForm.isSuperAdmin ? 'var(--color-primary)' : 'var(--color-surface-hover)', 
+                                                        borderRadius: '17px', 
+                                                        position: 'relative', 
+                                                        cursor: 'pointer',
+                                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                        border: '3px solid #000',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        boxShadow: editForm.isSuperAdmin ? '0 0 15px rgba(var(--color-primary-rgb), 0.3)' : 'none'
+                                                    }}
+                                                >
+                                                    <div style={{ 
+                                                        width: '24px', 
+                                                        height: '24px', 
+                                                        background: '#fff', 
+                                                        borderRadius: '50%', 
+                                                        position: 'absolute', 
+                                                        left: editForm.isSuperAdmin ? '34px' : '4px',
+                                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                        border: '3px solid #000',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        boxShadow: '1px 1px 0 #000'
+                                                    }}>
+                                                        {editForm.isSuperAdmin && <Trophy size={12} color="var(--color-primary)" />}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
                                 {/* SECTION: CONTENT */}
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                                     <h3 style={{ fontSize: '1.1rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px', borderBottom: '4px solid var(--color-text)', paddingBottom: '0.5rem' }}>
@@ -1014,7 +1069,8 @@ export default function Profile() {
                                                     cardBgColor: editForm.cardBgColor,
                                                     borderColor: editForm.borderColor,
                                                     featuredBadge: editForm.featuredBadge,
-                                                    top3Favorites: editForm.top3Favorites
+                                                    top3Favorites: editForm.top3Favorites,
+                                                    isSuperAdmin: editForm.isSuperAdmin
                                                 }}
                                                 isOwnProfile={false}
                                                 featuredBadgeData={editForm.featuredBadge ? displayBadges.find((b: Badge) => b.id === editForm.featuredBadge) : null}

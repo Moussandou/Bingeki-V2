@@ -48,9 +48,9 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
 
     const cardContent = (
         <div className="manga-panel" style={{ padding: '0', overflow: 'hidden', background: bgColor, color: textColor, position: 'relative', border: `3px solid ${borderColor} ` }}>
-            <div className={styles.scanlineOverlay} />
-            <div className={styles.holofoilOverlay} />
-            <ParticleBackground />
+            {user.isSuperAdmin && <div className={styles.scanlineOverlay} />}
+            {user.isSuperAdmin && <div className={styles.holofoilOverlay} />}
+            {user.isSuperAdmin && <ParticleBackground />}
 
             {/* Banner */}
             <div style={{
@@ -195,7 +195,7 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
         </div >
     );
 
-    if (user.isSuperAdmin || true) {
+    if (user.isSuperAdmin) {
         return (
             <div className={styles.cardWrapper}>
                 <Tilt
