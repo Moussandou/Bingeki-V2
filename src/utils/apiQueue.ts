@@ -51,29 +51,45 @@ class ApiQueue {
 
             try {
                 this.lastRequestTime = Date.now();
-                const response = await fetch(request.url, request.options);
+                
+                // Create a timeout controller
+                const timeoutController = new AbortController();
+                const timeoutId = setTimeout(() => timeoutController.abort(), 10000); // 10s default timeout
+
+                const fetchOptions = {
+                    ...request.options,
+                    signal: request.options?.signal 
+                        ? AbortSignal.any([request.options.signal, timeoutController.signal])
+                        : timeoutController.signal
+                };
+
+                const response = await fetch(request.url, fetchOptions);
+                clearTimeout(timeoutId);
 
                 // Handle rate limiting
                 if (response.status === 429) {
-                    if (request.retries < this.maxRetries) {
-                        console.warn(`[ApiQueue] Rate limit hit, retrying in ${this.retryDelay}ms...`);
-                        request.retries++;
-                        this.queue.unshift(request); // Put back at front
-                        await this.delay(this.retryDelay);
-                        continue;
-                    }
-                    request.reject(new Error('Rate limit exceeded after retries'));
+                    const retryAfterHeader = response.headers.get('Retry-After');
+                    const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) * 1000 : this.retryDelay;
+                    console.warn(`[ApiQueue] Rate limit hit for ${request.url}, retrying in ${retryAfter}ms...`);
+                    await this.delay(retryAfter);
+                    this.queue.unshift(request);
                     continue;
                 }
 
                 request.resolve(response);
             } catch (error) {
+                const isTimeout = error instanceof Error && error.name === 'AbortError';
+                const errorMsg = isTimeout ? 'Request timed out' : String(error);
+                
                 if (request.retries < this.maxRetries) {
                     request.retries++;
+                    console.warn(`[ApiQueue] Error fetching ${request.url} (Attempt ${request.retries}/${this.maxRetries}): ${errorMsg}`);
                     this.queue.unshift(request);
-                    await this.delay(500); // Brief delay before retry
+                    await this.delay(500); 
                     continue;
                 }
+                
+                console.error(`[ApiQueue] Failed to fetch ${request.url} after ${this.maxRetries} attempts: ${errorMsg}`);
                 request.reject(error instanceof Error ? error : new Error(String(error)));
             }
         }
