@@ -1237,7 +1237,13 @@ const resources = {
                     view_feedback: "Voir Feedback",
                     live_console: "Live Console",
                     survey_label: "Questionnaires",
-                    view_survey_details: "Voir les détails"
+                    view_survey_details: "Voir les détails",
+                    just_now: "A l'instant",
+                    minutes_ago: "Il y a {{count}} min",
+                    hours_ago: "Il y a {{count}}h",
+                    days_ago: "Il y a {{count}}j",
+                    last_seen: "Connecté",
+                    online: "En ligne"
                 },
                 users: {
                     title: "Gestion Utilisateurs",
@@ -2895,7 +2901,13 @@ const resources = {
                     view_feedback: "View Feedback",
                     live_console: "Live Console",
                     survey_label: "Surveys",
-                    view_survey_details: "View details"
+                    view_survey_details: "View details",
+                    just_now: "Just now",
+                    minutes_ago: "{{count}} min ago",
+                    hours_ago: "{{count}}h ago",
+                    days_ago: "{{count}}d ago",
+                    last_seen: "Seen",
+                    online: "Online"
                 },
                 users: {
                     title: "User Management",
