@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { ChevronDown, ChevronUp, UserPlus, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styles from './RankingList.module.css';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 interface RankingListProps {
     users: UserProfile[]; // Users starting from rank 4
@@ -58,9 +59,10 @@ export const RankingList: React.FC<RankingListProps> = ({
                             <span className={styles.rank}>#{globalRank}</span>
 
                             <div className={styles.avatarFrame}>
-                                <img
-                                    src={user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.displayName}`}
+                                <OptimizedImage
+                                    src={user.photoURL || undefined}
                                     alt={user.displayName || 'User'}
+                                    fallback={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.displayName}`}
                                     className={styles.avatarImage}
                                 />
                             </div>
@@ -133,9 +135,10 @@ export const RankingList: React.FC<RankingListProps> = ({
                     >
                         <span className={styles.rank}>#{currentUserRank.rank}</span>
                         <div className={styles.avatarFrame}>
-                            <img
-                                src={currentUserRank.profile.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUserRank.profile.displayName}`}
+                            <OptimizedImage
+                                src={currentUserRank.profile.photoURL || undefined}
                                 alt={currentUserRank.profile.displayName || 'User'}
+                                fallback={`https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUserRank.profile.displayName}`}
                                 className={styles.avatarImage}
                             />
                         </div>

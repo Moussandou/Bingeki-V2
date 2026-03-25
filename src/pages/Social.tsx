@@ -29,6 +29,7 @@ import { RankingList } from '@/components/social/RankingList';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/context/ToastContext';
 import { SEO } from '@/components/layout/SEO';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import styles from './Social.module.css';
 
 export default function Social() {
@@ -279,8 +280,11 @@ export default function Social() {
                                                 border: '1px solid var(--color-border)'
                                             }}>
                                                 <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border-heavy)', flexShrink: 0 }}>
-                                                    <img src={activity.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${activity.userName}`}
-                                                        alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    <OptimizedImage 
+                                                        src={activity.userPhoto || undefined} 
+                                                        fallback={`https://api.dicebear.com/7.x/avataaars/svg?seed=${activity.userName}`}
+                                                        alt="Avatar" 
+                                                    />
                                                 </div>
                                                 <div style={{ flex: 1, minWidth: 0 }}>
                                                     <p style={{
@@ -304,7 +308,7 @@ export default function Social() {
                                                 </div>
                                                 {activity.workImage && (
                                                     <div style={{ width: 50, height: 70, borderRadius: '4px', overflow: 'hidden', flexShrink: 0 }}>
-                                                        <img src={activity.workImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                        <OptimizedImage src={activity.workImage || undefined} alt="" />
                                                     </div>
                                                 )}
                                             </div>
@@ -448,7 +452,11 @@ export default function Social() {
                                                     >
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
                                                             <div style={{ width: 48, height: 48, borderRadius: '0', overflow: 'hidden', border: `2px solid ${result.themeColor || 'var(--color-border-heavy)'}`, flexShrink: 0, boxShadow: `4px 4px 0 ${result.themeColor || 'var(--color-primary)'}` }}>
-                                                                <img src={result.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${result.displayName}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                                <OptimizedImage 
+                                                                    src={result.photoURL || undefined} 
+                                                                    fallback={`https://api.dicebear.com/7.x/avataaars/svg?seed=${result.displayName}`} 
+                                                                    alt="Avatar" 
+                                                                />
                                                             </div>
                                                             <div style={{ minWidth: 0, paddingRight: '1rem' }}>
                                                                 <div style={{ fontWeight: 800, fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{result.displayName}</div>
@@ -492,7 +500,7 @@ export default function Social() {
                                             <div key={friend.uid} className="manga-panel" style={{ padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: '6px solid var(--color-primary)' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', overflow: 'hidden' }}>
                                                     <div style={{ width: 48, height: 48, borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-primary)', flexShrink: 0 }}>
-                                                        <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                        <OptimizedImage src={friend.photoURL || undefined} alt="Avatar" />
                                                     </div>
                                                     <div style={{ fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '1.1rem' }}>{friend.displayName}</div>
                                                 </div>
@@ -539,7 +547,7 @@ export default function Social() {
                                             >
                                                 <div style={{ height: '80px', background: 'var(--color-border-heavy)', position: 'relative', borderBottom: 'var(--manga-panel-border)' }}>
                                                     {friend.banner ? (
-                                                        <img src={friend.banner} alt="Banner" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                        <OptimizedImage src={friend.banner || undefined} alt="Banner" />
                                                     ) : (
                                                         <div style={{ width: '100%', height: '100%', background: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.1) 10px, rgba(0,0,0,0.1) 20px)' }} />
                                                     )}
@@ -552,7 +560,7 @@ export default function Social() {
                                                     border: 'var(--manga-panel-border)', background: 'var(--color-surface)',
                                                     position: 'relative', zIndex: 2
                                                 }}>
-                                                    <img src={friend.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    <OptimizedImage src={friend.photoURL || undefined} alt="Avatar" />
                                                 </div>
                                                 
                                                 <div style={{ padding: '0.5rem 1.5rem 1.5rem 1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>

@@ -6,6 +6,7 @@ import { NenChart } from './NenChart';
 import styles from './HunterLicenseCard.module.css';
 import { useTranslation } from 'react-i18next';
 import Tilt from 'react-parallax-tilt';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 interface HunterLicenseCardProps {
     user: Partial<UserProfile> & { uid: string, photoURL?: string | null, displayName?: string | null };
@@ -55,13 +56,21 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
             {/* Banner */}
             <div style={{
                 height: '120px',
-                background: user.banner ? `url(${user.banner}) center / cover` : accentColor,
-                backgroundPosition: `center ${user.bannerPosition || 'center'}`,
-                backgroundSize: 'cover',
                 borderBottom: `2px solid ${borderColor} `,
-                position: 'relative'
+                position: 'relative',
+                overflow: 'hidden'
             }}>
-                {!user.banner && <div className="manga-halftone" style={{ opacity: 0.2 }}></div>}
+                {user.banner ? (
+                    <OptimizedImage 
+                        src={user.banner} 
+                        alt="Banner" 
+                        style={{ objectPosition: `center ${user.bannerPosition || 'center'}` }}
+                    />
+                ) : (
+                    <div style={{ width: '100%', height: '100%', background: accentColor, position: 'relative' }}>
+                        <div className="manga-halftone" style={{ opacity: 0.2 }}></div>
+                    </div>
+                )}
             </div>
 
             {/* Header Strip */}
@@ -76,7 +85,11 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
                 {/* Avatar with Level Badge */}
                 <div className={styles.avatarContainer}>
                     <div className={styles.avatarBox} style={{ border: `3px solid ${borderColor} ` }}>
-                        <img src={user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <OptimizedImage 
+                            src={user.photoURL || undefined} 
+                            alt="Avatar" 
+                            fallback={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.displayName || 'Bingeki'}`}
+                        />
                     </div >
                     <div className={`${styles.levelBadge} manga-title`} style={{ background: accentColor, border: `2px solid ${borderColor}` }}>
                         LVL {stats.level}
@@ -127,7 +140,7 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
                                     {top3FavoritesData.map(fav => (
                                         <div key={fav.id} style={{ width: '50px', position: 'relative' }}>
                                             <div style={{ height: '70px', border: `1px solid ${borderColor}`, borderRadius: '2px', overflow: 'hidden' }}>
-                                                <img src={fav.image} alt={fav.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                <OptimizedImage src={fav.image} alt={fav.title} />
                                             </div>
                                         </div>
                                     ))}
@@ -141,7 +154,9 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
                             /* Fallback to single favorite if no top 3 set yet */
                             favoriteMangaData && (
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', border: `1px solid ${borderColor}`, padding: '0.5rem', borderRadius: '4px', background: 'rgba(255,255,255,0.1)' }}>
-                                    <img src={favoriteMangaData.image} alt="Fav" style={{ width: '30px', height: '40px', objectFit: 'cover' }} />
+                                    <div style={{ width: '30px', height: '40px', overflow: 'hidden', flexShrink: 0 }}>
+                                        <OptimizedImage src={favoriteMangaData.image} alt="Fav" />
+                                    </div>
                                     <div style={{ textAlign: 'left' }}>
                                         <div style={{ fontSize: '0.6rem', opacity: 0.7, textTransform: 'uppercase' }}>{t('hunter_license.favorite')}</div>
                                         <div style={{ fontWeight: 900, fontSize: '0.8rem', maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{favoriteMangaData.title}</div>

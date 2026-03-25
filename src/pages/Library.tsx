@@ -20,6 +20,7 @@ import { MALImportModal } from '@/components/library/MALImportModal';
 import { FolderModal } from '@/components/library/FolderModal';
 import { ShareModal } from '@/components/library/ShareModal';
 import type { Folder, FolderSharing } from '@/store/libraryStore';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 export default function Library() {
     const { t, i18n } = useTranslation();
@@ -273,7 +274,7 @@ export default function Library() {
                                 border: '2px solid var(--color-border-heavy)'
                             }}>
                                 {friendProfile?.photoURL ? (
-                                    <img src={friendProfile.photoURL} alt={friendProfile.displayName || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    <OptimizedImage src={friendProfile.photoURL} alt={friendProfile.displayName || ''} />
                                 ) : (
                                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text)' }}>
                                         <User size={24} />
@@ -816,14 +817,15 @@ export default function Library() {
                                                 style={{
                                                     height: viewMode === 'list' ? '150px' : undefined, // Handled by class in grid
                                                     width: viewMode === 'list' ? '120px' : undefined,
-                                                    backgroundImage: `url(${work.image})`,
-                                                    backgroundPosition: 'center',
-                                                    backgroundSize: viewMode === 'list' ? 'cover' : undefined, // Class handles grid
+                                                    position: 'relative',
+                                                    overflow: 'hidden',
                                                     flexShrink: 0,
                                                     borderRight: viewMode === 'list' ? '2px solid var(--color-border-heavy)' : 'none',
                                                     borderBottom: viewMode === 'grid' ? '2px solid var(--color-border-heavy)' : 'none'
                                                 }}
-                                            />
+                                            >
+                                                <OptimizedImage src={work.image} alt={work.title} />
+                                            </div>
 
                                             {/* Info */}
                                             <div style={{ padding: '1.25rem', flex: 1, background: 'var(--color-surface)' }}>

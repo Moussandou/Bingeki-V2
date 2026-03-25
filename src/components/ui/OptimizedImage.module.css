@@ -1,0 +1,37 @@
+.wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-surface-hover);
+}
+
+.skeleton {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        90deg, 
+        transparent 25%, 
+        rgba(255, 46, 99, 0.05) 50%, 
+        transparent 75%
+    );
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-expo);
+}
+
+.visible {
+    opacity: 1;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}

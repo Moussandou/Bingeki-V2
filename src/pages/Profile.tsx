@@ -48,6 +48,7 @@ import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { useToast } from '@/context/ToastContext';
 import { AddFavoriteCharacterModal } from '@/components/profile/AddFavoriteCharacterModal';
 import { useShare } from '@/hooks/useShare';
+import { compressImage } from '@/utils/imageOptimization';
 
 export default function Profile() {
     const { user, setUser, loading, userProfile } = useAuthStore();
@@ -230,14 +231,18 @@ export default function Profile() {
             // Upload Avatar if changed (Data URL)
             if (avatarUrl && avatarUrl.startsWith('data:')) {
                 const storageRef = ref(storage, `users/${user.uid}/avatar_${Date.now()}`);
-                await uploadString(storageRef, avatarUrl, 'data_url');
+                // Compress avatar to 400x400
+                const compressedAvatar = await compressImage(avatarUrl, { maxWidth: 400, maxHeight: 400, quality: 0.8 });
+                await uploadString(storageRef, compressedAvatar, 'data_url');
                 avatarUrl = await getDownloadURL(storageRef);
             }
 
             // If banner is a Data URL (new upload), upload to Storage
             if (bannerUrl && bannerUrl.startsWith('data:')) {
                 const storageRef = ref(storage, `banners/${user.uid}_${Date.now()}`);
-                await uploadString(storageRef, bannerUrl, 'data_url');
+                // Compress banner to 1200x400
+                const compressedBanner = await compressImage(bannerUrl, { maxWidth: 1200, maxHeight: 400, quality: 0.8 });
+                await uploadString(storageRef, compressedBanner, 'data_url');
                 bannerUrl = await getDownloadURL(storageRef);
             }
 

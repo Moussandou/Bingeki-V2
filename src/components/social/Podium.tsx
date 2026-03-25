@@ -5,6 +5,7 @@ import type { UserProfile } from '@/firebase/firestore';
 import { Crown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styles from './Podium.module.css';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 interface PodiumProps {
     users: UserProfile[]; // Expecting sorted array, top 3 will be used
@@ -39,9 +40,10 @@ const PodiumStep = ({ user, rank, delay, category }: { user: UserProfile | null,
             {/* Avatar */}
             <div className={styles.avatarContainer}>
                 <div className={styles.avatarFrame}>
-                    <img
-                        src={user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.displayName}`}
+                    <OptimizedImage
+                        src={user.photoURL || undefined}
                         alt={user.displayName || 'User'}
+                        fallback={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.displayName}`}
                         className={styles.avatarImage}
                     />
                 </div>

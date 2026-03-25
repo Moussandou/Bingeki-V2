@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal'; // Import Modal
 import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff, Reply, Video, Calendar, BarChart, Music, Disc, X, ArrowUp } from 'lucide-react';
 import { useState, useEffect, memo } from 'react';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
+
 
 
 import { useToast } from '@/context/ToastContext';
@@ -128,8 +130,7 @@ const RecursiveComment = memo(function RecursiveComment({
                 {/* Header */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
                     <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border-heavy)' }}>
-                        <img src={comment.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.userName}`}
-                            alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <OptimizedImage src={comment.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.userName}`} alt="" />
                     </div>
                     <div>
                         <p style={{ fontWeight: 800, fontSize: '0.9rem', textTransform: 'uppercase' }}>{comment.userName}</p>
@@ -758,7 +759,7 @@ export default function WorkDetails() {
                     {/* Cover Image */}
                     <div className={styles.coverSection}>
                         <div className={styles.coverImageWrapper}>
-                            <img
+                            <OptimizedImage
                                 src={work.image}
                                 alt={work.title}
                                 className={styles.coverImage}
