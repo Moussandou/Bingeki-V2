@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { loginWithGoogle, loginWithEmail, registerWithEmail, loginWithDiscord } from '@/firebase/auth';
+import { saveUserProfileToFirestore } from '@/firebase/firestore';
 import { useAuthStore } from '@/store/authStore';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocalizedNavigate } from '@/components/routing/LocalizedLink';
@@ -66,10 +67,24 @@ export default function Auth() {
     const handleDiscordLogin = async () => {
         setLoading(true);
         setError(null);
-        const user = await loginWithDiscord();
-        if (user) {
-            setUser(user);
-            navigate('/dashboard');
+        try {
+            const user = await loginWithDiscord();
+            if (user) {
+                // Check if user has a display name, if not use a temporary one or wait for Modal
+                await saveUserProfileToFirestore({
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || '', // Use empty string instead of null to signify missing
+                    photoURL: user.photoURL,
+                    lastLogin: Date.now()
+                }, false); // don't force update if already exists
+                
+                setUser(user);
+                navigate('/dashboard');
+            }
+        } catch (err) {
+            console.error(err);
+            setError(t('auth.error_generic'));
         }
         setLoading(false);
     };
@@ -77,10 +92,23 @@ export default function Auth() {
     const handleGoogleLogin = async () => {
         setLoading(true);
         setError(null);
-        const user = await loginWithGoogle();
-        if (user) {
-            setUser(user);
-            navigate('/dashboard');
+        try {
+            const user = await loginWithGoogle();
+            if (user) {
+                await saveUserProfileToFirestore({
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || '',
+                    photoURL: user.photoURL,
+                    lastLogin: Date.now()
+                }, false);
+
+                setUser(user);
+                navigate('/dashboard');
+            }
+        } catch (err) {
+            console.error(err);
+            setError(t('auth.error_generic'));
         }
         setLoading(false);
     };

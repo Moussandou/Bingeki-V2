@@ -9,7 +9,7 @@ import {
     updateProfile,
     type User
 } from 'firebase/auth';
-import { saveLibraryToFirestore, saveGamificationToFirestore } from './firestore';
+import { saveLibraryToFirestore, saveGamificationToFirestore, saveUserProfileToFirestore } from './firestore';
 import { useLibraryStore } from '@/store/libraryStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 
@@ -74,6 +74,16 @@ export const registerWithEmail = async (email: string, password: string, display
         // Update the user's display name
         if (result.user && displayName) {
             await updateProfile(result.user, { displayName });
+            
+            // NEW: Explicity save to firestore immediately to avoid race condition with onAuthStateChanged in App.tsx
+            // This ensures the initial Firestore document has the correct name.
+            await saveUserProfileToFirestore({
+                uid: result.user.uid,
+                email: result.user.email,
+                displayName: displayName,
+                photoURL: result.user.photoURL,
+                lastLogin: Date.now()
+            }, true); // forceUpdate true to ensure it's saved correctly
         }
         return { user: result.user, error: null };
     } catch (error) {

@@ -1317,24 +1317,27 @@ export async function deleteUserData(userId: string): Promise<void> {
 
 // ==================== ADMIN DASHBOARD FUNCTIONS ====================
 
-// Get system stats for dashboard
-export async function getAdminStats(): Promise<{
-    totalUsers: number;
-    totalFeedback: number;
-    newUsersToday: number;
-    pendingFeedback: number;
-    totalSurveyResponses: number;
-}> {
+// Get system stats for dashboard (Enhanced)
+export async function getAdminStats() {
     try {
+        const now = Date.now();
+        const startOfDay = new Date().setHours(0, 0, 0, 0);
+        const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
+        const sevenDaysAgo = now - (7 * 24 * 60 * 60 * 1000);
+        const thirtyDaysAgo = now - (30 * 24 * 60 * 60 * 1000);
+
+        // Basic counts
         const usersSnap = await getDocs(collection(db, 'users'));
         const feedbackSnap = await getDocs(collection(db, 'feedback'));
+        const surveySnap = await getDocs(collection(db, 'survey_responses'));
 
-        const now = new Date();
-        const startOfDay = new Date(now.setHours(0, 0, 0, 0)).getTime();
+        // DAU / WAU / MAU
+        const dau = usersSnap.docs.filter(d => (d.data().lastLogin || 0) >= twentyFourHoursAgo).length;
+        const wau = usersSnap.docs.filter(d => (d.data().lastLogin || 0) >= sevenDaysAgo).length;
+        const mau = usersSnap.docs.filter(d => (d.data().lastLogin || 0) >= thirtyDaysAgo).length;
 
         const newUsersToday = usersSnap.docs.filter(doc => {
             const data = doc.data() as UserProfile;
-            // Use lastLogin as proxy if createdAt missing
             const joinDate = data.createdAt || data.lastLogin || 0;
             return joinDate > startOfDay;
         }).length;
@@ -1344,18 +1347,28 @@ export async function getAdminStats(): Promise<{
             return data.status === 'open' || data.status === 'in_progress';
         }).length;
 
-        const surveySnap = await getDocs(collection(db, 'survey_responses'));
+        // Simple Engagement: % of users with at least one activity in last 7 days
+        // We'll approximate this with WAU / Total
+        const engagementRate = usersSnap.size > 0 ? (wau / usersSnap.size) * 100 : 0;
 
         return {
             totalUsers: usersSnap.size,
             totalFeedback: feedbackSnap.size,
             totalSurveyResponses: surveySnap.size,
             newUsersToday,
-            pendingFeedback
+            pendingFeedback,
+            dau,
+            wau,
+            mau,
+            engagementRate
         };
     } catch (error) {
         console.error('[Firestore] Error getting admin stats:', error);
-        return { totalUsers: 0, totalFeedback: 0, totalSurveyResponses: 0, newUsersToday: 0, pendingFeedback: 0 };
+        return {
+            totalUsers: 0, totalFeedback: 0, totalSurveyResponses: 0,
+            newUsersToday: 0, pendingFeedback: 0,
+            dau: 0, wau: 0, mau: 0, engagementRate: 0
+        };
     }
 }
 
@@ -1499,6 +1512,159 @@ export async function getSevenDayActivityStats() {
 
     } catch (error) {
         console.error('Error fetching chart stats:', error);
+        return [];
+    }
+}
+
+// Get detailed engagement breakdown
+export async function getEngagementBreakdown() {
+    try {
+        const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+        const q = query(
+            collection(db, 'activities'),
+            where('timestamp', '>=', sevenDaysAgo)
+        );
+        const snapshot = await getDocs(q);
+        const activities = snapshot.docs.map(doc => doc.data() as ActivityEvent);
+
+        const breakdown = {
+            watch: activities.filter(a => a.type === 'watch').length,
+            read: activities.filter(a => a.type === 'read').length,
+            add_work: activities.filter(a => a.type === 'add_work').length,
+            level_up: activities.filter(a => a.type === 'level_up').length,
+            badge: activities.filter(a => a.type === 'badge').length,
+            complete: activities.filter(a => a.type === 'complete').length,
+        };
+
+        return breakdown;
+    } catch (error) {
+        console.error('[Firestore] Error getting engagement breakdown:', error);
+        return { watch: 0, read: 0, add_work: 0, level_up: 0, badge: 0, complete: 0 };
+    }
+}
+
+// Get Top Content from activities
+export async function getTopContentStats(limitCount = 5) {
+    try {
+        const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+        const q = query(
+            collection(db, 'activities'),
+            where('type', 'in', ['add_work', 'watch', 'read', 'complete']),
+            where('timestamp', '>=', thirtyDaysAgo)
+        );
+        const snapshot = await getDocs(q);
+        const counts: Record<string, { title: string, count: number, id: number, image?: string }> = {};
+
+        snapshot.docs.forEach(doc => {
+            const data = doc.data() as ActivityEvent;
+            if (data.workTitle && data.workId) {
+                if (!counts[data.workId]) {
+                    counts[data.workId] = { title: data.workTitle, count: 0, id: data.workId, image: data.workImage };
+                }
+                counts[data.workId].count += 1;
+            }
+        });
+
+        return Object.values(counts)
+            .sort((a, b) => b.count - a.count)
+            .slice(0, limitCount);
+    } catch (error) {
+        console.error('[Firestore] Error getting top content stats:', error);
+        return [];
+    }
+}
+
+// Get Funnel Stats (Simplified)
+export async function getFunnelStats() {
+    try {
+        const usersSnap = await getDocs(collection(db, 'users'));
+        const total = usersSnap.size;
+
+        // Steps:
+        // 1. Registered (Total)
+        // 2. Added at least one work (Check activities or metadata)
+        // 3. Updated progress
+        // 4. Social (Friend or Comment)
+
+        const activitiesSnap = await getDocs(collection(db, 'activities'));
+        const activities = activitiesSnap.docs.map(d => d.data() as ActivityEvent);
+        const userIdsWithActivity = new Set(activities.map(a => a.userId));
+
+        const usersWithAdd = new Set(activities.filter(a => a.type === 'add_work').map(a => a.userId));
+        const usersWithProgress = new Set(activities.filter(a => ['watch', 'read', 'complete'].includes(a.type)).map(a => a.userId));
+
+        return [
+            { name: 'Inscription', value: total },
+            { name: 'Ajout Premier Work', value: usersWithAdd.size },
+            { name: 'Mise à jour Progression', value: usersWithProgress.size },
+            { name: 'Engagement Actif', value: userIdsWithActivity.size }
+        ];
+    } catch (error) {
+        console.error('[Firestore] Error getting funnel stats:', error);
+        return [];
+    }
+}
+
+// Get historical trends for various metrics
+export async function getHistoricalTrends(daysCount = 30) {
+    try {
+        const now = Date.now();
+        const startTime = now - (daysCount * 24 * 60 * 60 * 1000);
+
+        // Fetch activities and users from the period
+        // For performance in large datasets, we should use pagination or better indexing,
+        // but for < 1000 users this is acceptable.
+        const activitiesQuery = query(
+            collection(db, 'activities'),
+            where('timestamp', '>=', startTime),
+            orderBy('timestamp', 'asc')
+        );
+        const usersQuery = query(
+            collection(db, 'users'),
+            where('createdAt', '>=', startTime),
+            orderBy('createdAt', 'asc')
+        );
+
+        const [activitiesSnap, usersSnap] = await Promise.all([
+            getDocs(activitiesQuery),
+            getDocs(usersQuery)
+        ]);
+
+        const activities = activitiesSnap.docs.map(d => d.data() as ActivityEvent);
+        const users = usersSnap.docs.map(d => d.data() as UserProfile);
+
+        // Group by day
+        const dailyData: Record<string, { date: string, inscriptions: number, activities: number, activeUsers: number, uniqueUsers: Set<string> }> = {};
+
+        // Initialize days
+        for (let i = daysCount - 1; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+            dailyData[dateStr] = { date: dateStr, inscriptions: 0, activities: 0, activeUsers: 0, uniqueUsers: new Set() };
+        }
+
+        users.forEach(u => {
+            const dateStr = new Date(u.createdAt || 0).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+            if (dailyData[dateStr]) dailyData[dateStr].inscriptions += 1;
+        });
+
+        activities.forEach(a => {
+            const dateStr = new Date(a.timestamp).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+            if (dailyData[dateStr]) {
+                dailyData[dateStr].activities += 1;
+                dailyData[dateStr].uniqueUsers.add(a.userId);
+            }
+        });
+
+        return Object.values(dailyData).map(day => ({
+            date: day.date,
+            inscriptions: day.inscriptions,
+            activities: day.activities,
+            activeUsers: day.uniqueUsers.size
+        }));
+    } catch (error) {
+        console.error('[Firestore] Error getting historical trends:', error);
         return [];
     }
 }

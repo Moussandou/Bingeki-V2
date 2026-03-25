@@ -11,11 +11,12 @@ interface ModalProps {
     children: React.ReactNode;
     variant?: 'glass' | 'manga';
     maxWidth?: string;
+    hideCloseButton?: boolean;
 }
 
 import { createPortal } from 'react-dom';
 
-export function Modal({ isOpen, onClose, title, children, variant = 'glass', maxWidth = '600px' }: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, variant = 'glass', maxWidth = '600px', hideCloseButton = false }: ModalProps) {
     if (!isOpen) return null;
 
     return createPortal(
@@ -26,7 +27,7 @@ export function Modal({ isOpen, onClose, title, children, variant = 'glass', max
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        onClick={onClose}
+                        onClick={hideCloseButton ? undefined : onClose}
                         style={{
                             position: 'fixed',
                             inset: 0,
@@ -45,14 +46,16 @@ export function Modal({ isOpen, onClose, title, children, variant = 'glass', max
                             <Card variant={variant} style={{ padding: '1.5rem', background: variant === 'manga' ? 'var(--color-surface)' : undefined, border: variant === 'manga' ? '3px solid var(--color-border-heavy)' : undefined, boxShadow: variant === 'manga' ? '8px 8px 0 var(--color-shadow-solid)' : undefined }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                                     {title && <h3 style={{ fontSize: '1.5rem', fontFamily: variant === 'manga' ? 'var(--font-heading)' : undefined }}>{title}</h3>}
-                                    <Button
-                                        variant={variant === 'manga' ? 'manga' : 'ghost'}
-                                        size="icon"
-                                        onClick={onClose}
-                                        style={variant === 'manga' ? { width: '40px', height: '40px', borderRadius: '0', border: '2px solid var(--color-border-heavy)' } : undefined}
-                                    >
-                                        <X size={variant === 'manga' ? 24 : 20} strokeWidth={variant === 'manga' ? 3 : 2} />
-                                    </Button>
+                                    {!hideCloseButton && (
+                                        <Button
+                                            variant={variant === 'manga' ? 'manga' : 'ghost'}
+                                            size="icon"
+                                            onClick={onClose}
+                                            style={variant === 'manga' ? { width: '40px', height: '40px', borderRadius: '0', border: '2px solid var(--color-border-heavy)' } : undefined}
+                                        >
+                                            <X size={variant === 'manga' ? 24 : 20} strokeWidth={variant === 'manga' ? 3 : 2} />
+                                        </Button>
+                                    )}
                                 </div>
                                 {children}
                             </Card>

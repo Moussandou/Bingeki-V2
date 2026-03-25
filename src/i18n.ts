@@ -437,7 +437,13 @@ const resources = {
                 error_pseudo: "Veuillez entrer un pseudo",
                 error_generic: "Une erreur est survenue",
                 mobile_title: "VOTRE AVENTURE",
-                mobile_subtitle: "Suivez vos mangas, gagnez de l'XP et défiez vos amis."
+                mobile_subtitle: "Suivez vos mangas, gagnez de l'XP et défiez vos amis.",
+                choose_pseudo_title: "CHOISISSEZ VOTRE PSEUDO",
+                choose_pseudo_desc: "Pour une meilleure expérience, choisissez un pseudo unique qui vous représentera dans la communauté.",
+                save_pseudo: "CONFIRMER MON PSEUDO",
+                error_pseudo_short: "Le pseudo doit faire au moins 3 caractères",
+                error_pseudo_taken: "Ce pseudo est déjà utilisé",
+                error_pseudo: "Veuillez entrer un pseudo",
             },
             feedback: {
                 success_icon: "💌",

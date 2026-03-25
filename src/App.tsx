@@ -63,6 +63,7 @@ import { AdminLayout } from '@/components/admin/AdminLayout';
 import { RequireAdmin } from '@/components/admin/RequireAdmin';
 import { InstallInstructionsModal } from '@/components/pwa/InstallInstructionsModal';
 import { MobileMenuFAB } from '@/components/layout/MobileMenuFAB';
+import { UsernameSelectionModal } from '@/components/auth/UsernameSelectionModal';
 
 // Bot aware suspense to avoid blank screen during hydration for screenshot tools
 const BotAwareSuspense = ({ children }: { children: React.ReactNode }) => {
@@ -361,6 +362,7 @@ function App() {
   return (
     <ToastProvider>
       <BrowserRouter>
+        <UsernameSelectionModal />
         <BotAwareSuspense>
           <Routes>
             {/* Root redirect to language prefix */}
