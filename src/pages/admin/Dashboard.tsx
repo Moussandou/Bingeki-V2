@@ -16,6 +16,7 @@ import {
 } from 'recharts';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import styles from './Dashboard.module.css';
 
 interface ChartData {
     name: string;
@@ -229,7 +230,10 @@ export default function AdminDashboard() {
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <p style={{ textTransform: 'uppercase', fontWeight: 900, fontSize: '0.8rem', color: 'var(--color-text-dim)' }}>{t('admin.dashboard.dau')}</p>
-                                <div title="DAU: Actifs 24h | WAU: Actifs 7j | MAU: Actifs 30j" style={{ cursor: 'help' }}><Info size={14} /></div>
+                                <div className={styles.tooltipContainer}>
+                                    <Info size={14} />
+                                    <span className={styles.tooltipText}>DAU: Actifs 24h<br />WAU: Actifs 7j<br />MAU: Actifs 30j</span>
+                                </div>
                             </div>
                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', lineHeight: 1 }}>{stats.dau}</h3>
                         </div>
@@ -258,7 +262,10 @@ export default function AdminDashboard() {
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <p style={{ textTransform: 'uppercase', fontWeight: 900, fontSize: '0.8rem', color: 'var(--color-text-dim)' }}>{t('admin.dashboard.engagement_rate')}</p>
-                                <div title="Taux d'utilisateurs actifs (WAU) par rapport au total" style={{ cursor: 'help' }}><Info size={14} /></div>
+                                <div className={styles.tooltipContainer}>
+                                    <Info size={14} />
+                                    <span className={styles.tooltipText}>Taux d'utilisateurs actifs (WAU) par rapport au total</span>
+                                </div>
                             </div>
                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', lineHeight: 1 }}>{Math.round(stats.engagementRate)}%</h3>
                         </div>
