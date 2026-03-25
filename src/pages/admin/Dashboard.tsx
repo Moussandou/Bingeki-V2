@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { 
-    Users, TrendingUp, Activity, ExternalLink, Clipboard 
+    Users, TrendingUp, Activity, ExternalLink, Clipboard, Info, 
+    Calendar
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Link } from '@/components/routing/LocalizedLink';
@@ -43,21 +44,23 @@ export default function AdminDashboard() {
     const [topContent, setTopContent] = useState<any[]>([]);
     const [funnelData, setFunnelData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [period, setPeriod] = useState(30);
 
     useEffect(() => {
         const load = async () => {
+            setLoading(true);
             try {
                 const [basicStats, members, weeklyStats, engagement, top, funnel] = await Promise.all([
                     getAdminStats(),
                     getRecentMembers(10),
                     getSevenDayActivityStats(),
-                    getEngagementBreakdown(),
-                    getTopContentStats(5),
+                    getEngagementBreakdown(period),
+                    getTopContentStats(5, period),
                     getFunnelStats()
                 ]);
 
                 setStats(basicStats);
-                setRecentUsers(members.slice(0, 5));
+                setRecentUsers(members);
                 if (Array.isArray(weeklyStats)) {
                     setChartData(weeklyStats.filter((item): item is ChartData => item !== undefined));
                 }
@@ -72,7 +75,7 @@ export default function AdminDashboard() {
             }
         };
         load();
-    }, []);
+    }, [period]);
 
     const formatDate = (timestamp: number | undefined) => {
         if (!timestamp) return null;
@@ -174,11 +177,36 @@ export default function AdminDashboard() {
     return (
         <div style={containerStyle}>
             {/* Header */}
-            <div>
-                <h1 style={headerStyle}>{t('admin.dashboard.title')}</h1>
-                <p style={{ borderLeft: '4px solid var(--color-border)', paddingLeft: '1rem', fontFamily: 'monospace', color: 'var(--color-text-dim)' }}>
-                    {t('admin.dashboard.subtitle')}
-                </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                    <h1 style={headerStyle}>{t('admin.dashboard.title')}</h1>
+                    <p style={{ borderLeft: '4px solid var(--color-border)', paddingLeft: '1rem', fontFamily: 'monospace', color: 'var(--color-text-dim)' }}>
+                        {t('admin.dashboard.subtitle')}
+                    </p>
+                </div>
+                
+                <div style={{ display: 'flex', background: 'var(--color-surface)', border: '2px solid black', padding: '0.25rem', borderRadius: '4px', alignItems: 'center', gap: '0.5rem' }}>
+                    <Calendar size={16} style={{ marginLeft: '0.5rem' }} />
+                    {[7, 30, 90].map(p => (
+                        <button 
+                            key={p}
+                            onClick={() => setPeriod(p)}
+                            style={{ 
+                                padding: '0.4rem 0.8rem', 
+                                border: 'none', 
+                                background: period === p ? 'black' : 'transparent',
+                                color: period === p ? 'white' : 'var(--color-text)',
+                                fontWeight: 900,
+                                cursor: 'pointer',
+                                textTransform: 'uppercase',
+                                fontSize: '0.7rem',
+                                borderRadius: '2px'
+                            }}
+                        >
+                            {p} Jours
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Row 1: Key Metrics (KPIs) */}
@@ -199,7 +227,10 @@ export default function AdminDashboard() {
                 <Card variant="manga" style={statCardStyle} onClick={() => navigate('/admin/analytics/retention')}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                            <p style={{ textTransform: 'uppercase', fontWeight: 900, fontSize: '0.8rem', color: 'var(--color-text-dim)' }}>{t('admin.dashboard.dau')}</p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <p style={{ textTransform: 'uppercase', fontWeight: 900, fontSize: '0.8rem', color: 'var(--color-text-dim)' }}>{t('admin.dashboard.dau')}</p>
+                                <div title="DAU: Actifs 24h | WAU: Actifs 7j | MAU: Actifs 30j" style={{ cursor: 'help' }}><Info size={14} /></div>
+                            </div>
                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', lineHeight: 1 }}>{stats.dau}</h3>
                         </div>
                         <Activity size={24} />
@@ -225,7 +256,10 @@ export default function AdminDashboard() {
                 <Card variant="manga" style={statCardStyle} onClick={() => navigate('/admin/analytics/engagement')}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                            <p style={{ textTransform: 'uppercase', fontWeight: 900, fontSize: '0.8rem', color: 'var(--color-text-dim)' }}>{t('admin.dashboard.engagement_rate')}</p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <p style={{ textTransform: 'uppercase', fontWeight: 900, fontSize: '0.8rem', color: 'var(--color-text-dim)' }}>{t('admin.dashboard.engagement_rate')}</p>
+                                <div title="Taux d'utilisateurs actifs (WAU) par rapport au total" style={{ cursor: 'help' }}><Info size={14} /></div>
+                            </div>
                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', lineHeight: 1 }}>{Math.round(stats.engagementRate)}%</h3>
                         </div>
                         <Clipboard size={24} />
@@ -277,32 +311,38 @@ export default function AdminDashboard() {
             <div style={gridRow3}>
                 <Card variant="manga" style={chartCardStyle} onClick={() => navigate('/admin/analytics/engagement')}>
                     <h3 style={sectionTitleStyle}><Clipboard size={20} /> {t('admin.dashboard.engagement_breakdown')}</h3>
-                    <div style={{ display: 'flex', alignItems: 'center', height: '250px' }}>
-                        <ResponsiveContainer width="60%" height="100%">
-                            <PieChart>
-                                <Pie 
-                                    data={engagementData ? Object.entries(engagementData).map(([name, value]) => ({ name, value })) : []} 
-                                    innerRadius={60} 
-                                    outerRadius={80} 
-                                    paddingAngle={5} 
-                                    dataKey="value"
-                                >
-                                    {Object.keys(engagementData || {}).map((_entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                            </PieChart>
-                        </ResponsiveContainer>
-                        <div style={{ width: '40%', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            {engagementData && Object.entries(engagementData).map(([key, value], idx) => (
-                                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <div style={{ width: '10px', height: '10px', background: COLORS[idx % COLORS.length] }} />
-                                    <span style={{ textTransform: 'capitalize' }}>{key}: <strong>{value as number}</strong></span>
-                                </div>
-                            ))}
+                    {engagementData && Object.values(engagementData).some(v => (v as number) > 0) ? (
+                        <div style={{ display: 'flex', alignItems: 'center', height: '250px' }}>
+                            <ResponsiveContainer width="60%" height="100%">
+                                <PieChart>
+                                    <Pie 
+                                        data={Object.entries(engagementData).map(([name, value]) => ({ name, value }))} 
+                                        innerRadius={60} 
+                                        outerRadius={80} 
+                                        paddingAngle={5} 
+                                        dataKey="value"
+                                    >
+                                        {Object.keys(engagementData).map((_entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip />
+                                </PieChart>
+                            </ResponsiveContainer>
+                            <div style={{ width: '40%', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                {Object.entries(engagementData).map(([key, value], idx) => (
+                                    <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <div style={{ width: '10px', height: '10px', background: COLORS[idx % COLORS.length] }} />
+                                        <span style={{ textTransform: 'capitalize' }}>{key}: <strong>{value as number}</strong></span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div style={{ height: '250px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-surface)', border: '2px dashed var(--color-border)', color: 'var(--color-text-dim)', fontSize: '0.8rem' }}>
+                            Aucune activité enregistrée
+                        </div>
+                    )}
                 </Card>
 
                 <Card variant="manga" style={chartCardStyle}>
@@ -329,7 +369,7 @@ export default function AdminDashboard() {
                 <div>
                     <h3 style={sectionTitleStyle}><Clipboard size={20} /> {t('admin.dashboard.top_content')}</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                        {topContent.map((item, idx) => (
+                        {topContent.length > 0 ? topContent.map((item, idx) => (
                             <Card key={idx} variant="manga" style={{ padding: '0.75rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)' }}>
                                 <div style={{ width: '40px', height: '56px', background: '#e5e5e5', border: '1px solid var(--color-border)' }}>
                                     {item.image && <img src={item.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
@@ -340,21 +380,27 @@ export default function AdminDashboard() {
                                 </div>
                                 <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', color: 'var(--color-border)' }}>#{idx + 1}</div>
                             </Card>
-                        ))}
+                        )) : (
+                            <div style={{ padding: '2rem', textAlign: 'center', background: 'var(--color-surface)', border: '2px dashed var(--color-border)', color: 'var(--color-text-dim)', fontSize: '0.8rem' }}>
+                                Aucun contenu populaire identifié
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 <div>
-                    <h3 style={sectionTitleStyle}><Users size={20} /> {t('admin.dashboard.recent_members')}</h3>
+                    <h3 style={sectionTitleStyle}><Users size={20} /> Derniers Abonnés</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
-                        {recentUsers.map(user => (
+                        {recentUsers.slice(0, 5).map(user => (
                             <div key={user.uid} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem', borderBottom: '1px solid var(--color-border)' }}>
                                 <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#eee', overflow: 'hidden', border: '1px solid var(--color-border)' }}>
                                     {user.photoURL && <img src={user.photoURL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                                 </div>
                                 <div style={{ flex: 1 }}>
                                     <div style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>{user.displayName || 'Anonyme'}</div>
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-dim)' }}>{formatDate(user.lastLogin)}</div>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-dim)' }}>
+                                        Inscrit {formatDate(user.createdAt || user.lastLogin)}
+                                    </div>
                                 </div>
                                 <Link to={`/admin/users?highlight=${user.uid}`}><ExternalLink size={14} /></Link>
                             </div>

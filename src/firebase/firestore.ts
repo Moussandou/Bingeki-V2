@@ -1384,15 +1384,23 @@ export async function getAllUsers(): Promise<UserProfile[]> {
     }
 }
 
-// Get recent members sorted by last login (newest first), includes createdAt for display
+// Get recent members sorted by creation date (newest first)
 export async function getRecentMembers(count = 10): Promise<UserProfile[]> {
     try {
+        // First try ordering by createdAt
+        const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'), limit(count));
+        const snapshot = await getDocs(q);
+        const users = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as UserProfile));
+        
+        // If some users don't have createdAt, they might be missing. 
+        // We'll filter but realistically most should have it.
+        return users;
+    } catch (error) {
+        console.error('[Firestore] Error getting recent members by createdAt:', error);
+        // Fallback to lastLogin for older users
         const q = query(collection(db, 'users'), orderBy('lastLogin', 'desc'), limit(count));
         const snapshot = await getDocs(q);
         return snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as UserProfile));
-    } catch (error) {
-        console.error('[Firestore] Error getting recent members:', error);
-        return [];
     }
 }
 
@@ -1517,12 +1525,12 @@ export async function getSevenDayActivityStats() {
 }
 
 // Get detailed engagement breakdown
-export async function getEngagementBreakdown() {
+export async function getEngagementBreakdown(daysCount = 7) {
     try {
-        const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+        const startTime = Date.now() - (daysCount * 24 * 60 * 60 * 1000);
         const q = query(
             collection(db, 'activities'),
-            where('timestamp', '>=', sevenDaysAgo)
+            where('timestamp', '>=', startTime)
         );
         const snapshot = await getDocs(q);
         const activities = snapshot.docs.map(doc => doc.data() as ActivityEvent);
@@ -1544,24 +1552,32 @@ export async function getEngagementBreakdown() {
 }
 
 // Get Top Content from activities
-export async function getTopContentStats(limitCount = 5) {
+export async function getTopContentStats(limitCount = 5, daysCount = 30) {
     try {
-        const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+        const startTime = Date.now() - (daysCount * 24 * 60 * 60 * 1000);
+        // We fetch ALL activities in the period and aggregate because we can't filter by multiple fields easily in Firestore
+        // without composite indexes.
         const q = query(
             collection(db, 'activities'),
-            where('type', 'in', ['add_work', 'watch', 'read', 'complete']),
-            where('timestamp', '>=', thirtyDaysAgo)
+            where('timestamp', '>=', startTime)
         );
         const snapshot = await getDocs(q);
         const counts: Record<string, { title: string, count: number, id: number, image?: string }> = {};
 
         snapshot.docs.forEach(doc => {
             const data = doc.data() as ActivityEvent;
-            if (data.workTitle && data.workId) {
-                if (!counts[data.workId]) {
-                    counts[data.workId] = { title: data.workTitle, count: 0, id: data.workId, image: data.workImage };
+            // Only count target types
+            if (['add_work', 'watch', 'read', 'complete'].includes(data.type)) {
+                // Determine title/id even if missing from activity (fallback to activity info)
+                const workId = data.workId?.toString();
+                const workTitle = data.workTitle || 'Unknow Work';
+                
+                if (workId) {
+                    if (!counts[workId]) {
+                        counts[workId] = { title: workTitle, count: 0, id: Number(workId), image: data.workImage };
+                    }
+                    counts[workId].count += 1;
                 }
-                counts[data.workId].count += 1;
             }
         });
 
