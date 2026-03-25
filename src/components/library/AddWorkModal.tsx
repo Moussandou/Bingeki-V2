@@ -472,7 +472,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         cursor: 'pointer',
-                                        boxShadow: '2px 2px 0 #000'
+                                        boxShadow: '2px 2px 0 var(--color-shadow-solid)'
                                     }}
                                 >
                                     <X size={18} strokeWidth={3} />

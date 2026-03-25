@@ -58,9 +58,9 @@ export default function FeedbackList() {
                         {feedbacks.map((item: FeedbackData) => (
                             <div key={item.id} style={{
                                 background: '#fff',
-                                border: '2px solid #000',
+                                border: '2px solid var(--color-shadow-solid)',
                                 padding: '1.5rem',
-                                boxShadow: '4px 4px 0 #000',
+                                boxShadow: '4px 4px 0 var(--color-shadow-solid)',
                                 position: 'relative'
                             }}>
                                 {/* Header */}

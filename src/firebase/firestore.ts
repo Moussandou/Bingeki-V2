@@ -636,7 +636,14 @@ export async function getFriendsActivity(userId: string, limitCount: number = 20
         const querySnapshot = await getDocs(q);
         const activities: ActivityEvent[] = [];
         querySnapshot.forEach((doc) => {
-            activities.push(doc.data() as ActivityEvent);
+            const data = doc.data() as ActivityEvent;
+            // Inject fresh photo/name from current friend profile
+            const friend = friends.find(f => f.uid === data.userId);
+            if (friend) {
+                data.userName = friend.displayName || data.userName;
+                data.userPhoto = friend.photoURL || data.userPhoto;
+            }
+            activities.push(data);
         });
         return activities;
     } catch (error) {

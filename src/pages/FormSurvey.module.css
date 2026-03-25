@@ -81,7 +81,7 @@
   overflow: hidden;
   z-index: 10;
   position: relative;
-  box-shadow: 4px 4px 0 var(--color-shadow);
+  box-shadow: 4px 4px 0 var(--color-shadow-solid);
 }
 
 .progressBar {
@@ -208,7 +208,7 @@
   text-align: left;
   display: flex;
   align-items: center;
-  box-shadow: 4px 4px 0 var(--color-shadow);
+  box-shadow: 4px 4px 0 var(--color-shadow-solid);
   position: relative;
   overflow: hidden;
 }
@@ -235,7 +235,7 @@
   border-color: var(--color-primary);
   background-color: var(--color-background);
   transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0 var(--color-shadow);
+  box-shadow: 0px 0px 0 var(--color-shadow-solid);
 }
 
 .optionCard.selected::after {
@@ -280,7 +280,7 @@
   min-height: 120px;
   resize: vertical;
   transition: all 0.2s ease;
-  box-shadow: 4px 4px 0 var(--color-shadow);
+  box-shadow: 4px 4px 0 var(--color-shadow-solid);
 }
 
 .textarea:focus {
@@ -325,7 +325,7 @@
   font-family: var(--font-body);
   font-size: 1.1rem;
   transition: all 0.2s ease;
-  box-shadow: 4px 4px 0 var(--color-shadow);
+  box-shadow: 4px 4px 0 var(--color-shadow-solid);
 }
 
 .inputField:focus {
@@ -406,7 +406,7 @@
   padding: 2rem;
   background: var(--color-surface);
   border: 3px solid var(--color-border-heavy);
-  box-shadow: 8px 8px 0 var(--color-shadow);
+  box-shadow: 8px 8px 0 var(--color-shadow-solid);
   text-align: center;
   position: relative;
 }
@@ -461,13 +461,13 @@
   letter-spacing: 1px;
   padding: 1rem 2rem !important;
   border-radius: 0 !important;
-  box-shadow: 4px 4px 0 var(--color-shadow);
+  box-shadow: 4px 4px 0 var(--color-shadow-solid);
   transition: all 0.2s ease;
 }
 
 .joinBtn:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0 var(--color-shadow);
+  box-shadow: 6px 6px 0 var(--color-shadow-solid);
 }
 
 .instaLink {

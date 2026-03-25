@@ -55,7 +55,7 @@ export function InstallPWA({ variant = 'icon', className, style }: InstallPWAPro
                         alignItems: 'center',
                         gap: '1rem',
                         cursor: 'pointer',
-                        boxShadow: '6px 6px 0 #000',
+                        boxShadow: '6px 6px 0 var(--color-shadow-solid)',
                         transition: 'transform 0.1s, box-shadow 0.1s',
                         ...style
                     }}

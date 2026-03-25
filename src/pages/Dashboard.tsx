@@ -385,7 +385,7 @@ export default function Dashboard() {
                                                 onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-primary-glow)'}
                                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                             >
-                                                <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border)', boxShadow: '0 2px 4px var(--color-shadow)', flexShrink: 0 }}>
+                                                <div style={{ width: 40, height: 40, borderRadius: '0', overflow: 'hidden', border: '2px solid var(--color-border)', boxShadow: '4px 4px 0 var(--color-primary)', flexShrink: 0 }}>
                                                     <img src={activity.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${activity.userName}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                 </div>
                                                 <div style={{ flex: 1, minWidth: 0 }}>

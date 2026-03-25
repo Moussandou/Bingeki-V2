@@ -374,7 +374,7 @@ export default function Profile() {
                                                 border: '2px solid var(--color-border)',
                                                 borderRadius: '12px',
                                                 padding: '1rem',
-                                                boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+                                                boxShadow: '6px 6px 0 var(--color-shadow-solid)',
                                                 zIndex: 50,
                                                 width: '320px',
                                                 display: 'flex',
@@ -387,7 +387,7 @@ export default function Profile() {
                                                 <img
                                                     src={extendedProfile.photoURL || (isOwnProfile ? user?.photoURL : '') || `https://api.dicebear.com/7.x/avataaars/svg?seed=${extendedProfile.displayName}`}
                                                     alt=""
-                                                    style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-primary)' }}
+                                                    style={{ width: '36px', height: '36px', borderRadius: '0', objectFit: 'cover', border: `2px solid ${extendedProfile.themeColor || 'var(--color-primary)'}`, boxShadow: `2px 2px 0 ${extendedProfile.themeColor || 'var(--color-primary)'}` }}
                                                 />
                                                 <div>
                                                     <p style={{ fontWeight: 800, fontSize: '0.9rem', margin: 0 }}>{extendedProfile.displayName || (isOwnProfile ? user?.displayName : 'User')}</p>
@@ -702,7 +702,7 @@ export default function Profile() {
                                                         borderRadius: '50%',
                                                         overflow: 'hidden',
                                                         border: '3px solid #e11d48',
-                                                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                                                        boxShadow: '4px 4px 0 var(--color-shadow-solid)',
                                                         cursor: 'pointer'
                                                     }}>
                                                     <img
@@ -755,7 +755,7 @@ export default function Profile() {
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             border: `3px solid ${getBadgeColors(badge.rarity).border}`,
-                                            boxShadow: badge.rarity === 'legendary' ? '0 0 20px rgba(255, 215, 0, 0.5)' : '4px 4px 0 rgba(0,0,0,0.2)'
+                                            boxShadow: badge.rarity === 'legendary' ? '6px 6px 0 var(--color-shadow-solid)' : '4px 4px 0 var(--color-shadow-solid)'
                                         }}>
                                             {getBadgeIcon(badge.icon)}
                                         </div>
@@ -846,14 +846,14 @@ export default function Profile() {
                                     
                                     <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
                                         <div style={{ position: 'relative', width: '100px', height: '100px', flexShrink: 0 }}>
-                                            <div style={{ width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', border: '4px solid var(--color-text)', boxShadow: '6px 6px 0 var(--color-shadow-solid)' }}>
+                                            <div style={{ width: '100%', height: '100%', borderRadius: '0', overflow: 'hidden', border: '4px solid var(--color-primary)', boxShadow: '6px 6px 0 var(--color-primary)' }}>
                                                 <img
                                                     src={editForm.avatar || 'https://via.placeholder.com/150'}
                                                     alt="Avatar"
                                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                 />
                                             </div>
-                                            <label htmlFor="avatar-upload" style={{ position: 'absolute', bottom: 0, right: 0, background: 'var(--color-text)', color: 'var(--color-surface)', borderRadius: '50%', padding: '8px', cursor: 'pointer', border: '3px solid var(--color-text)', display: 'flex', boxShadow: '2px 2px 0 var(--color-shadow-solid)' }}>
+                                            <label htmlFor="avatar-upload" style={{ position: 'absolute', bottom: -10, right: -10, background: 'var(--color-text)', color: 'var(--color-surface)', borderRadius: '0', padding: '8px', cursor: 'pointer', border: '3px solid var(--color-primary)', display: 'flex', boxShadow: '4px 4px 0 var(--color-primary)' }}>
                                                 <PenTool size={16} />
                                             </label>
                                             <input id="avatar-upload" type="file" accept="image/*" style={{ display: 'none' }} 
@@ -1014,7 +1014,7 @@ export default function Profile() {
                                 </div>
 
                                 <Button variant="primary" onClick={handleSaveProfile} 
-                                    style={{ marginTop: '2rem', borderRadius: 0, border: '4px solid #000', boxShadow: '8px 8px 0 #000', height: '60px', fontSize: '1.2rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px' }}
+                                    style={{ marginTop: '2rem', borderRadius: 0, border: '4px solid var(--color-text)', boxShadow: '8px 8px 0 var(--color-shadow-solid)', height: '60px', fontSize: '1.2rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px' }}
                                 >
                                     {t('profile.edit_modal.save')}
                                 </Button>

@@ -75,9 +75,10 @@
 .avatarContainer {
     width: 100px;
     height: 100px;
-    border: 3px solid var(--color-border);
+    border: var(--manga-panel-border);
+    border-radius: 0;
     overflow: hidden;
-    box-shadow: 4px 4px 0px var(--color-primary);
+    box-shadow: 6px 6px 0px var(--color-primary);
     margin: 0 auto;
     /* Center on mobile if wrapped */
 }

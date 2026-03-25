@@ -447,7 +447,7 @@ export default function Social() {
                                                         onClick={() => navigate(`/profile/${result.uid}`)}
                                                     >
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
-                                                            <div style={{ width: 48, height: 48, borderRadius: '50%', overflow: 'hidden', border: `2px solid ${result.themeColor || 'var(--color-border-heavy)'}`, flexShrink: 0 }}>
+                                                            <div style={{ width: 48, height: 48, borderRadius: '0', overflow: 'hidden', border: `2px solid ${result.themeColor || 'var(--color-border-heavy)'}`, flexShrink: 0, boxShadow: `4px 4px 0 ${result.themeColor || 'var(--color-primary)'}` }}>
                                                                 <img src={result.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${result.displayName}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                             </div>
                                                             <div style={{ minWidth: 0, paddingRight: '1rem' }}>

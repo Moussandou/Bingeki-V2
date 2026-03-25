@@ -309,7 +309,7 @@ export default function AssetsPage() {
                                 padding: '4px 12px',
                                 gap: '8px',
                                 background: '#fff',
-                                boxShadow: '2px 2px 0 #000',
+                                boxShadow: '2px 2px 0 var(--color-shadow-solid)',
                                 fontWeight: 700,
                                 fontSize: '0.9rem'
                             }}>
@@ -620,7 +620,7 @@ export default function AssetsPage() {
                         padding: '2rem',
                         background: '#fff',
                         position: 'relative',
-                        boxShadow: '8px 8px 0 rgba(0,0,0,1)' // Hard shadow for pop
+                        boxShadow: '8px 8px 0 var(--color-shadow-solid)'
                     }}>
                         {/* Title Badge similar to Scout Card */}
                         <div style={{
@@ -726,7 +726,7 @@ export default function AssetsPage() {
                                     padding: '0.5rem 1rem',
                                     background: '#fff',
                                     border: '3px solid #000',
-                                    boxShadow: '6px 6px 0 #FF2E63',
+                                    boxShadow: '6px 6px 0 var(--color-shadow-solid)',
                                     fontFamily: '"Outfit", sans-serif'
                                 }}>
                                     LE Q.G.
@@ -931,7 +931,7 @@ export default function AssetsPage() {
                             flexDirection: 'column',
                             alignItems: 'center',
                             gap: '0.5rem',
-                            boxShadow: '8px 8px 0 #000'
+                            boxShadow: '8px 8px 0 var(--color-shadow-solid)'
                         }}>
                             <h3 style={{ fontSize: '1.5rem', textTransform: 'uppercase', fontWeight: 900, margin: 0 }}>Budget Global Estimé</h3>
                             <div style={{ fontSize: '4rem', fontWeight: 900, lineHeight: 1, fontFamily: 'var(--font-heading)' }}>3 000 €</div>
@@ -970,7 +970,7 @@ export default function AssetsPage() {
                                     padding: '1.5rem 1rem',
                                     textAlign: 'center',
                                     background: '#fff',
-                                    boxShadow: '4px 4px 0 rgba(0,0,0,1)'
+                                    boxShadow: '4px 4px 0 var(--color-shadow-solid)'
                                 }}>
                                     <div style={{ fontSize: '2.5rem', fontWeight: 900, lineHeight: 1, marginBottom: '0.5rem', color: i === 0 || i === 2 ? '#FF2E63' : '#000' }}>{stat.val}</div>
                                     <div style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', opacity: 0.8 }}>{stat.label}</div>
@@ -998,7 +998,7 @@ export default function AssetsPage() {
                                     <span key={i} style={{
                                         background: '#fff', border: '1px solid #000',
                                         padding: '0.4rem 0.8rem', fontWeight: 600, fontSize: '0.9rem',
-                                        boxShadow: '2px 2px 0 #000'
+                                        boxShadow: '2px 2px 0 var(--color-shadow-solid)'
                                     }}>
                                         {feat}
                                     </span>

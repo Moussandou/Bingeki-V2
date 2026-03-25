@@ -57,7 +57,7 @@
     gap: 0.75rem;
     background: var(--color-surface);
     border: 3px solid var(--color-border);
-    box-shadow: var(--shadow-brutal);
+    box-shadow: 6px 6px 0 var(--color-shadow-solid);
     transition: all 0.2s;
 }
 
@@ -89,7 +89,7 @@
     background: var(--color-surface);
     flex: 0 0 auto;
     border: 3px solid var(--color-border);
-    box-shadow: var(--shadow-brutal);
+    box-shadow: 6px 6px 0 var(--color-shadow-solid);
 }
 
 .controlButton {
@@ -250,7 +250,7 @@
     padding: 1rem;
     background: var(--color-surface);
     border: 3px solid var(--color-border);
-    box-shadow: var(--shadow-brutal);
+    box-shadow: 6px 6px 0 var(--color-shadow-solid);
 }
 
 .folderPill {

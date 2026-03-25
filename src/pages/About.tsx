@@ -19,10 +19,7 @@ export default function About() {
                 <div className="manga-panel" style={{ 
                     padding: '0', 
                     position: 'relative', 
-                    overflow: 'hidden', 
-                    background: 'var(--color-surface)', 
-                    border: '4px solid var(--color-border-heavy)',
-                    boxShadow: '12px 12px 0 var(--color-border-heavy)'
+                    overflow: 'hidden'
                 }}>
                     <div className="manga-halftone" style={{ opacity: 0.1, pointerEvents: 'none' }}></div>
                     
@@ -70,10 +67,7 @@ export default function About() {
                         {/* Introduction / Vision - Solid Background */}
                         <section className="manga-panel" style={{ 
                             marginBottom: '4rem', 
-                            padding: 'clamp(1.5rem, 4vw, 3rem)', 
-                            background: 'var(--color-surface)', 
-                            border: '3px solid var(--color-border-heavy)',
-                            boxShadow: '8px 8px 0 var(--color-border-heavy)' 
+                            padding: 'clamp(1.5rem, 4vw, 3rem)'
                         }}>
                             <div style={{ display: 'flex', gap: '3rem', flexWrap: 'wrap', alignItems: 'center' }}>
                                 <div style={{ flex: '2 1 500px' }}>
@@ -102,11 +96,7 @@ export default function About() {
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
                             <section className="manga-panel" style={{ 
                                 padding: '2.5rem', 
-                                borderLeft: '12px solid var(--color-primary)', 
-                                background: 'var(--color-surface)', 
-                                borderTop: '3px solid var(--color-border-heavy)', 
-                                borderRight: '3px solid var(--color-border-heavy)', 
-                                borderBottom: '3px solid var(--color-border-heavy)' 
+                                borderLeft: '12px solid var(--color-primary) !important'
                             }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                                     <Zap size={24} color="var(--color-primary)" />
@@ -121,9 +111,7 @@ export default function About() {
                             </section>
 
                             <section className="manga-panel" style={{ 
-                                padding: '2.5rem', 
-                                background: 'var(--color-surface)', 
-                                border: '3px solid var(--color-border-heavy)' 
+                                padding: '2.5rem'
                             }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                                     <Rocket size={24} color="var(--color-primary)" />
@@ -136,16 +124,14 @@ export default function About() {
                         </div>
 
                         {/* Core Statement */}
-                        <div style={{ 
+                        <div className="manga-panel" style={{ 
                             background: 'var(--color-text)', 
                             color: 'var(--color-surface)', 
                             padding: '4rem 2rem', 
                             textAlign: 'center', 
                             marginBottom: '4rem',
                             transform: 'rotate(-0.5deg)',
-                            margin: '0 -2rem 4rem -2rem',
-                            border: '6px solid var(--color-border-heavy)',
-                            boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+                            margin: '0 -2rem 4rem -2rem'
                         }}>
                             <Quote size={64} style={{ marginBottom: '1.5rem', opacity: 0.2 }} />
                             <h2 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 900, textTransform: 'uppercase', maxWidth: '1000px', margin: '0 auto', color: 'var(--color-surface)', lineHeight: '1.4' }}>
@@ -155,7 +141,7 @@ export default function About() {
 
                         {/* Features & Social & Progression - Unified Surface background */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
-                            <section className="manga-panel" style={{ padding: '2.5rem', background: 'var(--color-surface)', border: '3px solid var(--color-border-heavy)' }}>
+                            <section className="manga-panel" style={{ padding: '2.5rem' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                                     <BookOpen size={24} color="var(--color-primary)" />
                                     <h3 style={{ fontSize: '1.3rem', fontWeight: 900, textTransform: 'uppercase', color: 'var(--color-text)' }}>Fonctionnalités</h3>
@@ -166,7 +152,7 @@ export default function About() {
                                 </div>
                             </section>
 
-                            <section className="manga-panel" style={{ padding: '2.5rem', background: 'var(--color-surface)', border: '3px solid var(--color-border-heavy)' }}>
+                            <section className="manga-panel" style={{ padding: '2.5rem' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                                     <Users size={24} color="var(--color-primary)" />
                                     <h3 style={{ fontSize: '1.3rem', fontWeight: 900, textTransform: 'uppercase', color: 'var(--color-text)' }}>Social</h3>
@@ -174,7 +160,7 @@ export default function About() {
                                 <p style={{ lineHeight: '1.8', color: 'var(--color-text)' }}>{t('about.social_p1')}</p>
                             </section>
 
-                            <section className="manga-panel" style={{ padding: '2.5rem', background: 'var(--color-surface)', border: '3px solid var(--color-border-heavy)' }}>
+                            <section className="manga-panel" style={{ padding: '2.5rem' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                                     <Gamepad2 size={24} color="var(--color-primary)" />
                                     <h3 style={{ fontSize: '1.3rem', fontWeight: 900, textTransform: 'uppercase', color: 'var(--color-text)' }}>Progression</h3>
@@ -185,14 +171,14 @@ export default function About() {
 
                         {/* Design & Audience - Forced Surface Background for readability */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
-                            <div className="manga-panel" style={{ padding: '2.5rem', background: 'var(--color-surface)', border: '3px solid var(--color-border-heavy)' }}>
+                            <div className="manga-panel" style={{ padding: '2.5rem' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.2rem' }}>
                                     <Smartphone size={20} color="var(--color-primary)" />
                                     <h4 style={{ fontSize: '1.1rem', fontWeight: 900, textTransform: 'uppercase', color: 'var(--color-text)' }}>Accessibilité</h4>
                                 </div>
                                 <p style={{ fontSize: '1rem', lineHeight: '1.7', color: 'var(--color-text)' }}>{t('about.design_p1')}</p>
                             </div>
-                            <div className="manga-panel" style={{ padding: '2.5rem', background: 'var(--color-surface)', border: '3px solid var(--color-border-heavy)' }}>
+                            <div className="manga-panel" style={{ padding: '2.5rem' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.2rem' }}>
                                     <Target size={20} color="var(--color-primary)" />
                                     <h4 style={{ fontSize: '1.1rem', fontWeight: 900, textTransform: 'uppercase', color: 'var(--color-text)' }}>Public</h4>
@@ -202,7 +188,7 @@ export default function About() {
                         </div>
 
                         {/* Future & Ecosystem */}
-                        <section className="manga-panel" style={{ marginBottom: '4rem', padding: '3rem', border: '4px solid var(--color-border-heavy)', background: 'var(--color-surface)' }}>
+                        <section className="manga-panel" style={{ marginBottom: '4rem', padding: '3rem' }}>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem' }}>
                                 <div>
                                     <h3 style={{ fontWeight: 900, textTransform: 'uppercase', marginBottom: '1.2rem', color: 'var(--color-primary)' }}>L'Avenir</h3>
@@ -219,10 +205,7 @@ export default function About() {
                         <div className="manga-panel" style={{ 
                             textAlign: 'center', 
                             padding: '4rem 2rem', 
-                            background: 'var(--color-surface)', 
-                            border: '6px solid var(--color-border-heavy)',
-                            position: 'relative',
-                            boxShadow: '8px 8px 0 var(--color-primary)'
+                            position: 'relative'
                         }}>
                             <Rocket size={40} color="var(--color-primary)" style={{ marginBottom: '1.5rem', opacity: 0.8 }} />
                             <p style={{ fontSize: 'clamp(1.4rem, 5vw, 2.2rem)', fontWeight: 900, textTransform: 'uppercase', color: 'var(--color-primary)', lineHeight: '1.3', maxWidth: '850px', margin: '0 auto' }}>

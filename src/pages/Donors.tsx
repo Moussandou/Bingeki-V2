@@ -51,7 +51,7 @@ export default function Donors() {
                         maxWidth: '500px',
                         width: '100%',
                         clipPath: 'polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0% 100%, 0% 10%)',
-                        boxShadow: '0 0 30px rgba(255, 215, 0, 0.2)'
+                        boxShadow: '6px 6px 0 var(--color-shadow-solid)'
                     }}>
                         <div style={{
                             position: 'absolute',
@@ -67,7 +67,7 @@ export default function Donors() {
                             display: 'flex',
                             alignItems: 'center',
                             gap: '0.5rem',
-                            boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
+                            boxShadow: '4px 4px 0 var(--color-shadow-solid)',
                             width: 'max-content', // Fix truncation
                             whiteSpace: 'nowrap'
                         }}>
@@ -88,7 +88,7 @@ export default function Donors() {
                             fontWeight: 900,
                             color: '#000',
                             border: '4px solid #fff',
-                            boxShadow: '0 0 20px rgba(255, 215, 0, 0.5)'
+                            boxShadow: '6px 6px 0 var(--color-shadow-solid)'
                         }}>
                             1
                         </div>
@@ -148,12 +148,9 @@ export default function Donors() {
                 </div>
 
                 {/* THANK YOU SECTION */}
-                <div style={{
+                <div className="manga-panel" style={{
                     textAlign: 'center',
-                    background: 'var(--color-surface)',
                     padding: '3rem',
-                    borderRadius: '1rem',
-                    border: '1px solid var(--color-border)',
                     maxWidth: '800px',
                     margin: '0 auto'
                 }}>
@@ -174,7 +171,7 @@ export default function Donors() {
                             padding: '1rem 2rem',
                             fontWeight: 900,
                             textDecoration: 'none',
-                            borderRadius: '0.5rem', // Slight rounding
+                            borderRadius: '0',
                             fontFamily: 'var(--font-heading)',
                             textTransform: 'uppercase',
                             transition: 'transform 0.2s, box-shadow 0.2s',

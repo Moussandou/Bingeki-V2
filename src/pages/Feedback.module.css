@@ -144,7 +144,7 @@
 .priorityActive {
     background: var(--color-border-heavy);
     color: var(--color-text-inverse);
-    box-shadow: 4px 4px 0 var(--color-shadow);
+    box-shadow: 4px 4px 0 var(--color-shadow-solid);
 }
 
 .cat-bug.categoryActive {
@@ -388,7 +388,7 @@
     align-self: flex-end;
     background: var(--color-border-heavy);
     color: var(--color-text-inverse);
-    box-shadow: 4px 4px 0 var(--color-shadow);
+    box-shadow: 4px 4px 0 var(--color-shadow-solid);
 }
 
 .bubbleHeader {

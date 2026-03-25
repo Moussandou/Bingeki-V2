@@ -294,7 +294,7 @@ export default function Opening() {
                                     whileHover={{ scale: 1.1, zIndex: 10 }}
                                     style={{ transform: i % 2 === 0 ? 'translateY(20px)' : 'translateY(-20px)' }}
                                 >
-                                    <Card variant="manga" hoverable style={{ padding: 0, boxShadow: '6px 6px 0 rgba(0,0,0,0.1)' }}>
+                                    <Card variant="manga" hoverable style={{ padding: 0, boxShadow: '6px 6px 0 var(--color-shadow-solid)' }}>
                                         <div style={{ aspectRatio: '2/3', background: '#333' }}>
                                             <img src={manga.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         </div>
@@ -509,7 +509,7 @@ export default function Opening() {
                                     <div style={{
                                         background: 'var(--color-surface)',
                                         border: '4px solid var(--color-border)',
-                                        boxShadow: '8px 8px 0 var(--color-shadow)',
+                                        boxShadow: '8px 8px 0 var(--color-shadow-solid)',
                                         overflow: 'hidden',
                                         position: 'relative',
                                         display: 'flex',
@@ -526,7 +526,7 @@ export default function Opening() {
 
                                             <div style={{ position: 'absolute', bottom: '1rem', left: '1rem', display: 'flex', alignItems: 'flex-end', gap: '1rem' }}>
                                                 {/* Mini Poster */}
-                                                <div style={{ width: '80px', height: '120px', border: '3px solid var(--color-surface)', boxShadow: '0 4px 6px var(--color-shadow)', marginBottom: '-3rem', zIndex: 10, background: '#000' }}>
+                                                <div style={{ width: '80px', height: '120px', border: '3px solid var(--color-surface)', boxShadow: '0 4px 6px var(--color-shadow-solid)', marginBottom: '-3rem', zIndex: 10, background: '#000' }}>
                                                     <img src="https://cdn.myanimelist.net/images/manga/3/210341l.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                 </div>
 
@@ -628,7 +628,7 @@ export default function Opening() {
                                     <div style={{
                                         position: 'absolute', left: '-2.6rem', top: 0, width: '20px', height: '20px', background: 'var(--color-primary)', borderRadius: '50%', border: '4px solid var(--color-border)'
                                     }} />
-                                    <div style={{ background: 'var(--color-surface)', padding: '1.5rem', borderRadius: '4px', border: '3px solid var(--color-border)', boxShadow: '4px 4px 0 var(--color-shadow)' }}>
+                                    <div style={{ background: 'var(--color-surface)', padding: '1.5rem', borderRadius: '4px', border: '3px solid var(--color-border)', boxShadow: '4px 4px 0 var(--color-shadow-solid)' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
                                             <span style={{ fontWeight: 900, fontSize: '1.1rem' }}>{t('landing.features.wip.timeline.feedback_title')}</span>
                                             <span style={{ fontSize: '0.8rem', background: 'var(--color-primary)', color: '#000', padding: '0.1rem 0.5rem', fontWeight: 800, border: '1px solid var(--color-border)' }}>V1.2.0</span>

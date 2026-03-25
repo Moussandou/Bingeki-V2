@@ -250,7 +250,7 @@ export default function Discover() {
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ duration: 0.5, delay: 0.2 }}
                                 >
-                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-primary)', color: '#fff', padding: '0.5rem 1rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '1rem', boxShadow: '4px 4px 0 #000' }}>
+                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-primary)', color: '#fff', padding: '0.5rem 1rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '1rem', boxShadow: '4px 4px 0 var(--color-shadow-solid)' }}>
                                         <Flame size={18} fill="#fff" /> {t('discover.hero.featured')}
                                     </div>
                                     <h1 className={styles.heroTitle}>
@@ -270,7 +270,7 @@ export default function Discover() {
                                                 fontSize: '1.1rem',
                                                 padding: '0.75rem 1.5rem',
                                                 border: 'none',
-                                                boxShadow: '4px 4px 0 #000',
+                                                boxShadow: '4px 4px 0 var(--color-shadow-solid)',
                                                 background: 'var(--color-primary)',
                                                 color: '#fff'
                                             }}
@@ -285,8 +285,8 @@ export default function Discover() {
                                                 fontSize: '1.1rem',
                                                 padding: '0.75rem 1.5rem',
                                                 background: '#fff',
-                                                color: '#000',
-                                                borderColor: '#000'
+                                                color: 'var(--color-text)',
+                                                borderColor: 'var(--color-text)'
                                             }}
                                         >
                                             {t('discover.hero.more_details')}

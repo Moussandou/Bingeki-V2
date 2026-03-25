@@ -60,13 +60,14 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.4rem 1rem;
+    padding: 0 1rem;
+    height: 40px; /* Standardize height */
     background: var(--color-surface);
     border: 2px solid var(--color-border);
     font-size: 0.85rem;
     font-weight: 900;
     color: var(--color-text);
-    box-shadow: 2px 2px 0 var(--color-shadow);
+    box-shadow: 2px 2px 0 var(--color-shadow-solid);
 }
 
 .levelValue {
@@ -116,6 +117,11 @@
     color: var(--color-text);
     text-transform: uppercase;
     font-family: var(--font-heading);
+    height: 40px; /* Standardize height */
+    padding: 0 0.75rem;
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    box-shadow: 2px 2px 0 var(--color-shadow-solid);
 }
 
 .actionButton {
@@ -193,10 +199,12 @@
     align-items: center;
     gap: 0.75rem;
     cursor: pointer;
-    padding: 4px;
+    padding: 0 0.5rem;
+    height: 40px; /* Standardize height */
     border: 2px solid var(--color-border);
     background: var(--color-surface);
-    transition: background 0.2s;
+    box-shadow: 2px 2px 0 var(--color-shadow-solid);
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
 .profileDropdown:hover {
@@ -303,18 +311,24 @@
 }
 
 .iconButton {
-    /* Base styles for icon buttons that were missing */
-    padding: 6px;
+    /* Base styles for icon buttons */
+    padding: 0;
     cursor: pointer;
     border: 2px solid var(--color-border);
-    background: transparent;
+    background: var(--color-surface);
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 32px;
-    width: 32px;
+    height: 40px; /* Standardize height */
+    width: 40px; /* Square by default */
     color: var(--color-text);
-    margin-right: 0.5rem;
+    box-shadow: 2px 2px 0 var(--color-shadow-solid);
+    transition: all 0.2s ease;
+}
+
+.iconButton:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--color-primary);
 }
 
 @media (max-width: 768px) {

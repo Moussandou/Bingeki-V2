@@ -70,7 +70,7 @@ export function NewsCard({ title, slug, imageUrl, sourceName, publishedAt, tags 
                         fontWeight: 900,
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px',
-                        boxShadow: '2px 2px 0 #000'
+                        boxShadow: '2px 2px 0 var(--color-shadow-solid)'
                     }}>
                         {primaryTag}
                     </div>

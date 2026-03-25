@@ -20,7 +20,7 @@
     position: relative;
     display: inline-block;
     line-height: 1;
-    text-shadow: 4px 4px 0 var(--color-shadow);
+    text-shadow: 4px 4px 0 var(--color-shadow-solid);
 }
 
 .subtitle {
@@ -146,7 +146,7 @@
 
 .isNew {
     border-color: var(--color-border-heavy);
-    box-shadow: 8px 8px 0 #FFD700;
+    box-shadow: 8px 8px 0 var(--color-shadow-solid);
 }
 
 .newBadge {
@@ -168,7 +168,7 @@
 }
 
 .expanded.isNew {
-    box-shadow: 10px 10px 0 #FFD700;
+    box-shadow: 10px 10px 0 var(--color-shadow-solid);
 }
 
 .cardHeader {

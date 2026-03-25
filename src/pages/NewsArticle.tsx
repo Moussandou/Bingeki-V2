@@ -204,7 +204,7 @@ export default function NewsArticle() {
                                             fontWeight: 900,
                                             textTransform: 'uppercase',
                                             letterSpacing: '0.5px',
-                                            boxShadow: '3px 3px 0 #000'
+                                            boxShadow: '3px 3px 0 var(--color-shadow-solid)'
                                         }}>
                                             {tag}
                                         </span>
@@ -253,7 +253,7 @@ export default function NewsArticle() {
                                 color: '#000',
                                 padding: '2rem',
                                 border: '3px solid #000',
-                                boxShadow: '8px 8px 0 #000',
+                                boxShadow: '8px 8px 0 var(--color-shadow-solid)',
                                 marginBottom: '3rem',
                                 position: 'relative'
                             }}>
@@ -357,7 +357,7 @@ export default function NewsArticle() {
                                 position: 'relative',
                                 boxShadow: 'inset 0 0 40px rgba(0,0,0,0.05)'
                             }}>
-                                <div style={{ position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)', background: 'var(--color-primary)', color: '#fff', padding: '6px 20px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px', boxShadow: '4px 4px 0 #000' }}>
+                                <div style={{ position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)', background: 'var(--color-primary)', color: '#fff', padding: '6px 20px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px', boxShadow: '4px 4px 0 var(--color-shadow-solid)' }}>
                                     {t('news.source_badge', 'Source Officielle')}
                                 </div>
                                 <h3 style={{ marginBottom: '1.5rem', fontSize: '1.8rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>
@@ -407,7 +407,7 @@ export default function NewsArticle() {
                     background: 'var(--color-primary)',
                     color: '#fff',
                     border: '4px solid #000',
-                    boxShadow: '6px 6px 0 #000',
+                    boxShadow: '6px 6px 0 var(--color-shadow-solid)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
