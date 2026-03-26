@@ -257,7 +257,8 @@ const resources = {
                 prev: "Précédent",
                 mark_all_read: "Tout marquer comme lu",
                 view_details: "Voir détails",
-                unknown: "Inconnu"
+                unknown: "Inconnu",
+                continue: "Continuer"
             },
             tierlist: {
                 characters: "PERSONNAGES",
@@ -750,6 +751,10 @@ const resources = {
                 share_text: "Découvre mon profil sur Bingeki !",
                 link_copied: "Lien du profil copié !",
                 share_failed: "Échec du partage"
+            },
+            gamification: {
+                level_up: "MONTÉE DE NIVEAU !",
+                reached_level: "Tu as atteint le niveau {{level}}",
             },
             share: {
                 share: "Partager",
@@ -1869,6 +1874,10 @@ const resources = {
                 link_copied: "Profile link copied!",
                 share_failed: "Share failed"
             },
+            gamification: {
+                level_up: "LEVEL UP!",
+                reached_level: "You reached level {{level}}",
+            },
             share: {
                 share: "Share",
                 link_copied: "Link copied!",
@@ -1961,7 +1970,8 @@ const resources = {
                 prev: "Previous",
                 mark_all_read: "Mark all as read",
                 view_details: "View Details",
-                unknown: "Unknown"
+                unknown: "Unknown",
+                continue: "Continue"
             },
             tierlist: {
                 characters: "CHARACTERS",
