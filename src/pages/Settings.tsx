@@ -109,9 +109,9 @@ function RecalculateButton() {
 
             // Force save to Firestore if user is logged in
             if (user) {
-                const { level, xp, xpToNextLevel, streak, lastActivityDate, badges, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, totalWorksAdded, totalWorksCompleted } = useGamificationStore.getState();
+                const { level, xp, totalXp, xpToNextLevel, streak, lastActivityDate, badges, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, totalWorksAdded, totalWorksCompleted } = useGamificationStore.getState();
                 await saveGamificationToFirestore(user.uid, {
-                    level, xp, xpToNextLevel, streak, lastActivityDate, badges,
+                    level, xp, totalXp, xpToNextLevel, streak, lastActivityDate, badges,
                     totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, totalWorksAdded, totalWorksCompleted
                 });
             }
@@ -192,6 +192,7 @@ export default function Settings() {
                 await saveGamificationToFirestore(user.uid, {
                     level: 1,
                     xp: 0,
+                    totalXp: 0,
                     xpToNextLevel: 100,
                     streak: 0,
                     lastActivityDate: null,

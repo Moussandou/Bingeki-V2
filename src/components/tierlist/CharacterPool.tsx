@@ -77,7 +77,7 @@ export function CharacterPool() {
             }
 
             // Map to standard format
-            const formatted: PoolCharacter[] = results.map((c) => ({
+            const formatted: PoolCharacter[] = results.map((c: JikanCharacter) => ({
                 mal_id: c.character.mal_id,
                 name: c.character.name,
                 images: c.character.images
@@ -129,7 +129,7 @@ export function CharacterPool() {
         setIsLoading(true);
         try {
             const results = await getWorkCharacters(workId, 'anime');
-            const formatted: PoolCharacter[] = results.map((c) => ({
+            const formatted: PoolCharacter[] = results.map((c: JikanCharacter) => ({
                 mal_id: c.character.mal_id,
                 name: c.character.name,
                 images: c.character.images
