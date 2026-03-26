@@ -63,7 +63,7 @@ export default function Profile() {
 
 
     // Default (local) stats
-    const { level, xp, xpToNextLevel, streak, badges, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, totalWorksAdded, totalWorksCompleted } = useGamificationStore();
+    const { level, xp, totalXp, xpToNextLevel, streak, badges, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, totalWorksAdded, totalWorksCompleted, recalculateStats } = useGamificationStore();
     const { works, favoriteCharacters, setFavoriteCharacters } = useLibraryStore();
 
     // Local States
@@ -102,6 +102,7 @@ export default function Profile() {
                     setVisitedStats({
                         level: profile.level || 1,
                         xp: profile.xp || 0,
+                        totalXp: profile.totalXp || 0,
                         xpToNextLevel: 100,
                         streak: profile.streak || 0,
                         badges: (profile.badges as Badge[]) || [],
@@ -154,6 +155,14 @@ export default function Profile() {
 
     }, [uid, user?.uid, isOwnProfile, user?.displayName, user?.photoURL]);
 
+    // Force recalculation if totalXp is missing but works exist (Migration & Validation)
+    useEffect(() => {
+        if (isOwnProfile && works.length > 0 && totalXp === 0) {
+            console.log('[Profile] Forcing stat recalculation (Missing totalXp)');
+            recalculateStats(works);
+        }
+    }, [isOwnProfile, works, totalXp, recalculateStats]);
+
     // Redirect guest if no UID provided (visiting /profile directly)
     useEffect(() => {
         if (loading) return; // Wait for auth check to complete
@@ -166,15 +175,16 @@ export default function Profile() {
 
     // Computed Stats to display
     const displayStats = isOwnProfile ? {
-        level, xp, xpToNextLevel, streak, badgeCount: badges.length
+        level, xp, totalXp, xpToNextLevel, streak, badgeCount: badges.length
     } : (visitedStats ? {
         level: visitedStats.level || 1,
         xp: visitedStats.xp || 0,
+        totalXp: visitedStats.totalXp || 0,
         xpToNextLevel: visitedStats.xpToNextLevel || 100,
         streak: visitedStats.streak || 0,
         badgeCount: visitedStats.badges?.length || 0
     } : {
-        level: 1, xp: 0, xpToNextLevel: 100, streak: 0, badgeCount: 0
+        level: 1, xp: 0, totalXp: 0, xpToNextLevel: 100, streak: 0, badgeCount: 0
     });
 
     const displayBadges = isOwnProfile ? badges : (visitedStats?.badges || []);
@@ -565,7 +575,7 @@ export default function Profile() {
                                         <Trophy size={24} />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayStats.xp}</div>
+                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{(displayStats as any).totalXp?.toLocaleString() || 0}</div>
                                         <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.xp_total')}</p>
                                     </div>
                                 </div>

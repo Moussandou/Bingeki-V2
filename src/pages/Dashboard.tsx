@@ -31,7 +31,7 @@ import styles from './Dashboard.module.css';
 export default function Dashboard() {
     const { t } = useTranslation();
     const { user, userProfile } = useAuthStore();
-    const { level, xp, xpToNextLevel, streak, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched } = useGamificationStore();
+    const { level, xp, totalXp, xpToNextLevel, streak, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, recalculateStats } = useGamificationStore();
     const { works } = useLibraryStore();
 
     const [friendsActivity, setFriendsActivity] = useState<ActivityEvent[]>([]);
@@ -77,9 +77,15 @@ export default function Dashboard() {
                 // Small delay to ensure load
                 setTimeout(() => startTutorial(), 1000);
             }
+
+            // Force recalculation if totalXp is missing but works exist (Migration & Validation)
+            if (works.length > 0 && totalXp === 0) {
+                console.log('[Dashboard] Forcing stat recalculation (Missing totalXp)');
+                recalculateStats(works);
+            }
         }
         loadRecommendations();
-    }, [user, loadFriendsActivity, loadRecommendations]);
+    }, [user, loadFriendsActivity, loadRecommendations, works, totalXp, recalculateStats]);
 
     const handleRecommendationClick = (work: JikanResult) => {
         setSelectedWork(work);

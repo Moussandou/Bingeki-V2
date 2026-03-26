@@ -220,32 +220,46 @@ export const useGamificationStore = create<GamificationState>()(
                 let movies = 0;
                 const worksAdded = works.length;
                 let worksCompleted = 0;
+                let calculatedXp = 0;
 
                 // Calculate raw stats
                 works.forEach(w => {
                     const progress = w.currentChapter || 0;
+                    const total = w.totalChapters;
                     const type = w.type ? w.type.toLowerCase() : 'manga';
+
+                    // Anti-cheat: if total is unknown, don't count progress XP (0)
+                    // if total is known, cap progress by it.
+                    let effectiveProgress = 0;
+                    if (total && total > 0) {
+                        effectiveProgress = Math.min(progress, total);
+                    } else if (progress > 0) {
+                        // If no total is set by API, we don't grant XP for progress to prevent abuse
+                        // but we still track it in the stats UI (raw chapters read).
+                        effectiveProgress = 0;
+                    }
 
                     if (type === 'manga') {
                         chapters += progress;
+                        calculatedXp += effectiveProgress * XP_REWARDS.UPDATE_PROGRESS;
                     } else if (type === 'anime') {
                         if (w.format === 'Movie') {
                             movies += progress;
+                            calculatedXp += Math.min(progress, 1) * XP_REWARDS.UPDATE_PROGRESS; // Movies usually 1 episode
                         } else {
                             episodes += progress;
+                            calculatedXp += effectiveProgress * XP_REWARDS.UPDATE_PROGRESS;
                         }
                     } else {
                         chapters += progress;
+                        calculatedXp += effectiveProgress * XP_REWARDS.UPDATE_PROGRESS;
                     }
 
                     if (w.status === 'completed') worksCompleted++;
                 });
 
-                // Calculate Total XP
                 // 1. Works Added
-                let calculatedXp = worksAdded * XP_REWARDS.ADD_WORK;
-                // 2. Progress check
-                calculatedXp += (chapters + episodes + movies) * XP_REWARDS.UPDATE_PROGRESS;
+                calculatedXp += worksAdded * XP_REWARDS.ADD_WORK;
                 // 3. Completed
                 calculatedXp += worksCompleted * XP_REWARDS.COMPLETE_WORK;
 

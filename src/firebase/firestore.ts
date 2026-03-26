@@ -576,7 +576,7 @@ export const getLeaderboard = async (limitCount = 10, _period: 'week' | 'month' 
     try {
         const q = query(
             collection(db, 'users'),
-            orderBy('xp', 'desc'),
+            orderBy('totalXp', 'desc'),
             limit(limitCount)
         );
         const querySnapshot = await getDocs(q);
