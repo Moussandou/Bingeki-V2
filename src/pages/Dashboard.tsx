@@ -25,6 +25,7 @@ import { SEO } from '@/components/layout/SEO';
 import { TutorialOverlay } from '@/components/tutorial/TutorialOverlay';
 import { useTutorialStore } from '@/store/tutorialStore';
 import { SocialLinksBanner } from '@/components/social/SocialLinksBanner';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import styles from './Dashboard.module.css';
 
 export default function Dashboard() {
@@ -108,7 +109,7 @@ export default function Dashboard() {
                         className={`manga-panel ${styles.heroPanel}`}
                     >
                         <div className={styles.avatarContainer}>
-                            <img src={userProfile?.photoURL || user?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <OptimizedImage src={userProfile?.photoURL || user?.photoURL || undefined} alt="Avatar" fallback={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || 'Bingeki'}`} />
                         </div>
 
                         <div className={styles.heroInfo}>
@@ -319,7 +320,7 @@ export default function Dashboard() {
                                                     }}
                                                 >
                                                     <div style={{ paddingTop: '140%', position: 'relative' }}>
-                                                        <img src={work.image} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                        <OptimizedImage src={work.image} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                                                     </div>
                                                     <div style={{
                                                         position: 'absolute',
@@ -388,8 +389,8 @@ export default function Dashboard() {
                                                 onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-primary-glow)'}
                                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                             >
-                                                <div style={{ width: 40, height: 40, borderRadius: '0', overflow: 'hidden', border: '2px solid var(--color-border)', boxShadow: '4px 4px 0 var(--color-primary)', flexShrink: 0 }}>
-                                                    <img src={activity.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${activity.userName}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                <div style={{ width: 40, height: 40, borderRadius: '0', overflow: 'hidden', border: '2px solid var(--color-border)', boxShadow: '4px 4px 0 var(--color-primary)', flexShrink: 0, position: 'relative' }}>
+                                                    <OptimizedImage src={activity.userPhoto || undefined} alt="" fallback={`https://api.dicebear.com/7.x/avataaars/svg?seed=${activity.userName}`} />
                                                 </div>
                                                 <div style={{ flex: 1, minWidth: 0 }}>
                                                     <p style={{ fontSize: '0.9rem', lineHeight: 1.4 }}>
@@ -428,7 +429,7 @@ export default function Dashboard() {
                                             >
                                                 <Card variant="manga" hoverable style={{ padding: 0, overflow: 'hidden', height: '100%' }}>
                                                     <div style={{ position: 'relative', paddingTop: '150%' }}>
-                                                        <img
+                                                        <OptimizedImage
                                                             src={manga.images.jpg.image_url}
                                                             alt={manga.title}
                                                             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}

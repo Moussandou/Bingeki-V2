@@ -12,6 +12,7 @@ import { Search, Check, Loader2, Flame, Sparkles, Star, Dice5, TrendingUp, Plus,
 import { motion, AnimatePresence } from 'framer-motion';
 import { AddWorkModal } from '@/components/library/AddWorkModal';
 import { FriendRecommendations } from '@/components/social/FriendRecommendations';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { SEO } from '@/components/layout/SEO';
 import styles from './Discover.module.css';
 
@@ -597,7 +598,7 @@ export default function Discover() {
                                                     onClick={() => handleWorkClick(work)}
                                                 >
                                                     <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid var(--color-border-heavy)', flexShrink: 0 }}>
-                                                        <img src={work.images.jpg.image_url} alt={work.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                        <OptimizedImage src={work.images.jpg.image_url} alt={work.title} />
                                                         {isOwned && (
                                                             <div style={{ position: 'absolute', top: 5, right: 5, background: 'var(--color-primary)', color: '#fff', padding: '4px', borderRadius: '0' }}>
                                                                 <Check size={14} strokeWidth={3} />

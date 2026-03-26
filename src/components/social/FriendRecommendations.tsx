@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/authStore';
 import { getFriends, getUserLibrary } from '@/firebase/firestore';
 import { type Work } from '@/store/libraryStore';
 import { useNavigate } from 'react-router-dom';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 interface RecommendedWork {
     id: number;
@@ -146,10 +147,9 @@ export function FriendRecommendations() {
                             border: '2px solid #000',
                             marginBottom: '0.5rem'
                         }}>
-                            <img
+                            <OptimizedImage
                                 src={work.image}
                                 alt={work.title}
-                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
 
                             {/* Friends overlay */}
@@ -174,11 +174,13 @@ export function FriendRecommendations() {
                                             border: '2px solid #fff',
                                             marginLeft: '-4px'
                                         }}>
-                                            <img
-                                                src={f.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${f.name}`}
-                                                alt=""
-                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                            />
+                                            <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+                                                <OptimizedImage
+                                                    src={f.photo || undefined}
+                                                    alt=""
+                                                    fallback={`https://api.dicebear.com/7.x/avataaars/svg?seed=${f.name}`}
+                                                />
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

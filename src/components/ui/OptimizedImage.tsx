@@ -56,6 +56,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
                 onError={handleError}
                 loading="lazy"
                 decoding="async"
+                referrerPolicy={finalSrc?.includes('myanimelist.net') ? 'no-referrer' : undefined}
                 className={`${styles.image} ${loaded ? styles.visible : ''} ${className}`}
                 style={{ ...style, objectFit }}
                 {...props}

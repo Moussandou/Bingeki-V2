@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/Card';
 import type { JikanResult } from '@/services/animeApi';
 import { ChevronLeft, ChevronRight, Plus, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 interface CarouselProps {
     title: React.ReactNode;
@@ -103,7 +104,7 @@ export function Carousel({ title, items, onItemClick, libraryIds, onAdd, loading
                                     onClick={() => onItemClick(work)}
                                 >
                                     <div style={{ position: 'relative', aspectRatio: '2/3', borderBottom: '2px solid var(--color-border)' }}>
-                                        <img
+                                        <OptimizedImage
                                             src={work.images.jpg.image_url}
                                             alt={work.title}
                                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
