@@ -7,7 +7,7 @@ import { searchWorks, type JikanResult } from '@/services/animeApi';
 import { PenTool, Globe, Loader2, Plus, Check, Upload, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLibraryStore, type Work } from '@/store/libraryStore';
-import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
+import { useGamificationStore } from '@/store/gamificationStore';
 import { useAuthStore } from '@/store/authStore';
 import { logActivity } from '@/firebase/firestore';
 import { isValidImageSrc } from '@/utils/validation';
@@ -26,7 +26,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
     const [loading, setLoading] = useState(false);
     const [type, setType] = useState<'manga' | 'anime'>('manga');
     const { addWork, works } = useLibraryStore();
-    const { addXp, recordActivity, incrementStat } = useGamificationStore();
+    const { recordActivity, recalculateStats } = useGamificationStore();
     const { user } = useAuthStore();
 
     // Manual mode state
@@ -86,9 +86,10 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
         };
 
         addWork(newWork);
-        addXp(XP_REWARDS.ADD_WORK);
         recordActivity();
-        incrementStat('works');
+        
+        const updatedWorks = useLibraryStore.getState().works;
+        recalculateStats(updatedWorks);
 
         // Log activity for friends feed
         if (user) {
@@ -161,10 +162,10 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
             synopsis: work.synopsis || '', // Fallback to empty string if null
         };
         addWork(newWork);
-        // Award XP for adding a work
-        addXp(XP_REWARDS.ADD_WORK);
         recordActivity();
-        incrementStat('works');
+        
+        const updatedWorks = useLibraryStore.getState().works;
+        recalculateStats(updatedWorks);
 
         // Log activity for friends feed
         if (user) {

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
-import { Zap, User, Compass, Book, Languages, Search, TrendingUp, Upload, ArrowUp } from 'lucide-react'; // Added icons
+import { Zap, User, Compass, Book, Languages, Search, TrendingUp, Upload, ArrowUp, Flame, Trophy } from 'lucide-react'; // Added icons
 import { NenChart } from '@/components/profile/NenChart'; // Import NenChart
 
 // --- MOCK COMPONENTS FOR VISUALS ---
@@ -134,6 +134,47 @@ const MockImportVisual = () => (
     </div>
 );
 
+const MockGamificationVisual = () => (
+    <div style={{
+        display: 'flex', flexDirection: 'column', gap: '15px', width: '220px'
+    }}>
+        <div style={{
+            background: 'var(--color-surface)', padding: '10px', borderRadius: '8px', 
+            border: '2px solid var(--color-primary)', display: 'flex', alignItems: 'center', gap: '10px'
+        }}>
+            <div style={{
+                width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(var(--color-primary-rgb), 0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>
+                <Flame size={24} color="var(--color-primary)" />
+            </div>
+            <div>
+                <div style={{ fontSize: '1.2rem', fontWeight: '900', fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}>LVL 12</div>
+                <div style={{ height: '6px', width: '100px', background: 'var(--color-border)', borderRadius: '3px', marginTop: '4px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: '60%', background: 'var(--color-primary)' }} />
+                </div>
+            </div>
+        </div>
+        
+        <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{
+                flex: 1, background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px'
+            }}>
+                <Flame size={20} color="var(--color-accent)" />
+                <span style={{ fontWeight: 'bold' }}>15 🔥</span>
+            </div>
+            <div style={{
+                flex: 1, background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px'
+            }}>
+                <Trophy size={20} color="#f59e0b" />
+                <span style={{ fontWeight: 'bold', color: '#f59e0b' }}>8 ⭐</span>
+            </div>
+        </div>
+    </div>
+);
+
 // Steps definition with keys instead of hardcoded text
 const STEPS = [
     {
@@ -163,6 +204,13 @@ const STEPS = [
         target: "library-nav",
         icon: <Book size={64} style={{ color: 'var(--color-accent)' }} />,
         component: <MockLibraryVisual />
+    },
+    {
+        titleKey: "tutorial.gamification_title",
+        descKey: "tutorial.gamification_desc",
+        target: null,
+        icon: <Flame size={64} style={{ color: 'var(--color-primary)' }} />,
+        component: <MockGamificationVisual />
     },
     {
         titleKey: "tutorial.import_title",

@@ -27,6 +27,7 @@ import {
     getAnimeStaff, type JikanStaff, getWorkReviews, type JikanReview
 } from '../services/animeApi';
 import { handleProgressUpdateWithXP } from '@/utils/progressUtils';
+import { useGamificationStore } from '@/store/gamificationStore';
 import { SEO } from '@/components/layout/SEO';
 import styles from './WorkDetails.module.css';
 
@@ -284,7 +285,7 @@ export default function WorkDetails() {
     const { t } = useTranslation();
     const { addToast } = useToast(); // Initialize hook
     const { getWork, addWork, updateStatus, updateWorkDetails, removeWork } = useLibraryStore(); // Add removeWork
-    // const { } = useGamificationStore(); // Removed unused destructuring
+    const { recalculateStats } = useGamificationStore();
     const { user } = useAuthStore();
     const { spoilerMode } = useSettingsStore();
 
@@ -507,6 +508,10 @@ export default function WorkDetails() {
     const handleDelete = () => {
         if (!work) return;
         removeWork(work.id);
+        
+        const updatedWorks = useLibraryStore.getState().works;
+        recalculateStats(updatedWorks);
+
         addToast(t('work_details.danger.deleted_toast', { title: work.title }), 'error');
         navigate('/library');
     };

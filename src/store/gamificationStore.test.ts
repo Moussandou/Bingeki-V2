@@ -1,0 +1,130 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { useGamificationStore, XP_REWARDS } from './gamificationStore';
+import { type Work } from './libraryStore';
+
+describe('Gamification Store', () => {
+    beforeEach(() => {
+        useGamificationStore.getState().resetStore();
+        vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    it('should initialize with correct default values', () => {
+        const state = useGamificationStore.getState();
+        expect(state.level).toBe(1);
+        expect(state.xp).toBe(0);
+        expect(state.streak).toBe(0);
+        expect(state.bonusXp).toBe(0);
+        expect(state.xpToNextLevel).toBe(100);
+    });
+
+    it('should add XP and level up correctly', () => {
+        const { addXp } = useGamificationStore.getState();
+        
+        // Add exact amount to level up (100 -> level 2)
+        addXp(100);
+        
+        const state1 = useGamificationStore.getState();
+        expect(state1.level).toBe(2);
+        expect(state1.xp).toBe(0);
+        expect(state1.xpToNextLevel).toBe(114); 
+
+        // Check if levelUpData is set
+        expect(state1.levelUpData?.newLevel).toBe(2);
+        
+        // Add more XP to not level up
+        addXp(50);
+        const state2 = useGamificationStore.getState();
+        expect(state2.level).toBe(2);
+        expect(state2.xp).toBe(50);
+
+        // Level up again
+        addXp(114); 
+        const state3 = useGamificationStore.getState();
+        expect(state3.level).toBe(3);
+        expect(state3.xp).toBe(50); 
+        expect(state3.xpToNextLevel).toBe(131); 
+        expect(state3.lastLevel).toBe(2);
+    });
+
+    it('should handle recordActivity for streaks with <= 48 hour window', () => {
+        const { recordActivity } = useGamificationStore.getState();
+
+        // 1st login
+        const date1 = new Date('2024-03-20T10:00:00Z');
+        vi.setSystemTime(date1);
+        recordActivity();
+        
+        expect(useGamificationStore.getState().streak).toBe(1);
+
+        // Same day login (should ignore)
+        const date2 = new Date('2024-03-20T15:00:00Z');
+        vi.setSystemTime(date2);
+        recordActivity();
+        expect(useGamificationStore.getState().streak).toBe(1);
+
+        // Next calendar day, 30 hours later (within 48 hours)
+        const date3 = new Date('2024-03-21T16:00:00Z');
+        vi.setSystemTime(date3);
+        recordActivity();
+        expect(useGamificationStore.getState().streak).toBe(2);
+        // Expect daily login XP reward since streak > 1. Daily login is bonus XP.
+        expect(useGamificationStore.getState().xp).toBe(XP_REWARDS.DAILY_LOGIN);
+        expect(useGamificationStore.getState().bonusXp).toBe(XP_REWARDS.DAILY_LOGIN);
+
+        // Next calendar day, 49 hours later (streak broken)
+        const date4 = new Date('2024-03-23T17:00:01Z');
+        vi.setSystemTime(date4);
+        recordActivity();
+        expect(useGamificationStore.getState().streak).toBe(1);
+    });
+
+    it('should calculate XP deterministically via recalculateStats', () => {
+        const { recalculateStats } = useGamificationStore.getState();
+        const mockWorks: Work[] = [
+            { id: 1, title: 'Manga 1', type: 'manga', status: 'completed', totalChapters: 10, currentChapter: 10, rating: 0, notes: '', image: '', lastUpdated: 0, dateAdded: 0 },
+            { id: 2, title: 'Anime 1', type: 'anime', status: 'reading', totalChapters: 12, currentChapter: 5, rating: 0, notes: '', image: '', lastUpdated: 0, dateAdded: 0 }
+        ] as Work[];
+
+        recalculateStats(mockWorks);
+        
+        const state = useGamificationStore.getState();
+        // 2 works * 15 = 30
+        // (10 + 5) * 10 = 150
+        // 1 completed * 50 = 50
+        // Total = 230 XP
+        // Level 1: 100 XP -> Level 2 (Remaining 130)
+        // Level 2: 114 XP -> Level 3 (Remaining 16)
+        
+        expect(state.level).toBe(3);
+        expect(state.xp).toBe(16);
+        expect(state.totalWorksAdded).toBe(2);
+        expect(state.totalWorksCompleted).toBe(1);
+    });
+
+    it('should preserve bonusXp during recalculation', () => {
+        const { addXp, recalculateStats } = useGamificationStore.getState();
+        
+        // Add 50 bonus XP (e.g. daily login)
+        addXp(50, true);
+        
+        const mockWorks: Work[] = [
+            { id: 1, title: 'Manga 1', type: 'manga', status: 'reading', totalChapters: 10, currentChapter: 0, rating: 0, notes: '', image: '', lastUpdated: 0, dateAdded: 0 }
+        ] as Work[];
+        
+        recalculateStats(mockWorks);
+        
+        const state = useGamificationStore.getState();
+        // 1 work * 15 = 15
+        // 0 progress * 10 = 0
+        // 0 completed * 50 = 0
+        // Bonus XP = 50
+        // Total = 65 XP
+        
+        expect(state.xp).toBe(65);
+        expect(state.bonusXp).toBe(50);
+    });
+});

@@ -2,13 +2,19 @@ import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy, limit,
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from './config';
 import type { Work, Folder } from '@/store/libraryStore';
-import type { Badge } from '@/types/badge';
+// import type { Badge } from '@/types/badge'; // Removed unused import, already in GamificationData
 import type { FavoriteCharacter } from '@/types/character';
 import type { ActivityEvent } from '@/types/activity';
 export type { ActivityEvent };
 import type { Comment, CommentWithReplies } from '@/types/comment';
 import type { Challenge } from '@/types/challenge';
-import { mergeGamificationData, mergeLibraryData, validateGamificationWrite, logDataBackup } from '@/utils/dataProtection';
+import { 
+    mergeGamificationData, 
+    mergeLibraryData, 
+    validateGamificationWrite, 
+    logDataBackup,
+    type GamificationData // Import the unified type
+} from '@/utils/dataProtection';
 
 // Types for Firestore data
 interface LibraryData {
@@ -23,21 +29,7 @@ interface LibraryData {
     };
 }
 
-interface GamificationData {
-    level: number;
-    xp: number;
-    xpToNextLevel: number;
-    streak: number;
-    lastActivityDate: string | null;
-    badges: Badge[];
-    totalChaptersRead: number;
-    totalAnimeEpisodesWatched: number;
-    totalMoviesWatched: number;
-    totalWorksAdded: number;
-    totalWorksCompleted: number;
-    lastUpdated: number;
-    version?: number;
-}
+// interface GamificationData { ... } - REMOVED, importing from dataProtection instead
 
 export interface UserProfile {
     uid: string;
@@ -47,6 +39,7 @@ export interface UserProfile {
     lastLogin: number;
     xp?: number;
     level?: number;
+    totalXp?: number; // Added for robust leaderboard sorting
     streak?: number;
     badges?: { id: string; name: string; description: string; icon: string; rarity: string; unlockedAt?: number }[];
     totalChaptersRead?: number;
@@ -297,6 +290,7 @@ export async function saveGamificationToFirestore(
         await setDoc(userDocRef, {
             xp: mergedData.xp,
             level: mergedData.level,
+            totalXp: mergedData.totalXp, // Crucial for ranking
             streak: mergedData.streak,
             badges: mergedData.badges,
             totalChaptersRead: mergedData.totalChaptersRead,
@@ -702,7 +696,7 @@ export async function getFilteredLeaderboard(
     try {
         // Map category to Firestore field
         const fieldMap: Record<LeaderboardCategory, string> = {
-            'xp': 'xp',
+            'xp': 'totalXp', // Use totalXp for fair ranking
             'chapters': 'totalChaptersRead',
             'streak': 'streak'
         };
@@ -734,7 +728,7 @@ export async function getUserRank(
 ): Promise<{ rank: number; profile: UserProfile } | null> {
     try {
         const fieldMap: Record<LeaderboardCategory, string> = {
-            'xp': 'xp',
+            'xp': 'totalXp',
             'chapters': 'totalChaptersRead',
             'streak': 'streak'
         };

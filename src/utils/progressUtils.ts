@@ -1,8 +1,8 @@
 import { useLibraryStore } from '@/store/libraryStore';
-import { useGamificationStore, XP_REWARDS } from '@/store/gamificationStore';
+import { useGamificationStore } from '@/store/gamificationStore';
 
 /**
- * Handles progress updates with XP calculation (gain or loss) and boundary checks.
+ * Handles progress updates and recalculates XP deterministically.
  * @param workId ID of the work
  * @param newProgress New chapter/episode number
  * @param totalChapters Total chapters/episodes (optional)
@@ -14,7 +14,7 @@ export const handleProgressUpdateWithXP = (
     totalChapters?: number | null
 ) => {
     const { getWork, updateProgress, updateStatus } = useLibraryStore.getState();
-    const { addXp, recordActivity, incrementStat } = useGamificationStore.getState();
+    const { recordActivity, recalculateStats } = useGamificationStore.getState();
 
     const work = getWork(workId);
     if (!work) return false;
@@ -35,42 +35,17 @@ export const handleProgressUpdateWithXP = (
     // 3. Update Library Progress
     updateProgress(workId, newProgress);
 
-    // 4. XP Logic
-    const diff = newProgress - oldProgress;
-
-    if (diff > 0) {
-        // Progressing: Add XP
-        addXp(XP_REWARDS.UPDATE_PROGRESS * diff);
-        for (let i = 0; i < diff; i++) {
-            const type = work.type ? work.type.toLowerCase() : 'manga';
-            if (type === 'manga') {
-                incrementStat('chapters');
-            } else if (type === 'anime') {
-                if (work.format === 'Movie') {
-                    incrementStat('movies');
-                } else {
-                    incrementStat('episodes');
-                }
-            } else {
-                // Default fallback
-                incrementStat('chapters');
-            }
-        }
-        recordActivity(); // Maintain streak
-
-        // Check completion
-        if (totalChapters && newProgress >= totalChapters) {
-            updateStatus(workId, 'completed');
-            incrementStat('completed');
-            addXp(XP_REWARDS.COMPLETE_WORK);
-        }
-    } else {
-        // Regressing: Remove XP (Penalty)
-        // Simple deduction. to not go below 0 total XP? 
-        // For now, simple deduction.
-        const penalty = XP_REWARDS.UPDATE_PROGRESS * Math.abs(diff);
-        addXp(-penalty);
+    // Check completion logic BEFORE recalculating stats
+    if (newProgress > oldProgress && totalChapters && newProgress >= totalChapters) {
+        updateStatus(workId, 'completed');
     }
+
+    // 4. XP and Stats Logic (Deterministic recalculation)
+    recordActivity(); // Maintain streak if this is a manual user action
+    
+    // Get the fresh works array after the updateProgress and updateStatus calls
+    const updatedWorks = useLibraryStore.getState().works;
+    recalculateStats(updatedWorks);
 
     return true;
 };

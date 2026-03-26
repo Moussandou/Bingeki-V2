@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { AddWorkModal } from '@/components/library/AddWorkModal';
 import { useLibraryStore, type Work } from '@/store/libraryStore';
+import { useGamificationStore } from '@/store/gamificationStore';
 import { useAuthStore } from '@/store/authStore';
 import { Search, Plus, Filter, Grid, List, Trash2, AlertTriangle, BookOpen, CheckCircle, SortAsc, ChevronDown, Download, Upload, TrendingUp, User, FolderPlus, Share2 } from 'lucide-react';
 import styles from './Library.module.css';
@@ -30,6 +31,7 @@ export default function Library() {
     const { user: currentUser } = useAuthStore();
     const { addToast } = useToast();
     const { works: localWorks, removeWork, folders, createFolder, addToFolder, updateFolder, deleteFolder } = useLibraryStore();
+    const { recalculateStats } = useGamificationStore();
 
     // Friend Library State
     const [friendWorks, setFriendWorks] = useState<Work[]>([]);
@@ -245,6 +247,10 @@ export default function Library() {
         if (isReadOnly) return;
         if (confirm(t('library.delete_confirm', { count: selectedWorks.size }))) {
             selectedWorks.forEach(id => removeWork(id));
+            
+            const updatedWorks = useLibraryStore.getState().works;
+            recalculateStats(updatedWorks);
+
             setSelectedWorks(new Set());
             setIsSelectionMode(false);
             addToast(t('library.deleted_success', { count: selectedWorks.size }), 'success');
@@ -255,6 +261,10 @@ export default function Library() {
         if (isReadOnly) return;
         if (workToDelete) {
             removeWork(workToDelete.id);
+            
+            const updatedWorks = useLibraryStore.getState().works;
+            recalculateStats(updatedWorks);
+
             addToast(t('library.deleted_single', { title: workToDelete.title }), 'error');
             setWorkToDelete(null);
         }

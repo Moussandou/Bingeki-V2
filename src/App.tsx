@@ -64,6 +64,8 @@ import { RequireAdmin } from '@/components/admin/RequireAdmin';
 import { InstallInstructionsModal } from '@/components/pwa/InstallInstructionsModal';
 import { MobileMenuFAB } from '@/components/layout/MobileMenuFAB';
 import { UsernameSelectionModal } from '@/components/auth/UsernameSelectionModal';
+import { XPGainToast } from '@/components/gamification/XPGainToast';
+import { LevelUpModal } from '@/components/gamification/LevelUpModal';
 
 // Bot aware suspense to avoid blank screen during hydration for screenshot tools
 const BotAwareSuspense = ({ children }: { children: React.ReactNode }) => {
@@ -147,6 +149,7 @@ function App() {
   const gamificationState = useGamificationStore(useShallow((s) => ({
     level: s.level,
     xp: s.xp,
+    totalXp: s.totalXp,
     xpToNextLevel: s.xpToNextLevel,
     streak: s.streak,
     lastActivityDate: s.lastActivityDate,
@@ -205,8 +208,15 @@ function App() {
 
         console.log('[App] Data merged successfully:', {
           libraryCount: mergedLibrary.length,
-          level: mergedGamification.level
+          level: mergedGamification.level,
+          totalXp: mergedGamification.totalXp
         });
+
+        // Migration: If totalXp is 0 but user has content/level, force recalculate
+        if (mergedGamification.totalXp === 0 && (mergedGamification.level > 1 || mergedLibrary.length > 0)) {
+          console.log('[App] Migrating totalXp for existing user...');
+          useGamificationStore.getState().recalculateStats(mergedLibrary);
+        }
       } else {
         // User logged out - cleanup
         if (profileUnsubscribe) {
@@ -366,6 +376,8 @@ function App() {
     <ToastProvider>
       <BrowserRouter>
         <UsernameSelectionModal />
+        <XPGainToast />
+        <LevelUpModal />
         <BotAwareSuspense>
           <Routes>
             {/* Root redirect to language prefix */}

@@ -94,7 +94,8 @@
 }
 
 .socialIconActive {
-    color: #fff;
+    color: #000;
+    background: #fff;
     padding: 0.75rem;
     border: 3px solid #000;
     border-radius: 0;
@@ -104,6 +105,7 @@
 }
 
 .socialIconActive:hover {
+    color: #fff;
     transform: translate(-2px, -2px);
     box-shadow: 6px 6px 0 #000;
 }

@@ -5,6 +5,7 @@ import type { Badge } from '@/types/badge';
 export interface GamificationData {
     level: number;
     xp: number;
+    totalXp: number; // Added
     xpToNextLevel: number;
     streak: number;
     lastActivityDate: string | null;
@@ -39,6 +40,7 @@ export function mergeGamificationData(
         return {
             level: local.level || 1,
             xp: local.xp || 0,
+            totalXp: local.totalXp || 0,
             xpToNextLevel: local.xpToNextLevel || 100,
             streak: local.streak || 0,
             lastActivityDate: local.lastActivityDate || null,
@@ -70,6 +72,7 @@ export function mergeGamificationData(
     const MAX_LEVEL = 100;
     const mergedLevel = Math.min(MAX_LEVEL, Math.max(local.level || 1, cloud.level || 1));
     const mergedXp = Math.max(local.xp || 0, cloud.xp || 0);
+    const mergedTotalXp = Math.max(local.totalXp || 0, cloud.totalXp || 0);
     const mergedTotalChapters = Math.max(local.totalChaptersRead || 0, cloud.totalChaptersRead || 0);
     const mergedTotalEpisodes = Math.max(local.totalAnimeEpisodesWatched || 0, cloud.totalAnimeEpisodesWatched || 0);
     const mergedTotalMovies = Math.max(local.totalMoviesWatched || 0, cloud.totalMoviesWatched || 0);
@@ -97,7 +100,7 @@ export function mergeGamificationData(
 
     // Calculate xpToNextLevel based on merged level
     const LEVEL_BASE = 100;
-    const LEVEL_MULTIPLIER = 1.5;
+    const LEVEL_MULTIPLIER = 1.15;
     let xpToNext = LEVEL_BASE;
     for (let i = 1; i < mergedLevel; i++) {
         xpToNext = Math.floor(xpToNext * LEVEL_MULTIPLIER);
@@ -115,6 +118,7 @@ export function mergeGamificationData(
     return {
         level: mergedLevel,
         xp: mergedXp,
+        totalXp: mergedTotalXp,
         xpToNextLevel: xpToNext,
         streak: mergedStreak,
         lastActivityDate: mergedLastActivity || null,
@@ -193,6 +197,7 @@ export function validateGamificationWrite(
     // 1. Check cumulative stats don't decrease
     const checks = [
         { name: 'level', newVal: newData.level, oldVal: existing.level },
+        { name: 'totalXp', newVal: newData.totalXp, oldVal: existing.totalXp },
         { name: 'totalChaptersRead', newVal: newData.totalChaptersRead, oldVal: existing.totalChaptersRead },
         { name: 'totalAnimeEpisodesWatched', newVal: newData.totalAnimeEpisodesWatched, oldVal: existing.totalAnimeEpisodesWatched },
         { name: 'totalMoviesWatched', newVal: newData.totalMoviesWatched, oldVal: existing.totalMoviesWatched },
@@ -219,8 +224,8 @@ export function validateGamificationWrite(
     }
 
     if (newData.xp && existing.xp) {
-        // Max 1000 XP increase per save (covers most generous rewards + backlog)
-        if (newData.xp > existing.xp + 1000) {
+        // Max 10000 XP increase per save (covers most generous rewards + backlog imports)
+        if (newData.xp > existing.xp + 10000) {
             console.error(`[DataProtection] SECURITY: Prevented suspicious XP jump (+${newData.xp - existing.xp})`);
             return false;
         }

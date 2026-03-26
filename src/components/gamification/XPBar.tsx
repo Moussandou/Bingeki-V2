@@ -41,9 +41,22 @@ export function XPBar({ current, max, level }: XPBarProps) {
                         height: '100%',
                         background: 'var(--color-primary)',
                         position: 'relative',
-                        zIndex: 2
+                        zIndex: 2,
+                        overflow: 'hidden'
                     }}
-                />
+                >
+                    {/* Shimmer effect inside the bar */}
+                    <motion.div
+                        animate={{ x: ['-100%', '200%'] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'linear', delay: 1 }}
+                        style={{
+                            position: 'absolute',
+                            top: 0, left: 0, bottom: 0, width: '40%',
+                            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+                            zIndex: 3
+                        }}
+                    />
+                </motion.div>
             </div>
         </div>
     );
