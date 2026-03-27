@@ -2,6 +2,15 @@ import { queuedFetch } from '@/utils/apiQueue';
 import { useSettingsStore } from '@/store/settingsStore';
 
 const BASE_URL = 'https://api.jikan.moe/v4';
+ 
+export class ApiError extends Error {
+    status: number;
+    constructor(status: number, message: string) {
+        super(message);
+        this.status = status;
+        this.name = 'ApiError';
+    }
+}
 
 // Jikan API Status Response
 export interface JikanStatusResponse {
@@ -243,10 +252,18 @@ export const getWorkDetails = async (id: number, type: 'anime' | 'manga'): Promi
 
     try {
         const response = await queuedFetch(`${BASE_URL}/${type}/${id}`);
+        if (response.status === 404) {
+             throw new ApiError(404, `${type} with ID ${id} not found`);
+        }
         if (!response.ok) {
-            throw new Error(`Jikan API error: ${response.status} ${response.statusText}`);
+            throw new ApiError(response.status, `Jikan API error: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
+        
+        if (data.status === 404 || (data.error && data.error.includes('not found'))) {
+             throw new ApiError(404, `${type} with ID ${id} not found (API response)`);
+        }
+        
         setCache(cacheKey, data.data);
         return data.data as JikanResult;
     } catch (error) {
@@ -273,10 +290,18 @@ export const getWorkFull = async (id: number, type: 'anime' | 'manga'): Promise<
 
     try {
         const response = await queuedFetch(`${BASE_URL}/${type}/${id}/full`);
+        if (response.status === 404) {
+             throw new ApiError(404, `Full ${type} with ID ${id} not found`);
+        }
         if (!response.ok) {
-            throw new Error(`Jikan API error: ${response.status} ${response.statusText}`);
+            throw new ApiError(response.status, `Jikan API error: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
+
+        if (data.status === 404 || (data.error && data.error.includes('not found'))) {
+             throw new ApiError(404, `Full ${type} with ID ${id} not found (API response)`);
+        }
+
         setCache(cacheKey, data.data);
         return data.data as JikanResultFull;
     } catch (error) {

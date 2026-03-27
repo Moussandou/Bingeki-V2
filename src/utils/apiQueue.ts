@@ -17,9 +17,9 @@ class ApiQueue {
     private queue: QueuedRequest[] = [];
     private processing = false;
     private lastRequestTime = 0;
-    private readonly minInterval = 500; // 2 requests/sec to stay safe under 60/min
+    private readonly minInterval = 800; // Increase from 500ms to 800ms (safely under 60-75/min)
     private readonly maxRetries = 3;
-    private readonly retryDelay = 2000; // Wait 2s on 429
+    private readonly retryDelay = 3000; // Wait 3s on 429
 
     /**
      * Add a request to the queue
@@ -71,8 +71,12 @@ class ApiQueue {
                     const retryAfterHeader = response.headers.get('Retry-After');
                     const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) * 1000 : this.retryDelay;
                     console.warn(`[ApiQueue] Rate limit hit for ${request.url}, retrying in ${retryAfter}ms...`);
-                    await this.delay(retryAfter);
+                    
+                    // Add the request back to the front of the queue
                     this.queue.unshift(request);
+                    
+                    // Wait before processing next item
+                    await this.delay(retryAfter);
                     continue;
                 }
 

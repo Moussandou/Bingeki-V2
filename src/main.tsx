@@ -4,6 +4,7 @@ import { HelmetProvider } from 'react-helmet-async'
 import './styles/global.css'
 import './i18n'
 import App from './App.tsx'
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 
 // Handle asset loading errors (common after new deployments)
 window.addEventListener('vite:preloadError', (event) => {
@@ -17,7 +18,9 @@ const isPrerendered = document.body.classList.contains('is-prerendered');
 const rootElement = (
   <StrictMode>
     <HelmetProvider>
-      <App />
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
     </HelmetProvider>
   </StrictMode>
 );

@@ -24,7 +24,7 @@ import logoADN from '@/assets/logo_adn.png';
 
 import {
     getWorkCharacters, getWorkRecommendations, getWorkPictures, getWorkStatistics, type JikanCharacter, type JikanRelation, type JikanRecommendation, type JikanPicture, type JikanTheme, type JikanStatistics, type JikanStreaming,
-    getAnimeStaff, type JikanStaff, getWorkReviews, type JikanReview, getWorkFull
+    getAnimeStaff, type JikanStaff, getWorkReviews, type JikanReview, getWorkFull, ApiError
 } from '../services/animeApi';
 import { handleProgressUpdateWithXP } from '@/utils/progressUtils';
 import { useGamificationStore } from '@/store/gamificationStore';
@@ -107,10 +107,19 @@ const RecursiveComment = memo(function RecursiveComment({
 }: RecursiveCommentProps) {
     const isRevealed = revealedSpoilers.includes(comment.id);
     /* eslint-disable-next-line */
-    const timeDiff = Date.now() - comment.timestamp;
-    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const [timeAgo, setTimeAgo] = useState<string>('');
     const { t } = useTranslation();
-    const timeAgo = hours < 1 ? t('work_details.comments.time_now') : hours < 24 ? t('work_details.comments.time_hours', { hours }) : t('work_details.comments.time_days', { days: Math.floor(hours / 24) });
+    
+    useEffect(() => {
+        const timeDiff = Date.now() - comment.timestamp;
+        const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+        const formatted = hours < 1 
+            ? t('work_details.comments.time_now') 
+            : hours < 24 
+                ? t('work_details.comments.time_hours', { hours }) 
+                : t('work_details.comments.time_days', { days: Math.floor(hours / 24) });
+        setTimeAgo(formatted);
+    }, [comment.timestamp, t]);
     const isReplying = replyingTo === comment.id;
 
     return (
@@ -294,6 +303,7 @@ export default function WorkDetails() {
     const typeParam = searchParams.get('type') as 'anime' | 'manga' | null;
     const [fetchedWork, setFetchedWork] = useState<DetailedWork | null>(null);
     const [isFetchingDetails, setIsFetchingDetails] = useState(false);
+    const [fetchError, setFetchError] = useState<{ status: number; message: string } | null>(null);
 
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 
@@ -384,15 +394,13 @@ export default function WorkDetails() {
 
             getWorkFull(Number(id), typeToFetch).then(res => {
                 const workTypeNormalized = res.type ? res.type.toLowerCase() : typeToFetch;
-                // Determine our internal type (anime/manga) based on API type
                 const internalType = (workTypeNormalized === 'manga' || workTypeNormalized === 'manhwa' || workTypeNormalized === 'manhua' || workTypeNormalized === 'novel') ? 'manga' : 'anime';
-
-                // Map JikanResult to compatible format for UI (partial)
+ 
                 const mapped: DetailedWork = {
                     id: res.mal_id,
                     title: res.title,
-                    type: internalType, // Use our strictly typed internalType
-                    format: res.type, // Store original specific type (TV, Movie, etc) here if needed, adding to interface
+                    type: internalType,
+                    format: res.type,
                     image: res.images.jpg.large_image_url,
                     synopsis: res.synopsis,
                     totalChapters: res.chapters || res.episodes || 0,
@@ -401,7 +409,6 @@ export default function WorkDetails() {
                     currentChapter: 0,
                     rating: 0,
                     notes: '',
-                    // New Fields
                     trailer: res.trailer,
                     studios: res.studios || [],
                     genres: res.genres || [],
@@ -413,17 +420,23 @@ export default function WorkDetails() {
                     ratingString: res.rating,
                     source: res.source
                 };
-
+ 
                 // Sync extra data from /full immediately
                 if (res.relations) setRelations(res.relations);
                 if (res.theme) setThemes(res.theme);
                 if (res.streaming) setStreaming(res.streaming);
-
+ 
                 setFetchedWork(mapped);
+                setFetchError(null);
                 setIsFetchingDetails(false);
             })
-.catch(err => {
+            .catch(err => {
                 console.error("Failed to fetch work details", err);
+                if (err instanceof ApiError) {
+                    setFetchError({ status: err.status, message: err.message });
+                } else {
+                    setFetchError({ status: 500, message: "Internal Error" });
+                }
                 setIsFetchingDetails(false);
             });
         }
@@ -437,44 +450,33 @@ export default function WorkDetails() {
 
 
         const fetchData = async () => {
-            const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
             if (!work.type) return;
-            const workTypeNormalized = work.type.toLowerCase();
-            const type = (workTypeNormalized === 'manga' || workTypeNormalized === 'manhwa' || workTypeNormalized === 'manhua' || workTypeNormalized === 'novel') ? 'manga' : 'anime';
-
-
+            const type = work.type === 'manga' ? 'manga' : 'anime';
 
             try {
-                // Fetch Characters (not in /full)
-                const chars = await getWorkCharacters(Number(id), type);
+                // Fetch basic UI data immediately
+                const [chars, recs, pics] = await Promise.all([
+                    getWorkCharacters(Number(id), type),
+                    getWorkRecommendations(Number(id), type),
+                    getWorkPictures(Number(id), type)
+                ]);
+                
                 setCharacters(chars);
-                await delay(300);
-
-                // Fetch Recommendations (not in /full)
-                const recs = await getWorkRecommendations(Number(id), type);
                 setRecommendations(recs);
-                await delay(300);
-
-                // Fetch Pictures (not in /full)
-                const pics = await getWorkPictures(Number(id), type);
                 setPictures(pics);
-                await delay(300);
 
-                // Fetch Statistics (not in /full)
-                const stats = await getWorkStatistics(Number(id), type);
-                setStatistics(stats);
-                await delay(300);
-
-                // Staff is usually not in /full either
+                // Fetch other data only if we are in the respective tab or section is expanded
+                // This will be handled by specific tab activation later or if we just want to avoid hitting the API too much on mount
+                // For now, let's keep statistics, staff, and reviews delayed or concurrent
+                
+                // Statistics
+                getWorkStatistics(Number(id), type).then(setStatistics);
+                
                 if (type === 'anime') {
-                    const stf = await getAnimeStaff(Number(id));
-                    setStaff(stf);
-                    await delay(300);
+                    getAnimeStaff(Number(id)).then(setStaff);
                 }
-
-                // Fetch reviews for both anime and manga
-                const revs = await getWorkReviews(Number(id), type);
-                setReviews(revs);
+                
+                getWorkReviews(Number(id), type).then(setReviews);
 
             } catch (error) {
                 console.error('Error fetching details:', error);
@@ -612,6 +614,18 @@ export default function WorkDetails() {
             document.body.removeEventListener('scroll', handleScroll);
         };
     }, []);
+
+    if (fetchError?.status === 404) {
+        return (
+            <Layout>
+                <div className="container" style={{ textAlign: 'center', paddingTop: '4rem' }}>
+                    <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem' }}>{t('work_details.not_found')}</h1>
+                    <p>{t('work_details.not_found_desc')}</p>
+                    <Button onClick={() => navigate('/discover')} style={{ marginTop: '1rem' }}>{t('work_details.back')}</Button>
+                </div>
+            </Layout>
+        );
+    }
 
     if (!work) {
         if (isFetchingDetails) {
