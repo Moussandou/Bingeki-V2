@@ -135,6 +135,7 @@
 .chartContainer {
     height: 280px;
     width: 100%;
+    min-width: 0;
 }
 
 .responsesSection {

@@ -1,16 +1,16 @@
 import { useState, useEffect, useMemo, Fragment } from 'react';
 import { 
-    Clipboard, 
     Users, 
     ChevronDown, 
     ChevronUp,
-    Clock,
     User,
     ArrowLeft,
     TrendingUp,
     Star,
     Mail,
-    Globe
+    Globe,
+    Calendar,
+    Clipboard,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { getSurveyResponses, type SurveyResponse } from '@/firebase/firestore';
@@ -21,11 +21,13 @@ import {
 import { useTranslation } from 'react-i18next';
 import styles from './SurveyDashboard.module.css';
 import { Link } from '@/components/routing/LocalizedLink';
+import { useMounted } from '@/hooks/useMounted';
 
 const COLORS = ['#ef4444', '#3b82f6', '#f59e0b', '#10b981', '#8b5cf6', '#ec4899', '#6366f1'];
 
 export default function SurveyDashboard() {
     const { t } = useTranslation();
+    const isMounted = useMounted();
     const [responses, setResponses] = useState<SurveyResponse[]>([]);
     const [loading, setLoading] = useState(true);
     const [expandedRow, setExpandedRow] = useState<string | null>(null);
@@ -147,29 +149,33 @@ export default function SurveyDashboard() {
                             {t('survey.questions.ageRange', 'Âge')}
                             <Users size={18} />
                         </h3>
-                        <div className={styles.chartContainer}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={stats?.age}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={85}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                        stroke="none"
-                                    >
-                                        {stats?.age.map((_, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <RechartsTooltip 
-                                        contentStyle={{ background: '#000', border: '2px solid var(--color-border)', color: '#fff' }}
-                                    />
-                                    <Legend />
-                                </PieChart>
-                            </ResponsiveContainer>
+                        <div className={styles.chartContainer} style={{ minWidth: 0 }}>
+                            {isMounted ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={stats?.age}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={85}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                            stroke="none"
+                                        >
+                                            {stats?.age.map((_, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip 
+                                            contentStyle={{ background: '#000', border: '2px solid var(--color-border)', color: '#fff' }}
+                                        />
+                                        <Legend />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div style={{ height: '100%', border: '1px dashed var(--color-border)', opacity: 0.5 }} />
+                            )}
                         </div>
                     </Card>
 
@@ -178,19 +184,23 @@ export default function SurveyDashboard() {
                             {t('survey.questions.interestLevel', 'Intérêt')}
                             <TrendingUp size={18} />
                         </h3>
-                        <div className={styles.chartContainer}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={stats?.interest}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
-                                    <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                                    <YAxis tick={{ fontSize: 10 }} />
-                                    <RechartsTooltip 
-                                        cursor={{fill: 'rgba(239, 68, 68, 0.1)'}}
-                                        contentStyle={{ background: '#000', border: '2px solid var(--color-border)', color: '#fff' }}
-                                    />
-                                    <Bar dataKey="value" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                                </BarChart>
-                            </ResponsiveContainer>
+                        <div className={styles.chartContainer} style={{ minWidth: 0 }}>
+                            {isMounted ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={stats?.interest}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
+                                        <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                                        <YAxis tick={{ fontSize: 10 }} />
+                                        <RechartsTooltip 
+                                            cursor={{fill: 'rgba(239, 68, 68, 0.1)'}}
+                                            contentStyle={{ background: '#000', border: '2px solid var(--color-border)', color: '#fff' }}
+                                        />
+                                        <Bar dataKey="value" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div style={{ height: '100%', border: '1px dashed var(--color-border)', opacity: 0.5 }} />
+                            )}
                         </div>
                     </Card>
 
@@ -199,18 +209,22 @@ export default function SurveyDashboard() {
                             {t('survey.questions.mostAttractiveFeatures', 'Fonctionnalités')}
                             <Star size={18} />
                         </h3>
-                        <div className={styles.chartContainer}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart layout="vertical" data={stats?.features.slice(0, 5)} margin={{ left: 20 }}>
-                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--color-border)" />
-                                    <XAxis type="number" hide />
-                                    <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 10 }} />
-                                    <RechartsTooltip 
-                                        contentStyle={{ background: '#000', border: '2px solid var(--color-border)', color: '#fff' }}
-                                    />
-                                    <Bar dataKey="value" fill="#3b82f6" radius={[0, 4, 4, 0]} />
-                                </BarChart>
-                            </ResponsiveContainer>
+                        <div className={styles.chartContainer} style={{ minWidth: 0 }}>
+                            {isMounted ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart layout="vertical" data={stats?.features.slice(0, 5)} margin={{ left: 20 }}>
+                                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--color-border)" />
+                                        <XAxis type="number" hide />
+                                        <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 10 }} />
+                                        <RechartsTooltip 
+                                            contentStyle={{ background: '#000', border: '2px solid var(--color-border)', color: '#fff' }}
+                                        />
+                                        <Bar dataKey="value" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div style={{ height: '100%', border: '1px dashed var(--color-border)', opacity: 0.5 }} />
+                            )}
                         </div>
                     </Card>
 
@@ -219,28 +233,32 @@ export default function SurveyDashboard() {
                             {t('survey.questions.status', 'Situation')}
                             <User size={18} />
                         </h3>
-                        <div className={styles.chartContainer}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={stats?.status}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={85}
-                                        dataKey="value"
-                                        stroke="none"
-                                    >
-                                        {stats?.status.map((_, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[(index + 3) % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <RechartsTooltip 
-                                        contentStyle={{ background: '#000', border: '2px solid var(--color-border)', color: '#fff' }}
-                                    />
-                                    <Legend />
-                                </PieChart>
-                            </ResponsiveContainer>
+                        <div className={styles.chartContainer} style={{ minWidth: 0 }}>
+                            {isMounted ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={stats?.status}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={85}
+                                            dataKey="value"
+                                            stroke="none"
+                                        >
+                                            {stats?.status.map((_, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[(index + 3) % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip 
+                                            contentStyle={{ background: '#000', border: '2px solid var(--color-border)', color: '#fff' }}
+                                        />
+                                        <Legend />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div style={{ height: '100%', border: '1px dashed var(--color-border)', opacity: 0.5 }} />
+                            )}
                         </div>
                     </Card>
                 </div>
@@ -271,8 +289,12 @@ export default function SurveyDashboard() {
                                         >
                                             <td>
                                                 <div className={styles.dateTime}>
-                                                    <Clock size={14} />
-                                                    {new Date(response.submittedAt || 0).toLocaleDateString()}
+                                                    <Calendar size={14} />
+                                                    <span>
+                                                        {isMounted 
+                                                            ? new Date(response.submittedAt || 0).toLocaleDateString()
+                                                            : '...'}
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td>
@@ -326,4 +348,3 @@ export default function SurveyDashboard() {
         </div>
     );
 }
-

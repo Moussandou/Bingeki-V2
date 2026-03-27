@@ -27,9 +27,11 @@ import { useTutorialStore } from '@/store/tutorialStore';
 import { SocialLinksBanner } from '@/components/social/SocialLinksBanner';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import styles from './Dashboard.module.css';
+import { useMounted } from '@/hooks/useMounted';
 
 export default function Dashboard() {
     const { t } = useTranslation();
+    const isMounted = useMounted();
     const { user, userProfile } = useAuthStore();
     const { level, xp, totalXp, xpToNextLevel, streak, totalChaptersRead, totalAnimeEpisodesWatched, totalMoviesWatched, recalculateStats } = useGamificationStore();
     const { works } = useLibraryStore();
@@ -93,6 +95,7 @@ export default function Dashboard() {
     };
 
     const formatTimeAgo = (timestamp: number) => {
+        if (!isMounted) return '...';
         /* eslint-disable-next-line */
         const diff = Date.now() - timestamp;
         const hours = Math.floor(diff / (1000 * 60 * 60));
