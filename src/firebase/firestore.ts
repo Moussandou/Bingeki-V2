@@ -1,4 +1,5 @@
-import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy, limit, updateDoc, deleteDoc, addDoc, onSnapshot, getAggregateFromServer, count } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy, limit, updateDoc, deleteDoc, addDoc, onSnapshot, getAggregateFromServer, count, Timestamp } from 'firebase/firestore';
+
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from './config';
 import type { Work, Folder } from '@/store/libraryStore';
@@ -8,10 +9,10 @@ import type { ActivityEvent } from '@/types/activity';
 export type { ActivityEvent };
 import type { Comment, CommentWithReplies } from '@/types/comment';
 import type { Challenge } from '@/types/challenge';
-import { 
-    mergeGamificationData, 
-    mergeLibraryData, 
-    validateGamificationWrite, 
+import {
+    mergeGamificationData,
+    mergeLibraryData,
+    validateGamificationWrite,
     logDataBackup,
     type GamificationData // Import the unified type
 } from '@/utils/dataProtection';
@@ -63,7 +64,35 @@ export interface UserProfile {
     createdAt?: number; // Added for new user stats
 }
 
-// Save user profile to Firestore
+// Types for analytics and charts
+export interface EngagementBreakdown {
+    watch: number;
+    read: number;
+    add_work: number;
+    level_up: number;
+    badge: number;
+    complete: number;
+}
+
+export interface ContentStat {
+    title: string;
+    count: number;
+    id: number;
+    image?: string;
+}
+
+export interface FunnelStep {
+    name: string;
+    value: number;
+}
+
+export interface HistoricalTrend {
+    date: string;
+    inscriptions: number;
+    activities: number;
+    activeUsers: number;
+}
+
 // Save user profile to Firestore
 export async function saveUserProfileToFirestore(user: Partial<UserProfile>, forceUpdate: boolean = false): Promise<void> {
     try {
@@ -99,11 +128,12 @@ export async function saveUserProfileToFirestore(user: Partial<UserProfile>, for
                 return;
             }
 
-            if (user[field] !== undefined) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (dataToSave as any)[field] = user[field];
+            const value = user[field];
+            if (value !== undefined) {
+                (dataToSave as Record<string, unknown>)[field] = value;
             }
         });
+
 
         await setDoc(docRef, dataToSave, { merge: true });
         console.log('[Firestore] User profile saved:', dataToSave);
@@ -1385,7 +1415,7 @@ export async function getRecentMembers(count = 10): Promise<UserProfile[]> {
         const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'), limit(count));
         const snapshot = await getDocs(q);
         const users = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as UserProfile));
-        
+
         // If some users don't have createdAt, they might be missing. 
         // We'll filter but realistically most should have it.
         return users;
@@ -1519,7 +1549,8 @@ export async function getSevenDayActivityStats() {
 }
 
 // Get detailed engagement breakdown
-export async function getEngagementBreakdown(daysCount = 7) {
+export async function getEngagementBreakdown(daysCount = 7): Promise<EngagementBreakdown> {
+
     try {
         const startTime = Date.now() - (daysCount * 24 * 60 * 60 * 1000);
         const q = query(
@@ -1546,7 +1577,8 @@ export async function getEngagementBreakdown(daysCount = 7) {
 }
 
 // Get Top Content from activities
-export async function getTopContentStats(limitCount = 5, daysCount = 30) {
+export async function getTopContentStats(limitCount = 5, daysCount = 30): Promise<ContentStat[]> {
+
     try {
         const startTime = Date.now() - (daysCount * 24 * 60 * 60 * 1000);
         // We fetch ALL activities in the period and aggregate because we can't filter by multiple fields easily in Firestore
@@ -1565,7 +1597,7 @@ export async function getTopContentStats(limitCount = 5, daysCount = 30) {
                 // Determine title/id even if missing from activity (fallback to activity info)
                 const workId = data.workId?.toString();
                 const workTitle = data.workTitle || 'Unknow Work';
-                
+
                 if (workId) {
                     if (!counts[workId]) {
                         counts[workId] = { title: workTitle, count: 0, id: Number(workId), image: data.workImage };
@@ -1585,7 +1617,8 @@ export async function getTopContentStats(limitCount = 5, daysCount = 30) {
 }
 
 // Get Funnel Stats (Simplified)
-export async function getFunnelStats() {
+export async function getFunnelStats(): Promise<FunnelStep[]> {
+
     try {
         const usersSnap = await getDocs(collection(db, 'users'));
         const total = usersSnap.size;
@@ -1616,7 +1649,8 @@ export async function getFunnelStats() {
 }
 
 // Get historical trends for various metrics
-export async function getHistoricalTrends(daysCount = 30) {
+export async function getHistoricalTrends(daysCount = 30): Promise<HistoricalTrend[]> {
+
     try {
         const now = Date.now();
         const startTime = now - (daysCount * 24 * 60 * 60 * 1000);
@@ -1885,11 +1919,12 @@ export interface DeploymentEvent {
     id: string;
     channelId: string;
     url: string;
-    createdAt: any; // Timestamp
-    expiresAt: any; // Timestamp
+    createdAt: Timestamp;
+    expiresAt: Timestamp;
     type: 'preview' | 'live';
     status: 'active' | 'expired';
 }
+
 
 export async function getDeployments(limitCount = 10): Promise<DeploymentEvent[]> {
     try {
@@ -1914,11 +1949,12 @@ export async function getDeployments(limitCount = 10): Promise<DeploymentEvent[]
 export interface SurveyResponse {
     id: string;
     surveyId: string;
-    answers: Record<string, any>;
+    answers: Record<string, unknown>;
     submittedAt: number;
     userAgent: string;
     language: string;
 }
+
 
 export async function getSurveyResponses(): Promise<SurveyResponse[]> {
     try {

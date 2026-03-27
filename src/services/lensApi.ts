@@ -71,7 +71,7 @@ async function searchTraceMoe(file: File): Promise<TraceMoeResult[]> {
     }
 
     const data = await response.json();
-    return (data.result || []).slice(0, 5).map((r: any) => ({
+    return (data.result || []).slice(0, 5).map((r: TraceMoeResult) => ({
         anilist: r.anilist,
         filename: r.filename || '',
         episode: r.episode,

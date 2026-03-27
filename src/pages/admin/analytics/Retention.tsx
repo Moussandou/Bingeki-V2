@@ -6,11 +6,35 @@ import { getFunnelStats, getAdminStats, getHistoricalTrends } from '@/firebase/f
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area } from 'recharts';
 import { useTranslation } from 'react-i18next';
 
+interface FunnelEntry {
+    name: string;
+    value: number;
+}
+
+interface AdminStats {
+    dau: number;
+    wau: number;
+    mau: number;
+    totalUsers: number;
+    totalFeedback: number;
+    totalSurveyResponses: number;
+    newUsersToday: number;
+    pendingFeedback: number;
+    engagementRate: number;
+}
+
+interface TrendEntry {
+    date: string;
+    inscriptions: number;
+    activities: number;
+    activeUsers: number;
+}
+
 export default function RetentionAnalytics() {
     const { t } = useTranslation();
-    const [funnelData, setFunnelData] = useState<any[]>([]);
-    const [stats, setStats] = useState<any>(null);
-    const [trends, setTrends] = useState<any[]>([]);
+    const [funnelData, setFunnelData] = useState<FunnelEntry[]>([]);
+    const [stats, setStats] = useState<AdminStats | null>(null);
+    const [trends, setTrends] = useState<TrendEntry[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -91,7 +115,7 @@ export default function RetentionAnalytics() {
                             <XAxis dataKey="date" />
                             <YAxis />
                             <Tooltip />
-                            <Area type="monotone" dataKey="active" stroke="black" fill="black" fillOpacity={0.1} strokeWidth={3} />
+                            <Area type="monotone" dataKey="activeUsers" stroke="black" fill="black" fillOpacity={0.1} strokeWidth={3} />
                         </AreaChart>
                     </ResponsiveContainer>
                 </div>

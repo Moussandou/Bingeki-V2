@@ -13,7 +13,8 @@ interface QueuedRequest {
     retries: number;
 }
 
-class ApiQueue {
+export class ApiQueue {
+
     private queue: QueuedRequest[] = [];
     private processing = false;
     private lastRequestTime = 0;
@@ -56,11 +57,9 @@ class ApiQueue {
                 const timeoutController = new AbortController();
                 const timeoutId = setTimeout(() => timeoutController.abort(), 10000); // 10s default timeout
 
-                const fetchOptions = {
+                const fetchOptions: RequestInit = {
                     ...request.options,
-                    signal: request.options?.signal 
-                        ? AbortSignal.any([request.options.signal, timeoutController.signal])
-                        : timeoutController.signal
+                    signal: request.options?.signal || timeoutController.signal
                 };
 
                 const response = await fetch(request.url, fetchOptions);
@@ -82,7 +81,8 @@ class ApiQueue {
 
                 request.resolve(response);
             } catch (error) {
-                const isTimeout = error instanceof Error && error.name === 'AbortError';
+                const isTimeout = (error as any)?.name === 'AbortError';
+
                 const errorMsg = isTimeout ? 'Request timed out' : String(error);
                 
                 if (request.retries < this.maxRetries) {
@@ -94,8 +94,10 @@ class ApiQueue {
                 }
                 
                 console.error(`[ApiQueue] Failed to fetch ${request.url} after ${this.maxRetries} attempts: ${errorMsg}`);
-                request.reject(error instanceof Error ? error : new Error(String(error)));
+                const finalError = isTimeout ? new Error('Request timed out') : (error instanceof Error ? error : new Error(String(error)));
+                request.reject(finalError);
             }
+
         }
 
         this.processing = false;

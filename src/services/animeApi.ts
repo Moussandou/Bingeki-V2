@@ -21,19 +21,24 @@ export interface JikanStatusResponse {
 }
 
 // --- API Caching ---
-const API_CACHE = new Map<string, { data: any; timestamp: number }>();
+interface CacheEntry<T> {
+    data: T;
+    timestamp: number;
+}
+
+const API_CACHE = new Map<string, CacheEntry<unknown>>();
 const CACHE_TTL = 10 * 60 * 1000; // 10 minutes cache
 
-const getCached = (key: string) => {
-    const cached = API_CACHE.get(key);
+const getCached = <T>(key: string): T | null => {
+    const cached = API_CACHE.get(key) as CacheEntry<T> | undefined;
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
         return cached.data;
     }
     return null;
 };
 
-const setCache = (key: string, data: any) => {
-    API_CACHE.set(key, { data, timestamp: Date.now() });
+const setCache = <T>(key: string, data: T) => {
+    API_CACHE.set(key, { data, timestamp: Date.now() } as CacheEntry<unknown>);
 };
 
 // Check Jikan API status
@@ -135,7 +140,7 @@ export const searchWorks = async (
 ) => {
     const { nsfwMode } = useSettingsStore.getState();
     const cacheKey = `search_${type}_${query}_${JSON.stringify(filters || {})}_nsfw_${nsfwMode}`;
-    const cached = getCached(cacheKey);
+    const cached = getCached<JikanResult[]>(cacheKey);
     if (cached) return cached;
 
     try {
@@ -156,7 +161,7 @@ export const searchWorks = async (
         const response = await queuedFetch(`${BASE_URL}/${type}?${params.toString()}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        setCache(cacheKey, data.data);
+        setCache<JikanResult[]>(cacheKey, data.data);
         return data.data as JikanResult[];
     } catch (error) {
         console.error('API Error:', error);
@@ -171,14 +176,14 @@ export const getTopWorks = async (
 ) => {
     const { nsfwMode } = useSettingsStore.getState();
     const cacheKey = `top_${type}_${filter}_${limit}_nsfw_${nsfwMode}`;
-    const cached = getCached(cacheKey);
+    const cached = getCached<JikanResult[]>(cacheKey);
     if (cached) return cached;
 
     try {
         const response = await queuedFetch(`${BASE_URL}/top/${type}?filter=${filter}&limit=${limit}&sfw=${!nsfwMode}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        setCache(cacheKey, data.data);
+        setCache<JikanResult[]>(cacheKey, data.data);
         return data.data as JikanResult[];
     } catch (error) {
         console.error('API Error:', error);
@@ -189,7 +194,7 @@ export const getTopWorks = async (
 export const getSeasonalAnime = async (limit: number = 24) => {
     const { nsfwMode } = useSettingsStore.getState();
     const cacheKey = `seasonal_${limit}_nsfw_${nsfwMode}`;
-    const cached = getCached(cacheKey);
+    const cached = getCached<JikanResult[]>(cacheKey);
     if (cached) return cached;
 
     try {
@@ -197,7 +202,7 @@ export const getSeasonalAnime = async (limit: number = 24) => {
         const response = await queuedFetch(`${BASE_URL}/seasons/now?limit=${limit}&sfw=${!nsfwMode}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        setCache(cacheKey, data.data);
+        setCache<JikanResult[]>(cacheKey, data.data);
         return data.data as JikanResult[];
     } catch (error) {
         console.error('API Error:', error);
@@ -247,7 +252,7 @@ export const getAnimeEpisodeDetails = async (id: number, episodeId: number) => {
 
 export const getWorkDetails = async (id: number, type: 'anime' | 'manga'): Promise<JikanResult> => {
     const cacheKey = `${type}_${id}_details`;
-    const cached = getCached(cacheKey);
+    const cached = getCached<JikanResult>(cacheKey);
     if (cached) return cached;
 
     try {
@@ -264,7 +269,7 @@ export const getWorkDetails = async (id: number, type: 'anime' | 'manga'): Promi
              throw new ApiError(404, `${type} with ID ${id} not found (API response)`);
         }
         
-        setCache(cacheKey, data.data);
+        setCache<JikanResult>(cacheKey, data.data);
         return data.data as JikanResult;
     } catch (error) {
         console.error(`API Error fetching ${type} ${id}:`, error);
@@ -285,7 +290,7 @@ export interface JikanResultFull extends JikanResult {
 
 export const getWorkFull = async (id: number, type: 'anime' | 'manga'): Promise<JikanResultFull> => {
     const cacheKey = `${type}_${id}_full`;
-    const cached = getCached(cacheKey);
+    const cached = getCached<JikanResultFull>(cacheKey);
     if (cached) return cached;
 
     try {
@@ -302,7 +307,7 @@ export const getWorkFull = async (id: number, type: 'anime' | 'manga'): Promise<
              throw new ApiError(404, `Full ${type} with ID ${id} not found (API response)`);
         }
 
-        setCache(cacheKey, data.data);
+        setCache<JikanResultFull>(cacheKey, data.data);
         return data.data as JikanResultFull;
     } catch (error) {
         console.error(`API Error fetching full ${type} ${id}:`, error);
@@ -342,7 +347,7 @@ export interface JikanCharacter {
 
 export const getWorkCharacters = async (id: number, type: 'anime' | 'manga') => {
     const cacheKey = `${type}_${id}_characters`;
-    const cached = getCached(cacheKey);
+    const cached = getCached<JikanCharacter[]>(cacheKey);
     if (cached) return cached;
 
     try {
@@ -350,7 +355,7 @@ export const getWorkCharacters = async (id: number, type: 'anime' | 'manga') => 
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         const chars = (data.data as JikanCharacter[]).slice(0, 10);
-        setCache(cacheKey, chars);
+        setCache<JikanCharacter[]>(cacheKey, chars);
         return chars;
     } catch (error) {
         console.error('API Error:', error);
@@ -370,14 +375,14 @@ export interface JikanRelation {
 
 export const getWorkRelations = async (id: number, type: 'anime' | 'manga') => {
     const cacheKey = `${type}_${id}_relations`;
-    const cached = getCached(cacheKey);
+    const cached = getCached<JikanRelation[]>(cacheKey);
     if (cached) return cached;
 
     try {
         const response = await queuedFetch(`${BASE_URL}/${type}/${id}/relations`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        setCache(cacheKey, data.data);
+        setCache<JikanRelation[]>(cacheKey, data.data);
         return data.data as JikanRelation[];
     } catch (error) {
         console.error('API Error:', error);
@@ -402,7 +407,7 @@ export interface JikanRecommendation {
 
 export const getWorkRecommendations = async (id: number, type: 'anime' | 'manga') => {
     const cacheKey = `${type}_${id}_recommendations`;
-    const cached = getCached(cacheKey);
+    const cached = getCached<JikanRecommendation[]>(cacheKey);
     if (cached) return cached;
 
     try {
@@ -410,7 +415,7 @@ export const getWorkRecommendations = async (id: number, type: 'anime' | 'manga'
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         const recs = (data.data as JikanRecommendation[]).slice(0, 12); // Limit to 12 recs
-        setCache(cacheKey, recs);
+        setCache<JikanRecommendation[]>(cacheKey, recs);
         return recs;
     } catch (error) {
         console.error('API Error:', error);
@@ -427,14 +432,14 @@ export interface JikanPicture {
 
 export const getWorkPictures = async (id: number, type: 'anime' | 'manga') => {
     const cacheKey = `${type}_${id}_pictures`;
-    const cached = getCached(cacheKey);
+    const cached = getCached<JikanPicture[]>(cacheKey);
     if (cached) return cached;
 
     try {
         const response = await queuedFetch(`${BASE_URL}/${type}/${id}/pictures`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        setCache(cacheKey, data.data);
+        setCache<JikanPicture[]>(cacheKey, data.data);
         return data.data as JikanPicture[];
     } catch (error) {
         console.error('API Error:', error);
@@ -449,14 +454,14 @@ export interface JikanTheme {
 
 export const getWorkThemes = async (id: number): Promise<JikanTheme> => {
     const cacheKey = `anime_${id}_themes`;
-    const cached = getCached(cacheKey);
+    const cached = getCached<JikanTheme>(cacheKey);
     if (cached) return cached;
 
     try {
         const response = await queuedFetch(`${BASE_URL}/anime/${id}/themes`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        setCache(cacheKey, data.data);
+        setCache<JikanTheme>(cacheKey, data.data);
         return data.data as JikanTheme;
     } catch (error) {
         console.error('API Error:', error);
@@ -480,14 +485,14 @@ export interface JikanStatistics {
 
 export const getWorkStatistics = async (id: number, type: 'anime' | 'manga') => {
     const cacheKey = `${type}_${id}_statistics`;
-    const cached = getCached(cacheKey);
+    const cached = getCached<JikanStatistics>(cacheKey);
     if (cached) return cached;
 
     try {
         const response = await queuedFetch(`${BASE_URL}/${type}/${id}/statistics`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        setCache(cacheKey, data.data);
+        setCache<JikanStatistics>(cacheKey, data.data);
         return data.data as JikanStatistics;
     } catch (error) {
         console.error(`API Error fetching ${type} ${id} statistics:`, error);
@@ -502,14 +507,14 @@ export interface JikanStreaming {
 
 export const getAnimeStreaming = async (id: number) => {
     const cacheKey = `anime_${id}_streaming`;
-    const cached = getCached(cacheKey);
+    const cached = getCached<JikanStreaming[]>(cacheKey);
     if (cached) return cached;
 
     try {
         const response = await queuedFetch(`${BASE_URL}/anime/${id}/streaming`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        setCache(cacheKey, data.data);
+        setCache<JikanStreaming[]>(cacheKey, data.data);
         return data.data as JikanStreaming[];
     } catch (error) {
         console.error('API Error:', error);
