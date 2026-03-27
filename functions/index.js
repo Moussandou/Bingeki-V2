@@ -467,13 +467,14 @@ const MAX_LEVEL = 100;
 
 const XP_REWARDS = {
     ADD_WORK: 15,
-    UPDATE_PROGRESS: 10,
+    UPDATE_PROGRESS: 5, // 5 XP per episode/chapter (more sustainable than 10)
     COMPLETE_WORK: 50,
 };
 
 // Anti-Cheat Caps
-const MAX_EPISODES = 10000;
-const MAX_CHAPTERS = 10000;
+const MAX_EPISODES = 2500; // No anime currently has more than ~7000, 2500 is a safe progress cap for XP
+const MAX_CHAPTERS = 5000;
+const MAX_XP_PER_WORK = 15000; // Absolute max XP a single work can provide
 
 // --- BADGE DEFINITIONS (Server-side source of truth) ---
 const BADGE_DEFINITIONS = [
@@ -587,18 +588,20 @@ function calculateUserStats(libraryWorks, bonusXp = 0) {
                     // Movies are 1 unit.
                     totalXpFromLibrary += (w.status === 'completed' ? XP_REWARDS.UPDATE_PROGRESS : 0);
                 } else {
-                    totalAnimeEpisodesWatched += progress;
-                    totalXpFromLibrary += effectiveProgress * XP_REWARDS.UPDATE_PROGRESS;
+                    effectiveProgress = Math.min(progress, MAX_EPISODES);
+                    totalAnimeEpisodesWatched += effectiveProgress;
+                    totalXpFromLibrary += Math.min(effectiveProgress * XP_REWARDS.UPDATE_PROGRESS, MAX_XP_PER_WORK);
                 }
             } else {
-                totalChaptersRead += progress;
-                totalXpFromLibrary += effectiveProgress * XP_REWARDS.UPDATE_PROGRESS;
+                effectiveProgress = Math.min(progress, MAX_CHAPTERS);
+                totalChaptersRead += effectiveProgress;
+                totalXpFromLibrary += Math.min(effectiveProgress * XP_REWARDS.UPDATE_PROGRESS, MAX_XP_PER_WORK);
             }
         } else {
             // Default to Manga-like behavior if unknown type
-            effectiveProgress = Math.min(effectiveProgress, MAX_CHAPTERS);
-            totalChaptersRead += progress;
-            totalXpFromLibrary += effectiveProgress * XP_REWARDS.UPDATE_PROGRESS;
+            effectiveProgress = Math.min(progress, MAX_CHAPTERS);
+            totalChaptersRead += effectiveProgress;
+            totalXpFromLibrary += Math.min(effectiveProgress * XP_REWARDS.UPDATE_PROGRESS, MAX_XP_PER_WORK);
         }
 
         // 4. Bonus for completion
