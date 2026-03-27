@@ -33,6 +33,7 @@ interface GamificationState {
     resetStore: () => void;
     recalculateStats: (works: Work[]) => void;
     clearLevelUpData: () => void;
+    syncFromProfile: (profile: any) => void;
 }
 
 const LEVEL_BASE = 100;
@@ -281,6 +282,52 @@ export const useGamificationStore = create<GamificationState>()(
                          } 
                        : {})
                 });
+            },
+
+            syncFromProfile: (profile: any) => {
+                if (!profile) return;
+
+                // Only update if we actually have gamification data in the profile
+                if (profile.level === undefined && profile.xp === undefined) return;
+
+                const state = get();
+                const level = profile.level || 1;
+                const xp = profile.xp || 0;
+                const streak = profile.streak || 0;
+                const totalXp = profile.totalXp || calculateCumulativeXp(level, xp);
+
+                // Quick equality check to prevent loops
+                if (
+                    state.level === level && 
+                    state.xp === xp && 
+                    state.streak === streak &&
+                    state.totalXp === totalXp &&
+                    JSON.stringify(state.badges) === JSON.stringify(profile.badges || [])
+                ) {
+                    return;
+                }
+                
+                // Calculate xpToNextLevel for the given level
+                let xpToNext = LEVEL_BASE;
+                for (let i = 1; i < level; i++) {
+                    xpToNext = Math.floor(xpToNext * LEVEL_MULTIPLIER);
+                }
+
+                set({
+                    level: level,
+                    xp: xp,
+                    totalXp: totalXp,
+                    xpToNextLevel: xpToNext,
+                    streak: streak,
+                    badges: profile.badges || [],
+                    totalChaptersRead: profile.totalChaptersRead || state.totalChaptersRead,
+                    totalAnimeEpisodesWatched: profile.totalAnimeEpisodesWatched || state.totalAnimeEpisodesWatched,
+                    totalMoviesWatched: profile.totalMoviesWatched || state.totalMoviesWatched,
+                    totalWorksAdded: profile.totalWorksAdded || state.totalWorksAdded,
+                    totalWorksCompleted: profile.totalWorksCompleted || state.totalWorksCompleted,
+                });
+                
+                console.log('[GamificationStore] Synced from profile:', { level, xp, totalXp: totalXp });
             }
         }),
         {

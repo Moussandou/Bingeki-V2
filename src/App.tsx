@@ -239,6 +239,14 @@ function App() {
     };
   }, [setUser, setLoading, setUserProfile]);
 
+  // Real-time synchronization: Bridge authStore.userProfile to gamificationStore
+  useEffect(() => {
+    const syncProfile = useGamificationStore.getState().syncFromProfile;
+    if (userProfile) {
+      syncProfile(userProfile);
+    }
+  }, [userProfile]);
+
   // Auto-save to Firestore when data changes (debounced)
   useEffect(() => {
     if (!user) return;
