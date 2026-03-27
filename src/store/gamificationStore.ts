@@ -167,35 +167,9 @@ export const useGamificationStore = create<GamificationState>()(
             },
 
             checkBadges: () => {
-                const { level, streak, totalChaptersRead, totalWorksAdded, totalWorksCompleted, unlockBadge } = get();
-
-                // First work badge
-                if (totalWorksAdded >= 1) unlockBadge('first_work');
-
-                // Collection badges
-                if (totalWorksAdded >= 5) unlockBadge('collector_5');
-                if (totalWorksAdded >= 10) unlockBadge('collector_10');
-                if (totalWorksAdded >= 25) unlockBadge('collector_25');
-
-                // Reader badges
-                if (totalChaptersRead >= 5) unlockBadge('reader_5');
-                if (totalChaptersRead >= 25) unlockBadge('reader_25');
-                if (totalChaptersRead >= 100) unlockBadge('reader_100');
-
-                // Streak badges
-                if (streak >= 3) unlockBadge('streak_3');
-                if (streak >= 7) unlockBadge('streak_7');
-                if (streak >= 30) unlockBadge('streak_30');
-
-                // Completion badges
-                if (totalWorksCompleted >= 1) unlockBadge('first_complete');
-                if (totalWorksCompleted >= 5) unlockBadge('complete_5');
-
-                // Level badges
-                if (level >= 5) unlockBadge('level_5');
-                if (level >= 10) unlockBadge('level_10');
-                if (level >= 25) unlockBadge('level_25');
-                if (level >= 50) unlockBadge('level_50');
+                // Badges are now calculated server-side by onLibraryUpdate trigger.
+                // This function is kept as a no-op to avoid breaking call sites.
+                // Badge data is synced from Firestore when the gamification doc updates.
             },
 
             resetStore: () => set({

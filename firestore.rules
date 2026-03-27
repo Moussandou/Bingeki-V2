@@ -41,22 +41,14 @@ service cloud.firestore {
       
       // --- Subcollection: Data (Library & Gamification) ---
       
-      // 1. Gamification Data - STRICT SECURITY
+      // 1. Gamification Data - SERVER-SIDE ONLY
       match /data/gamification {
         allow read: if isAuthenticated();
-        // Admins can do anything
+        // Write: Only server-side Cloud Functions (admin SDK) and Admins can write.
+        // Client-side writes are BLOCKED to prevent XP/badge manipulation.
         allow write: if isAdmin();
         
-        // Owner Update: Allow updates but enforce Hard Caps
-        allow update: if isOwner(userId) && 
-                      // Level Limit: 100 Max
-                      request.resource.data.level <= 100 &&
-                      // Basic sanity checks
-                      request.resource.data.level >= 1 &&
-                      request.resource.data.xp >= 0 &&
-                      request.resource.data.streak >= 0;
-        
-        // Owner Create: Must start reasonable
+        // Owner Create: Allow initial creation only (first login setup)
         allow create: if isOwner(userId);
       }
 
@@ -69,10 +61,13 @@ service cloud.firestore {
       // 3. Other Data - Closed by default for security
       // If you add more documents to /data/, add them explicitly above.
 
-      // --- Subcollection: Friends ---
+      // --- Subcollection: Friends (Server-side managed) ---
       match /friends/{friendId} {
-        allow read, write: if isOwner(userId);
-        allow create, update: if isAuthenticated() && request.auth.uid == friendId;
+        // Read: Owner can see their own friends list
+        allow read: if isOwner(userId);
+        // Write: BLOCKED for clients. All friend management
+        // (send/accept/reject) goes through Cloud Functions.
+        // Admin SDK bypasses these rules.
       }
       
       // --- Subcollection: Notifications ---
@@ -106,11 +101,13 @@ service cloud.firestore {
       allow delete: if isAuthenticated() && (resource.data.creatorId == request.auth.uid || isAdmin());
     }
 
-    // ACTIVITY FEED
+    // ACTIVITY FEED (Server-side managed)
     match /activities/{activityId} {
-      // Security: Only allow creating activities for YOURSELF
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      // Read: Authenticated users can view the feed
       allow read: if isAuthenticated();
+      // Write: BLOCKED for clients. Activities are auto-logged
+      // by the onLibraryUpdate Cloud Function trigger.
+      // Admin SDK bypasses these rules.
     }
 
     // COMMENTS

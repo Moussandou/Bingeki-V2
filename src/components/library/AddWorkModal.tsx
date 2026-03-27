@@ -8,8 +8,7 @@ import { PenTool, Globe, Loader2, Plus, Check, Upload, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLibraryStore, type Work } from '@/store/libraryStore';
 import { useGamificationStore } from '@/store/gamificationStore';
-import { useAuthStore } from '@/store/authStore';
-import { logActivity } from '@/firebase/firestore';
+// Activity logging is now handled server-side by onLibraryUpdate trigger
 import { isValidImageSrc } from '@/utils/validation';
 
 interface AddWorkModalProps {
@@ -27,7 +26,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
     const [type, setType] = useState<'manga' | 'anime'>('manga');
     const { addWork, works } = useLibraryStore();
     const { recordActivity, recalculateStats } = useGamificationStore();
-    const { user } = useAuthStore();
+
 
     // Manual mode state
     const [manualTitle, setManualTitle] = useState('');
@@ -91,18 +90,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
         const updatedWorks = useLibraryStore.getState().works;
         recalculateStats(updatedWorks);
 
-        // Log activity for friends feed
-        if (user) {
-            logActivity(user.uid, {
-                userId: user.uid,
-                userName: user.displayName || 'Héros',
-                userPhoto: user.photoURL || '',
-                type: 'add_work',
-                workId: newWork.id as number,
-                workTitle: newWork.title,
-                workImage: newWork.image
-            });
-        }
+        // Activity logging is now handled server-side by onLibraryUpdate trigger
 
         // Reset and close
         setManualTitle('');
@@ -167,18 +155,7 @@ export function AddWorkModal({ isOpen, onClose, initialWork }: AddWorkModalProps
         const updatedWorks = useLibraryStore.getState().works;
         recalculateStats(updatedWorks);
 
-        // Log activity for friends feed
-        if (user) {
-            logActivity(user.uid, {
-                userId: user.uid,
-                userName: user.displayName || 'Héros',
-                userPhoto: user.photoURL || '',
-                type: 'add_work',
-                workId: work.mal_id,
-                workTitle: work.title,
-                workImage: work.images.jpg.image_url
-            });
-        }
+        // Activity logging is now handled server-side by onLibraryUpdate trigger
     };
 
     const isAdded = (id: number) => works.some(w => w.id === id);

@@ -504,65 +504,42 @@ export function subscribeToUserProfile(uid: string, callback: (profile: UserProf
     });
 }
 
-// Send Friend Request
-export async function sendFriendRequest(currentUserId: string, currentUserData: { displayName: string, photoURL: string }, targetUser: UserProfile): Promise<void> {
+// Send Friend Request (via Cloud Function)
+export async function sendFriendRequest(_currentUserId: string, _currentUserData: { displayName: string, photoURL: string }, targetUser: UserProfile): Promise<void> {
     try {
-        // 1. Add to current user's friends list as 'outgoing'
-        const myFriendRef = doc(db, 'users', currentUserId, 'friends', targetUser.uid);
-        await setDoc(myFriendRef, {
-            uid: targetUser.uid,
-            displayName: targetUser.displayName,
-            photoURL: targetUser.photoURL,
-            status: 'pending',
-            direction: 'outgoing'
-        });
-
-        // 2. Add to target user's friends list as 'incoming'
-        const theirFriendRef = doc(db, 'users', targetUser.uid, 'friends', currentUserId);
-        await setDoc(theirFriendRef, {
-            uid: currentUserId,
-            displayName: currentUserData.displayName,
-            photoURL: currentUserData.photoURL,
-            status: 'pending',
-            direction: 'incoming'
-        });
-
-        console.log('[Firestore] Friend request sent');
+        const { httpsCallable } = await import('firebase/functions');
+        const { functions } = await import('./config');
+        const sendFn = httpsCallable(functions, 'sendFriendRequestFn');
+        await sendFn({ targetUserId: targetUser.uid });
+        console.log('[Firestore] Friend request sent via Cloud Function');
     } catch (error) {
         console.error('[Firestore] Error sending friend request:', error);
         throw error;
     }
 }
 
-// Accept Friend Request
-export async function acceptFriendRequest(currentUserId: string, friendUid: string): Promise<void> {
+// Accept Friend Request (via Cloud Function)
+export async function acceptFriendRequest(_currentUserId: string, friendUid: string): Promise<void> {
     try {
-        // Update my status
-        await updateDoc(doc(db, 'users', currentUserId, 'friends', friendUid), {
-            status: 'accepted'
-        });
-
-        // Update their status
-        await updateDoc(doc(db, 'users', friendUid, 'friends', currentUserId), {
-            status: 'accepted'
-        });
-        console.log('[Firestore] Friend request accepted');
+        const { httpsCallable } = await import('firebase/functions');
+        const { functions } = await import('./config');
+        const acceptFn = httpsCallable(functions, 'acceptFriendRequestFn');
+        await acceptFn({ friendUid });
+        console.log('[Firestore] Friend request accepted via Cloud Function');
     } catch (error) {
         console.error('[Firestore] Error accepting friend request:', error);
         throw error;
     }
 }
 
-// Reject/Remove Friend Request
-export async function rejectFriendRequest(currentUserId: string, friendUid: string): Promise<void> {
+// Reject/Remove Friend Request (via Cloud Function)
+export async function rejectFriendRequest(_currentUserId: string, friendUid: string): Promise<void> {
     try {
-        // Remove from my list
-        await deleteDoc(doc(db, 'users', currentUserId, 'friends', friendUid));
-
-        // Remove from their list
-        await deleteDoc(doc(db, 'users', friendUid, 'friends', currentUserId));
-
-        console.log('[Firestore] Friend request rejected/removed');
+        const { httpsCallable } = await import('firebase/functions');
+        const { functions } = await import('./config');
+        const rejectFn = httpsCallable(functions, 'rejectFriendRequestFn');
+        await rejectFn({ friendUid });
+        console.log('[Firestore] Friend request rejected/removed via Cloud Function');
     } catch (error) {
         console.error('[Firestore] Error rejecting friend request:', error);
         throw error;
@@ -624,19 +601,10 @@ export const getLeaderboard = async (limitCount = 10, _period: 'week' | 'month' 
 // ==================== ACTIVITY FEED FUNCTIONS ====================
 
 // Log an activity event
-export async function logActivity(_userId: string, event: Omit<ActivityEvent, 'id' | 'timestamp'>): Promise<void> {
-    try {
-        const activityRef = doc(collection(db, 'activities'));
-        const activity: ActivityEvent = {
-            ...event,
-            id: activityRef.id,
-            timestamp: Date.now()
-        };
-        await setDoc(activityRef, activity);
-        console.log('[Firestore] Activity logged:', event.type);
-    } catch (error) {
-        console.error('[Firestore] Error logging activity:', error);
-    }
+// DEPRECATED: Activity logging is now handled server-side by onLibraryUpdate trigger.
+// Firestore rules block client writes to /activities. This function is kept for reference.
+export async function logActivity(_userId: string, _event: Omit<ActivityEvent, 'id' | 'timestamp'>): Promise<void> {
+    console.warn('[Firestore] logActivity is deprecated. Activities are now logged server-side.');
 }
 
 // Get activities from friends

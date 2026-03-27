@@ -1,4 +1,5 @@
-const functions = require("firebase-functions");
+const { onRequest, onCall, HttpsError } = require("firebase-functions/v2/https");
+const { onDocumentWritten } = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
 const express = require("express");
 const fs = require("fs");
@@ -456,4 +457,593 @@ app.get('/*', async (req, res) => {
     res.send(html);
 });
 
-exports.seoHandler = functions.https.onRequest(app);
+exports.seoHandler = onRequest(app);
+
+// --- XP & GAMIFICATION MANAGEMENT (SERVER-SIDE) ---
+
+const LEVEL_BASE = 100;
+const LEVEL_MULTIPLIER = 1.15;
+const MAX_LEVEL = 100;
+
+const XP_REWARDS = {
+    ADD_WORK: 15,
+    UPDATE_PROGRESS: 10,
+    COMPLETE_WORK: 50,
+};
+
+// Anti-Cheat Caps
+const MAX_EPISODES = 10000;
+const MAX_CHAPTERS = 10000;
+
+// --- BADGE DEFINITIONS (Server-side source of truth) ---
+const BADGE_DEFINITIONS = [
+    { id: 'first_steps', name: 'Premiers Pas', description: 'Créer un compte Bingeki', icon: 'flag', rarity: 'common' },
+    { id: 'first_work', name: 'Bibliophile', description: 'Ajouter votre première œuvre', icon: 'book', rarity: 'common' },
+    { id: 'reader_5', name: 'Lecteur Assidu', description: 'Lire 5 chapitres', icon: 'book-open', rarity: 'common' },
+    { id: 'reader_25', name: 'Dévoreur', description: 'Lire 25 chapitres', icon: 'flame', rarity: 'rare' },
+    { id: 'reader_100', name: 'Binge Reader', description: 'Lire 100 chapitres', icon: 'zap', rarity: 'epic' },
+    { id: 'collector_5', name: 'Collectionneur', description: 'Ajouter 5 œuvres', icon: 'library', rarity: 'common' },
+    { id: 'collector_10', name: 'Amateur', description: 'Ajouter 10 œuvres', icon: 'layers', rarity: 'rare' },
+    { id: 'collector_25', name: 'Otaku', description: 'Ajouter 25 œuvres', icon: 'database', rarity: 'epic' },
+    { id: 'streak_3', name: 'Régulier', description: 'Maintenir un streak de 3 jours', icon: 'timer', rarity: 'common' },
+    { id: 'streak_7', name: 'Motivé', description: 'Maintenir un streak de 7 jours', icon: 'calendar-check', rarity: 'rare' },
+    { id: 'streak_30', name: 'Inarrêtable', description: 'Maintenir un streak de 30 jours', icon: 'crown', rarity: 'legendary' },
+    { id: 'first_complete', name: 'Finisher', description: 'Terminer votre première œuvre', icon: 'check-circle', rarity: 'common' },
+    { id: 'complete_5', name: 'Complétiste', description: 'Terminer 5 œuvres', icon: 'target', rarity: 'rare' },
+    { id: 'level_5', name: 'Novice', description: 'Atteindre le niveau 5', icon: 'star', rarity: 'common' },
+    { id: 'level_10', name: 'Apprenti', description: 'Atteindre le niveau 10', icon: 'medal', rarity: 'rare' },
+    { id: 'level_25', name: 'Expert', description: 'Atteindre le niveau 25', icon: 'award', rarity: 'epic' },
+    { id: 'level_50', name: 'Légende', description: 'Atteindre le niveau 50', icon: 'trophy', rarity: 'legendary' },
+];
+
+/**
+ * Determine which badges a user has earned based on their stats.
+ * Preserves existing badge unlock timestamps.
+ */
+function calculateBadges(stats, streak, existingBadges = []) {
+    const existingMap = {};
+    existingBadges.forEach(b => { existingMap[b.id] = b; });
+
+    const earnedIds = new Set();
+
+    // Collection badges
+    if (stats.totalWorksAdded >= 1) earnedIds.add('first_work');
+    if (stats.totalWorksAdded >= 5) earnedIds.add('collector_5');
+    if (stats.totalWorksAdded >= 10) earnedIds.add('collector_10');
+    if (stats.totalWorksAdded >= 25) earnedIds.add('collector_25');
+
+    // Reader badges
+    if (stats.totalChaptersRead >= 5) earnedIds.add('reader_5');
+    if (stats.totalChaptersRead >= 25) earnedIds.add('reader_25');
+    if (stats.totalChaptersRead >= 100) earnedIds.add('reader_100');
+
+    // Streak badges
+    if (streak >= 3) earnedIds.add('streak_3');
+    if (streak >= 7) earnedIds.add('streak_7');
+    if (streak >= 30) earnedIds.add('streak_30');
+
+    // Completion badges
+    if (stats.totalWorksCompleted >= 1) earnedIds.add('first_complete');
+    if (stats.totalWorksCompleted >= 5) earnedIds.add('complete_5');
+
+    // Level badges
+    if (stats.level >= 5) earnedIds.add('level_5');
+    if (stats.level >= 10) earnedIds.add('level_10');
+    if (stats.level >= 25) earnedIds.add('level_25');
+    if (stats.level >= 50) earnedIds.add('level_50');
+
+    // first_steps is always earned (they have an account)
+    earnedIds.add('first_steps');
+
+    // Build badges array, preserving existing timestamps
+    const badges = [];
+    for (const id of earnedIds) {
+        if (existingMap[id]) {
+            badges.push(existingMap[id]); // Keep original unlock time
+        } else {
+            const def = BADGE_DEFINITIONS.find(d => d.id === id);
+            if (def) {
+                badges.push({ ...def, unlockedAt: Date.now() });
+            }
+        }
+    }
+
+    return badges;
+}
+
+/**
+ * Core logic to calculate user stats based on their library and bonus XP.
+ */
+function calculateUserStats(libraryWorks, bonusXp = 0) {
+    let totalChaptersRead = 0;
+    let totalAnimeEpisodesWatched = 0;
+    let totalMoviesWatched = 0;
+    const totalWorksAdded = libraryWorks.length;
+    let totalWorksCompleted = 0;
+    let totalXpFromLibrary = 0;
+
+    libraryWorks.forEach(w => {
+        const progress = w.currentChapter || w.currentEpisode || 0;
+        const total = w.totalChapters || w.totalEpisodes || 0;
+        const type = (w.type || 'manga').toLowerCase();
+        
+        // 1. Calculate base XP for adding the work
+        totalXpFromLibrary += XP_REWARDS.ADD_WORK;
+
+        // 2. Anti-cheat: calculate effective progress for XP
+        let effectiveProgress = 0;
+        if (total && total > 0) {
+            effectiveProgress = Math.min(progress, total);
+        }
+        
+        // 3. Apply Hard Caps for XP calculation
+        if (type === 'anime' || type === 'manga') {
+            const cap = type === 'anime' ? MAX_EPISODES : MAX_CHAPTERS;
+            effectiveProgress = Math.min(effectiveProgress, cap);
+            
+            if (type === 'anime') {
+                if (w.format === 'Movie') {
+                    totalMoviesWatched += (w.status === 'completed' ? 1 : 0);
+                    // Movies are 1 unit.
+                    totalXpFromLibrary += (w.status === 'completed' ? XP_REWARDS.UPDATE_PROGRESS : 0);
+                } else {
+                    totalAnimeEpisodesWatched += progress;
+                    totalXpFromLibrary += effectiveProgress * XP_REWARDS.UPDATE_PROGRESS;
+                }
+            } else {
+                totalChaptersRead += progress;
+                totalXpFromLibrary += effectiveProgress * XP_REWARDS.UPDATE_PROGRESS;
+            }
+        } else {
+            // Default to Manga-like behavior if unknown type
+            effectiveProgress = Math.min(effectiveProgress, MAX_CHAPTERS);
+            totalChaptersRead += progress;
+            totalXpFromLibrary += effectiveProgress * XP_REWARDS.UPDATE_PROGRESS;
+        }
+
+        // 4. Bonus for completion
+        if (w.status === 'completed') {
+            totalWorksCompleted += 1;
+            totalXpFromLibrary += XP_REWARDS.COMPLETE_WORK;
+        }
+    });
+
+    const totalXp = totalXpFromLibrary + bonusXp;
+
+    // Derive Level
+    let level = 1;
+    let remainingXp = totalXp;
+    let xpToNext = LEVEL_BASE;
+
+    while (remainingXp >= xpToNext && level < MAX_LEVEL) {
+        remainingXp -= xpToNext;
+        level++;
+        xpToNext = Math.floor(xpToNext * LEVEL_MULTIPLIER);
+    }
+
+    return {
+        level,
+        xp: remainingXp, // current level progress
+        totalXp,         // cumulative
+        xpToNextLevel: xpToNext,
+        totalChaptersRead,
+        totalAnimeEpisodesWatched,
+        totalMoviesWatched,
+        totalWorksAdded,
+        totalWorksCompleted
+    };
+}
+
+/**
+ * Trigger: Update user stats, badges, and activity feed whenever their library changes.
+ */
+exports.onLibraryUpdate = onDocumentWritten('users/{userId}/data/library', async (event) => {
+        const userId = event.params.userId;
+        const change = event.data;
+        if (!change) return null;
+        const libraryData = change.after.exists ? change.after.data() : { works: [] };
+        const works = libraryData.works || [];
+
+        // Previous library state (for activity detection)
+        const prevLibraryData = change.before.exists ? change.before.data() : { works: [] };
+        const prevWorks = prevLibraryData.works || [];
+
+        try {
+            // Fetch gamification doc for bonusXp, streak, and existing badges
+            const gamificationSnap = await admin.firestore()
+                .collection('users')
+                .doc(userId)
+                .collection('data')
+                .doc('gamification')
+                .get();
+            
+            const gamData = gamificationSnap.exists ? gamificationSnap.data() : {};
+            const bonusXp = gamData.bonusXp || 0;
+            const streak = gamData.streak || 0;
+            const existingBadges = gamData.badges || [];
+
+            const stats = calculateUserStats(works, bonusXp);
+
+            // Calculate badges server-side
+            const badges = calculateBadges(stats, streak, existingBadges);
+
+            // Update Root User Profile (Leaderboard source)
+            await admin.firestore().collection('users').doc(userId).set({
+                ...stats,
+                badges,
+                lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+
+            // Update Gamification Doc (Data integrity)
+            await admin.firestore()
+                .collection('users')
+                .doc(userId)
+                .collection('data')
+                .doc('gamification')
+                .set({
+                    ...stats,
+                    badges,
+                    lastUpdated: Date.now()
+                }, { merge: true });
+
+            // --- AUTO ACTIVITY LOGGING ---
+            // Detect changes between previous and current library
+            try {
+                const userDoc = await admin.firestore().collection('users').doc(userId).get();
+                const userData = userDoc.exists ? userDoc.data() : {};
+                const userName = userData.displayName || 'Héros';
+                const userPhoto = userData.photoURL || '';
+
+                const prevWorkMap = {};
+                prevWorks.forEach(w => { prevWorkMap[w.id] = w; });
+
+                const activitiesToLog = [];
+
+                for (const work of works) {
+                    const prev = prevWorkMap[work.id];
+
+                    if (!prev) {
+                        // New work added
+                        activitiesToLog.push({
+                            userId,
+                            userName,
+                            userPhoto,
+                            type: 'add_work',
+                            workId: work.id,
+                            workTitle: work.title,
+                            workImage: work.image || '',
+                            timestamp: Date.now()
+                        });
+                    } else if (work.status === 'completed' && prev.status !== 'completed') {
+                        // Work completed
+                        activitiesToLog.push({
+                            userId,
+                            userName,
+                            userPhoto,
+                            type: 'complete',
+                            workId: work.id,
+                            workTitle: work.title,
+                            workImage: work.image || '',
+                            timestamp: Date.now()
+                        });
+                    } else if ((work.currentChapter || 0) > (prev.currentChapter || 0)) {
+                        // Progress update (only log if significant: >= 5 units difference to avoid spam)
+                        const diff = (work.currentChapter || 0) - (prev.currentChapter || 0);
+                        if (diff >= 5) {
+                            const workType = (work.type || 'manga').toLowerCase();
+                            activitiesToLog.push({
+                                userId,
+                                userName,
+                                userPhoto,
+                                type: workType === 'anime' ? 'watch' : 'read',
+                                workId: work.id,
+                                workTitle: work.title,
+                                workImage: work.image || '',
+                                episodeNumber: work.currentChapter || 0,
+                                timestamp: Date.now()
+                            });
+                        }
+                    }
+                }
+
+                // Batch write activities (limit to 5 per update to prevent spam)
+                const batch = admin.firestore().batch();
+                const limitedActivities = activitiesToLog.slice(0, 5);
+                for (const activity of limitedActivities) {
+                    const actRef = admin.firestore().collection('activities').doc();
+                    batch.set(actRef, { ...activity, id: actRef.id });
+                }
+                if (limitedActivities.length > 0) {
+                    await batch.commit();
+                    console.log(`[Activity] Logged ${limitedActivities.length} activities for user ${userId}`);
+                }
+            } catch (actError) {
+                // Don't fail the whole trigger if activity logging fails
+                console.error(`[Activity] Error logging activities for ${userId}:`, actError);
+            }
+
+            console.log(`[Gamification] Recalculated stats + badges for user ${userId}`);
+            return null;
+        } catch (error) {
+            console.error(`[Gamification] Error updating user ${userId}:`, error);
+            return null;
+        }
+    });
+
+
+/**
+ * Admin: Force recalculation for all users.
+ */
+exports.recalculateAllUserStats = onCall({
+    timeoutSeconds: 540,
+    memory: '1GiB'
+}, async (request) => {
+    // Check admin permissions
+    if (!request.auth) {
+        throw new HttpsError('unauthenticated', 'Must be logged in.');
+    }
+
+    const callerDoc = await admin.firestore().collection('users').doc(request.auth.uid).get();
+    if (!callerDoc.exists || !callerDoc.data().isAdmin) {
+        throw new HttpsError('permission-denied', 'Admin access required.');
+    }
+
+    const usersSnap = await admin.firestore().collection('users').get();
+    const results = {
+        total: usersSnap.size,
+        updated: 0,
+        errors: 0
+    };
+
+    const batch = admin.firestore().batch();
+    let batchCount = 0;
+
+    for (const userDoc of usersSnap.docs) {
+        const userId = userDoc.id;
+        try {
+            const librarySnap = await admin.firestore()
+                .collection('users')
+                .doc(userId)
+                .collection('data')
+                .doc('library')
+                .get();
+            
+            const works = librarySnap.exists ? (librarySnap.data().works || []) : [];
+
+            const gamificationSnap = await admin.firestore()
+                .collection('users')
+                .doc(userId)
+                .collection('data')
+                .doc('gamification')
+                .get();
+            
+            const gamData = gamificationSnap.exists ? gamificationSnap.data() : {};
+            const bonusXp = gamData.bonusXp || 0;
+            const streak = gamData.streak || 0;
+            const existingBadges = gamData.badges || [];
+
+            const stats = calculateUserStats(works, bonusXp);
+            const badges = calculateBadges(stats, streak, existingBadges);
+
+            // Update Root User
+            batch.set(admin.firestore().collection('users').doc(userId), {
+                ...stats,
+                badges,
+                lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+
+            // Update Gamification Doc
+            batch.set(admin.firestore()
+                .collection('users')
+                .doc(userId)
+                .collection('data')
+                .doc('gamification'), {
+                    ...stats,
+                    badges,
+                    lastUpdated: Date.now()
+                }, { merge: true });
+
+            results.updated++;
+            batchCount++;
+
+            if (batchCount >= 200) {
+                await batch.commit();
+                batchCount = 0;
+            }
+        } catch (e) {
+            console.error(`Error processing user ${userId}:`, e);
+            results.errors++;
+        }
+    }
+
+    if (batchCount > 0) {
+        await batch.commit();
+    }
+
+    return results;
+});
+
+/**
+ * Public: Server-side leaderboard query.
+ * Returns authoritative rankings from root user docs.
+ */
+exports.getLeaderboard = onCall(async (request) => {
+    const data = request.data || {};
+    const category = data.category || 'xp';
+    const limitCount = Math.min(data.limit || 20, 100);
+
+    const fieldMap = {
+        'xp': 'totalXp',
+        'chapters': 'totalChaptersRead',
+        'episodes': 'totalAnimeEpisodesWatched',
+        'streak': 'streak'
+    };
+
+    const field = fieldMap[category] || 'totalXp';
+
+    try {
+        const usersSnap = await admin.firestore()
+            .collection('users')
+            .orderBy(field, 'desc')
+            .limit(limitCount)
+            .get();
+
+        const leaderboard = [];
+        let rank = 1;
+        for (const userDoc of usersSnap.docs) {
+            const d = userDoc.data();
+            leaderboard.push({
+                uid: userDoc.id,
+                displayName: d.displayName || null,
+                username: d.username || null,
+                photoURL: d.photoURL || null,
+                level: d.level || 1,
+                totalXp: d.totalXp || 0,
+                totalChaptersRead: d.totalChaptersRead || 0,
+                totalAnimeEpisodesWatched: d.totalAnimeEpisodesWatched || 0,
+                totalWorksCompleted: d.totalWorksCompleted || 0,
+                streak: d.streak || 0,
+                rank
+            });
+            rank++;
+        }
+
+        return { leaderboard };
+    } catch (error) {
+        console.error('[Leaderboard] Error:', error);
+        throw new HttpsError('internal', 'Failed to fetch leaderboard.');
+    }
+});
+
+// --- FRIEND REQUESTS (Server-side, atomic) ---
+
+/**
+ * Send a friend request. Creates entries in both users' friend subcollections atomically.
+ */
+exports.sendFriendRequestFn = onCall(async (request) => {
+    if (!request.auth) {
+        throw new HttpsError('unauthenticated', 'Must be logged in.');
+    }
+
+    const currentUserId = request.auth.uid;
+    const targetUserId = request.data.targetUserId;
+
+    if (!targetUserId || typeof targetUserId !== 'string') {
+        throw new HttpsError('invalid-argument', 'targetUserId is required.');
+    }
+
+    if (currentUserId === targetUserId) {
+        throw new HttpsError('invalid-argument', 'Cannot send a friend request to yourself.');
+    }
+
+    const db = admin.firestore();
+
+    // Check target user exists
+    const targetDoc = await db.collection('users').doc(targetUserId).get();
+    if (!targetDoc.exists) {
+        throw new HttpsError('not-found', 'User not found.');
+    }
+
+    // Check no existing relationship
+    const existingRef = db.collection('users').doc(currentUserId).collection('friends').doc(targetUserId);
+    const existingSnap = await existingRef.get();
+    if (existingSnap.exists) {
+        throw new HttpsError('already-exists', 'A friend request already exists.');
+    }
+
+    // Get current user data for the friend entry
+    const currentUserDoc = await db.collection('users').doc(currentUserId).get();
+    const currentUserData = currentUserDoc.data() || {};
+
+    const targetData = targetDoc.data() || {};
+
+    // Atomic batch write
+    const batch = db.batch();
+
+    batch.set(db.collection('users').doc(currentUserId).collection('friends').doc(targetUserId), {
+        uid: targetUserId,
+        displayName: targetData.displayName || null,
+        photoURL: targetData.photoURL || null,
+        status: 'pending',
+        direction: 'outgoing'
+    });
+
+    batch.set(db.collection('users').doc(targetUserId).collection('friends').doc(currentUserId), {
+        uid: currentUserId,
+        displayName: currentUserData.displayName || null,
+        photoURL: currentUserData.photoURL || null,
+        status: 'pending',
+        direction: 'incoming'
+    });
+
+    await batch.commit();
+    console.log(`[Friends] ${currentUserId} sent friend request to ${targetUserId}`);
+    return { success: true };
+});
+
+/**
+ * Accept a friend request. Updates both entries atomically.
+ */
+exports.acceptFriendRequestFn = onCall(async (request) => {
+    if (!request.auth) {
+        throw new HttpsError('unauthenticated', 'Must be logged in.');
+    }
+
+    const currentUserId = request.auth.uid;
+    const friendUid = request.data.friendUid;
+
+    if (!friendUid || typeof friendUid !== 'string') {
+        throw new HttpsError('invalid-argument', 'friendUid is required.');
+    }
+
+    const db = admin.firestore();
+
+    // Verify the friend request exists and is incoming
+    const myFriendRef = db.collection('users').doc(currentUserId).collection('friends').doc(friendUid);
+    const myFriendSnap = await myFriendRef.get();
+
+    if (!myFriendSnap.exists) {
+        throw new HttpsError('not-found', 'No friend request found.');
+    }
+
+    const myFriendData = myFriendSnap.data();
+    if (myFriendData.status !== 'pending' || myFriendData.direction !== 'incoming') {
+        throw new HttpsError('failed-precondition', 'This request cannot be accepted.');
+    }
+
+    // Atomic update
+    const batch = db.batch();
+    batch.update(myFriendRef, { status: 'accepted' });
+    batch.update(db.collection('users').doc(friendUid).collection('friends').doc(currentUserId), { status: 'accepted' });
+    await batch.commit();
+
+    console.log(`[Friends] ${currentUserId} accepted friend request from ${friendUid}`);
+    return { success: true };
+});
+
+/**
+ * Reject or remove a friend. Deletes both entries atomically.
+ */
+exports.rejectFriendRequestFn = onCall(async (request) => {
+    if (!request.auth) {
+        throw new HttpsError('unauthenticated', 'Must be logged in.');
+    }
+
+    const currentUserId = request.auth.uid;
+    const friendUid = request.data.friendUid;
+
+    if (!friendUid || typeof friendUid !== 'string') {
+        throw new HttpsError('invalid-argument', 'friendUid is required.');
+    }
+
+    const db = admin.firestore();
+
+    // Atomic delete
+    const batch = db.batch();
+    batch.delete(db.collection('users').doc(currentUserId).collection('friends').doc(friendUid));
+    batch.delete(db.collection('users').doc(friendUid).collection('friends').doc(currentUserId));
+    await batch.commit();
+
+    console.log(`[Friends] ${currentUserId} rejected/removed ${friendUid}`);
+    return { success: true };
+});

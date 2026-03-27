@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { 
     Users, TrendingUp, Activity, ExternalLink, Clipboard, Info, 
-    Calendar
+    Calendar, RefreshCw, Wrench
 } from 'lucide-react';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '@/firebase/config';
 import { Card } from '@/components/ui/Card';
 import { Link } from '@/components/routing/LocalizedLink';
 import { 
@@ -46,6 +48,30 @@ export default function AdminDashboard() {
     const [funnelData, setFunnelData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState(30);
+    const [recalculating, setRecalculating] = useState(false);
+    const [recalcResult, setRecalcResult] = useState<{ total: number; updated: number; errors: number } | null>(null);
+    const [recalcError, setRecalcError] = useState<string | null>(null);
+
+    const handleRecalculateStats = async () => {
+        if (recalculating) return;
+        if (!window.confirm('Recalculer les stats XP de TOUS les utilisateurs ? Cette opération peut prendre quelques minutes.')) return;
+        
+        setRecalculating(true);
+        setRecalcResult(null);
+        setRecalcError(null);
+        
+        try {
+            const recalcFn = httpsCallable<unknown, { total: number; updated: number; errors: number }>(functions, 'recalculateAllUserStats');
+            const result = await recalcFn({});
+            setRecalcResult(result.data);
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Erreur inconnue';
+            setRecalcError(message);
+            console.error('Recalculate failed:', err);
+        } finally {
+            setRecalculating(false);
+        }
+    };
 
     useEffect(() => {
         const load = async () => {
@@ -427,6 +453,54 @@ export default function AdminDashboard() {
                         </Link>
                     </div>
                 </div>
+            </div>
+
+            {/* Row 5: System Maintenance */}
+            <div>
+                <h3 style={sectionTitleStyle}><Wrench size={20} /> Maintenance Système</h3>
+                <Card variant="manga" style={{ padding: '1.5rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)', display: 'flex', flexDirection: 'column' as const, gap: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                        <div>
+                            <div style={{ fontWeight: 900, fontSize: '1rem', textTransform: 'uppercase' }}>Recalcul Global XP</div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-dim)', marginTop: '0.25rem' }}>
+                                Recalcule le niveau et l'XP de chaque utilisateur côté serveur. Corrige le leaderboard et neutralise les tricheurs.
+                            </div>
+                        </div>
+                        <button 
+                            onClick={handleRecalculateStats}
+                            disabled={recalculating}
+                            style={{ 
+                                padding: '0.75rem 1.5rem',
+                                background: recalculating ? '#666' : '#ef4444',
+                                color: 'white',
+                                border: 'none',
+                                fontWeight: 900,
+                                textTransform: 'uppercase',
+                                cursor: recalculating ? 'not-allowed' : 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                fontSize: '0.8rem',
+                                whiteSpace: 'nowrap'
+                            }}
+                        >
+                            <RefreshCw size={16} style={{ animation: recalculating ? 'spin 1s linear infinite' : 'none' }} />
+                            {recalculating ? 'Recalcul en cours...' : 'Recalculer tout'}
+                        </button>
+                    </div>
+
+                    {recalcResult && (
+                        <div style={{ padding: '0.75rem', background: '#10b98120', border: '2px solid #10b981', fontSize: '0.85rem', fontFamily: 'monospace' }}>
+                            ✅ Terminé — {recalcResult.updated}/{recalcResult.total} utilisateurs mis à jour{recalcResult.errors > 0 ? `, ${recalcResult.errors} erreurs` : ''}
+                        </div>
+                    )}
+
+                    {recalcError && (
+                        <div style={{ padding: '0.75rem', background: '#ef444420', border: '2px solid #ef4444', fontSize: '0.85rem', fontFamily: 'monospace' }}>
+                            ❌ Erreur: {recalcError}
+                        </div>
+                    )}
+                </Card>
             </div>
         </div>
     );

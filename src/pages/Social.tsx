@@ -4,13 +4,14 @@ import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 import { Trophy, Users, Search, UserPlus, Check, X, Activity, BookOpen, Flame, Clock, Swords, Tv, Library } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '@/firebase/config';
 import {
     getFriends,
     sendFriendRequest,
     acceptFriendRequest,
     rejectFriendRequest,
     getFriendsActivity,
-    getFilteredLeaderboard,
     getUserRank,
     searchUsersByPrefix,
     getUserProfile,
@@ -74,7 +75,12 @@ export default function Social() {
         }
 
         if (activeTab === 'ranking') {
-            const data = await getFilteredLeaderboard(leaderboardCategory, leaderboardPeriod, 20);
+            const getLeaderboardFn = httpsCallable<
+                { category: string; limit: number },
+                { leaderboard: (UserProfile & { rank: number })[] }
+            >(functions, 'getLeaderboard');
+            const result = await getLeaderboardFn({ category: leaderboardCategory, limit: 20 });
+            const data = result.data.leaderboard as UserProfile[];
             setLeaderboard(data);
             // Always fetch user rank so we can show it if they're not in the visible top 8
             // (top 3 podium + 5 initially displayed in list)
