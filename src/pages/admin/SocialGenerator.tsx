@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import styles from './SocialGenerator.module.css';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 type FormatData = {
     id: string;
@@ -441,7 +442,7 @@ export default function SocialGenerator() {
                                                 className={styles.searchResultItem}
                                                 onClick={() => setBackgroundImage(res.images?.jpg?.large_image_url || res.images?.jpg?.image_url)}
                                             >
-                                                <img src={res.images?.jpg?.image_url} alt={res.title} />
+                                                <OptimizedImage src={res.images?.jpg?.image_url} alt={res.title} />
                                                 <span>{res.title}</span>
                                             </div>
                                         ))}
@@ -665,7 +666,7 @@ export default function SocialGenerator() {
                                             transition: 'filter 0.2s ease',
                                             backgroundColor: 'transparent'
                                         }}>
-                                            <img 
+                                            <OptimizedImage 
                                                 src={el.content} 
                                                 alt="Uploaded Element" 
                                                 style={{ width: `${el.fontSize}px`, height: 'auto', display: 'block', pointerEvents: 'none', backgroundColor: 'transparent' }}
@@ -681,7 +682,7 @@ export default function SocialGenerator() {
                                 color: (isDarkTheme || backgroundImage) ? 'white' : 'black',
                                 opacity: 0.8
                             }}>
-                                <img src="/logo.png" alt="Bingeki Logo" className={styles.brandLogo} />
+                                <OptimizedImage src="/logo.png" alt="Bingeki Logo" className={styles.brandLogo} />
                                 <span className={styles.watermarkText}>BINGEKI</span>
                             </div>
                         </div>

@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocalizedNavigate } from '@/components/routing/LocalizedLink';
 import { SEO } from '@/components/layout/SEO';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 export default function Auth() {
     const { t } = useTranslation();
@@ -166,7 +167,7 @@ export default function Auth() {
                 >
                     {/* Logo */}
                     <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
-                        <img src="/logo.png" alt="Bingeki Logo" style={{ width: 100, height: 100, objectFit: 'contain' }} />
+                        <OptimizedImage src="/logo.png" alt="Bingeki Logo" style={{ width: 100, height: 100, objectFit: 'contain' }} />
                         <span style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: 'var(--color-text)' }}>BINGEKI</span>
                     </Link>
 
@@ -194,7 +195,7 @@ export default function Auth() {
                     {/* Mobile Only Header */}
                     <div className="mobileOnly" style={{ display: 'none', textAlign: 'center', marginBottom: '2rem' }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                            <img src="/logo.png" alt="Bingeki" style={{ width: 60, height: 60, objectFit: 'contain' }} />
+                            <OptimizedImage src="/logo.png" alt="Bingeki" style={{ width: 60, height: 60, objectFit: 'contain' }} />
                             <span style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900 }}>BINGEKI</span>
                         </div>
                         <h1 style={{ fontSize: '2rem', lineHeight: 1.1, textTransform: 'uppercase', marginBottom: '0.5rem' }}>
@@ -286,7 +287,7 @@ export default function Auth() {
                                     width: '100%'
                                 }}
                             >
-                                <img src="https://www.google.com/favicon.ico" alt="Google" style={{ width: 18, height: 18 }} />
+                                <OptimizedImage src="https://www.google.com/favicon.ico" alt="Google" style={{ width: 18, height: 18 }} />
                                 {t('auth.google_login')}
                             </Button>
 

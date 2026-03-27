@@ -10,6 +10,7 @@ import { BingekiBanner } from '@/components/ui/BingekiBanner';
 import { ComparisonTable } from '@/components/ui/ComparisonTable';
 import { MockupBrowser, MockupPhone } from '@/components/mockups/MockupBrowser';
 import { MockupDashboard, MockupProfile, MockupDashboardMobile, MockupProfileMobile, MockupDiscover, MockupDiscoverMobile, MockupDetails, MockupDetailsMobile, MockupLibrary, MockupLibraryMobile, MockupSchedule, MockupScheduleMobile, MockupSocial, MockupSocialMobile, MockupAuth, MockupAuthMobile } from '@/components/mockups/PageLayouts';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 export default function AssetsPage() {
     return (
@@ -368,7 +369,7 @@ export default function AssetsPage() {
                                     border: '2px solid #000',
                                     marginBottom: '0.5rem'
                                 }}>
-                                    <img
+                                    <OptimizedImage
                                         src="https://cdn.myanimelist.net/images/anime/1015/138006l.jpg"
                                         alt="Frieren"
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -385,7 +386,7 @@ export default function AssetsPage() {
                                                     width: 22, height: 22, borderRadius: '50%', overflow: 'hidden',
                                                     border: '2px solid #fff', marginLeft: '-4px', background: '#ccc'
                                                 }}>
-                                                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`} alt="" style={{ width: '100%', height: '100%' }} />
+                                                    <OptimizedImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`} alt="" style={{ width: '100%', height: '100%' }} />
                                                 </div>
                                             ))}
                                         </div>

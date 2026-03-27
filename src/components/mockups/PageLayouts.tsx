@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { XPBar } from '@/components/gamification/XPBar';
 import { StreakCounter } from '@/components/gamification/StreakCounter';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { HunterLicenseCard } from '@/components/profile/HunterLicenseCard';
 import { Target, TrendingUp, BookOpen, Users, Flame, ChevronRight, Play, Plus, Star, Award, Library, Image as ImageIcon, Home, Compass, Book, Search, Menu, SlidersHorizontal, ArrowLeft, LayoutGrid, List, Calendar, Clock, Trophy, Activity, Swords, Mail, Lock } from 'lucide-react';
 import styles from '../../pages/Dashboard.module.css';
@@ -417,7 +418,7 @@ const MockupMobileHeader = () => (
     }}>
         {/* Logo */}
         <div className="text-gradient" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
-            <img src="/logo.png" alt="Logo" style={{ width: 32, height: 32 }} />
+            <OptimizedImage src="/logo.png" alt="Logo" style={{ width: 32, height: 32 }} />
             <span style={{ fontSize: '1rem', fontFamily: 'var(--font-heading)', fontWeight: 900, textTransform: 'uppercase', color: 'var(--color-text)' }}>Bingeki</span>
         </div>
 
@@ -1268,7 +1269,7 @@ export function MockupAuth() {
                     {/* Left: Visuals */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                            <img src="/logo.png" alt="Bingeki" style={{ width: 80, height: 80, objectFit: 'contain' }} />
+                        <OptimizedImage src="/logo.png" alt="Bingeki" style={{ width: 80, height: 80, objectFit: 'contain' }} />
                             <span style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 900 }}>BINGEKI</span>
                         </div>
 
@@ -1338,7 +1339,7 @@ export function MockupAuth() {
                             marginBottom: '0.5rem',
                             boxShadow: '2px 2px 0 #000'
                         }}>
-                            <img src="https://www.google.com/favicon.ico" alt="Google" style={{ width: 18, height: 18 }} />
+                            <OptimizedImage src="https://www.google.com/favicon.ico" alt="Google" style={{ width: 18, height: 18 }} />
                             Google
                         </button>
 
@@ -1378,7 +1379,7 @@ export function MockupAuthMobile() {
             }}>
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                        <img src="/logo.png" alt="Bingeki" style={{ width: 60, height: 60, objectFit: 'contain' }} />
+                        <OptimizedImage src="/logo.png" alt="Bingeki" style={{ width: 60, height: 60, objectFit: 'contain' }} />
                         <span style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900 }}>BINGEKI</span>
                     </div>
                     <h1 style={{ fontSize: '1.5rem', fontWeight: 900, lineHeight: 1.1, textTransform: 'uppercase', marginBottom: '0.5rem' }}>
@@ -1422,7 +1423,7 @@ export function MockupAuthMobile() {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                         <button style={{ height: 40, border: '2px solid #000', background: '#fff', boxShadow: '2px 2px 0 #000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <img src="https://www.google.com/favicon.ico" alt="Google" style={{ width: 18, height: 18 }} />
+                            <OptimizedImage src="https://www.google.com/favicon.ico" alt="Google" style={{ width: 18, height: 18 }} />
                         </button>
                         <button style={{ height: 40, border: '2px solid #000', background: '#5865F2', boxShadow: '2px 2px 0 #000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <svg width="20" height="20" viewBox="0 0 127 96" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 20, height: 20 }}>

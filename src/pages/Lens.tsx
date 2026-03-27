@@ -7,6 +7,7 @@ import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/context/ToastContext';
 import { lensSearch, type LensResult } from '@/services/lensApi';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import styles from './Lens.module.css';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -171,7 +172,7 @@ export default function Lens() {
                         animate={{ opacity: 1, scale: 1 }}
                         className={styles.previewContainer}
                     >
-                        <img src={previewUrl} alt="Preview" className={styles.previewImage} />
+                        <OptimizedImage src={previewUrl} alt="Preview" className={styles.previewImage} />
                         <button className={styles.clearButton} onClick={clearFile}>
                             <X size={18} />
                         </button>
@@ -228,11 +229,10 @@ export default function Lens() {
                                     className={styles.resultCard}
                                 >
                                     {result.thumbnail && (
-                                        <img
+                                        <OptimizedImage
                                             src={result.thumbnail}
                                             alt={result.title}
                                             className={styles.resultThumb}
-                                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                                         />
                                     )}
 

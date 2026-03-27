@@ -12,6 +12,7 @@ import {
 import { useAuthStore } from '@/store/authStore';
 import { useTranslation } from 'react-i18next';
 import { StatusBadge } from '@/components/feedback/StatusBadge';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 export default function AdminFeedback() {
     const { t } = useTranslation();
@@ -309,7 +310,7 @@ export default function AdminFeedback() {
                                             <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
                                                 {item.attachments.map((url, idx) => (
                                                     <a key={idx} href={url} target="_blank" rel="noopener noreferrer" style={{ width: '100px', height: '100px', border: '2px solid black', overflow: 'hidden' }}>
-                                                        <img src={url} alt="Attachment" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                        <OptimizedImage src={url} alt="Attachment" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                     </a>
                                                 ))}
                                             </div>

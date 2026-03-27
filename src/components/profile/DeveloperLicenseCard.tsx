@@ -1,4 +1,5 @@
 import { PenTool, Terminal as TerminalIcon, Book } from 'lucide-react';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 
 import styles from './HunterLicenseCard.module.css'; // Reusing styles
@@ -88,7 +89,11 @@ export function DeveloperLicenseCard({ user, stats, education, projects, logs }:
                         {/* Avatar centered over line */}
                         <div className={styles.avatarContainer} style={{ position: 'absolute', bottom: '-40px', left: '50%', transform: 'translateX(-50%)', margin: 0 }}>
                             <div className={styles.avatarBox} style={{ border: `3px solid ${borderColor}`, width: '80px', height: '80px' }}>
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Moussandou" alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <OptimizedImage
+                                    src={user.photoURL || `https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.displayName}`}
+                                    alt={user.displayName}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
                             </div >
                         </div>
                     </div>

@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 export default function AdminUsers() {
     const { t } = useTranslation();
@@ -226,7 +227,13 @@ export default function AdminUsers() {
                                     overflow: 'hidden',
                                     background: 'var(--color-surface-hover)'
                                 }}>
-                                    {user.photoURL && <img src={user.photoURL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                                    {user.photoURL && (
+                                        <OptimizedImage
+                                            src={user.photoURL}
+                                            alt=""
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                    )}
                                 </div>
                                 <div>
                                     <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', lineHeight: 1 }}>

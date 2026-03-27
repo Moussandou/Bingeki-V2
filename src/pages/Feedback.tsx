@@ -14,6 +14,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ImageUpload } from '@/components/feedback/ImageUpload';
 import { StatusBadge } from '@/components/feedback/StatusBadge';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { TicketCard } from '@/components/feedback/TicketCard';
 import styles from './Feedback.module.css';
 
@@ -372,7 +373,7 @@ export default function Feedback() {
                                                 <div className={styles.attachmentStrip}>
                                                     {selectedTicket.attachments.map((url, i) => (
                                                         <a key={i} href={url} target="_blank" rel="noreferrer" className={styles.attachmentThumb}>
-                                                            <img src={url} alt="Attachment" />
+                                                            <OptimizedImage src={url} alt="Attachment" />
                                                         </a>
                                                     ))}
                                                 </div>

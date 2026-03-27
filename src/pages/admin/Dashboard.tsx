@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styles from './Dashboard.module.css';
 import { useMounted } from '@/hooks/useMounted';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 interface ChartData {
     name: string;
@@ -444,7 +445,7 @@ export default function AdminDashboard() {
                         {topContent.length > 0 ? topContent.map((item, idx) => (
                             <Card key={idx} variant="manga" style={{ padding: '0.75rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)' }}>
                                 <div style={{ width: '40px', height: '56px', background: '#e5e5e5', border: '1px solid var(--color-border)' }}>
-                                    {item.image && <img src={item.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                                    {item.image && <OptimizedImage src={item.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                                 </div>
                                 <div style={{ flex: 1 }}>
                                     <div style={{ fontWeight: 900, fontSize: '0.9rem' }}>{item.title}</div>
@@ -466,7 +467,7 @@ export default function AdminDashboard() {
                         {recentUsers.slice(0, 5).map(user => (
                             <div key={user.uid} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem', borderBottom: '1px solid var(--color-border)' }}>
                                 <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#eee', overflow: 'hidden', border: '1px solid var(--color-border)' }}>
-                                    {user.photoURL && <img src={user.photoURL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                                    {user.photoURL && <OptimizedImage src={user.photoURL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                                 </div>
                                 <div style={{ flex: 1 }}>
                                     <div style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>{user.displayName || 'Anonyme'}</div>

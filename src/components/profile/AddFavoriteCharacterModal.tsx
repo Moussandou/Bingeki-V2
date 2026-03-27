@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { Modal } from '@/components/ui/Modal';
 
 import { Button } from '@/components/ui/Button';
@@ -197,11 +198,11 @@ export function AddFavoriteCharacterModal({ isOpen, onClose, currentFavorites, o
                                     overflow: 'hidden',
                                     flexShrink: 0
                                 }}>
-                                    <img
-                                        src={char.images.jpg.image_url}
-                                        alt={char.name}
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                    />
+                                            <OptimizedImage
+                                                src={char.images.jpg.image_url}
+                                                alt={char.name}
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                            />
                                 </div>
                                 <div style={{ flex: 1 }}>
                                     <div style={{

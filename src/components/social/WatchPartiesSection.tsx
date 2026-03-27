@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Play, Users, Plus, BookOpen, Tv, LogOut, Ban } from 'lucide-react';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useAuthStore } from '@/store/authStore';
 import { useLibraryStore } from '@/store/libraryStore';
 import {
@@ -188,7 +189,7 @@ export function WatchPartiesSection() {
                                     style={{ width: 80, height: 110, borderRadius: '4px', overflow: 'hidden', border: '2px solid var(--color-border-heavy)', cursor: 'pointer', flexShrink: 0 }}
                                     onClick={() => navigate(`/work/${party.workId}`)}
                                 >
-                                    <img
+                                    <OptimizedImage
                                         src={party.workImage || `https://via.placeholder.com/80x110?text=${party.workType}`}
                                         alt={party.workTitle}
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -245,7 +246,7 @@ export function WatchPartiesSection() {
                                                     border: `2px solid ${p.isReady ? '#22c55e' : '#ccc'}`,
                                                     marginLeft: '-4px'
                                                 }}>
-                                                    <img src={p.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.name}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    <OptimizedImage src={p.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.name}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                 </div>
                                             ))}
                                         </div>
@@ -307,7 +308,7 @@ export function WatchPartiesSection() {
                                         }}
                                     >
                                         <div style={{ width: '100%', aspectRatio: '2/3', borderRadius: '4px', overflow: 'hidden' }}>
-                                            <img src={work.image} alt={work.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <OptimizedImage src={work.image} alt={work.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         </div>
                                         <p style={{ fontSize: '0.65rem', textAlign: 'center', marginTop: '0.25rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{work.title}</p>
                                     </div>
@@ -360,7 +361,7 @@ export function WatchPartiesSection() {
                                         }}
                                     >
                                         <div style={{ width: 28, height: 28, borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--color-border-heavy)' }}>
-                                            <img
+                                            <OptimizedImage
                                                 src={friend.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${friend.displayName}`}
                                                 alt=""
                                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}

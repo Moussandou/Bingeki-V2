@@ -2,6 +2,7 @@ import { Layout } from '@/components/layout/Layout';
 import styles from './Credits.module.css';
 import { Github, Linkedin, Globe, Code, Heart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 export default function Credits() {
     const { t } = useTranslation();
@@ -19,14 +20,11 @@ export default function Credits() {
                     <div className={styles.card}>
                         <div className={styles.profileSection}>
                             <div className={styles.avatar}>
-                                <img
+                                <OptimizedImage
                                     src="https://media.licdn.com/dms/image/v2/D4E03AQGgqVvXfXyq2A/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1718206192135?e=1741219200&v=beta&t=7y2y2y2y2y2y2y2y2y2y2y2y2y2y2y2y2y2y2y2y2y2"
                                     alt="Moussandou"
                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                    onError={(e) => {
-                                        // Fallback if the LinkedIn URL fails/expires
-                                        (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/avataaars/svg?seed=Moussandou`;
-                                    }}
+                                    fallback={`https://api.dicebear.com/7.x/avataaars/svg?seed=Moussandou`}
                                 />
                             </div>
                             <h2 className={styles.name}>Moussandou</h2>
