@@ -353,6 +353,11 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
 app.get('/*', async (req, res) => {
     const url = req.url;
 
+    // Prevent SEO handler from serving HTML for static assets that are 404ing
+    if (url.includes('.') || url.startsWith('/assets/')) {
+        return res.status(404).send('Not Found');
+    }
+
     // Default values
     let title = "Bingeki | Votre aventure Manga";
     let description = "Transformez votre passion manga en quête RPG ! Suivez vos lectures, gagnez de l'XP, débloquez des badges et affrontez vos amis.";
@@ -457,6 +462,7 @@ app.get('/*', async (req, res) => {
     res.set('X-Frame-Options', 'DENY');
     res.set('X-XSS-Protection', '1; mode=block');
     res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    res.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), browsing-topics=()');
     res.set('X-SEO-Handler', 'true');
     res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
     res.send(html);
