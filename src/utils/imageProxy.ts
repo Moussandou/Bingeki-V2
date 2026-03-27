@@ -3,11 +3,9 @@
  * Primarily used for MyAnimeList (MAL) images.
  */
 
-const PROXIED_DOMAINS = [
-    'myanimelist.net',
-    'cdn.myanimelist.net',
-    'images.myanimelist.net'
-];
+// If we want to disable proxying and use referrerPolicy="no-referrer" directly in components
+// we keep this list empty or just disable the check.
+const PROXIED_DOMAINS: string[] = [];
 
 /**
  * Checks if a URL should be proxied and returns the proxied URL if necessary.
@@ -17,13 +15,7 @@ const PROXIED_DOMAINS = [
 export const getProxiedImageUrl = (url: string | undefined): string | undefined => {
     if (!url) return undefined;
     
-    // Check if the URL belongs to a domain we want to proxy
-    const shouldProxy = PROXIED_DOMAINS.some(domain => url.includes(domain));
-    
-    if (shouldProxy) {
-        // Use wsrv.nl image proxy for bypassing hotlinking and providing a default image
-        return `https://wsrv.nl/?url=${encodeURIComponent(url)}&default=https://placehold.co/400x600?text=No+Image`;
-    }
-    
+    // Simplest version: just return the original URL.
+    // We rely on <img referrerpolicy="no-referrer" /> in the component to bypass hotlinking.
     return url;
 };
