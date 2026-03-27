@@ -54,6 +54,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
                     }
                 }}
                 loading={priority ? 'eager' : 'lazy'}
+                referrerPolicy="no-referrer"
                 {...props}
             />
         </div>

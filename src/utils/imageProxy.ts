@@ -5,7 +5,8 @@
 
 const PROXIED_DOMAINS = [
     'myanimelist.net',
-    'cdn.myanimelist.net'
+    'cdn.myanimelist.net',
+    'images.myanimelist.net'
 ];
 
 /**
@@ -20,8 +21,8 @@ export const getProxiedImageUrl = (url: string | undefined): string | undefined 
     const shouldProxy = PROXIED_DOMAINS.some(domain => url.includes(domain));
     
     if (shouldProxy) {
-        // Use Google's image proxy which is reliable for bypassing MAL hotlinking
-        return `https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=2592000&url=${encodeURIComponent(url)}`;
+        // Use wsrv.nl image proxy for bypassing hotlinking and providing a default image
+        return `https://wsrv.nl/?url=${encodeURIComponent(url)}&default=https://placehold.co/400x600?text=No+Image`;
     }
     
     return url;
