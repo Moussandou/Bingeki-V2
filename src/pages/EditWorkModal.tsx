@@ -1,34 +1,32 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { WorkEntry } from '../types/library';
+import { type Work } from '@/store/libraryStore';
 import './EditWorkModal.css';
 
 interface EditWorkModalProps {
-    work: WorkEntry;
+    work: Work;
     onClose: () => void;
-    onSave: (updatedWork: Partial<WorkEntry>) => Promise<boolean>;
+    onSave: (updatedWork: Partial<Work>) => Promise<boolean>;
 }
 
 const EditWorkModal: React.FC<EditWorkModalProps> = ({ work, onClose, onSave }) => {
     const { t } = useTranslation();
     const [title, setTitle] = useState(work.title || '');
     const [synopsis, setSynopsis] = useState(work.synopsis || '');
-    const [type, setType] = useState<WorkEntry['type']>(work.type || 'manga');
-    const [chapters, setChapters] = useState(work.chapters_total || 0);
-    const [episodes, setEpisodes] = useState(work.episodes_total || 0);
-    const [imageUrl, setImageUrl] = useState(work.image_url || '');
+    const [type, setType] = useState<Work['type']>(work.type || 'manga');
+    const [totalUnits, setTotalUnits] = useState(work.totalChapters || 0);
+    const [imageUrl, setImageUrl] = useState(work.image || '');
     const [isSaving, setIsSaving] = useState(false);
 
     const handleSave = async () => {
         setIsSaving(true);
-        const updatedData: Partial<WorkEntry> = {
+        const updatedData: Partial<Work> = {
             title,
             synopsis,
             type,
-            chapters_total: chapters,
-            episodes_total: episodes,
-            image_url: imageUrl,
-            updated_at: new Date().toISOString()
+            totalChapters: totalUnits,
+            image: imageUrl,
+            lastUpdated: Date.now()
         };
         
         const success = await onSave(updatedData);
@@ -69,31 +67,24 @@ const EditWorkModal: React.FC<EditWorkModalProps> = ({ work, onClose, onSave }) 
                     <div className="form-row">
                         <div className="form-group">
                             <label>{t('work_details.edit_modal.label_type')}</label>
-                            <select value={type} onChange={(e) => setType(e.target.value as WorkEntry['type'])}>
+                            <select value={type} onChange={(e) => setType(e.target.value as Work['type'])}>
                                 <option value="manga">MANGA</option>
                                 <option value="anime">ANIME</option>
                             </select>
                         </div>
 
-                        {type === 'manga' ? (
-                            <div className="form-group">
-                                <label>{t('work_details.edit_modal.label_chapters')}</label>
-                                <input 
-                                    type="number" 
-                                    value={chapters} 
-                                    onChange={(e) => setChapters(parseInt(e.target.value) || 0)} 
-                                />
-                            </div>
-                        ) : (
-                            <div className="form-group">
-                                <label>{t('work_details.edit_modal.label_episodes')}</label>
-                                <input 
-                                    type="number" 
-                                    value={episodes} 
-                                    onChange={(e) => setEpisodes(parseInt(e.target.value) || 0)} 
-                                />
-                            </div>
-                        )}
+                        <div className="form-group">
+                            <label>
+                                {type === 'manga' 
+                                    ? t('work_details.edit_modal.label_chapters') 
+                                    : t('work_details.edit_modal.label_episodes')}
+                            </label>
+                            <input 
+                                type="number" 
+                                value={totalUnits} 
+                                onChange={(e) => setTotalUnits(parseInt(e.target.value) || 0)} 
+                            />
+                        </div>
                     </div>
 
                     <div className="form-group">
@@ -130,3 +121,4 @@ const EditWorkModal: React.FC<EditWorkModalProps> = ({ work, onClose, onSave }) 
 };
 
 export default EditWorkModal;
+
