@@ -36,7 +36,7 @@ export class ApiQueue {
 
         const promise = new Promise<Response>((resolve, reject) => {
             this.queue.push({ url, options, resolve, reject, retries: 0 });
-            this.processQueue();
+            this.processQueue().catch(() => { /* handled via request.reject in loop */ });
         });
 
         if (!options?.method || options.method === 'GET') {
