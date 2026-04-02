@@ -22,7 +22,7 @@ export function TierListCard({ tierList }: TierListCardProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ x: -2, y: -2, boxShadow: '8px 8px 0 var(--color-primary)' }}
-            onClick={() => navigate(`/${lang}/tier-list/${tierList.id}`)}
+            onClick={() => navigate(`/${lang}/tierlist/${tierList.id}`)}
             className="tier-list-card"
             style={{
                 background: '#1a1a1a',

@@ -466,9 +466,9 @@ function App() {
               <Route path="news" element={<NewsIndex />} />
               <Route path="news/article/:slug" element={<NewsArticle />} />
 
-              <Route path="tier-list" element={<TierListFeed />} />
-              <Route path="tier-list/create" element={<CreateTierList />} />
-              <Route path="tier-list/:id" element={<ViewTierList />} />
+              <Route path="tierlist" element={<TierListFeed />} />
+              <Route path="tierlist/create" element={<CreateTierList />} />
+              <Route path="tierlist/:id" element={<ViewTierList />} />
 
               <Route path="admin" element={
                 <RequireAdmin>

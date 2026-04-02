@@ -88,7 +88,7 @@ export default function ViewTierList() {
         try {
             await deleteTierList(id);
             addToast(t('tierlist.delete_success'), 'success');
-            navigate(`/${lang}/tier-list`);
+            navigate(`/${lang}/tierlist`);
         } catch (error) {
             logger.error(error);
             addToast(t('tierlist.delete_error'), 'error');
@@ -108,7 +108,7 @@ export default function ViewTierList() {
             <Layout>
                 <div style={{ padding: '4rem', textAlign: 'center', color: 'white' }}>
                     <h2>{t('tierlist.not_found')}</h2>
-                    <Button onClick={() => navigate(`/${lang}/tier-list`)} variant="outline">{t('tierlist.back_to_feed')}</Button>
+                    <Button onClick={() => navigate(`/${lang}/tierlist`)} variant="outline">{t('tierlist.back_to_feed')}</Button>
                 </div>
             </Layout>
         );
@@ -170,7 +170,7 @@ export default function ViewTierList() {
                             <Button onClick={handleExportImage} variant="primary" icon={<Download size={20} />}>
                                 {t('tierlist.export_image')}
                             </Button>
-                            <Button onClick={() => navigate(`/${lang}/tier-list/create`)} variant="outline" icon={<Copy size={20} />}>
+                            <Button onClick={() => navigate(`/${lang}/tierlist/create`)} variant="outline" icon={<Copy size={20} />}>
                                 {t('tierlist.create_your_own')}
                             </Button>
                             {/* Delete button — author only */}

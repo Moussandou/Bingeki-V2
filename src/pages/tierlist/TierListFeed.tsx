@@ -51,7 +51,7 @@ export default function TierListFeed() {
                         size="lg"
                         variant="primary"
                         icon={<Plus size={20} />}
-                        onClick={() => navigate(`/${lang}/tier-list/create`)}
+                        onClick={() => navigate(`/${lang}/tierlist/create`)}
                         className={styles.createButton}
                     >
                         {t('tierlist.create_button')}
@@ -95,7 +95,7 @@ export default function TierListFeed() {
                         <p>{t('tierlist.empty_cta')}</p>
                         <Button
                             className="mt-4"
-                            onClick={() => navigate(`/${lang}/tier-list/create`)}
+                            onClick={() => navigate(`/${lang}/tierlist/create`)}
                             variant="primary"
                         >
                             {t('tierlist.create_now')}

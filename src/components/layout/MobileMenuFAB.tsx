@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { auth } from '@/firebase/config';
 import {
     Menu, X, MessageSquare, Calendar, History as HistoryIcon,
-    Newspaper, ScanSearch, MessageCircle, User, Settings, LogOut
+    Newspaper, ScanSearch, MessageCircle, User, Settings, LogOut, LayoutList
 } from 'lucide-react';
 import styles from './MobileMenuFAB.module.css';
 
@@ -101,6 +101,10 @@ export function MobileMenuFAB() {
                                 <Link to="/news" className={styles.menuItem} onClick={handleClose}>
                                     <Newspaper size={24} />
                                     <span>Anime News</span>
+                                </Link>
+                                <Link to="/tierlist" className={styles.menuItem} onClick={handleClose}>
+                                    <LayoutList size={24} />
+                                    <span>{t('header.tierlist')}</span>
                                 </Link>
                                 <Link to="/lens" className={styles.menuItem} onClick={handleClose}>
                                     <ScanSearch size={24} />
