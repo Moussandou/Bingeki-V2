@@ -62,8 +62,10 @@ describe('apiQueue', () => {
                 return new Promise((_resolve, reject) => {
                     if (options?.signal) {
                         options.signal.addEventListener('abort', () => {
-                            reject(new DOMException('Aborted', 'AbortError'));
-                        });
+                            const error = new Error('Aborted');
+                            error.name = 'AbortError';
+                            reject(error);
+                        }, { once: true });
                     }
                 });
             });
