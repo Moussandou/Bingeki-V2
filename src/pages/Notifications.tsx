@@ -64,7 +64,16 @@ export default function Notifications() {
                                         {!n.read && <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-primary)' }} />}
                                         <h3 style={{ fontWeight: 900, fontSize: '1.1rem' }}>{n.title}</h3>
                                         <span style={{ fontSize: '0.8rem', opacity: 0.5, marginLeft: 'auto' }}>
-                                            {n.createdAt?.seconds ? new Date(n.createdAt.seconds * 1000).toLocaleDateString() + ' ' + new Date(n.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                                            {(() => {
+                                                if (!n.createdAt) return '';
+                                                const date = (typeof n.createdAt === 'object' && 'seconds' in n.createdAt)
+                                                    ? new Date(n.createdAt.seconds * 1000)
+                                                    : new Date(n.createdAt);
+                                                
+                                                return isNaN(date.getTime()) ? '' : 
+                                                    date.toLocaleDateString() + ' ' + 
+                                                    date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                            })()}
                                         </span>
                                     </div>
                                     <p style={{ opacity: 0.8, lineHeight: 1.5 }}>{n.body}</p>
