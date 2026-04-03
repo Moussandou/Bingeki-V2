@@ -1389,6 +1389,8 @@ const resources = {
                 },
                 health: {
                     title: "Health Dashboard",
+                    repair_history: "Historique des réparations",
+                    history_title: "Historique Global de Santé",
                     subtitle: "Diagnostic temps réel de la plateforme",
                     loading: "Diagnostic en cours...",
                     refresh: "Actualiser",
@@ -3187,6 +3189,8 @@ const resources = {
                 },
                 health: {
                     title: "Health Dashboard",
+                    repair_history: "Repair History",
+                    history_title: "Global Health History",
                     subtitle: "Real-time platform diagnostics",
                     loading: "Running diagnostics...",
                     refresh: "Refresh",
