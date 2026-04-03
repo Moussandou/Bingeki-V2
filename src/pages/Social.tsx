@@ -84,9 +84,12 @@ export default function Social() {
                 groups[event.userId] = {
                     userId: event.userId,
                     userName: event.userName,
-                    userPhoto: event.userPhoto,
+                    userPhoto: event.userPhoto || '',
                     events: []
                 };
+            } else if (!groups[event.userId].userPhoto && event.userPhoto) {
+                // Ensure we have a photo even if the most recent event is missing it
+                groups[event.userId].userPhoto = event.userPhoto;
             }
             groups[event.userId].events.push(event);
         });
@@ -392,9 +395,18 @@ export default function Social() {
                                     {groupedActivities.map((group: GroupedActivity) => (
                                         <div key={group.userId} className={styles.friendCard}>
                                             <div className={styles.cardHeader}>
-                                                <div style={{ width: 44, height: 44, borderRadius: '4px', overflow: 'hidden', border: '2px solid var(--color-border-heavy)', flexShrink: 0, background: 'var(--color-surface)' }}>
+                                                <div style={{ 
+                                                    width: 44, height: 44, 
+                                                    borderRadius: '0', 
+                                                    overflow: 'hidden', 
+                                                    border: '2px solid var(--color-border-heavy)', 
+                                                    boxShadow: '4px 4px 0 var(--color-primary)',
+                                                    flexShrink: 0, 
+                                                    background: 'var(--color-surface)',
+                                                    position: 'relative'
+                                                }}>
                                                     <OptimizedImage 
-                                                        src={group.userPhoto || undefined} 
+                                                        src={group.userPhoto && group.userPhoto !== '' ? group.userPhoto : undefined} 
                                                         fallback={`https://api.dicebear.com/7.x/avataaars/svg?seed=${group.userName}`}
                                                         alt="Avatar" 
                                                     />

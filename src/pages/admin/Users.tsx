@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Shield, Ban, ExternalLink, Edit, Eye, Trash2, Clock, Circle, ArrowUpDown } from 'lucide-react';
+import { Search, Shield, Ban, ExternalLink, Edit, Eye, Trash2, Clock, Circle, ArrowUpDown, LayoutGrid, List } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Switch } from '@/components/ui/Switch';
 import { getAllUsers, toggleUserBan, toggleUserAdmin, adminUpdateUserGamification, deleteUserData, type UserProfile } from '@/firebase/firestore';
@@ -15,6 +15,8 @@ export default function AdminUsers() {
     const [users, setUsers] = useState<UserProfile[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
+    const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+    const [filter, setFilter] = useState<'all' | 'admin' | 'banned'>('all');
 
     // Modal State
     const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
@@ -57,11 +59,19 @@ export default function AdminUsers() {
     }, []);
 
     const filteredUsers = useMemo(() => {
-        const filtered = users.filter(user =>
-            user.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.uid.includes(searchTerm)
-        );
+        let filtered = users.filter(user => {
+            const matchesSearch = 
+                (user.displayName?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (user.email?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (user.uid.toLowerCase().includes(searchTerm.toLowerCase()));
+            
+            const matchesFilter = 
+                filter === 'all' ? true :
+                filter === 'admin' ? user.isAdmin :
+                filter === 'banned' ? user.isBanned : true;
+
+            return matchesSearch && matchesFilter;
+        });
         return [...filtered].sort((a, b) => {
             switch (sortBy) {
                 case 'lastLogin': return (b.lastLogin || 0) - (a.lastLogin || 0);
@@ -154,8 +164,9 @@ export default function AdminUsers() {
                     </p>
                 </div>
 
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <div style={{ position: 'relative' }}>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', width: '100%' }}>
+                    {/* Search */}
+                    <div style={{ position: 'relative', flex: '1', minWidth: '300px' }}>
                         <input
                             type="text"
                             placeholder={t('admin.users.search_placeholder')}
@@ -165,7 +176,6 @@ export default function AdminUsers() {
                                 padding: '0.75rem 1rem 0.75rem 2.5rem',
                                 border: '2px solid var(--color-border)',
                                 fontFamily: 'monospace',
-                                minWidth: '300px',
                                 width: '100%',
                                 outline: 'none',
                                 background: 'var(--color-surface)',
@@ -174,6 +184,8 @@ export default function AdminUsers() {
                         />
                         <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-dim)' }} />
                     </div>
+
+                    {/* Sort */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexWrap: 'wrap' }}>
                         <ArrowUpDown size={14} style={{ color: 'var(--color-text-dim)', marginRight: '0.25rem' }} />
                         {([
@@ -203,148 +215,286 @@ export default function AdminUsers() {
                             </button>
                         ))}
                     </div>
+
+                    {/* Filter Toggle */}
+                    <div style={{ display: 'flex', border: '2px solid var(--color-border)', overflow: 'hidden' }}>
+                        {(['all', 'admin', 'banned'] as const).map(opt => (
+                            <button
+                                key={opt}
+                                onClick={() => setFilter(opt)}
+                                style={{
+                                    padding: '0.4rem 0.8rem',
+                                    background: filter === opt ? 'var(--color-primary)' : 'var(--color-surface)',
+                                    color: filter === opt ? 'white' : 'var(--color-text)',
+                                    border: 'none',
+                                    borderRight: opt !== 'banned' ? '1px solid var(--color-border)' : 'none',
+                                    cursor: 'pointer',
+                                    fontFamily: 'monospace',
+                                    fontSize: '0.7rem',
+                                    fontWeight: 900,
+                                    textTransform: 'uppercase'
+                                }}
+                            >
+                                {opt === 'all' ? 'Tous' : opt === 'admin' ? 'Admins' : 'Bannis'}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* View Toggle */}
+                    <div style={{ display: 'flex', border: '2px solid var(--color-border)', overflow: 'hidden', marginLeft: 'auto' }}>
+                        <button
+                            onClick={() => setViewMode('grid')}
+                            style={{
+                                padding: '0.4rem 0.6rem',
+                                background: viewMode === 'grid' ? 'var(--color-text)' : 'var(--color-surface)',
+                                color: viewMode === 'grid' ? 'var(--color-surface)' : 'var(--color-text)',
+                                border: 'none',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}
+                            title="Vue Grille"
+                        >
+                            <LayoutGrid size={16} />
+                        </button>
+                        <button
+                            onClick={() => setViewMode('table')}
+                            style={{
+                                padding: '0.4rem 0.6rem',
+                                background: viewMode === 'table' ? 'var(--color-text)' : 'var(--color-surface)',
+                                color: viewMode === 'table' ? 'var(--color-surface)' : 'var(--color-text)',
+                                borderLeft: '2px solid var(--color-border)',
+                                borderTop: 'none',
+                                borderBottom: 'none',
+                                borderRight: 'none',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}
+                            title="Vue Tableau"
+                        >
+                            <List size={16} />
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
-                {loading ? (
+            {loading ? (
+                <div style={{ padding: '3rem', textAlign: 'center', opacity: 0.5 }}>
                     <p>{t('admin.users.loading')}</p>
-                ) : filteredUsers.map(user => (
-                    <Card key={user.uid} variant="manga" style={{
-                        padding: '1.5rem',
-                        background: 'var(--color-surface)',
-                        position: 'relative',
-                        opacity: user.isBanned ? 0.7 : 1,
-                        filter: user.isBanned ? 'grayscale(100%)' : 'none'
-                    }}>
-                        {/* Header */}
-                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                <div style={{
-                                    width: '48px', height: '48px',
-                                    borderRadius: '50%',
-                                    border: '2px solid var(--color-border)',
-                                    overflow: 'hidden',
-                                    background: 'var(--color-surface-hover)'
-                                }}>
-                                    {user.photoURL && (
-                                        <OptimizedImage
-                                            src={user.photoURL}
-                                            alt=""
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        />
-                                    )}
+                </div>
+            ) : viewMode === 'grid' ? (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                    {filteredUsers.map(user => (
+                        <Card key={user.uid} variant="manga" style={{
+                            padding: '1.5rem',
+                            background: 'var(--color-surface)',
+                            position: 'relative',
+                            opacity: user.isBanned ? 0.7 : 1,
+                            filter: user.isBanned ? 'grayscale(100%)' : 'none'
+                        }}>
+                            {/* Header */}
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                    <div style={{
+                                        width: '48px', height: '48px',
+                                        borderRadius: '50%',
+                                        border: '2px solid var(--color-border)',
+                                        overflow: 'hidden',
+                                        background: 'var(--color-surface-hover)'
+                                    }}>
+                                        {user.photoURL && (
+                                            <OptimizedImage
+                                                src={user.photoURL}
+                                                alt=""
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                            />
+                                        )}
+                                    </div>
+                                    <div style={{ minWidth: 0 }}>
+                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', lineHeight: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                            {user.displayName || t('admin.users.no_name')}
+                                        </h3>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-dim)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', lineHeight: 1 }}>
-                                        {user.displayName || t('admin.users.no_name')}
-                                    </h3>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-dim)' }}>{user.email}</div>
+                                {user.isAdmin && (
+                                    <div style={{ background: 'var(--color-text)', color: 'var(--color-surface)', padding: '0.25rem 0.5rem', fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                                        <Shield size={10} /> {t('admin.users.admin')}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Connection status */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', color: 'var(--color-text-dim)', marginBottom: '0.5rem', fontFamily: 'monospace' }}>
+                                {isOnline(user.lastLogin) ? (
+                                    <span style={{ color: '#22c55e', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                        <Circle size={8} fill="#22c55e" /> En ligne
+                                    </span>
+                                ) : (
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                        <Clock size={11} /> Connecte {formatRelativeDate(user.lastLogin)}
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Registration date */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.7rem', color: 'var(--color-text-dim)', marginBottom: '0.5rem', fontFamily: 'monospace' }}>
+                                {user.createdAt
+                                    ? `Inscrit le ${new Date(user.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`
+                                    : 'Inscription inconnue'
+                                }
+                            </div>
+
+                            {/* Stats Strip */}
+                            <div style={{ display: 'flex', gap: '1rem', padding: '0.5rem 0', borderTop: '1px solid #eee', borderBottom: '1px solid #eee', marginBottom: '1rem', fontSize: '0.8rem', fontFamily: 'monospace' }}>
+                                <div>LVL <b>{user.level || 1}</b></div>
+                                <div>XP <b>{user.xp || 0}</b></div>
+                                <div>Ban <b>{user.isBanned ? t('admin.users.ban_yes') : t('admin.users.ban_no')}</b></div>
+                            </div>
+
+                            {/* Actions */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontWeight: 'bold', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <Ban size={16} /> {t('admin.users.ban')}
+                                    </span>
+                                    <Switch isOn={!!user.isBanned} onToggle={() => handleBan(user.uid, user.isBanned)} />
                                 </div>
-                            </div>
-                            {user.isAdmin && (
-                                <div style={{ background: 'var(--color-text)', color: 'var(--color-surface)', padding: '0.25rem 0.5rem', fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    <Shield size={10} /> {t('admin.users.admin')}
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontWeight: 'bold', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <Shield size={16} /> {t('admin.users.admin')}
+                                    </span>
+                                    <Switch isOn={!!user.isAdmin} onToggle={() => handleAdmin(user.uid, user.isAdmin)} />
                                 </div>
-                            )}
-                        </div>
 
-                        {/* Connection status */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', color: 'var(--color-text-dim)', marginBottom: '0.5rem', fontFamily: 'monospace' }}>
-                            {isOnline(user.lastLogin) ? (
-                                <span style={{ color: '#22c55e', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                    <Circle size={8} fill="#22c55e" /> En ligne
-                                </span>
-                            ) : (
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                    <Clock size={11} /> Connecte {formatRelativeDate(user.lastLogin)}
-                                </span>
-                            )}
-                        </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => openLevelModal(user)}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}
+                                    >
+                                        <Edit size={14} /> Edit Level
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => openDetailsModal(user)}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}
+                                    >
+                                        <Eye size={14} /> Details
+                                    </Button>
+                                </div>
 
-                        {/* Registration date */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.7rem', color: 'var(--color-text-dim)', marginBottom: '0.5rem', fontFamily: 'monospace' }}>
-                            {user.createdAt
-                                ? `Inscrit le ${new Date(user.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`
-                                : 'Inscription inconnue'
-                            }
-                        </div>
-
-                        {/* Stats Strip */}
-                        <div style={{ display: 'flex', gap: '1rem', padding: '0.5rem 0', borderTop: '1px solid #eee', borderBottom: '1px solid #eee', marginBottom: '1rem', fontSize: '0.8rem', fontFamily: 'monospace' }}>
-                            <div>LVL <b>{user.level || 1}</b></div>
-                            <div>XP <b>{user.xp || 0}</b></div>
-                            <div>Ban <b>{user.isBanned ? t('admin.users.ban_yes') : t('admin.users.ban_no')}</b></div>
-                        </div>
-
-                        {/* Actions */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontWeight: 'bold', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Ban size={16} /> {t('admin.users.ban')}
-                                </span>
-                                <Switch isOn={!!user.isBanned} onToggle={() => handleBan(user.uid, user.isBanned)} />
-                            </div>
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontWeight: 'bold', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Shield size={16} /> {t('admin.users.admin')}
-                                </span>
-                                <Switch isOn={!!user.isAdmin} onToggle={() => handleAdmin(user.uid, user.isAdmin)} />
-                            </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.5rem' }}>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => openLevelModal(user)}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}
-                                >
-                                    <Edit size={14} /> Edit Level
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => openDetailsModal(user)}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}
-                                >
-                                    <Eye size={14} /> Details
-                                </Button>
-                            </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                                <Link to={`/profile/${user.uid}`} style={{
-                                    padding: '0.5rem',
-                                    background: 'var(--color-text)',
-                                    color: 'var(--color-surface)',
-                                    textAlign: 'center',
-                                    fontWeight: 'bold',
-                                    textTransform: 'uppercase',
-                                    fontSize: '0.75rem',
-                                    display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px'
-                                }}>
-                                    <ExternalLink size={14} /> {t('admin.users.view_profile')}
-                                </Link>
-
-                                <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() => handleDeleteAccount(user.uid, user.displayName || 'User')}
-                                    style={{
-                                        color: '#ef4444',
-                                        border: '1px solid currentColor',
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                                    <Link to={`/profile/${user.uid}`} style={{
+                                        padding: '0.5rem',
+                                        background: 'var(--color-text)',
+                                        color: 'var(--color-surface)',
+                                        textAlign: 'center',
+                                        fontWeight: 'bold',
+                                        textTransform: 'uppercase',
                                         fontSize: '0.75rem',
-                                        fontWeight: 900,
-                                        display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center'
-                                    }}
-                                >
-                                    <Trash2 size={14} /> {t('admin.users.delete_account')}
-                                </Button>
+                                        display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px'
+                                    }}>
+                                        <ExternalLink size={14} /> View
+                                    </Link>
+
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => handleDeleteAccount(user.uid, user.displayName || 'User')}
+                                        style={{
+                                            color: '#ef4444',
+                                            border: '1px solid currentColor',
+                                            fontSize: '0.75rem',
+                                            fontWeight: 900,
+                                            display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center'
+                                        }}
+                                    >
+                                        <Trash2 size={14} /> Delete
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
-                    </Card>
-                ))}
-            </div>
+                        </Card>
+                    ))}
+                </div>
+            ) : (
+                <div style={{ background: 'var(--color-surface)', border: '3px solid var(--color-border)', overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '1000px' }}>
+                        <thead style={{ background: 'var(--color-text)', color: 'var(--color-surface)' }}>
+                            <tr>
+                                <th style={{ padding: '1rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>User</th>
+                                <th style={{ padding: '1rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>Stats</th>
+                                <th style={{ padding: '1rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>Status</th>
+                                <th style={{ padding: '1rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>Role</th>
+                                <th style={{ padding: '1rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 900, fontFamily: 'var(--font-heading)', textAlign: 'right' }}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredUsers.map((user, idx) => (
+                                <tr key={user.uid} style={{ 
+                                    borderBottom: '1px solid var(--color-border)',
+                                    background: idx % 2 === 0 ? 'transparent' : 'rgba(0,0,0,0.02)',
+                                    opacity: user.isBanned ? 0.6 : 1
+                                }}>
+                                    <td style={{ padding: '1rem' }}>
+                                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                            <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', border: '1px solid var(--color-border)' }}>
+                                                {user.photoURL && <OptimizedImage src={user.photoURL} alt="" />}
+                                            </div>
+                                            <div>
+                                                <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>{user.displayName || 'N/A'}</div>
+                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-dim)', fontFamily: 'monospace' }}>{user.email}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style={{ padding: '1rem', fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                                        Lvl <b>{user.level || 1}</b> • XP <b>{user.xp || 0}</b>
+                                    </td>
+                                    <td style={{ padding: '1rem', fontSize: '0.75rem', fontFamily: 'monospace' }}>
+                                        {isOnline(user.lastLogin) ? (
+                                            <span style={{ color: '#22c55e', fontWeight: 800 }}>● Online</span>
+                                        ) : (
+                                            <span style={{ opacity: 0.7 }}>{formatRelativeDate(user.lastLogin)}</span>
+                                        )}
+                                        {user.isBanned && <div style={{ color: '#ef4444', fontWeight: 900, textTransform: 'uppercase', marginTop: '2px' }}>BANNED</div>}
+                                    </td>
+                                    <td style={{ padding: '1rem' }}>
+                                        {user.isAdmin ? (
+                                            <span style={{ background: 'var(--color-text)', color: 'var(--color-surface)', padding: '2px 6px', fontSize: '0.65rem', fontWeight: 900 }}>ADMIN</span>
+                                        ) : (
+                                            <span style={{ opacity: 0.5, fontSize: '0.65rem' }}>USER</span>
+                                        )}
+                                    </td>
+                                    <td style={{ padding: '1rem', textAlign: 'right' }}>
+                                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                            <button 
+                                                onClick={() => openDetailsModal(user)}
+                                                style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--color-text)' }}
+                                                title="Details"
+                                            ><Eye size={18} /></button>
+                                            <button 
+                                                onClick={() => openLevelModal(user)}
+                                                style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--color-text)' }}
+                                                title="Edit Stats"
+                                            ><Edit size={18} /></button>
+                                            <button 
+                                                onClick={() => handleBan(user.uid, user.isBanned)}
+                                                style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: user.isBanned ? '#22c55e' : '#ef4444' }}
+                                                title={user.isBanned ? 'Unban' : 'Ban'}
+                                            ><Ban size={18} /></button>
+                                            <Link to={`/profile/${user.uid}`} style={{ color: 'var(--color-text)' }}><ExternalLink size={18} /></Link>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
             {/* Level Edit Modal */}
             <Modal isOpen={modalType === 'level'} onClose={() => setModalType(null)} title="Edit User Stats">

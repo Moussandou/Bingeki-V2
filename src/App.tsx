@@ -88,7 +88,6 @@ const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
 const AdminUsers = lazy(() => import('@/pages/admin/Users'));
 const AdminFeedback = lazy(() => import('@/pages/admin/FeedbackAdmin'));
 const AdminSystem = lazy(() => import('@/pages/admin/SystemLogs'));
-const AdminSocialGenerator = lazy(() => import('@/pages/admin/SocialGenerator'));
 const AdminSurvey = lazy(() => import('@/pages/admin/SurveyDashboard'));
 const AdminGrowthAnalytics = lazy(() => import('@/pages/admin/analytics/Growth'));
 const AdminEngagementAnalytics = lazy(() => import('@/pages/admin/analytics/Engagement'));
@@ -485,7 +484,6 @@ function App() {
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="feedback" element={<AdminFeedback />} />
                 <Route path="system" element={<AdminSystem />} />
-                <Route path="social-generator" element={<AdminSocialGenerator />} />
                 <Route path="survey" element={<AdminSurvey />} />
                 <Route path="assets" element={<Assets />} />
                 <Route path="analytics/growth" element={<AdminGrowthAnalytics />} />
