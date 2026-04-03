@@ -248,7 +248,7 @@ export default function Social() {
                     {/* Tabs */}
                     <div className={styles.tabContainer}>
                         <Button
-                            variant={activeTab === 'ranking' ? 'primary' : 'ghost'}
+                            variant={activeTab === 'ranking' ? 'primary' : 'manga'}
                             onClick={() => setActiveTab('ranking')}
                             icon={<Trophy size={20} />}
                             style={{ flexShrink: 0 }}
@@ -256,7 +256,7 @@ export default function Social() {
                             {t('social.tabs.ranking')}
                         </Button>
                         <Button
-                            variant={activeTab === 'feed' ? 'primary' : 'ghost'}
+                            variant={activeTab === 'feed' ? 'primary' : 'manga'}
                             onClick={() => setActiveTab('feed')}
                             icon={<Newspaper size={20} />}
                             style={{ flexShrink: 0 }}
@@ -264,7 +264,7 @@ export default function Social() {
                             {t('social.tabs.feed')}
                         </Button>
                         <Button
-                            variant={activeTab === 'activity' ? 'primary' : 'ghost'}
+                            variant={activeTab === 'activity' ? 'primary' : 'manga'}
                             onClick={() => setActiveTab('activity')}
                             icon={<Activity size={20} />}
                             style={{ flexShrink: 0 }}
@@ -272,7 +272,7 @@ export default function Social() {
                             {t('social.tabs.activity')}
                         </Button>
                         <Button
-                            variant={activeTab === 'challenges' ? 'primary' : 'ghost'}
+                            variant={activeTab === 'challenges' ? 'primary' : 'manga'}
                             onClick={() => setActiveTab('challenges')}
                             icon={<Swords size={20} />}
                             style={{ flexShrink: 0 }}
@@ -280,7 +280,7 @@ export default function Social() {
                             {t('social.tabs.challenges')}
                         </Button>
                         <Button
-                            variant={activeTab === 'parties' ? 'primary' : 'ghost'}
+                            variant={activeTab === 'parties' ? 'primary' : 'manga'}
                             onClick={() => setActiveTab('parties')}
                             icon={<Tv size={20} />}
                             style={{ flexShrink: 0 }}
@@ -288,7 +288,7 @@ export default function Social() {
                             {t('social.tabs.parties')}
                         </Button>
                         <Button
-                            variant={activeTab === 'friends' ? 'primary' : 'ghost'}
+                            variant={activeTab === 'friends' ? 'primary' : 'manga'}
                             onClick={() => setActiveTab('friends')}
                             icon={<Users size={20} />}
                             style={{ flexShrink: 0 }}
@@ -397,27 +397,22 @@ export default function Social() {
                             </div>
 
                             {/* Category selector */}
-                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-                                <div className="manga-panel" style={{ display: 'inline-flex', gap: '0.5rem', padding: '0.5rem 0.75rem', background: 'var(--color-surface)' }}>
-                                    <Button
-                                        variant={leaderboardCategory === 'xp' ? 'manga' : 'ghost'}
-                                        size="sm"
-                                        onClick={() => setLeaderboardCategory('xp')}
-                                        icon={<Trophy size={14} />}
-                                    >{t('social.ranking.xp')}</Button>
-                                    <Button
-                                        variant={leaderboardCategory === 'chapters' ? 'manga' : 'ghost'}
-                                        size="sm"
-                                        onClick={() => setLeaderboardCategory('chapters')}
-                                        icon={<BookOpen size={14} />}
-                                    >{t('social.ranking.chapters')}</Button>
-                                    <Button
-                                        variant={leaderboardCategory === 'streak' ? 'manga' : 'ghost'}
-                                        size="sm"
-                                        onClick={() => setLeaderboardCategory('streak')}
-                                        icon={<Flame size={14} />}
-                                    >{t('social.ranking.streak')}</Button>
-                                </div>
+                            <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                                <Button
+                                    variant={leaderboardCategory === 'xp' ? 'primary' : 'manga'}
+                                    onClick={() => setLeaderboardCategory('xp')}
+                                    icon={<Trophy size={14} />}
+                                >{t('social.ranking.xp')}</Button>
+                                <Button
+                                    variant={leaderboardCategory === 'chapters' ? 'primary' : 'manga'}
+                                    onClick={() => setLeaderboardCategory('chapters')}
+                                    icon={<BookOpen size={14} />}
+                                >{t('social.ranking.chapters')}</Button>
+                                <Button
+                                    variant={leaderboardCategory === 'streak' ? 'primary' : 'manga'}
+                                    onClick={() => setLeaderboardCategory('streak')}
+                                    icon={<Flame size={14} />}
+                                >{t('social.ranking.streak')}</Button>
                             </div>
 
                             {/* Podium (Top 3) */}

@@ -78,9 +78,29 @@
     margin-bottom: 1rem;
 }
 
+.firstPlace .name {
+    font-size: 1.05rem;
+    color: #FBBF24; /* Golden highlight for rank #1 */
+}
+
+.firstPlace .scoreValue {
+    font-size: 1rem;
+    color: #FBBF24;
+}
+
 .secondPlace,
 .thirdPlace {
     z-index: 1;
+}
+
+.secondPlace .name,
+.thirdPlace .name {
+    font-size: 0.9rem;
+}
+
+.secondPlace .scoreValue,
+.thirdPlace .scoreValue {
+    font-size: 0.85rem;
 }
 
 /* ─── Avatar ───────────────────────────────────────────────── */
@@ -102,9 +122,10 @@
     border-radius: 9999px;
     border: 3px solid var(--color-border-heavy);
     overflow: hidden;
-    background: var(--color-surface-dim);
+    background: #000;
     position: relative;
     z-index: 10;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4), 0 0 0 2px rgba(255,255,255,0.1);
 }
 
 .avatarImage {
@@ -166,13 +187,14 @@
 }
 
 .levelBadge {
-    background: var(--color-border-heavy);
-    color: var(--color-surface);
-    font-size: 0.55rem;
-    font-weight: 700;
-    padding: 0.1rem 0.3rem;
-    border-radius: 0.125rem;
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    font-size: 0.6rem;
+    font-weight: 800;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.25rem;
     white-space: nowrap;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
 }
 
 .rankLetterBadge {
@@ -189,6 +211,10 @@
 /* ─── Info ─────────────────────────────────────────────────── */
 
 .info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     margin-bottom: 0.375rem;
     padding: 0 0.125rem;
@@ -197,12 +223,17 @@
 
 .name {
     font-weight: 900;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
+    line-height: 1;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+    overflow: visible;
+    text-overflow: clip;
+    text-align: center;
+    width: max-content; /* Allow centering even when overflowing */
     font-family: var(--font-heading, 'Outfit', sans-serif);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+    color: var(--color-text-primary);
 }
 
 .score {
@@ -214,9 +245,10 @@
 }
 
 .scoreValue {
-    font-size: 0.7rem;
+    font-size: 0.85rem;
     font-weight: 900;
     font-family: var(--font-heading, 'Outfit', sans-serif);
+    color: var(--color-text-primary);
 }
 
 .scoreUnit {
