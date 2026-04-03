@@ -4,6 +4,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { SortableItem, TierItemDisplay } from './SortableItem';
 import { X } from 'lucide-react';
+import styles from './TierRow.module.css';
 
 interface TierItem {
     id: number | string;
@@ -32,29 +33,14 @@ export function TierRow({ tier, onLabelChange, onColorChange, onDelete, readOnly
     });
 
     return (
-        <div style={{ display: 'flex', marginBottom: '4px', minHeight: '100px', background: '#1a1a1a' }}>
-            {/* Label Column */}
-            <div style={{
-                width: '100px',
-                background: tier.color,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                padding: '0.5rem',
-                border: '3px solid var(--color-border-heavy)',
-                borderRight: 'none',
-                position: 'relative'
-            }}>
+        <div className={styles.row}>
+            {/* Label Column — background stays inline (dynamic tier color) */}
+            <div
+                className={styles.labelCell}
+                style={{ background: tier.color }}
+            >
                 {readOnly ? (
-                    <div style={{
-                        textAlign: 'center',
-                        fontWeight: 900,
-                        fontSize: '1.5rem',
-                        color: '#000',
-                        fontFamily: 'var(--font-heading)',
-                        wordBreak: 'break-word'
-                    }}>
+                    <div className={styles.labelText}>
                         {tier.label}
                     </div>
                 ) : (
@@ -62,30 +48,13 @@ export function TierRow({ tier, onLabelChange, onColorChange, onDelete, readOnly
                         <input
                             value={tier.label}
                             onChange={(e) => onLabelChange && onLabelChange(e.target.value)}
-                            style={{
-                                background: 'transparent',
-                                border: 'none',
-                                textAlign: 'center',
-                                fontWeight: 900,
-                                fontSize: '1.5rem',
-                                width: '100%',
-                                color: '#000',
-                                outline: 'none',
-                                fontFamily: 'var(--font-heading)'
-                            }}
+                            className={styles.labelInput}
                         />
                         <input
                             type="color"
                             value={tier.color}
                             onChange={(e) => onColorChange && onColorChange(e.target.value)}
-                            style={{
-                                width: '20px',
-                                height: '20px',
-                                border: '2px solid black',
-                                padding: 0,
-                                cursor: 'pointer',
-                                marginTop: '0.5rem'
-                            }}
+                            className={styles.colorPicker}
                         />
                     </>
                 )}
@@ -93,16 +62,7 @@ export function TierRow({ tier, onLabelChange, onColorChange, onDelete, readOnly
 
             {/* Droppable Area */}
             {readOnly ? (
-                <div style={{
-                    flex: 1,
-                    background: '#262626',
-                    border: '3px solid var(--color-border-heavy)',
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '0.5rem',
-                    padding: '0.5rem',
-                    alignItems: 'center'
-                }}>
+                <div className={styles.droppable}>
                     {tier.items.map((item) => (
                         <TierItemDisplay key={item.id} character={item} />
                     ))}
@@ -113,19 +73,7 @@ export function TierRow({ tier, onLabelChange, onColorChange, onDelete, readOnly
                     items={tier.items.map(item => `${tier.id}-${item.id}`)}
                     strategy={horizontalListSortingStrategy}
                 >
-                    <div
-                        ref={setNodeRef}
-                        style={{
-                            flex: 1,
-                            background: '#262626',
-                            border: '3px solid var(--color-border-heavy)',
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            gap: '0.5rem',
-                            padding: '0.5rem',
-                            alignItems: 'center'
-                        }}
-                    >
+                    <div ref={setNodeRef} className={styles.droppable}>
                         {tier.items.map((item) => (
                             <SortableItem
                                 key={`${tier.id}-${item.id}`}
@@ -134,7 +82,7 @@ export function TierRow({ tier, onLabelChange, onColorChange, onDelete, readOnly
                             />
                         ))}
                         {tier.items.length === 0 && (
-                            <div style={{ opacity: 0.2, color: 'white', width: '100%', textAlign: 'center' }}>
+                            <div className={styles.dropPlaceholder}>
                                 {t('tierlist.drop_items_here')}
                             </div>
                         )}
@@ -144,17 +92,9 @@ export function TierRow({ tier, onLabelChange, onColorChange, onDelete, readOnly
 
             {/* Controls */}
             {!readOnly && (
-                <div style={{
-                    background: '#111',
-                    width: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '3px solid var(--color-border-heavy)',
-                    borderLeft: 'none'
-                }}>
+                <div className={styles.controls}>
                     {onDelete && (
-                        <button onClick={onDelete} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}>
+                        <button onClick={onDelete} className={styles.deleteButton}>
                             <X size={20} />
                         </button>
                     )}

@@ -1,60 +1,98 @@
-# Firebase & Backend Architecture ☁️
+# Firebase Backend Documentation
 
-Bingeki V2 is a "Serverless" application relying heavily on **Firebase** for its backend infrastructure.
+This document outlines the Firebase-powered backend architectural patterns, data models, and server-side logic used in Bingeki.
 
-## 1. Cloud Firestore (NoSQL Database)
+## Firestore Data Architecture
 
-We use Firestore as our primary database. It is structured into high-level collections with strictly defined security rules.
+Bingeki follows a hybrid structure of root collections for global features and user-centric subcollections for private data.
 
-### Core Collections:
-*   **`users/`**: Profile data, levels, XP, and settings.
-    *   **`data/gamification`**: Persistent RPG stats (Nen chart, badges).
-    *   **`data/library`**: User's manga/anime collection.
-*   **`news/`**: Global articles and updates.
-*   **`activities/`**: Public feed of user actions (Watch/Read/Level up).
-*   **`watchparties/`**: Real-time synchronization data for shared sessions.
+### 1. User Documents (`/users/{userId}`)
+The root of all user data. Contains essential profile information synced for social features and leaderboards.
 
-### Security Strategy (`firestore.rules`):
-*   **Authentication**: Most read/write operations require an authenticated user.
-*   **Ownership**: Users can only write to their own `/users/{userId}` sub-collections.
-*   **Admin Role**: Users with the `isAdmin: true` flag in their document bypass common write restrictions for moderation.
-*   **Server-Side Only**: Fields like `isAdmin`, `isBanned`, and `createdAt` are protected from client-side updates.
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `uid` | string | Unique identifier from Firebase Auth |
+| `displayName` | string | User-chosen name |
+| `xp` | number | Current level progress |
+| `level` | number | Current user level |
+| `totalXp` | number | Cumulative XP (used for ranking) |
+| `badges` | array | List of earned badge objects |
 
----
+#### User Data Subcollections
+*   **`/data/library`**: Stores the user's manga/anime list (`works` array).
+*   **`/data/gamification`**: Stores detailed progress, streaks, and bonus XP history.
+*   **`/friends`**: Stores friendship status and friend profile snapshots (managed by Cloud Functions).
 
-## 2. Cloud Functions & SEO Handler 🤖
-
-The `seoHandler` is a critical Firebase Function that acts as a middleware between the user (or bot) and the application.
-
--   **Rewrites**: Configured in `firebase.json`, it intercepts requests to profiles, news articles, and common landing pages.
--   **Bot Detection**: Uses the `isBot` utility to detect crawlers (Google, Discord, Twitter).
--   **Dynamic Metadata**:
-    1.  Fetches the target data (e.g., User Profile) from Firestore.
-    2.  Injects specific `<meta>` tags (OpenGraph, Twitter Cards) into the HTML document.
-    3.  Serves the modified HTML to the requester.
--   **Localized Entry Points**: Serves `index-en.html` or `index-fr.html` depending on the URL path.
+### 2. Global Collections
+*   **`/news`**: Manga/Anime news articles.
+*   **`/activities`**: Global/Friend activity feed (Read-only for clients).
+*   **`/comments`**: User comments on news or works.
+*   **`/challenges`**: Global events and community goals.
 
 ---
 
-## 3. Storage & Binary Assets
+## Security Rules (`firestore.rules`)
 
-We use Firebase Storage for user-generated content and shared assets.
+Security is built on a "Closed by Default" principle.
 
-*   **Profiles**: `/users/{userId}/avatars/`
-*   **Dynamic OG Images**: `/assets/og/` (generated via the SEO handler or manually).
+### Key Security Patterns
+1.  **Ownership Check**: `request.auth.uid == userId` ensures users can only write to their own data.
+2.  **Field Protection**: Prevent users from manually promoting themselves to Admin by blocking updates to the `isAdmin` field in `/users/{userId}`.
+3.  **Server-Only Writes**: The `/activities` and `/friends` collections are locked for clients (`allow write: if false`). These are managed exclusively via Admin SDK in Cloud Functions.
+
+```javascript
+// Example: Blocking specific field updates
+allow update: if isOwner(userId) && 
+              !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned']);
+```
 
 ---
 
-## 4. Hosting & Domain Management
+## Cloud Functions (`functions/index.js`)
 
-*   **Site ID**: `bingeki`
-*   **Security Headers**: We implement strict Content-Security-Policy (CSP) and Permissions-Policy headers via `firebase.json` to ensure a premium, secure user experience.
-*   **Asset Hashing**: Vite generates hashed filenames for assets, which are cached long-term, while `index.html` and `sw.js` are never cached (`no-cache`).
+Bingeki leverages Firebase Functions (v2) for specialized tasks that require elevated privileges or server-side rendering.
+
+### 1. SEO & Dynamic OG Images (`seoHandler`)
+A production-grade Express app running as a Function to provide:
+*   **Dynamic Meta Tags**: Injects `<meta>` tags based on the requested route (Profile, News, etc.).
+*   **OG-Image Generation**: Returns on-the-fly generated SVGs (Hunter License style) for social sharing.
+*   **Localization**: Serves localized versions of `index.html` based on URL prefix (`/en` or `/fr`).
+
+### 2. Gamification Engine (`onLibraryUpdate`)
+A Firestore trigger that automatically synchronizes data when a user's library changes.
+*   **Automatic XP**: Calculates XP based on chapters read/watched.
+*   **Badge Detection**: Automatically unlocks badges (e.g., "Otaku" for 25 works).
+*   **Anti-Cheat**: Implements server-side hard caps for XP to prevent manual data injection.
+*   **Activity Logging**: Automatically logs "Read", "Watched", or "Completed" events to the global feed.
+
+### 3. Social Logic (`sendFriendRequestFn`, etc.)
+Dedicated `onCall` functions for managing friendships.
+*   Ensures mutual acceptance before displaying users as friends.
+*   Maintains data integrity by updating both users' friend subcollections atomically.
 
 ---
 
-## 🛠️ Modifying the Backend
+## Service Layer (`src/firebase/firestore.ts`)
 
-1.  **Rules**: Edit `firestore.rules` or `storage.rules`. ALWAYS run `npm test` after modifying rules to ensure no regressions.
-2.  **Functions**: Source code is in the `functions/` directory. Deploy using `firebase deploy --only functions`.
-3.  **Indexes**: Required for complex queries (e.g., sorting by XP across all users). Defined in `firestore.indexes.json`.
+The frontend interacts with Firestore through a clean service layer.
+
+### Pattern: Safe Data Merging
+To prevent accidental data loss during multi-device sync, we use a `mergeLibraryData` utility before saving to Firestore.
+
+```typescript
+export async function saveLibraryToFirestore(userIdStr, works, folders) {
+    const docRef = doc(db, 'users', userIdStr, 'data', 'library');
+    const existing = (await getDoc(docRef)).data();
+    
+    // Create backup before merge
+    logDataBackup(userIdStr, 'library', existing);
+    
+    const mergedWorks = mergeLibraryData(works, existing?.works);
+    await setDoc(docRef, { works: mergedWorks, ... }, { merge: true });
+}
+```
+
+### Key Service Methods
+*   `saveUserProfileToFirestore`: Keeps Auth Profile and Firestore Profile in sync.
+*   `loadFullLibraryData`: Loads works, folders, and sharing settings.
+*   `getFilteredLeaderboard`: Fetches the top hunters based on XP or Chapters.

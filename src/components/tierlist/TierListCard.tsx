@@ -3,6 +3,7 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { Heart, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
+import styles from './TierListCard.module.css';
 
 interface TierListCardProps {
     tierList: TierList;
@@ -23,37 +24,14 @@ export function TierListCard({ tierList }: TierListCardProps) {
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ x: -2, y: -2, boxShadow: '8px 8px 0 var(--color-primary)' }}
             onClick={() => navigate(`/${lang}/tierlist/${tierList.id}`)}
-            className="tier-list-card"
-            style={{
-                background: '#1a1a1a',
-                border: '3px solid var(--color-border-heavy)',
-                borderRadius: 0,
-                boxShadow: '4px 4px 0 var(--color-shadow-solid)',
-                overflow: 'hidden',
-                cursor: 'pointer',
-                display: 'flex',
-                flexDirection: 'column'
-            }}
+            className={styles.card}
         >
             {/* Preview Section */}
-            <div style={{
-                height: '100px',
-                background: previewTier?.color || '#333',
-                padding: '0.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                overflow: 'hidden'
-            }}>
-                <div style={{
-                    writingMode: 'vertical-rl',
-                    textOrientation: 'upright',
-                    fontWeight: 900,
-                    fontSize: '1.2rem',
-                    color: '#000',
-                    marginRight: '0.5rem',
-                    fontFamily: 'var(--font-heading)'
-                }}>
+            <div
+                className={styles.preview}
+                style={{ background: previewTier?.color || 'var(--color-border)' }}
+            >
+                <div className={styles.previewLabel}>
                     {previewTier?.label || 'RANK'}
                 </div>
                 {previewItems.map(item => (
@@ -61,12 +39,8 @@ export function TierListCard({ tierList }: TierListCardProps) {
                         key={item.id}
                         src={item.image}
                         alt={item.name}
-                        style={{
-                            width: '60px',
-                            height: '80px',
-                            borderRadius: 0,
-                            border: '2px solid black'
-                        }}
+                        className={styles.previewImage}
+                        style={{ width: '60px', height: '80px' }}
                         objectFit="cover"
                         showSkeleton={false}
                     />
@@ -74,27 +48,33 @@ export function TierListCard({ tierList }: TierListCardProps) {
             </div>
 
             {/* Info Section */}
-            <div style={{ padding: '1rem' }}>
-                <h3 style={{
-                    margin: '0 0 0.5rem 0',
-                    fontSize: '1.2rem',
-                    color: 'white',
-                    fontFamily: 'var(--font-heading)'
-                }}>
+            <div className={styles.info}>
+                <h3 className={styles.infoTitle}>
                     {tierList.title}
                 </h3>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#888', fontSize: '0.9rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div className={styles.infoMeta}>
+                    <div className={styles.metaAuthor}>
                         {tierList.authorPhoto ? (
-                            <OptimizedImage src={tierList.authorPhoto} style={{ width: 24, height: 24, borderRadius: '50%' }} alt="Author" objectFit="cover" showSkeleton={false} />
+                            <OptimizedImage
+                                src={tierList.authorPhoto}
+                                className={styles.authorAvatar}
+                                style={{ width: 24, height: 24 }}
+                                alt="Author"
+                                objectFit="cover"
+                                showSkeleton={false}
+                            />
                         ) : (
                             <User size={16} />
                         )}
                         <span>{tierList.authorName}</span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                        <Heart size={16} fill={tierList.likes.length > 0 ? '#ef4444' : 'none'} color={tierList.likes.length > 0 ? '#ef4444' : '#888'} />
+                    <div className={styles.metaLikes}>
+                        <Heart
+                            size={16}
+                            fill={tierList.likes.length > 0 ? 'var(--color-primary)' : 'none'}
+                            color={tierList.likes.length > 0 ? 'var(--color-primary)' : 'var(--color-text-dim)'}
+                        />
                         <span>{tierList.likes.length}</span>
                     </div>
                 </div>

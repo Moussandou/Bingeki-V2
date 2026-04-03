@@ -80,7 +80,7 @@ export default function TierListFeed() {
 
                 {/* Grid */}
                 {loading ? (
-                    <div style={{ color: 'white', textAlign: 'center', padding: '4rem' }}>
+                    <div className={styles.loadingState}>
                         {t('common.loading')}
                     </div>
                 ) : lists.length > 0 ? (

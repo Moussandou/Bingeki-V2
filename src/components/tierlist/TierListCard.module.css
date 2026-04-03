@@ -1,0 +1,82 @@
+/* Card container */
+.card {
+    background: var(--color-surface);
+    border: 3px solid var(--color-border-heavy);
+    border-radius: 0;
+    box-shadow: 4px 4px 0 var(--color-shadow-solid);
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Preview strip — background stays inline (dynamic tier color) */
+.preview {
+    height: 100px;
+    padding: var(--space-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+/* Tier label in preview — contrast trick for any tier color */
+.previewLabel {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    font-weight: 900;
+    font-size: 1.2rem;
+    font-family: var(--font-heading);
+    margin-right: var(--space-sm);
+    flex-shrink: 0;
+    filter: invert(1) grayscale(1) contrast(9);
+}
+
+/* Preview character images */
+.previewImage {
+    border-radius: 0;
+    border: 2px solid var(--color-border-heavy);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* Info section */
+.info {
+    padding: var(--space-md);
+}
+
+.infoTitle {
+    margin: 0 0 var(--space-sm) 0;
+    font-size: 1.2rem;
+    color: var(--color-text);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* Meta row */
+.infoMeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--color-text-dim);
+    font-size: 0.9rem;
+}
+
+.metaAuthor {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.authorAvatar {
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.metaLikes {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}

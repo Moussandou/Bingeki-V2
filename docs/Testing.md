@@ -1,65 +1,108 @@
 # Testing Strategy 🧪
 
-Bingeki V2 follows a multi-layered testing strategy to ensure reliability, performance, and accessibility.
+Bingeki V2 employs a multi-layered testing strategy to ensure reliability across global state, UI components, and critical user journeys.
 
-## 1. Unit & Integration Testing (Vitest)
+## 1. Unit Testing (Vitest)
 
-We use **Vitest** for fast, concurrent execution of unit and integration tests.
+We use **Vitest** for testing "pure" logic, such as Zustand stores and utility functions.
 
--   **Command**: `npm test` or `npm run test:run`
--   **Config**: `vitest.config.ts`
--   **Environment**: `jsdom` (simulates a browser environment)
--   **Coverage**: `npm run test:coverage` (outputs to `coverage/`)
+### Example: Zustand Store Test
+Testing the `gamificationStore.ts` ensures that XP calculations and level-ups are deterministic.
+```typescript
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { useGamificationStore } from './gamificationStore';
 
-### Key Areas Tested:
-*   **Utils**: Business logic, date formatting, and XP calculation.
-*   **Hooks**: Custom React hooks ensuring state transitions are correct.
-*   **Store**: Zustand stores and their persistence logic.
-*   **Components**: Core UI atoms and complex layout blocks.
+describe('Gamification Store', () => {
+    beforeEach(() => {
+        useGamificationStore.getState().resetStore();
+    });
 
----
-
-## 2. End-to-End Testing (Playwright)
-
-**Playwright** is used to verify critical user flows in real browser environments.
-
--   **Command**: `npm run test:e2e`
--   **Interactive Mode**: `npm run test:e2e:ui`
--   **Config**: `playwright.config.ts`
-
-### Critical Flows Verified:
-*   **Authentication**: Login, signup, and session persistence.
-*   **Library Management**: Adding/removing works, updating progress.
-*   **PWA Install**: Ensuring the installation prompt appears and functions.
-*   **Social**: Creating watch parties and sending friend requests.
+    it('should add XP and level up correctly', () => {
+        const { addXp } = useGamificationStore.getState();
+        
+        // Level 1 -> Level 2 requires 100 XP
+        addXp(100);
+        
+        const state = useGamificationStore.getState();
+        expect(state.level).toBe(2);
+        expect(state.xp).toBe(0);
+        expect(state.totalXp).toBe(100);
+    });
+});
+```
 
 ---
 
-## 3. Performance & Audit (Lighthouse CI)
+## 2. Component Testing (React Testing Library)
 
-We automate performance monitoring using **Lighthouse CI** to prevent regression in core web vitals.
+Integrated with Vitest, **RTL** is used to test how components render and interact with the user, mocking the necessary stores.
 
--   **Command**: `npm run audit`
--   **Config**: `lighthouserc.json`
--   **Targets**:
-    *   **Performance**: Min Score 0.7
-    *   **Accessibility**: Min Score 0.8
-    *   **Best Practices**: Min Score 0.8
-    *   **SEO**: Min Score 0.8
+### Example: Header Component
+Testing conditional rendering based on authentication state.
+```tsx
+import { render, screen } from '@testing-library/react';
+import { Header } from '../Header';
+import { useAuthStore } from '@/store/authStore';
+
+vi.mock('@/store/authStore');
+
+it('renders login button for guest users', () => {
+    // Mocking the store return value
+    (useAuthStore as any).mockReturnValue({
+        user: null,
+        userProfile: null,
+    });
+
+    render(<Header />);
+    expect(screen.getByText('header.login')).toBeInTheDocument();
+});
+```
 
 ---
 
-## 4. Internationalization Validation
+## 3. End-to-End (E2E) Testing (Playwright)
 
-A custom script ensures that no translation keys are missing between supported locales.
+We use **Playwright** to simulate real browser interactions on the production build.
 
--   **Command**: `npm run validate:i18n`
--   **Script**: `scripts/check-translations.ts`
+### Core Flows Tested:
+- **Authentication**: Login, Logout, and Protected Routes.
+- **Library Management**: Adding/Removing titles from the collection.
+- **PWA Features**: Offline mode and manifest validity.
+
+### Example: Critical Path Spec
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('User can add a manga to their library', async ({ page }) => {
+    await page.goto('/en/discover');
+    
+    // Search for a title
+    await page.fill('input[placeholder*="Search"]', 'One Piece');
+    await page.press('input', 'Enter');
+    
+    // Click the "Add" button on the first result
+    await page.click('button:has-text("Add")');
+    
+    // Verify it appears in the library
+    await page.goto('/en/library');
+    await expect(page.locator('text=One Piece')).toBeVisible();
+});
+```
 
 ---
 
-## 🏗️ Writing New Tests
+## 4. Performance & SEO Audits
 
-1.  **Unit Tests**: Create a file with `.test.ts` or `.test.tsx` next to the file being tested.
-2.  **E2E Tests**: Add new test cases in the `tests/e2e/` directory.
-3.  **Mocking Firebase**: Use the mocks provided in `src/test/setup.tsx` to simulate Firestore and Auth behaviors without making real network requests.
+Every Pull Request undergoes automated audits via **GitHub Actions**:
+1.  **Lighthouse**: Audits for Performance (90+), Accessibility (100), and SEO (100).
+2.  **Trivy**: Scours dependencies for security vulnerabilities.
+3.  **i18n Validation**: Ensures no missing translation keys in `fr.json` vs `en.json`.
+
+## 🚀 Running Tests
+
+| Command | Purpose |
+| :--- | :--- |
+| `npm run test` | Run Vitest unit & component tests. |
+| `npm run test:ui` | Open Vitest interactive UI. |
+| `npm run e2e` | Run Playwright E2E tests (requires `npm run build`). |
+| `npm run audit` | Run full build, lint, and type-check suite. |

@@ -4,9 +4,9 @@
     display: flex;
     gap: 2rem;
     flex-direction: column;
-    background: #09090b;
+    background: var(--color-background);
     min-height: calc(100vh - 80px);
-    color: white;
+    color: var(--color-text);
     font-family: var(--font-body);
 }
 
@@ -30,11 +30,11 @@
     font-family: var(--font-heading);
     background: transparent;
     border: none;
-    border-bottom: 4px solid white;
+    border-bottom: 4px solid var(--color-border-heavy);
     outline: none;
     width: 100%;
     max-width: 500px;
-    color: white;
+    color: var(--color-text);
     padding-bottom: 0.5rem;
     font-weight: 900;
     text-transform: uppercase;
@@ -58,22 +58,20 @@
 
 .board {
     flex: 3;
-    background: #111;
+    background: var(--color-background);
     padding: 1.5rem;
     overflow-y: auto;
-    border: 3px solid white;
-    box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.1);
+    border: 3px solid var(--color-border-heavy);
+    box-shadow: 8px 8px 0 var(--color-shadow-solid);
     border-radius: 0;
-    /* Brutalist - no radius */
 }
 
 .poolContainer {
     flex: 1;
     min-width: 320px;
-    background: #111;
-    border: 3px solid white;
-    box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.1);
-    /* height: 100%; handled by flex parent but good to ensure */
+    background: var(--color-background);
+    border: 3px solid var(--color-border-heavy);
+    box-shadow: 8px 8px 0 var(--color-shadow-solid);
     overflow-y: auto;
 }
 
@@ -81,12 +79,12 @@
 .trashZone {
     height: 100px;
     margin-top: 2rem;
-    border: 3px dashed #444;
+    border: 3px dashed var(--color-border);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #666;
-    background: #000;
+    color: var(--color-text-dim);
+    background: var(--color-surface);
     transition: all 0.2s;
     gap: 1rem;
     text-transform: uppercase;
@@ -94,9 +92,9 @@
 }
 
 .trashZoneActive {
-    border-color: #ef4444;
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
+    border-color: var(--color-primary);
+    background: rgba(255, 46, 99, 0.1);
+    color: var(--color-primary);
     transform: scale(1.02);
 }
 
@@ -156,7 +154,7 @@
     .poolContainer {
         min-width: 0;
         flex: none;
-        height: 50vh; /* Better scroll space for dragging */
+        height: 50vh;
         border-width: 2px;
     }
 

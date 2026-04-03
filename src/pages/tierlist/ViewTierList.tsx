@@ -6,11 +6,13 @@ import { getTierListById, toggleTierListLike, deleteTierList } from '@/firebase/
 import type { TierList } from '@/firebase/firestore';
 import { TierRow } from '@/components/tierlist/TierRow';
 import { Button } from '@/components/ui/Button';
-import { Download, Copy, User, Calendar, Heart, Trash2 } from 'lucide-react';
+import { Download, Copy, User, Calendar, Heart, Trash2, ArrowLeft } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { useToast } from '@/context/ToastContext';
 import { useAuthStore } from '@/store/authStore';
 import { logger } from '@/utils/logger';
+import { cn } from '@/utils/cn';
+import styles from './ViewTierList.module.css';
 
 export default function ViewTierList() {
     const { t } = useTranslation();
@@ -98,7 +100,7 @@ export default function ViewTierList() {
     if (loading) {
         return (
             <Layout>
-                <div style={{ padding: '4rem', textAlign: 'center', color: 'white' }}>{t('common.loading')}</div>
+                <div className={styles.loading}>{t('common.loading')}</div>
             </Layout>
         );
     }
@@ -106,9 +108,11 @@ export default function ViewTierList() {
     if (!tierList) {
         return (
             <Layout>
-                <div style={{ padding: '4rem', textAlign: 'center', color: 'white' }}>
+                <div className={styles.notFound}>
                     <h2>{t('tierlist.not_found')}</h2>
-                    <Button onClick={() => navigate(`/${lang}/tierlist`)} variant="outline">{t('tierlist.back_to_feed')}</Button>
+                    <Button onClick={() => navigate(`/${lang}/tierlist`)} variant="outline">
+                        {t('tierlist.back_to_feed')}
+                    </Button>
                 </div>
             </Layout>
         );
@@ -119,49 +123,40 @@ export default function ViewTierList() {
 
     return (
         <Layout>
-            <div className="container" style={{ padding: '2rem' }}>
-                {/* Header Info */}
-                <div style={{ marginBottom: '2rem', color: 'white' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                            <h1 style={{
-                                fontSize: '3rem',
-                                fontFamily: 'var(--font-heading)',
-                                margin: '0 0 1rem 0',
-                                lineHeight: 1
-                            }}>
-                                {tierList.title}
-                            </h1>
-                            <div style={{ display: 'flex', gap: '2rem', color: '#888' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div className={`container ${styles.container}`}>
+                {/* Header */}
+                <div className={styles.header}>
+                    <div className={styles.backButton}>
+                        <Button
+                            variant="ghost"
+                            icon={<ArrowLeft size={16} />}
+                            onClick={() => navigate(`/${lang}/tierlist`)}
+                        >
+                            {t('tierlist.back_to_feed')}
+                        </Button>
+                    </div>
+
+                    <div className={styles.titleRow}>
+                        <div className={styles.titleBlock}>
+                            <h1 className={styles.title}>{tierList.title}</h1>
+                            <div className={styles.meta}>
+                                <div className={styles.metaItem}>
                                     <User size={18} />
                                     <span>{t('tierlist.created_by')} <strong>{tierList.authorName}</strong></span>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <div className={styles.metaItem}>
                                     <Calendar size={18} />
                                     <span>{new Date(tierList.createdAt).toLocaleDateString()}</span>
                                 </div>
                             </div>
                         </div>
-                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                            {/* Like button */}
+
+                        <div className={styles.actions}>
                             {user && (
                                 <button
                                     onClick={handleLike}
                                     disabled={likeLoading}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.4rem',
-                                        background: 'transparent',
-                                        border: '1px solid #444',
-                                        borderRadius: '4px',
-                                        color: hasLiked ? '#e74c3c' : '#888',
-                                        cursor: likeLoading ? 'default' : 'pointer',
-                                        padding: '0.5rem 0.75rem',
-                                        fontSize: '0.9rem',
-                                        transition: 'color 0.2s, border-color 0.2s',
-                                    }}
+                                    className={cn(styles.likeButton, hasLiked && styles.likeButtonActive)}
                                 >
                                     <Heart size={18} fill={hasLiked ? 'currentColor' : 'none'} />
                                     <span>{tierList.likes.length}</span>
@@ -173,7 +168,6 @@ export default function ViewTierList() {
                             <Button onClick={() => navigate(`/${lang}/tierlist/create`)} variant="outline" icon={<Copy size={20} />}>
                                 {t('tierlist.create_your_own')}
                             </Button>
-                            {/* Delete button — author only */}
                             {isAuthor && (
                                 <Button onClick={handleDelete} variant="ghost" icon={<Trash2 size={18} />}>
                                     {t('tierlist.delete_button')}
@@ -184,15 +178,7 @@ export default function ViewTierList() {
                 </div>
 
                 {/* Tier List Display */}
-                <div
-                    ref={tiersRef}
-                    style={{
-                        background: '#111',
-                        padding: '1rem',
-                        border: '3px solid var(--color-border-heavy)',
-                        borderRadius: 0
-                    }}
-                >
+                <div ref={tiersRef} className={styles.tiersPanel}>
                     {tierList.tiers.map(tier => (
                         <TierRow
                             key={tier.id}

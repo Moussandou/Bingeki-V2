@@ -376,7 +376,7 @@ export default function CreateTierList() {
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center',
                                 borderRadius: '4px',
-                                border: '2px solid white',
+                                border: '2px solid var(--color-border-heavy)',
                                 boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
                             }} />
                         ) : null}

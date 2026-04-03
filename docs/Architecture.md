@@ -1,91 +1,122 @@
 # Architecture & Tech Stack 🏗️
 
-## Technology Stack
+Bingeki V2 is designed as a high-performance, mobile-first Progressive Web App (PWA). The architecture prioritizes **speed**, **maintainability**, and a **"Brutalist Manga"** aesthetic.
 
-| Category | Technology | Purpose |
-| :--- | :--- | :--- |
-| **Frontend** | React 18 | Component-based UI library. |
-| **Language** | TypeScript | Type safety and developer experience. |
-| **Build Tool** | Vite | Extremely fast dev server and bundler. |
-| **Styling** | CSS Modules | Scoped component styling with Vanilla CSS variables. |
-| **State** | Zustand | Lightweight global state management. |
-| **Backend** | Firebase | Auth, Firestore (NoSQL DB), Storage, Hosting. |
-| **Icons** | Lucide React | Consistent, lightweight vector icons. |
-| **Charts** | Recharts | Visualization for the "Nen Chart". |
-| **Animations** | Framer Motion | Fluid layouts and gesture-based animations. |
-| **Imaging** | OptimizedImage | Custom component with `wsrv.nl` proxying & lazy loading. |
+## ⚛️ React Strategy
 
-## Project Structure
+Bingeki uses **React 18** to leverage modern concurrent features while maintaining a lightweight footprint.
 
-```
-src/
-├── components/          # React Components
-│   ├── ui/              # Atom-level UI (Button, Card, Modal)
-│   ├── layout/          # Layout blocks (Header, Footer, SEO)
-│   ├── library/         # Library-specific components
-│   ├── profile/         # Profile & Stats components
-│   └── pwa/             # PWA Install logic
-├── pages/               # Route Pages
-│   ├── Dashboard/       # Home/Summary view
-│   ├── Library/         # Main collection view
-│   ├── WorkDetails/     # Specific Anime/Manga details
-│   └── Social/          # Friends & Challenges
-├── store/               # Zustand Stores
-│   ├── authStore.ts     # User session & profile data
-│   ├── libraryStore.ts  # CRUD for user's collection
-│   └── settingsStore.ts # Theme & Preference config
-├── firebase/            # Firebase Config & Helpers
-├── services/            # External APIs (Jikan/MyAnimeList)
-├── styles/              # Global variables & resets
-└── i18n.ts              # Internationalization config
+### Why React?
+1.  **Component-Based Architecture**: Allows for reusable UI "Atoms" (Buttons, Inputs) and "Molecules" (ActionCards, Modals).
+2.  **Ecosystem**: Native integration with **Framer Motion** for layout transitions and **React Router 7** for nested routing.
+3.  **PWA Compatibility**: React's lifecycle methods and hooks (like `useEffect` and `useSyncExternalStore`) make it ideal for handling offline states and background sync.
+
+### Pattern: Functional Components & Hooks
+We exclusively use Functional Components with specialized custom hooks for side effects.
+```tsx
+// Example of a data-fetching hook with Jikan API
+export function useAnimeSearch(query: string) {
+    const [results, setResults] = useState<Anime[]>([]);
+    useEffect(() => {
+        if (!query) return;
+        const fetchAnime = async () => {
+            const data = await jikanService.search(query);
+            setResults(data);
+        };
+        fetchAnime();
+    }, [query]);
+    return results;
+}
 ```
 
-## Data Schema (Firestore)
+---
 
-### `users/{userId}`
-Stores user profile and gamification stats.
-- `displayName`, `photoURL`
-- `level`, `xp`, `streak`
-- `badges`: Array of unlocked badge IDs.
-- `nenStats`: { passion, diligence, ... }
+## 📦 State Management (Zustand)
 
-### `users/{userId}/works/{workId}`
-Sub-collection for the user's library.
-- `id`: Jikan ID
-- `title`, `image`
-- `type`: 'anime' | 'manga'
-- `status`: 'completed' | 'watching' | 'plan_to_watch'
-- `progress`: Number (chapters read / episodes watched)
-- `rating`: 0-5
+We use **Zustand** for global state. It was chosen over Redux for its minimal boilerplate and superior performance with React's concurrent rendering.
 
-### `users/{userId}/activities/{activityId}`
-Log of user actions for the social feed.
-- `type`: 'read', 'watch', 'level_up'
-- `targetName`: "One Piece", etc.
-- `timestamp`
+### Persistence & Middleware
+Most stores use the `persist` middleware to automatically sync state with `localStorage`.
+```typescript
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-### `watchparties/{partyId}`
-Shared state for synchronous viewing sessions.
+export const useLibraryStore = create<LibraryState>()(
+    persist(
+        (set, get) => ({
+            works: [],
+            addWork: (work) => set((state) => ({
+                works: [...state.works, { ...work, dateAdded: Date.now() }]
+            })),
+            getWork: (id) => get().works.find((w) => w.id === id),
+        }),
+        { name: 'bingeki-library-storage' }
+    )
+);
+```
 
-## SEO & Bot Optimization 🤖
+### Selector Pattern
+To prevent unnecessary re-renders, always use selectors when consuming state:
+```tsx
+// ❌ Bad: Re-renders on any store change
+const { works } = useLibraryStore();
 
-To ensure maximum visibility and a premium sharing experience, Bingeki implements a hybrid SEO strategy:
+// ✅ Good: Only re-renders if works array changes
+const works = useLibraryStore(state => state.works);
+```
 
-### Dynamic Meta-Tag Injection
-The `seoHandler` Firebase Cloud Function intercepts requests to profiles and news articles. It dynamically fetches data from Firestore and replaces meta tags in the HTML baseline:
--   **Security**: The handler blocks requests to static assets (`/assets/`) to prevent unauthorized file serving.
--   **Title & Description**: Localized based on URL path (`/fr/` or `/en/`).
--   **Open Graph (OG) & Twitter Tags**: Populated with specific user or article data.
--   **Canonical URLs**: Automatically generated to prevent duplicate content issues.
+---
 
-### Dynamic Social Previews
-Social media cards (OG images) are generated in two ways:
-1.  **Direct SVGs**: The `/api/og-image` route serves custom-crafted SVGs (e.g., "Hunter License" for profiles, news layouts for articles).
-2.  **Microlink Integration**: For high-fidelity social previews, we use Microlink to capture real-time screenshots of the app, proxied through a binary image endpoint.
+## 🎨 Styling Architecture
 
-### Bot-Specific Enhancements
-Bingeki detects crawlers (Googlebot, DiscordBot, etc.) via the `isBot` utility to optimize their experience:
--   **Forced Dark Theme**: Ensures that screenshots and crawls always capture the intended premium aesthetic.
--   **Permissions-Policy**: Includes `browsing-topics` for modern browser privacy compliance.
--   **Loading Screen Bypass**: Bots skip the initial animation sequences to access content immediately.
--   **X-SEO-Handler Header**: Responses generated by the SEO function include this header for debugging and cache management.
+Bingeki uses **Vanilla CSS** with **CSS Modules** and a **Global Token System**. This approach ensures maximum performance (zero-runtime CSS-in-JS) and prevents class name collisions.
+
+### 1. Global Tokens (`tokens.css`)
+We define all constants (colors, spacing, durations) as CSS Variables.
+```css
+:root {
+  --color-primary: #FF2E63;
+  --space-md: 1rem;
+  --duration-fast: 0.2s;
+}
+```
+
+### 2. CSS Modules
+Each component has its own `.module.css` file.
+```tsx
+import styles from './Button.module.css';
+
+export function Button({ children, variant = 'primary' }) {
+    return (
+        <button className={cn(styles.button, styles[variant])}>
+            {children}
+        </button>
+    );
+}
+```
+
+### 3. "Brutalist Manga" Implementation
+The manga aesthetic is achieved via thick borders, solid shadows, and high-energy hover states defined in `manga-theme.css`.
+```css
+.manga-panel {
+    border: 4px solid var(--color-border-heavy);
+    box-shadow: 6px 6px 0px var(--color-shadow-solid);
+    transition: transform var(--duration-fast) var(--ease-expo);
+}
+```
+
+---
+
+## 📁 Project Structure (Atomic Design Lite)
+
+-   `src/components/ui/`: **Atoms** - Basic building blocks (Button, Input, Badge). No business logic.
+-   `src/components/library/`: **Molecules/Organisms** - Domain-specific components (WorkCard, CollectionGrid).
+-   `src/pages/`: **Templates/Pages** - Full page layouts and route entry points.
+-   `src/store/`: **Global State** - Business logic and data persistence.
+-   `src/services/`: **External APIs** - Pure functions for API calls (Jikan, Firestore).
+
+## 🤖 SEO & Performance Highlights
+
+1.  **Hybrid Rendering**: Core shell is CSR (Client-Side Rendering) for speed, while `scripts/prerender.ts` generates static snapshots for SEO.
+2.  **Edge Interception**: Firebase Cloud Functions (`seoHandler`) inject dynamic OG tags for social sharing.
+3.  **Image Proxying**: Uses `wsrv.nl` for real-time resizing and WebP conversion to maintain a near-perfect Lighthouse score.

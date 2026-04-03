@@ -1,7 +1,7 @@
 .container {
     padding: 2rem;
     min-height: 80vh;
-    background: #09090b;
+    background: var(--color-background);
     border-radius: 0;
     margin-top: 1rem;
 }
@@ -18,7 +18,7 @@
     font-size: 3rem;
     font-weight: 900;
     font-family: var(--font-heading);
-    color: white;
+    color: var(--color-text);
     line-height: 1;
     margin: 0;
     text-transform: uppercase;
@@ -48,15 +48,27 @@
     padding: 4rem;
     border: 3px dashed var(--color-border);
     border-radius: 0;
-    color: var(--color-text-muted);
+    color: var(--color-text-dim);
     background: rgba(255, 255, 255, 0.02);
 }
 
 .emptyState h2 {
-    color: white;
+    color: var(--color-text);
     margin-bottom: 1rem;
     font-family: var(--font-heading);
     text-transform: uppercase;
+}
+
+/* Loading state */
+.loadingState {
+    padding: 4rem;
+    text-align: center;
+    color: var(--color-text-dim);
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
 }
 
 @media (max-width: 768px) {

@@ -1,0 +1,111 @@
+/* Row container */
+.row {
+    display: flex;
+    margin-bottom: 4px;
+    min-height: 100px;
+    background: var(--color-background);
+}
+
+/* Label column — background is dynamic (tier.color), only layout/border here */
+.labelCell {
+    width: 100px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: var(--space-sm);
+    border: 3px solid var(--color-border-heavy);
+    border-right: none;
+    position: relative;
+}
+
+/* Contrast trick: forces text to be either pure black or white
+   depending on the luminance of the tier color background.
+   Applied only to the text elements, not the cell itself. */
+.labelText {
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.5rem;
+    font-family: var(--font-heading);
+    word-break: break-word;
+    filter: invert(1) grayscale(1) contrast(9);
+}
+
+.labelInput {
+    background: transparent;
+    border: none;
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.5rem;
+    width: 100%;
+    outline: none;
+    font-family: var(--font-heading);
+    filter: invert(1) grayscale(1) contrast(9);
+}
+
+.colorPicker {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-border-heavy);
+    padding: 0;
+    cursor: pointer;
+    margin-top: var(--space-sm);
+    background: transparent;
+}
+
+/* Droppable area */
+.droppable {
+    flex: 1;
+    background: var(--color-surface);
+    border: 3px solid var(--color-border-heavy);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    align-items: center;
+    min-width: 0;
+}
+
+/* Drop placeholder — was opacity: 0.2 (unreadable), now 0.5 with dashed border */
+.dropPlaceholder {
+    opacity: 0.5;
+    color: var(--color-text-dim);
+    width: 100%;
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: var(--space-md);
+    border: 2px dashed var(--color-border);
+}
+
+/* Controls column */
+.controls {
+    background: var(--color-background);
+    width: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--color-border-heavy);
+    border-left: none;
+}
+
+/* Delete button */
+.deleteButton {
+    color: var(--color-primary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xs);
+    transition: opacity 0.15s;
+}
+
+.deleteButton:hover {
+    opacity: 0.7;
+}

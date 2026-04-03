@@ -1,0 +1,173 @@
+/* Pool container */
+.pool {
+    background: var(--color-surface);
+    border: 3px solid var(--color-border-heavy);
+    box-shadow: 4px 4px 0 var(--color-shadow-solid);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Header */
+.poolHeader {
+    padding: var(--space-md);
+    border-bottom: 3px solid var(--color-border-heavy);
+    background: var(--color-background);
+    flex-shrink: 0;
+}
+
+.poolTitle {
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    color: var(--color-text);
+    margin: 0 0 var(--space-sm) 0;
+    letter-spacing: 0.05em;
+}
+
+/* Mode tabs */
+.modeTabs {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+/* Search form */
+.searchForm {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.searchInput {
+    flex: 1;
+    padding: 0.5rem var(--space-sm);
+    background: var(--color-surface);
+    border: 2px solid var(--color-border-heavy);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    outline: none;
+    border-radius: 0;
+    min-width: 0;
+}
+
+.searchInput:focus {
+    border-color: var(--color-primary);
+    box-shadow: 2px 2px 0 var(--color-primary);
+}
+
+.searchInput::placeholder {
+    color: var(--color-text-dim);
+}
+
+/* Quick collections */
+.quickCollections {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    margin-top: var(--space-xs);
+}
+
+/* Scroll content */
+.poolContent {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-md);
+}
+
+/* Character grid */
+.characterGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    justify-content: center;
+}
+
+/* Pool item (wrapper for draggable) */
+.poolItem {
+    width: 60px;
+    height: 60px;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid var(--color-border-heavy);
+    border-radius: 0;
+    cursor: grab;
+    flex-shrink: 0;
+}
+
+.poolItem:active {
+    cursor: grabbing;
+}
+
+/* Work grid */
+.workGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+}
+
+/* Work card */
+.workCard {
+    cursor: pointer;
+    border: 2px solid var(--color-border);
+    border-radius: 0;
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.15s;
+}
+
+.workCard:hover {
+    border-color: var(--color-border-heavy);
+}
+
+/* Work title overlay */
+.workTitle {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 4px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--font-body);
+}
+
+/* Empty state */
+.emptyState {
+    text-align: center;
+    opacity: 0.5;
+    margin-top: 2rem;
+    color: var(--color-text-dim);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.emptyState p {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Loading state */
+.loadingState {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-text-dim);
+    opacity: 0.6;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.9rem;
+}

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { searchCharacters, getWorkCharacters, searchWorks } from '@/services/animeApi';
 import type { JikanCharacter, JikanResult } from '@/services/animeApi';
 import { useToast } from '@/context/ToastContext';
+import styles from './CharacterPool.module.css';
 
 // Define a unified Character type for the pool that covers both search results and work characters
 interface PoolCharacter {
@@ -36,22 +37,14 @@ function DraggablePoolItem({ character }: { character: PoolCharacter }) {
     return (
         <div
             ref={setNodeRef}
-            style={style}
+            style={{
+                ...style,
+                backgroundImage: `url(${character.images?.jpg?.image_url})`
+            }}
             {...listeners}
             {...attributes}
-            className="pool-item"
-        >
-            <div style={{
-                width: '60px',
-                height: '60px',
-                backgroundImage: `url(${character.images?.jpg?.image_url})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                borderRadius: '4px',
-                border: '2px solid black',
-                cursor: 'grab'
-            }} />
-        </div>
+            className={styles.poolItem}
+        />
     );
 }
 
@@ -150,11 +143,11 @@ export function CharacterPool() {
     };
 
     return (
-        <div style={{ background: 'white', border: '2px solid black', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '1rem', borderBottom: '2px solid black', background: '#f5f5f5' }}>
-                <h3 style={{ fontFamily: 'var(--font-heading)', margin: 0, marginBottom: '0.5rem' }}>{t('tierlist.characters')}</h3>
+        <div className={styles.pool}>
+            <div className={styles.poolHeader}>
+                <h3 className={styles.poolTitle}>{t('tierlist.characters')}</h3>
 
-                <div style={{ display: 'flex', marginBottom: '1rem', gap: '1rem' }}>
+                <div className={styles.modeTabs}>
                     <Button
                         size="sm"
                         variant={mode === 'character' ? 'primary' : 'outline'}
@@ -173,69 +166,62 @@ export function CharacterPool() {
                     </Button>
                 </div>
 
-                <form onSubmit={handleSearch} style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                <form onSubmit={handleSearch} className={styles.searchForm}>
                     <input
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         placeholder={mode === 'character' ? t('tierlist.search_name') : t('tierlist.search_anime')}
-                        style={{ flex: 1, padding: '0.5rem', border: '2px solid black' }}
+                        className={styles.searchInput}
                     />
                     <Button type="submit" size="sm" icon={<Search size={16} />}></Button>
                 </form>
 
-                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <div className={styles.quickCollections}>
                     <Button size="sm" variant="ghost" onClick={() => handleLoadCollection('jjk')}>JJK</Button>
                     <Button size="sm" variant="ghost" onClick={() => handleLoadCollection('naruto')}>Naruto</Button>
                     <Button size="sm" variant="ghost" onClick={() => handleLoadCollection('aot')}>AOT</Button>
                 </div>
             </div>
 
-            <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
+            <div className={styles.poolContent}>
                 {isLoading ? (
-                    <div style={{ textAlign: 'center', opacity: 0.5 }}>{t('common.loading')}</div>
+                    <div className={styles.loadingState}>{t('common.loading')}</div>
                 ) : (
                     <>
                         {mode === 'character' ? (
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
+                            <div className={styles.characterGrid}>
                                 {characters.map(char => (
                                     <DraggablePoolItem key={char.mal_id} character={char} />
                                 ))}
-                                {characters.length === 0 && !isLoading && (
-                                    <div style={{ textAlign: 'center', opacity: 0.5, marginTop: '2rem' }}>
-                                        <Info size={24} style={{ marginBottom: '0.5rem' }} />
+                                {characters.length === 0 && (
+                                    <div className={styles.emptyState}>
+                                        <Info size={24} />
                                         <p>{t('tierlist.no_characters')}</p>
                                     </div>
                                 )}
                             </div>
                         ) : (
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+                            <div className={styles.workGrid}>
                                 {works.map(work => (
                                     <div
                                         key={work.mal_id}
                                         onClick={() => handleWorkSelect(work.mal_id)}
-                                        style={{
-                                            cursor: 'pointer',
-                                            border: '2px solid transparent',
-                                            borderRadius: '4px',
-                                            overflow: 'hidden',
-                                            position: 'relative'
-                                        }}
-                                        className="hover:border-black transition-colors"
+                                        className={styles.workCard}
                                     >
-                                        <OptimizedImage src={work.images?.jpg?.image_url} alt={work.title} style={{ width: '100%', aspectRatio: '2/3' }} objectFit="cover" />
-                                        <div style={{
-                                            position: 'absolute', bottom: 0, left: 0, right: 0,
-                                            background: 'rgba(0,0,0,0.8)', color: 'white',
-                                            fontSize: '0.7rem', padding: '4px', textAlign: 'center',
-                                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-                                        }}>
+                                        <OptimizedImage
+                                            src={work.images?.jpg?.image_url}
+                                            alt={work.title}
+                                            style={{ width: '100%', aspectRatio: '2/3' }}
+                                            objectFit="cover"
+                                        />
+                                        <div className={styles.workTitle}>
                                             {work.title}
                                         </div>
                                     </div>
                                 ))}
-                                {works.length === 0 && !isLoading && (
-                                    <div style={{ textAlign: 'center', opacity: 0.5, marginTop: '2rem', gridColumn: 'span 2' }}>
-                                        <Info size={24} style={{ marginBottom: '0.5rem' }} />
+                                {works.length === 0 && (
+                                    <div className={styles.emptyState} style={{ gridColumn: 'span 2' }}>
+                                        <Info size={24} />
                                         <p>{t('tierlist.no_anime')}</p>
                                     </div>
                                 )}
@@ -244,6 +230,6 @@ export function CharacterPool() {
                     </>
                 )}
             </div>
-        </div >
+        </div>
     );
 }
