@@ -692,6 +692,7 @@ const resources = {
                     }
                 },
                 ranking: {
+                    title: "CLASSEMENT",
                     filter_by: "Par :",
                     xp: "XP",
                     chapters: "Chapitres",
@@ -2313,6 +2314,7 @@ const resources = {
                     }
                 },
                 ranking: {
+                    title: "RANKING",
                     filter_by: "By:",
                     xp: "XP",
                     chapters: "Chapters",
