@@ -176,6 +176,12 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // HEALTH HISTORY
+    match /admin_health_history/{historyId} {
+      // Only admins can read/write health history
+      allow read, write: if isAdmin();
+    }
+
     // ==================== LEGACY / ROOT ACCESS ====================
     // DELETED: Legacy root collections removed for security.
     // All data must go through users/{userId}/data/ subcollections.

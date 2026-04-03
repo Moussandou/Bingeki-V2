@@ -25,6 +25,9 @@ service firebase.storage {
       allow delete: if isAdmin();
     }
 
+    // ADMIN BUCKET LISTING (for health checks)
+    allow list: if isAdmin();
+
     // Existing rules for other paths...
     match /avatars/{userId} {
       allow read: if true;
