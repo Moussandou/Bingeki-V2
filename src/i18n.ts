@@ -788,7 +788,9 @@ const resources = {
                 share: "Partager",
                 share_text: "Découvre mon profil sur Bingeki !",
                 link_copied: "Lien du profil copié !",
-                share_failed: "Échec du partage"
+                share_failed: "Échec du partage",
+                private_title: "PROFIL PRIVÉ",
+                private_message: "Ce héros a choisi de garder ses exploits secrets."
             },
             gamification: {
                 level_up: "MONTÉE DE NIVEAU !",
@@ -2048,7 +2050,9 @@ const resources = {
                 share: "Share",
                 share_text: "Check out my profile on Bingeki!",
                 link_copied: "Profile link copied!",
-                share_failed: "Share failed"
+                share_failed: "Share failed",
+                private_title: "PRIVATE PROFILE",
+                private_message: "This hero has chosen to keep their exploits secret."
             },
             gamification: {
                 level_up: "LEVEL UP!",
