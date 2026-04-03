@@ -482,11 +482,16 @@ export default function AdminUsers() {
                                                 title="Edit Stats"
                                             ><Edit size={18} /></button>
                                             <button 
+                                                onClick={() => openDetailsModal(user)}
+                                                style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--color-primary)' }}
+                                                title="View Details"
+                                            ><Eye size={18} /></button>
+                                            <button 
                                                 onClick={() => handleBan(user.uid, user.isBanned)}
                                                 style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: user.isBanned ? '#22c55e' : '#ef4444' }}
                                                 title={user.isBanned ? 'Unban' : 'Ban'}
                                             ><Ban size={18} /></button>
-                                            <Link to={`/profile/${user.uid}`} style={{ color: 'var(--color-text)' }}><ExternalLink size={18} /></Link>
+                                            <Link to={`/profile/${user.uid}`} style={{ color: 'var(--color-text)' }} title="View Profile"><ExternalLink size={18} /></Link>
                                         </div>
                                     </td>
                                 </tr>
@@ -540,7 +545,7 @@ export default function AdminUsers() {
                             <table style={{ width: '100%', fontSize: '0.9rem', fontFamily: 'monospace' }}>
                                 <tbody>
                                     <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>Level:</td><td>{selectedUser.level || 1}</td></tr>
-                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>XP:</td><td>{selectedUser.xp || 0}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>XP:</td><td>{(selectedUser.xp || 0).toLocaleString()}</td></tr>
                                     <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Streak:</td><td>{selectedUser.streak || 0} days</td></tr>
                                     <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Last Login:</td><td>{selectedUser.lastLogin || 'N/A'}</td></tr>
                                 </tbody>

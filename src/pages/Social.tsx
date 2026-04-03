@@ -184,7 +184,8 @@ export default function Social() {
                 if (!friendsEnriched) {
                     currentFriends = await fetchFriends(true) || [];
                 }
-                const activityData = await getFriendsActivity(user.uid, 30, currentFriends);
+                const activityLimit = 100;
+                const activityData = await getFriendsActivity(user.uid, activityLimit, currentFriends);
                 // Filter activities where the author has disabled activity status
                 const filteredActivities = activityData.filter(a => {
                     const author = currentFriends.find(f => f.uid === a.userId);
@@ -394,7 +395,7 @@ export default function Social() {
                                 <div className={styles.activityGrid}>
                                     {groupedActivities.map((group: GroupedActivity) => (
                                         <div key={group.userId} className={styles.friendCard}>
-                                            <div className={styles.cardHeader}>
+                                            <Link to={`/profile/${group.userId}`} className={styles.cardHeader}>
                                                 <div style={{ 
                                                     width: 44, height: 44, 
                                                     borderRadius: '0', 
@@ -413,11 +414,11 @@ export default function Social() {
                                                 </div>
                                                 <div className={styles.friendName}>{group.userName}</div>
                                                 <ChevronRight size={16} style={{ marginLeft: 'auto', opacity: 0.5 }} />
-                                            </div>
+                                            </Link>
 
                                             <div className={styles.cardBody}>
                                                 <div className={styles.activityList}>
-                                                    {group.events.slice(0, 3).map((activity: ActivityEvent, idx: number) => {
+                                                    {group.events.map((activity: ActivityEvent, idx: number) => {
                                                         const timeDiff = Date.now() - activity.timestamp;
                                                         const hours = Math.floor(timeDiff / (1000 * 60 * 60));
                                                         const timeAgo = hours < 1 ? t('social.activity.time.less_than_hour') :
@@ -460,11 +461,6 @@ export default function Social() {
                                                         );
                                                     })}
                                                 </div>
-                                                {group.events.length > 3 && (
-                                                    <div style={{ fontSize: '0.75rem', opacity: 0.4, textAlign: 'center', paddingTop: '0.5rem', borderTop: '1px solid var(--color-border)' }}>
-                                                        + {group.events.length - 3} {t('social.activity.more', 'autres activités')}
-                                                    </div>
-                                                )}
                                             </div>
                                         </div>
                                     ))}

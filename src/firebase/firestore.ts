@@ -649,29 +649,38 @@ export async function getFriendsActivity(userId: string, limitCount: number = 20
         const friendIds = friends.filter(f => f.status === 'accepted').map(f => f.uid);
         if (friendIds.length === 0) return [];
 
-        // 2. Fetch activities from friends
-        // Firestore 'in' query limited to 30 items (not 10 as previously commented)
-        const batchedIds = friendIds.slice(0, 30);
-        const q = query(
-            collection(db, 'activities'),
-            where('userId', 'in', batchedIds),
-            orderBy('timestamp', 'desc'),
-            limit(limitCount)
-        );
-
-        const querySnapshot = await getDocs(q);
-        const activities: ActivityEvent[] = [];
+        // 2. Fetch activities from friends in batches of 30 (Firestore limit for 'in' query)
+        let allActivities: ActivityEvent[] = [];
         
-        // 3. Fetch fresh profiles for the active friends in these activities to ensure correct photos
-        const activeUserIds = Array.from(new Set(querySnapshot.docs.map(doc => doc.data().userId as string)));
+        // Loop through friends in chunks of 30
+        for (let i = 0; i < friendIds.length; i += 30) {
+            const batch = friendIds.slice(i, i + 30);
+            const q = query(
+                collection(db, 'activities'),
+                where('userId', 'in', batch),
+                orderBy('timestamp', 'desc'),
+                limit(limitCount)
+            );
+            
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach(doc => {
+                allActivities.push({ ...(doc.data() as ActivityEvent), id: doc.id });
+            });
+        }
+        
+        // 3. Post-process to merge multiple batches: Sort by time and limit to find global top activities
+        const sortedActivities = allActivities
+            .sort((a, b) => b.timestamp - a.timestamp)
+            .slice(0, limitCount);
+
+        // 4. Fetch fresh profiles for the active friends in these activities
+        const activeUserIds = Array.from(new Set(sortedActivities.map(a => a.userId)));
         let freshProfiles: UserProfile[] = [];
         if (activeUserIds.length > 0) {
             freshProfiles = await getUserProfiles(activeUserIds);
         }
 
-        querySnapshot.forEach((doc) => {
-            const data = doc.data() as ActivityEvent;
-            
+        const activities: ActivityEvent[] = sortedActivities.map(data => {
             // Priority: Freshly fetched Profile (most up to date) > Provided list (fallback) > Original activity data
             const profile = freshProfiles.find(p => p.uid === data.userId);
             if (profile) {
@@ -686,7 +695,7 @@ export async function getFriendsActivity(userId: string, limitCount: number = 20
                 }
             }
             
-            activities.push({ ...data, id: doc.id });
+            return { ...data };
         });
         
         return activities;

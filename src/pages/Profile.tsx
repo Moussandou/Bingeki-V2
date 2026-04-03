@@ -535,9 +535,17 @@ export default function Profile() {
                                     <div style={{ padding: '0.75rem', background: 'var(--color-primary)', color: '#fff' }}>
                                         <Flame size={24} />
                                     </div>
-                                    <div>
-                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{isOwnProfile ? works.filter(w => w.status === 'reading').length : '-'}</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.in_progress')}</p>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ 
+                                            fontSize: (isOwnProfile ? works.filter(w => w.status === 'reading').length : 0) > 999 ? '1.25rem' : '1.75rem', 
+                                            fontWeight: 900,
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
+                                        }}>
+                                            {isOwnProfile ? works.filter(w => w.status === 'reading').length : '-'}
+                                        </div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('profile.in_progress')}</p>
                                     </div>
                                 </div>
 
@@ -546,9 +554,17 @@ export default function Profile() {
                                     <div style={{ padding: '0.75rem', background: '#22c55e', color: '#fff' }}>
                                         <CheckCircle size={24} />
                                     </div>
-                                    <div>
-                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayWorksCompleted}</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.completed')}</p>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ 
+                                            fontSize: displayWorksCompleted > 999 ? '1.25rem' : '1.75rem', 
+                                            fontWeight: 900,
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
+                                        }}>
+                                            {displayWorksCompleted}
+                                        </div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('profile.completed')}</p>
                                     </div>
                                 </div>
 
@@ -557,9 +573,17 @@ export default function Profile() {
                                     <div style={{ padding: '0.75rem', background: '#0ea5e9', color: '#fff' }}>
                                         <Play size={24} />
                                     </div>
-                                    <div>
-                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayTotalAnime}</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.episodes_watched')}</p>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ 
+                                            fontSize: displayTotalAnime > 9999 ? '1.25rem' : '1.75rem', 
+                                            fontWeight: 900,
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
+                                        }}>
+                                            {displayTotalAnime}
+                                        </div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('profile.episodes_watched')}</p>
                                     </div>
                                 </div>
 
@@ -568,9 +592,17 @@ export default function Profile() {
                                     <div style={{ padding: '0.75rem', background: '#f43f5e', color: '#fff' }}>
                                         <Film size={24} />
                                     </div>
-                                    <div>
-                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayTotalMovies}</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.movies_watched')}</p>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ 
+                                            fontSize: displayTotalMovies > 999 ? '1.25rem' : '1.75rem', 
+                                            fontWeight: 900,
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
+                                        }}>
+                                            {displayTotalMovies}
+                                        </div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('profile.movies_watched')}</p>
                                     </div>
                                 </div>
 
@@ -579,9 +611,17 @@ export default function Profile() {
                                     <div style={{ padding: '0.75rem', background: 'var(--color-border-heavy)', color: 'var(--color-text-inverse)' }}>
                                         <Library size={24} />
                                     </div>
-                                    <div>
-                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayTotalWorks}</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.collection')}</p>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ 
+                                            fontSize: displayTotalWorks > 999 ? '1.25rem' : '1.75rem', 
+                                            fontWeight: 900,
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
+                                        }}>
+                                            {displayTotalWorks}
+                                        </div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('profile.collection')}</p>
                                     </div>
                                 </div>
 
@@ -590,9 +630,17 @@ export default function Profile() {
                                     <div style={{ padding: '0.75rem', background: '#fbbf24', color: '#000' }}>
                                         <Award size={24} />
                                     </div>
-                                    <div>
-                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{displayStats.badgeCount} / 16</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.badges')}</p>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ 
+                                            fontSize: displayStats.badgeCount > 99 ? '1.25rem' : '1.75rem', 
+                                            fontWeight: 900,
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
+                                        }}>
+                                            {displayStats.badgeCount} / 16
+                                        </div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('profile.badges')}</p>
                                     </div>
                                 </div>
 
@@ -601,9 +649,17 @@ export default function Profile() {
                                     <div style={{ padding: '0.75rem', background: '#8b5cf6', color: '#fff' }}>
                                         <Trophy size={24} />
                                     </div>
-                                    <div>
-                                        <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{(displayStats as any).totalXp?.toLocaleString() || 0}</div>
-                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6 }}>{t('profile.xp_total')}</p>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ 
+                                            fontSize: ((displayStats as any).totalXp?.toLocaleString() || '').length > 7 ? '1.15rem' : (((displayStats as any).totalXp?.toLocaleString() || '').length > 5 ? '1.35rem' : '1.75rem'), 
+                                            fontWeight: 900,
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
+                                        }}>
+                                            {(displayStats as any).totalXp?.toLocaleString() || 0}
+                                        </div>
+                                        <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('profile.xp_total')}</p>
                                     </div>
                                 </div>
                             </div>
