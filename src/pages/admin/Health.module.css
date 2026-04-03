@@ -1,0 +1,508 @@
+/* ─── Health Dashboard ─── Brutalist Manga Style ─── */
+
+.healthPage {
+    padding: var(--space-lg);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+}
+
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.headerIcon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-primary);
+    border: 4px solid var(--color-border-heavy);
+    box-shadow: 4px 4px 0 var(--color-shadow-solid);
+    color: #fff;
+}
+
+.title {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text);
+    line-height: 1.1;
+}
+
+.subtitle {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.refreshBtn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-surface);
+    border: 4px solid var(--color-border-heavy);
+    box-shadow: 4px 4px 0 var(--color-shadow-solid);
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    color: var(--color-text);
+    transition: transform var(--duration-fast), box-shadow var(--duration-fast);
+}
+
+.refreshBtn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--color-shadow-solid);
+}
+
+.refreshBtn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--color-shadow-solid);
+}
+
+.refreshBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ─── Overall Score ─── */
+.overallScoreCard {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xl);
+    padding: var(--space-lg);
+    background: var(--color-surface);
+    border: 4px solid var(--color-border-heavy);
+    box-shadow: 6px 6px 0 var(--color-shadow-solid);
+    margin-bottom: var(--space-xl);
+}
+
+.scoreCircle {
+    width: 100px;
+    height: 100px;
+    border-radius: 0; /* Brutalist - no rounding */
+    border: 4px solid var(--color-border-heavy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    box-shadow: 4px 4px 0 var(--color-shadow-solid);
+}
+
+.scoreValue {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.scoreLabel {
+    font-family: var(--font-body);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--color-text-dim);
+}
+
+.scoreInfo {
+    flex: 1;
+}
+
+.scoreTitle {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-xs);
+}
+
+.scoreDesc {
+    font-size: 0.85rem;
+    color: var(--color-text-dim);
+    line-height: 1.4;
+}
+
+.lastChecked {
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    margin-top: var(--space-sm);
+}
+
+/* ─── Section Grid ─── */
+.sectionsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: var(--space-lg);
+}
+
+/* ─── Section Card ─── */
+.sectionCard {
+    background: var(--color-surface);
+    border: 4px solid var(--color-border-heavy);
+    box-shadow: 6px 6px 0 var(--color-shadow-solid);
+    overflow: hidden;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 4px solid var(--color-border-heavy);
+    background: var(--color-surface-hover);
+}
+
+.sectionIcon {
+    color: var(--color-primary);
+}
+
+.sectionTitle {
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.sectionBody {
+    padding: var(--space-lg);
+}
+
+/* ─── Service Status Row ─── */
+.serviceRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) 0;
+    border-bottom: 2px dashed var(--color-border);
+}
+
+.serviceRow:last-child {
+    border-bottom: none;
+}
+
+.serviceLeft {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.statusDot {
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--color-border-heavy);
+    flex-shrink: 0;
+}
+
+.statusDot[data-status="operational"] {
+    background: #22c55e;
+}
+
+.statusDot[data-status="degraded"] {
+    background: #f59e0b;
+}
+
+.statusDot[data-status="down"] {
+    background: #ef4444;
+}
+
+.statusDot[data-status="checking"] {
+    background: var(--color-text-dim);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.serviceName {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.serviceRight {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.responseTime {
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    color: var(--color-text-dim);
+    padding: 2px 6px;
+    border: 2px solid var(--color-border);
+    background: var(--color-background);
+}
+
+.statusBadge {
+    font-family: var(--font-heading);
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 2px 8px;
+    border: 2px solid var(--color-border-heavy);
+}
+
+.statusBadge[data-status="operational"] {
+    background: #22c55e;
+    color: #000;
+}
+
+.statusBadge[data-status="degraded"] {
+    background: #f59e0b;
+    color: #000;
+}
+
+.statusBadge[data-status="down"] {
+    background: #ef4444;
+    color: #fff;
+}
+
+.statusBadge[data-status="checking"] {
+    background: var(--color-surface-hover);
+    color: var(--color-text-dim);
+}
+
+/* ─── Stats Grid inside sections ─── */
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+}
+
+.statBox {
+    padding: var(--space-md);
+    border: 3px solid var(--color-border-heavy);
+    box-shadow: 3px 3px 0 var(--color-shadow-solid);
+    text-align: center;
+}
+
+.statValue {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--color-text);
+}
+
+.statLabel {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-text-dim);
+    margin-top: var(--space-xs);
+}
+
+/* ─── Health Bar ─── */
+.healthBarContainer {
+    margin-top: var(--space-md);
+}
+
+.healthBarLabel {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: var(--space-xs);
+}
+
+.healthBarTrack {
+    height: 16px;
+    background: var(--color-background);
+    border: 3px solid var(--color-border-heavy);
+    position: relative;
+    overflow: hidden;
+}
+
+.healthBarFill {
+    height: 100%;
+    transition: width 0.6s var(--ease-expo);
+}
+
+/* ─── Security Row ─── */
+.securityRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) 0;
+    border-bottom: 2px dashed var(--color-border);
+}
+
+.securityRow:last-child {
+    border-bottom: none;
+}
+
+.securityLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.securityValue {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border: 2px solid var(--color-border-heavy);
+}
+
+.securityOk {
+    background: #22c55e;
+    color: #000;
+}
+
+.securityWarn {
+    background: #f59e0b;
+    color: #000;
+}
+
+.securityDanger {
+    background: #ef4444;
+    color: #fff;
+}
+
+/* ─── Loading State ─── */
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3xl);
+    gap: var(--space-md);
+}
+
+.loadingText {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-dim);
+}
+
+.loadingBar {
+    width: 200px;
+    height: 8px;
+    background: var(--color-border);
+    border: 2px solid var(--color-border-heavy);
+    overflow: hidden;
+}
+
+.loadingBarFill {
+    width: 40%;
+    height: 100%;
+    background: var(--color-primary);
+    animation: loadingSlide 1.2s ease-in-out infinite;
+}
+
+@keyframes loadingSlide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(350%); }
+}
+
+/* ─── Auto-refresh indicator ─── */
+.autoRefreshBar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+    padding: var(--space-sm) var(--space-md);
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+}
+
+.liveDot {
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+    .healthPage {
+        padding: var(--space-md);
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sectionsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .overallScoreCard {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .title {
+        font-size: 1.3rem;
+    }
+
+    .statsGrid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .statValue {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+}

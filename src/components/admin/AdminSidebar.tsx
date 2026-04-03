@@ -1,5 +1,5 @@
 import { NavLink } from '@/components/routing/LocalizedLink';
-import { LayoutDashboard, Users, MessageSquare, ShieldAlert, LogOut, Home, X, Share2, Palette, Clipboard } from 'lucide-react';
+import { LayoutDashboard, Users, MessageSquare, ShieldAlert, LogOut, Home, X, Share2, Palette, Clipboard, HeartPulse } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { auth } from '@/firebase/config';
 import { useState } from 'react';
@@ -35,6 +35,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         { to: "/admin/survey", icon: Clipboard, label: t('admin.sidebar.survey', 'Questionnaire') },
         { to: "/admin/social-generator", icon: Share2, label: "Social UI", end: false },
         { to: "/admin/assets", icon: Palette, label: "Assets", end: false },
+        { to: "/admin/health", icon: HeartPulse, label: t('admin.sidebar.health', 'Health'), end: false },
         { to: "/admin/system", icon: ShieldAlert, label: t('admin.sidebar.system') },
     ];
 
