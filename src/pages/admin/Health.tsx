@@ -11,10 +11,13 @@ import {
     getFullHealthReport,
     sendDiscordHealthAlert,
     runSelfHealing,
+    getRepairHistory,
     type FullHealthReport,
     type ServiceHealthResult,
-    type ServiceStatus
+    type ServiceStatus,
+    type RepairSession
 } from '@/firebase/healthChecks';
+import { useAuthStore } from '@/store/authStore';
 import styles from './Health.module.css';
 
 const STATUS_LABELS: Record<ServiceStatus, string> = {
@@ -147,6 +150,10 @@ export default function AdminHealth() {
     const [repairing, setRepairing] = useState(false);
     const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
     const [scoreHistory, setScoreHistory] = useState<ScoreHistoryEntry[]>([]);
+    const [repairHistory, setRepairHistory] = useState<RepairSession[]>([]);
+    const [expandedSession, setExpandedSession] = useState<string | null>(null);
+
+    const { userProfile } = useAuthStore();
 
     // Discord Integration State
     const [showDiscordModal, setShowDiscordModal] = useState(false);
@@ -154,20 +161,24 @@ export default function AdminHealth() {
         const saved = localStorage.getItem('bingeki_discord_health');
         return saved ? JSON.parse(saved) : { webhookUrl: '', enabled: false };
     });
+    const [isTestingDiscord, setIsTestingDiscord] = useState(false);
+    const [testStatus, setTestStatus] = useState<{ success?: boolean; message?: string } | null>(null);
 
     const fetchData = useCallback(async (isRefresh = false) => {
         if (isRefresh) setRefreshing(true);
         else setLoading(true);
 
         try {
-            const [healthReport, stats, history] = await Promise.all([
+            const [healthReport, stats, history, repairLog] = await Promise.all([
                 getFullHealthReport(),
                 getAdminStats(),
-                getHealthHistory()
+                getHealthHistory(),
+                getRepairHistory(10)
             ]);
             setReport(healthReport);
             setAdminStats(stats);
             setScoreHistory(history as any);
+            setRepairHistory(repairLog);
             setLastRefresh(new Date());
 
             // Auto-report to Discord if critical (score < 50 OR any service is DOWN)
@@ -201,10 +212,12 @@ export default function AdminHealth() {
         if (!window.confirm("Run full system scan and repair common data issues?")) return;
         setRepairing(true);
         try {
-            const result = await runSelfHealing();
+            const adminName = userProfile?.displayName || userProfile?.email?.split('@')[0] || "Admin";
+            const result = await runSelfHealing(adminName);
             alert(`Repair complete! Fixed ${result.repaired} issues, encountered ${result.errors} errors.`);
-            fetchData();
+            fetchData(true);
         } catch (e) {
+            console.error('[Health] Manual repair failed:', e);
             alert("Repair failed. Check console.");
         } finally {
             setRepairing(false);
@@ -214,8 +227,36 @@ export default function AdminHealth() {
     const saveDiscordConfig = () => {
         localStorage.setItem('bingeki_discord_health', JSON.stringify(discordConfig));
         setShowDiscordModal(false);
+        setTestStatus(null);
         if (discordConfig.enabled && discordConfig.webhookUrl) {
             alert("Discord alerts enabled. A test message will be sent if score is critical.");
+        }
+    };
+
+    const testDiscordWebhook = async () => {
+        if (!discordConfig.webhookUrl) {
+            setTestStatus({ success: false, message: "Webhook URL required" });
+            return;
+        }
+
+        setIsTestingDiscord(true);
+        setTestStatus(null);
+        console.log('[AdminHealth] Starting Discord test...');
+
+        try {
+            const success = await sendDiscordHealthAlert(discordConfig.webhookUrl, report!, true);
+            if (success) {
+                setTestStatus({ success: true, message: "Test message sent!" });
+                console.log('[AdminHealth] Test message success.');
+            } else {
+                setTestStatus({ success: false, message: "Failed to send message (check console/URL)" });
+                console.error('[AdminHealth] Test message failed.');
+            }
+        } catch (error) {
+            setTestStatus({ success: false, message: "Error during test" });
+            console.error('[AdminHealth] Test error:', error);
+        } finally {
+            setIsTestingDiscord(false);
         }
     };
 
@@ -851,6 +892,85 @@ export default function AdminHealth() {
                         </div>
                     </div>
                 </div>
+
+                {/* ─── 10. Repair Activity Logs (HISTORY) ─── */}
+                <div className={`${styles.sectionCard} ${styles.fullWidth}`}>
+                    <div className={styles.sectionHeader}>
+                        <Clock size={18} className={styles.sectionIcon} />
+                        <h3 className={styles.sectionTitle}>
+                            {t('admin.health.repair_history', 'Repair Activity Logs')}
+                        </h3>
+                    </div>
+                    <div className={styles.sectionBody}>
+                        {repairHistory.length === 0 ? (
+                            <div className={styles.emptyLog}>No recent repair activity.</div>
+                        ) : (
+                            <div className={styles.historyList}>
+                                {repairHistory.map((session) => (
+                                    <div key={session.id} className={styles.historySession}>
+                                        <div 
+                                            className={styles.sessionHeader}
+                                            onClick={() => setExpandedSession(expandedSession === session.id ? null : session.id!)}
+                                        >
+                                            <div className={styles.sessionMain}>
+                                                <span className={styles.sessionTime}>
+                                                    {new Date(session.timestamp).toLocaleString()}
+                                                </span>
+                                                <span className={styles.sessionAdmin}>
+                                                    by <strong>{session.adminName}</strong>
+                                                </span>
+                                            </div>
+                                            <div className={styles.sessionStats}>
+                                                <span className={styles.repairedCount}>
+                                                    <CheckCircle size={12} /> {session.repairedCount} fixed
+                                                </span>
+                                                {session.errorsCount > 0 && (
+                                                    <span className={styles.errorsCount}>
+                                                        <AlertTriangle size={12} /> {session.errorsCount} errors
+                                                    </span>
+                                                )}
+                                                <div className={`${styles.chevron} ${expandedSession === session.id ? styles.open : ''}`}>
+                                                    ▼
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {expandedSession === session.id && (
+                                            <div className={styles.sessionDetails}>
+                                                {session.actions.length === 0 ? (
+                                                    <p className={styles.noActions}>No specific users were modified.</p>
+                                                ) : (
+                                                    <table className={styles.detailsTable}>
+                                                        <thead>
+                                                            <tr>
+                                                                <th>User</th>
+                                                                <th>UID</th>
+                                                                <th>Changes</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {session.actions.map((act, i) => (
+                                                                <tr key={i}>
+                                                                    <td className={styles.cellUser}>{act.userName}</td>
+                                                                    <td className={styles.cellUid}>{act.uid}</td>
+                                                                    <td className={styles.cellChanges}>
+                                                                        <ul className={styles.changesList}>
+                                                                            {act.changes.map((c, j) => <li key={j}>{c}</li>)}
+                                                                        </ul>
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* ─── Auto-refresh indicator ─── */}
@@ -898,13 +1018,34 @@ export default function AdminHealth() {
                             </div>
                         </div>
                         <div className={styles.modalFooter}>
-                            <button className={styles.cancelBtn} onClick={() => setShowDiscordModal(false)}>
-                                Cancel
+                            <button 
+                                className={styles.testBtn} 
+                                onClick={testDiscordWebhook}
+                                disabled={isTestingDiscord || !discordConfig.webhookUrl}
+                            >
+                                {isTestingDiscord ? 'Sending...' : 'Test Webhook'}
                             </button>
-                            <button className={styles.saveBtn} onClick={saveDiscordConfig}>
-                                Save Config
-                            </button>
+
+                            <div className={styles.modalFooterRight}>
+                                <button className={styles.cancelBtn} onClick={() => {
+                                    setShowDiscordModal(false);
+                                    setTestStatus(null);
+                                }}>
+                                    Cancel
+                                </button>
+                                <button className={styles.saveBtn} onClick={saveDiscordConfig}>
+                                    Save Config
+                                </button>
+                            </div>
                         </div>
+
+                        {testStatus && (
+                            <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                                <span className={testStatus.success ? styles.testSuccess : styles.testError}>
+                                    {testStatus.message}
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

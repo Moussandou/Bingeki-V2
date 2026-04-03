@@ -92,6 +92,21 @@ export interface FullHealthReport {
     checkedAt: number;
 }
 
+export interface RepairAction {
+    uid: string;
+    userName: string;
+    changes: string[];
+}
+
+export interface RepairSession {
+    id?: string;
+    timestamp: any;
+    adminName: string;
+    repairedCount: number;
+    errorsCount: number;
+    actions: RepairAction[];
+}
+
 // ─── Infrastructure Checks ──────────────────────────────────────────
 
 /** Check Firebase Auth connectivity */
@@ -494,34 +509,53 @@ export async function getSurveyStats(): Promise<SurveyStats> {
 // ─── Self-Healing ───────────────────────────────────────────────────
 
 /** Scan and repair common data issues */
-export async function runSelfHealing(): Promise<{ repaired: number; errors: number }> {
+export async function runSelfHealing(adminName: string = "System"): Promise<{ repaired: number; errors: number; sessionId?: string }> {
     let repaired = 0;
     let errors = 0;
+    const actions: RepairAction[] = [];
+
     try {
         const snap = await getDocs(query(collection(db, 'users'), limit(100))); // Batch size for safety
         
         const repairs = snap.docs.map(async (d) => {
             const data = d.data();
             const updates: DocumentData = {};
+            const userChanges: string[] = [];
             
             // Fix 1: Missing DisplayName (use email prefix if available)
             if (!data.displayName || data.displayName.trim() === "") {
+                const oldName = data.displayName || "empty";
                 if (data.email) {
                     updates.displayName = data.email.split('@')[0];
                 } else {
                     updates.displayName = `User_${d.id.substring(0, 5)}`;
                 }
+                userChanges.push(`Changed displayName from '${oldName}' to '${updates.displayName}'`);
             }
 
             // Fix 2: Corrupted numeric fields
-            if (typeof data.level !== 'number') updates.level = 1;
-            if (typeof data.xp !== 'number') updates.xp = 0;
-            if (typeof data.totalXp !== 'number') updates.totalXp = data.xp || 0;
+            if (typeof data.level !== 'number') {
+                updates.level = 1;
+                userChanges.push(`Reset level (was ${typeof data.level}) to 1`);
+            }
+            if (typeof data.xp !== 'number') {
+                updates.xp = 0;
+                userChanges.push(`Reset xp (was ${typeof data.xp}) to 0`);
+            }
+            if (typeof data.totalXp !== 'number') {
+                updates.totalXp = data.xp || 0;
+                userChanges.push(`Re-calculated totalXp`);
+            }
 
             if (Object.keys(updates).length > 0) {
                 try {
                     await updateDoc(d.ref, updates);
                     repaired++;
+                    actions.push({
+                        uid: d.id,
+                        userName: updates.displayName || data.displayName || "Unknown",
+                        changes: userChanges
+                    });
                 } catch (e) {
                     errors++;
                     logger.error(`[SelfHealing] Failed to repair user ${d.id}:`, e);
@@ -530,16 +564,52 @@ export async function runSelfHealing(): Promise<{ repaired: number; errors: numb
         });
 
         await Promise.all(repairs);
-        return { repaired, errors };
+
+        // Log the session if any repairs were made
+        let sessionId: string | undefined;
+        if (actions.length > 0 || errors > 0) {
+            const session: RepairSession = {
+                timestamp: serverTimestamp(),
+                adminName,
+                repairedCount: repaired,
+                errorsCount: errors,
+                actions
+            };
+            const sessionRef = await addDoc(collection(db, 'admin_repair_history'), session);
+            sessionId = sessionRef.id;
+        }
+
+        return { repaired, errors, sessionId };
     } catch (error) {
         logger.error('[SelfHealing] Fatal error during scan:', error);
         return { repaired, errors: errors + 1 };
     }
 }
 
+/** Get recent repair history */
+export async function getRepairHistory(maxEntries = 10): Promise<RepairSession[]> {
+    try {
+        const q = query(
+            collection(db, 'admin_repair_history'),
+            orderBy('timestamp', 'desc'),
+            limit(maxEntries)
+        );
+        const snap = await getDocs(q);
+        return snap.docs.map(d => ({
+            id: d.id,
+            ...d.data(),
+            timestamp: d.data().timestamp?.toMillis?.() || Date.now()
+        }) as RepairSession);
+    } catch (error) {
+        logger.error('[HealthCheck] Error getting repair history:', error);
+        return [];
+    }
+}
+
 // ─── Discord Integration ────────────────────────────────────────────
 
 export async function sendDiscordHealthAlert(webhookUrl: string, report: FullHealthReport, isTest = false): Promise<boolean> {
+    console.log(`[DiscordAlert] Attempting to send ${isTest ? 'TEST ' : ''}alert to Discord...`);
     try {
         const hasDown = report.infrastructure.some(s => s.status === 'down');
         const statusEmoji = hasDown ? '🚨' : (report.overallScore >= 80 ? '✅' : report.overallScore >= 50 ? '⚠️' : '🚨');
@@ -562,14 +632,24 @@ export async function sendDiscordHealthAlert(webhookUrl: string, report: FullHea
             }]
         };
 
+        console.log('[DiscordAlert] Payload:', JSON.stringify(payload, null, 2));
+
         const response = await fetch(webhookUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
 
-        return response.ok;
+        if (response.ok) {
+            console.log('[DiscordAlert] Successfully sent to Discord.');
+            return true;
+        } else {
+            const errorText = await response.text();
+            console.error(`[DiscordAlert] Discord API returned error ${response.status}:`, errorText);
+            return false;
+        }
     } catch (error) {
+        console.error('[DiscordAlert] Fetch failed:', error);
         logger.error('[DiscordAlert] Send failed:', error);
         return false;
     }

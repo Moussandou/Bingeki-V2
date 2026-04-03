@@ -782,9 +782,15 @@
 
 .modalFooter {
     display: flex;
+    align-items: center;
     justify-content: flex-end;
     gap: var(--space-md);
     margin-top: var(--space-lg);
+}
+
+.modalFooterRight {
+    display: flex;
+    gap: var(--space-md);
 }
 
 .cancelBtn, .saveBtn {
@@ -811,6 +817,50 @@
 .saveBtn:active {
     box-shadow: 1px 1px 0 var(--color-shadow-solid);
     transform: translate(3px, 3px);
+}
+
+.testBtn {
+    background: #5865F2; /* Discord color */
+    color: #fff;
+    padding: 8px 16px;
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 3px solid var(--color-border-heavy);
+    box-shadow: 4px 4px 0 var(--color-shadow-solid);
+    margin-right: auto; /* Push cancel/save to the right */
+    transition: all var(--duration-fast);
+}
+
+.testBtn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 0 var(--color-shadow-solid);
+}
+
+.testBtn:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 2px 2px 0 var(--color-shadow-solid);
+}
+
+.testBtn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.testSuccess {
+    color: #22c55e;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-top: var(--space-xs);
+}
+
+.testError {
+    color: #ef4444;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-top: var(--space-xs);
 }
 
 /* ─── Responsive ─── */
@@ -868,4 +918,152 @@
     .sparklineSvg {
         width: 120px;
     }
+}
+
+/* ─── Repair History ─── */
+.fullWidth {
+    grid-column: 1 / -1;
+}
+
+.historyList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.historySession {
+    border: 3px solid var(--color-border-heavy);
+    background: var(--color-background);
+}
+
+.sessionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) var(--space-md);
+    cursor: pointer;
+    background: var(--color-surface-hover);
+    border-bottom: 3px solid var(--color-border-heavy);
+    user-select: none;
+}
+
+.sessionMain {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.sessionTime {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.sessionAdmin {
+    font-size: 0.75rem;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+}
+
+.sessionStats {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.repairedCount {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #22c55e;
+    text-transform: uppercase;
+}
+
+.errorsCount {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #ef4444;
+    text-transform: uppercase;
+}
+
+.chevron {
+    transition: transform 0.2s;
+    font-size: 0.6rem;
+    color: var(--color-text-dim);
+}
+
+.chevron.open {
+    transform: rotate(180deg);
+}
+
+.sessionDetails {
+    padding: var(--space-md);
+    background: var(--color-surface);
+}
+
+.noActions {
+    font-size: 0.8rem;
+    color: var(--color-text-dim);
+    font-style: italic;
+    text-align: center;
+}
+
+.detailsTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.detailsTable th {
+    text-align: left;
+    padding: var(--space-xs) var(--space-sm);
+    border-bottom: 2px solid var(--color-border-heavy);
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+}
+
+.detailsTable td {
+    padding: var(--space-sm);
+    border-bottom: 1px dashed var(--color-border);
+    vertical-align: top;
+}
+
+.cellUser {
+    font-weight: 700;
+    width: 20%;
+}
+
+.cellUid {
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    color: var(--color-text-dim);
+    width: 20%;
+}
+
+.changesList {
+    margin: 0;
+    padding-left: var(--space-md);
+    list-style-type: square;
+}
+
+.changesList li {
+    margin-bottom: 2px;
+}
+
+.emptyLog {
+    text-align: center;
+    padding: var(--space-xl);
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    border: 2px dashed var(--color-border);
 }
