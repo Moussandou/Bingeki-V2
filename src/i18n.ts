@@ -267,8 +267,8 @@ const resources = {
             },
             tierlist: {
                 characters: "PERSONNAGES",
-                by_name: "Par Nom",
-                by_anime: "Par Anime",
+                by_name: "PAR NOM",
+                by_anime: "PAR ANIME",
                 search_name: "Rechercher un nom...",
                 search_anime: "Rechercher un anime...",
                 no_characters: "Aucun personnage trouvé.",
@@ -318,9 +318,7 @@ const resources = {
                 anime: "ANIME",
                 search_manga: "Rechercher un manga...",
                 no_manga: "Aucun manga trouvé.",
-                by_manga: "PAR MANGA",
-                by_anime: "PAR ANIME",
-                by_name: "PAR NOM"
+                by_manga: "PAR MANGA"
             },
             stats: {
                 level: "Niveau",
@@ -2181,8 +2179,8 @@ const resources = {
             },
             tierlist: {
                 characters: "CHARACTERS",
-                by_name: "By Name",
-                by_anime: "By Anime",
+                by_name: "BY NAME",
+                by_anime: "BY ANIME",
                 search_name: "Search Name...",
                 search_anime: "Search Anime...",
                 no_characters: "No characters found.",
@@ -2220,7 +2218,19 @@ const resources = {
                 delete_confirm: "Delete this tier list?",
                 delete_success: "Tier list deleted.",
                 delete_error: "Error deleting tier list.",
-                like_error: "Error updating like."
+                like_error: "Error updating like.",
+                import_json: "Import JSON",
+                export_json: "Export JSON",
+                add_tier: "Add Tier",
+                clear_all: "Clear All",
+                clear_all_confirm: "Are you sure you want to clear all characters from the tier list?",
+                import_success: "Tier list imported!",
+                import_error: "Import failed",
+                manga: "MANGA",
+                anime: "ANIME",
+                search_manga: "Search manga...",
+                no_manga: "No manga found.",
+                by_manga: "BY MANGA"
             },
             maintenance: {
                 title: "Maintenance in Progress",
