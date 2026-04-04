@@ -88,14 +88,38 @@
 
 /* Pool item (wrapper for draggable) */
 .poolItem {
-    width: 50px;
-    height: 50px;
+    width: 80px;
+    height: 80px;
     background-size: cover;
     background-position: center;
     border: 2px solid var(--color-border-heavy);
     border-radius: 0;
     cursor: grab;
     flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.nameOverlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: 0.55rem;
+    padding: 2px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.poolItem:hover .nameOverlay {
+    opacity: 1;
 }
 
 .poolItem:active {

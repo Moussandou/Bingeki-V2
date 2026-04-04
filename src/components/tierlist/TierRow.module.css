@@ -27,8 +27,6 @@
 .droppable {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
-    padding: 5px;
     background: #1a1a1a;
     min-height: 80px;
 }

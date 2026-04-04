@@ -1,0 +1,36 @@
+.tierItem {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-sizing: border-box;
+    cursor: inherit;
+}
+
+.nameOverlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: 0.55rem;
+    padding: 2px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.tierItemWrapper:hover .nameOverlay {
+    opacity: 1;
+}
+
+.dragging {
+    opacity: 0.5;
+}

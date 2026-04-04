@@ -371,7 +371,7 @@ export const getWorkCharacters = async (id: number, type: 'anime' | 'manga') => 
         const response = await queuedFetch(`${BASE_URL}/${type}/${id}/characters`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        const chars = (data.data as JikanCharacter[]).slice(0, 10);
+        const chars = data.data as JikanCharacter[];
         setCache<JikanCharacter[]>(cacheKey, chars);
         return chars;
     } catch (error) {
@@ -778,7 +778,7 @@ export const getPersonFull = async (id: number) => {
     }
 };
 
-export const searchCharacters = async (query: string, limit: number = 15) => {
+export const searchCharacters = async (query: string, limit: number = 25) => {
     try {
         const response = await queuedFetch(`${BASE_URL}/characters?q=${encodeURIComponent(query)}&limit=${limit}`);
         if (!response.ok) throw new Error('Network response was not ok');

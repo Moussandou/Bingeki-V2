@@ -44,7 +44,11 @@ function DraggablePoolItem({ character }: { character: PoolCharacter }) {
             {...listeners}
             {...attributes}
             className={styles.poolItem}
-        />
+        >
+            <div className={styles.nameOverlay}>
+                {character.name}
+            </div>
+        </div>
     );
 }
 

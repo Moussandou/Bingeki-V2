@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import styles from './SortableItem.module.css';
 
 interface SortableItemProps {
     id: string; // Unique ID (e.g., "S-1234")
@@ -12,40 +12,17 @@ interface SortableItemProps {
     };
 }
 
-export function TierItemDisplay({ character, style }: { character: SortableItemProps['character'], style?: React.CSSProperties }) {
+export function TierItemDisplay({ character, style, isDragging }: { character: SortableItemProps['character'], style?: React.CSSProperties, isDragging?: boolean }) {
     return (
         <div
-            className="tier-item"
-            style={{
-                ...style,
-                position: 'relative',
-                touchAction: 'none'
-            }}
+            className={`${styles.tierItemWrapper} ${isDragging ? styles.dragging : ''}`}
+            style={style}
         >
-            <div style={{
-                width: '50px',
-                height: '50px',
-                backgroundImage: `url(${character.image})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                borderRadius: 0,
-                border: '2px solid var(--color-border-heavy)',
-                cursor: 'inherit'
-            }} />
-            <div style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                background: 'rgba(0,0,0,0.8)',
-                color: 'white',
-                fontSize: '0.6rem',
-                padding: '2px',
-                textAlign: 'center',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-            }}>
+            <div
+                className={styles.tierItem}
+                style={{ backgroundImage: `url(${character.image})` }}
+            />
+            <div className={styles.nameOverlay}>
                 {character.name}
             </div>
         </div>
