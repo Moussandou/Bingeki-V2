@@ -286,6 +286,7 @@ const resources = {
                 create_button: "Créer le tien",
                 filter_trending: "Tendances",
                 filter_popular: "Populaires",
+                filter_recent: "Récents",
                 view_full: "Voir la Liste Complète",
                 empty_state: "Aucune Tier List trouvée",
                 empty_cta: "Sois le premier à en créer une !",
@@ -2230,6 +2231,7 @@ const resources = {
                 create_button: "Create Your Own",
                 filter_trending: "Trending",
                 filter_popular: "Popular",
+                filter_recent: "Recent",
                 view_full: "View Full List",
                 empty_state: "No Tier Lists Found",
                 empty_cta: "Be the first to create one!",
@@ -3532,6 +3534,7 @@ const resources = {
                 trailer: {
                     title: "TRAILER",
                     watch: "WATCH TRAILER",
+                    watch_on_youtube: "WATCH ON YOUTUBE",
                     close: "CLOSE"
                 },
                 casting: {
