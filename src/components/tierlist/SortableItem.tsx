@@ -23,8 +23,8 @@ export function TierItemDisplay({ character, style }: { character: SortableItemP
             }}
         >
             <div style={{
-                width: '80px',
-                height: '80px',
+                width: '50px',
+                height: '50px',
                 backgroundImage: `url(${character.image})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',

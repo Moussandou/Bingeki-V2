@@ -1,20 +1,20 @@
 /* Row container */
 .row {
     display: flex;
-    margin-bottom: 4px;
-    min-height: 100px;
+    margin-bottom: 2px;
+    min-height: 80px;
     background: var(--color-background);
 }
 
 /* Label column — background is dynamic (tier.color), only layout/border here */
 .labelCell {
-    width: 100px;
+    width: 80px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    padding: var(--space-sm);
+    padding: var(--space-xs);
     border: 3px solid var(--color-border-heavy);
     border-right: none;
     position: relative;
@@ -26,7 +26,7 @@
 .labelText {
     text-align: center;
     font-weight: 900;
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     font-family: var(--font-heading);
     word-break: break-word;
     filter: invert(1) grayscale(1) contrast(9);
@@ -37,7 +37,7 @@
     border: none;
     text-align: center;
     font-weight: 900;
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     width: 100%;
     outline: none;
     font-family: var(--font-heading);
@@ -45,12 +45,12 @@
 }
 
 .colorPicker {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border: 2px solid var(--color-border-heavy);
     padding: 0;
     cursor: pointer;
-    margin-top: var(--space-sm);
+    margin-top: 4px;
     background: transparent;
 }
 
@@ -61,8 +61,8 @@
     border: 3px solid var(--color-border-heavy);
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-sm);
-    padding: var(--space-sm);
+    gap: var(--space-xs);
+    padding: var(--space-xs);
     align-items: center;
     min-width: 0;
 }

@@ -11,7 +11,7 @@
 
 /* Header */
 .poolHeader {
-    padding: var(--space-md);
+    padding: var(--space-sm);
     border-bottom: 3px solid var(--color-border-heavy);
     background: var(--color-background);
     flex-shrink: 0;
@@ -20,10 +20,10 @@
 .poolTitle {
     font-family: var(--font-heading);
     font-weight: 900;
-    font-size: 1.1rem;
+    font-size: 1rem;
     text-transform: uppercase;
     color: var(--color-text);
-    margin: 0 0 var(--space-sm) 0;
+    margin: 0 0 var(--space-xs) 0;
     letter-spacing: 0.05em;
 }
 
@@ -31,7 +31,7 @@
 .modeTabs {
     display: flex;
     gap: var(--space-sm);
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-sm);
 }
 
 /* Search form */
@@ -75,21 +75,21 @@
 .poolContent {
     flex: 1;
     overflow-y: auto;
-    padding: var(--space-md);
+    padding: var(--space-sm);
 }
 
 /* Character grid */
 .characterGrid {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-sm);
+    gap: var(--space-xs);
     justify-content: center;
 }
 
 /* Pool item (wrapper for draggable) */
 .poolItem {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     background-size: cover;
     background-position: center;
     border: 2px solid var(--color-border-heavy);
