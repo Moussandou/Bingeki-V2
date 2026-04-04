@@ -38,7 +38,7 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    color: var(--text-dim);
+    color: rgba(255, 255, 255, 0.5); /* Improved visibility on dark background */
     font-size: 0.8rem;
     text-transform: uppercase;
     pointer-events: none;
