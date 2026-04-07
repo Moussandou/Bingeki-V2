@@ -93,7 +93,7 @@ export function NenChart({ stats, themeColor = '#FF2E63' }: NenChartProps) {
                 </div>
             )}
 
-            <ResponsiveContainer width="100%" height="100%" debounce={100}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={180} debounce={100}>
                 <RadarChart cx="50%" cy="50%" outerRadius="45%" data={data}>
                     <PolarGrid stroke="var(--color-border)" strokeOpacity={0.5} />
                     <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--color-text)', fontSize: 10, fontWeight: 900 }} />

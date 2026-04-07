@@ -360,7 +360,7 @@ export default function WorkDetails() {
     const [replyText, setReplyText] = useState('');
 
     // Friends reading this
-    const [friendsReading, setFriendsReading] = useState<{ count: number; friends: UserProfile[] }>({ count: 0, friends: [] });
+    const [friendsReading, setFriendsReading] = useState<{ count: number; friends: { profile: UserProfile; work: Work }[] }>({ count: 0, friends: [] });
 
     // New Data: Characters & Relations
     const [characters, setCharacters] = useState<JikanCharacter[]>([]);
@@ -1621,33 +1621,50 @@ export default function WorkDetails() {
                                     {isCommentsExpanded && (
                                         <div>
 
-                                            {/* Friends reading indicator */}
+                                            {/* Friends activity - Enhanced */}
                                             {friendsReading.count > 0 && (
-                                                <div style={{
-                                                    background: 'var(--color-surface-hover)',
-                                                    padding: '1rem',
-                                                    borderRadius: '8px',
-                                                    marginBottom: '1rem',
-                                                    border: '1px solid var(--color-border)'
-                                                }}>
-                                                    <p style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-text)' }}>
-                                                        👥 <strong>{t('work_details.comments.friends_count', { count: friendsReading.count })}</strong>
-                                                    </p>
-                                                    <div style={{ display: 'flex', gap: '-8px', marginTop: '0.5rem' }}>
-                                                        {friendsReading.friends.slice(0, 5).map(f => (
-                                                            <div key={f.uid} style={{
-                                                                width: 28,
-                                                                height: 28,
-                                                                borderRadius: '50%',
-                                                                overflow: 'hidden',
-                                                                border: '2px solid var(--color-surface)',
-                                                                marginLeft: '-8px'
-                                                            }}>
-                                                                <OptimizedImage
-                                                                    src={f.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${f.displayName}`}
-                                                                    alt={f.displayName || ''}
-                                                                    objectFit="cover"
-                                                                />
+                                                <div className={styles.friendsActivitySection}>
+                                                    <h4 className={styles.friendsActivityHeader}>
+                                                        👥 {t('work_details.comments.friends_count', { count: friendsReading.count })}
+                                                    </h4>
+                                                    <div className={styles.friendsCardsList}>
+                                                        {friendsReading.friends.map(({ profile, work: friendWork }) => (
+                                                            <div key={profile.uid} className={styles.friendCard}>
+                                                                <div className={styles.friendCardMain}>
+                                                                    <div className={styles.friendAvatarWrapper}>
+                                                                        <OptimizedImage
+                                                                            src={profile.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.displayName}`}
+                                                                            alt={profile.displayName || ''}
+                                                                        />
+                                                                    </div>
+                                                                    <div className={styles.friendCardInfo}>
+                                                                        <span className={styles.friendNameText}>{profile.displayName}</span>
+                                                                        <div className={styles.friendRatingStars}>
+                                                                            {[...Array(5)].map((_, i) => (
+                                                                                <Star 
+                                                                                    key={i} 
+                                                                                    size={12} 
+                                                                                    fill={i < Math.round((friendWork.rating || 0) / 2) ? '#ffb800' : 'none'}
+                                                                                    color={i < Math.round((friendWork.rating || 0) / 2) ? '#ffb800' : 'rgba(255,255,255,0.2)'}
+                                                                                />
+                                                                            ))}
+                                                                            <span className={styles.friendRatingValue}>{friendWork.rating || 0}/10</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div className={styles.friendProgressBadge}>
+                                                                    <span>
+                                                                        {friendWork.type === 'manga' ? t('library.chapters') : t('library.episodes')}: 
+                                                                        <strong> {friendWork.currentChapter} / {friendWork.totalChapters || '?'}</strong>
+                                                                    </span>
+                                                                </div>
+
+                                                                {friendWork.notes && (
+                                                                    <div className={styles.friendNoteBubble}>
+                                                                        <p>"{friendWork.notes}"</p>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         ))}
                                                     </div>

@@ -64,7 +64,7 @@ export default function GrowthAnalytics() {
                     <Calendar size={24} />
                 </div>
                 <div style={{ height: '400px' }}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minHeight={400}>
                         <AreaChart data={trends}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                             <XAxis dataKey="date" />
@@ -79,7 +79,7 @@ export default function GrowthAnalytics() {
             <Card variant="manga" style={{ padding: '2rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)' }}>
                 <h3 style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontSize: '1.5rem', marginBottom: '1.5rem' }}>Utilisateurs cumulés</h3>
                 <div style={{ height: '300px' }}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                         <BarChart data={trends}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                             <XAxis dataKey="date" />

@@ -334,7 +334,7 @@ export default function AdminDashboard() {
                     </div>
                     <div style={{ height: '300px', minWidth: 0, position: 'relative', overflow: 'hidden' }}>
                         {isMounted ? (
-                             <ResponsiveContainer width="100%" height="100%" debounce={50}>
+                             <ResponsiveContainer width="100%" height="100%" minHeight={300} debounce={50}>
                                 <AreaChart data={chartData}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e5e5" />
                                     <XAxis dataKey="name" axisLine={false} tickLine={false} style={{ fontSize: '10px' }} />
@@ -354,7 +354,7 @@ export default function AdminDashboard() {
                     <h3 style={sectionTitleStyle}><Activity size={20} /> {t('admin.dashboard.active_users')}</h3>
                     <div style={{ height: '300px', minWidth: 0, position: 'relative', overflow: 'hidden' }}>
                         {isMounted ? (
-                             <ResponsiveContainer width="100%" height="100%" debounce={50}>
+                             <ResponsiveContainer width="100%" height="100%" minHeight={300} debounce={50}>
                                 <BarChart data={chartData}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e5e5" />
                                     <XAxis dataKey="name" axisLine={false} tickLine={false} style={{ fontSize: '10px' }} />
@@ -378,7 +378,7 @@ export default function AdminDashboard() {
                         <div style={{ display: 'flex', alignItems: 'center', height: '250px', minWidth: 0, position: 'relative', overflow: 'hidden' }}>
                             {isMounted ? (
                                 <>
-                                    <ResponsiveContainer width="60%" height="100%" debounce={50}>
+                                    <ResponsiveContainer width="60%" height="100%" minHeight={250} debounce={50}>
                                         <PieChart>
                                             <Pie 
                                                 data={Object.entries(engagementData).map(([name, value]) => ({ name, value }))} 
@@ -418,7 +418,7 @@ export default function AdminDashboard() {
                     <h3 style={sectionTitleStyle}><TrendingUp size={20} /> {t('admin.dashboard.funnel')}</h3>
                     <div style={{ height: '250px', minWidth: 0, position: 'relative', overflow: 'hidden' }}>
                         {isMounted ? (
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minHeight={250}>
                                 <BarChart layout="vertical" data={funnelData} margin={{ left: 40, right: 40 }}>
                                     <XAxis type="number" hide />
                                     <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} width={120} style={{ fontSize: '10px', fontWeight: 900 }} />

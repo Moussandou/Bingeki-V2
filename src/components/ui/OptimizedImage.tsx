@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { getProxiedImageUrl } from '@/utils/imageProxy';
 import { useSettingsStore } from '@/store/settingsStore';
 import styles from './OptimizedImage.module.css';
@@ -33,6 +33,32 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     ...props
 }) => {
     const { dataSaver } = useSettingsStore();
+    
+    // Determine if we should apply CORS based on the domain
+    const crossOriginValue = useMemo(() => {
+        if (!src) return undefined;
+        
+        // List of domains known to support CORS (lowercase for comparison)
+        const corsSafeDomains = [
+            'firebasestorage.googleapis.com',
+            'api.dicebear.com',
+            'localhost',
+            '127.0.0.1',
+            window.location.hostname
+        ];
+        
+        try {
+            const url = new URL(src);
+            const isSafe = corsSafeDomains.some(domain => 
+                url.hostname === domain || url.hostname.endsWith('.' + domain)
+            );
+            return isSafe ? 'anonymous' : undefined;
+        } catch (e) {
+            // Not a valid URL or a relative path, default to no CORS
+            return undefined;
+        }
+    }, [src]);
+
     const [isLoaded, setIsLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
     const [startTime, setStartTime] = useState(Date.now());
@@ -114,7 +140,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
                     className={`${styles.placeholder} ${isLoaded ? styles.placeholderHidden : ''}`}
                     style={{ objectFit }}
                     aria-hidden="true"
-                    crossOrigin="anonymous"
+                    crossOrigin={crossOriginValue}
                     onLoad={() => {
                         setPlaceholderLoaded(true);
                     }}
@@ -137,7 +163,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
                     }}
                     loading={priority ? 'eager' : 'lazy'}
                     referrerPolicy="no-referrer"
-                    crossOrigin="anonymous"
+                    crossOrigin={crossOriginValue}
                     {...props}
                 />
             )}

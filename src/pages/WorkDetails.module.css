@@ -576,3 +576,124 @@
     background: var(--color-text);
     color: var(--color-surface);
 }
+
+/* Friends Activity Section */
+.friendsActivitySection {
+    background: var(--color-surface-hover);
+    padding: 1.5rem;
+    border: 3px solid var(--color-border-heavy);
+    box-shadow: 6px 6px 0 var(--color-shadow-solid);
+    margin-bottom: 2rem;
+    border-radius: 4px;
+}
+
+.friendsActivityHeader {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 900;
+}
+
+.friendsCardsList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.friendCard {
+    background: var(--color-surface);
+    border: 2px solid var(--color-border-heavy);
+    padding: 1rem;
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.friendCard:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--color-shadow-solid);
+}
+
+.friendCardMain {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.friendAvatarWrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--color-border-heavy);
+    flex-shrink: 0;
+}
+
+.friendCardInfo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.friendNameText {
+    font-weight: 800;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    color: var(--color-text);
+}
+
+.friendRatingStars {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.friendRatingValue {
+    font-size: 0.75rem;
+    font-weight: 800;
+    margin-left: 0.4rem;
+    opacity: 0.6;
+}
+
+.friendProgressBadge {
+    font-size: 0.8rem;
+    background: var(--color-surface-hover);
+    padding: 0.35rem 0.75rem;
+    border-left: 4px solid var(--color-primary);
+    font-weight: 600;
+    width: fit-content;
+}
+
+.friendProgressBadge strong {
+    font-weight: 900;
+    color: var(--color-primary);
+}
+
+.friendNoteBubble {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    padding: 0.75rem;
+    background: var(--color-surface-hover);
+    border: 1px dashed var(--color-border);
+    font-style: italic;
+    opacity: 0.9;
+    border-radius: 4px;
+    color: var(--color-text);
+}
+
+/* Desktop sizing for cards */
+@media (min-width: 768px) {
+    .friendsCardsList {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}

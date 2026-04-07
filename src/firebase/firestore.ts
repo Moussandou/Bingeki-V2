@@ -966,12 +966,13 @@ export async function updateChallengeProgress(challengeId: string, participantId
 // ==================== FRIEND RECOMMENDATIONS ====================
 
 // Get how many friends are reading a specific work
-export async function getFriendsReadingWork(userId: string, workId: number): Promise<{ count: number; friends: UserProfile[] }> {
+export async function getFriendsReadingWork(userId: string, workId: number): Promise<{ count: number; friends: { profile: UserProfile; work: Work }[] }> {
     try {
         const friends = await getFriends(userId);
         const acceptedFriends = friends.filter(f => f.status === 'accepted');
 
-        const friendSlice = acceptedFriends.slice(0, 10);
+        // We'll limit to a manageable number for performance on this quick-fetch
+        const friendSlice = acceptedFriends.slice(0, 15);
 
         // Batch fetch all libraries and profiles in parallel
         const [libraries, profiles] = await Promise.all([
@@ -979,11 +980,18 @@ export async function getFriendsReadingWork(userId: string, workId: number): Pro
             Promise.all(friendSlice.map(f => getUserProfile(f.uid)))
         ]);
 
-        const friendsReading = friendSlice
-            .filter((_, i) => libraries[i]?.some(w => w.id === workId) && profiles[i])
-            .map((_, i) => profiles[i]!);
+        const friendsData = friendSlice
+            .map((_, i) => {
+                const friendWork = libraries[i]?.find(w => Number(w.id) === workId);
+                const profile = profiles[i];
+                if (friendWork && profile) {
+                    return { profile, work: friendWork };
+                }
+                return null;
+            })
+            .filter((item): item is { profile: UserProfile; work: Work } => item !== null);
 
-        return { count: friendsReading.length, friends: friendsReading };
+        return { count: friendsData.length, friends: friendsData };
     } catch (error) {
         logger.error('[Firestore] Error getting friends reading work:', error);
         return { count: 0, friends: [] };
