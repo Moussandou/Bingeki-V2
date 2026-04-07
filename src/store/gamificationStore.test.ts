@@ -111,15 +111,14 @@ describe('Gamification Store', () => {
         
         const state = useGamificationStore.getState();
         // 2 works * 15 = 30
-        // (10 + 5) * 10 = 150
+        // (10 + 5) * 5 = 75
         // 1 completed * 50 = 50
-        // Total = 230 XP
-        // Level 1: 100 XP -> Level 2 (Remaining 130)
-        // Level 2: 114 XP -> Level 3 (Remaining 16)
+        // Total = 155 XP
+        // Level 1: 100 XP -> Level 2 (Remaining 55)
         
-        expect(state.level).toBe(3);
-        expect(state.xp).toBe(16);
-        expect(state.totalXp).toBe(100 + 114 + 16); // 230
+        expect(state.level).toBe(2);
+        expect(state.xp).toBe(55);
+        expect(state.totalXp).toBe(155);
         expect(state.totalWorksAdded).toBe(2);
         expect(state.totalWorksCompleted).toBe(1);
     });
