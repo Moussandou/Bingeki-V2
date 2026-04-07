@@ -829,8 +829,11 @@ const resources = {
                     save_error: "Erreur lors de la sauvegarde : ",
                     friend_request_sent: "Demande d'ami envoyée !",
                     friend_request_error: "Erreur lors de l'envoi de la demande",
-                    already_friends: "Vous êtes déjà amis"
+                    already_friends: "Vous êtes déjà amis",
+                    friend_removed: "L'ami a été retiré",
+                    friend_remove_error: "Erreur lors de la suppression de l'ami"
                 },
+                confirm_remove_friend: "Voulez-vous vraiment retirer {{name}} de vos amis ?",
                 add_favorite_character: "Ajouter un personnage favori",
                 character_removed: "Personnage retiré des favoris",
                 add_friend: "AJOUTER EN AMI",
@@ -2093,8 +2096,11 @@ const resources = {
                     save_error: "Error saving: ",
                     friend_request_sent: "Friend request sent!",
                     friend_request_error: "Error sending friend request",
-                    already_friends: "You are already friends"
+                    already_friends: "You are already friends",
+                    friend_removed: "Friend removed successfully",
+                    friend_remove_error: "Error removing friend"
                 },
+                confirm_remove_friend: "Are you sure you want to remove {{name}} from your friends?",
                 add_favorite_character: "Add favorite character",
                 character_removed: "Character removed from favorites",
                 add_friend: "ADD FRIEND",
