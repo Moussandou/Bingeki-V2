@@ -5,6 +5,7 @@ import { BADGE_ICONS } from '@/utils/badges';
 import { NenChart } from './NenChart';
 import styles from './HunterLicenseCard.module.css';
 import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect, useMemo } from 'react';
 import Tilt from 'react-parallax-tilt';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
@@ -231,34 +232,43 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
     return cardContent;
 }
 
+// Make sure React is imported at top or we can just use React.useMemo
 function ParticleBackground() {
-    const particles = Array.from({ length: 30 });
+    const particles = useMemo(() => {
+        return Array.from({ length: 30 }).map((_, i) => {
+            return {
+                id: i,
+                size: Math.random() * 8 + 4,
+                duration: Math.random() * 4 + 4,
+                delay: Math.random() * 8,
+                left: Math.random() * 100,
+                top: Math.random() * 100,
+                x: (Math.random() - 0.5) * 200,
+                y: (Math.random() - 1) * 200,
+                maxOpacity: Math.random() * 0.4 + 0.4
+            };
+        });
+    }, []);
+
     return (
         <div className={styles.particleContainer}>
-            {particles.map((_, i) => {
-                const size = Math.random() * 8 + 4;
-                const duration = Math.random() * 4 + 4;
-                const delay = Math.random() * 8;
-                const x = (Math.random() - 0.5) * 200;
-                const y = (Math.random() - 1) * 200;
-                const maxOpacity = Math.random() * 0.4 + 0.4;
-
+            {particles.map((p) => {
                 return (
                     <div
-                        key={i}
+                        key={p.id}
                         className={styles.particle}
                         style={{
-                            width: `${size}px`,
-                            height: `${size}px`,
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
+                            width: `${p.size}px`,
+                            height: `${p.size}px`,
+                            left: `${p.left}%`,
+                            top: `${p.top}%`,
                             // @ts-ignore
-                            '--duration': `${duration}s`,
-                            '--delay': `${delay}s`,
-                            '--x': `${x}px`,
-                            '--y': `${y}px`,
-                            '--max-opacity': maxOpacity,
-                        } as any}
+                            '--duration': `${p.duration}s`,
+                            '--delay': `${p.delay}s`,
+                            '--x': `${p.x}px`,
+                            '--y': `${p.y}px`,
+                            '--max-opacity': p.maxOpacity
+                        } as React.CSSProperties}
                     />
                 );
             })}

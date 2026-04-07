@@ -195,8 +195,19 @@ function App() {
     }
 
     // Handle ChunkLoadError - this happens when a new version is deployed
-    // and the user's browser 8tries to fetch a chunk that no longer exists
+    // and the user's browser tries to fetch a chunk that no longer exists
     const handleChunkError = (e: ErrorEvent) => {
+      // Safely ignore benign ResizeObserver error from Recharts/browser that triggers Vite's grey error overlay
+      if (e.message === 'ResizeObserver loop limit exceeded' || e.message === 'ResizeObserver loop completed with undelivered notifications.') {
+        e.stopImmediatePropagation();
+        
+        // Hide Vite's error overlay if it appears in dev
+        const viteOverlay = document.querySelector('vite-error-overlay');
+        if (viteOverlay) viteOverlay.remove();
+        
+        return;
+      }
+
       if (e.message && (e.message.includes('ChunkLoadError') || e.message.includes('Loading chunk'))) {
         logger.warn('[App] ChunkLoadError detected, reloading page...');
         window.location.reload();
