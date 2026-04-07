@@ -1113,8 +1113,11 @@ export default function WorkDetails() {
                                             || work.trailer.images?.large_image_url
                                             || work.trailer.images?.medium_image_url
                                             || work.trailer.images?.small_image_url
-                                            || (work.trailer.youtube_id ? `https://img.youtube.com/vi/${work.trailer.youtube_id}/maxresdefault.jpg` : null)
-                                            || (work.trailer.youtube_id ? `https://img.youtube.com/vi/${work.trailer.youtube_id}/hqdefault.jpg` : null);
+                                            || (work.trailer.youtube_id ? `https://img.youtube.com/vi/${work.trailer.youtube_id}/maxresdefault.jpg` : null);
+                                        
+                                        const trailerFallback = work.trailer.youtube_id 
+                                            ? `https://img.youtube.com/vi/${work.trailer.youtube_id}/hqdefault.jpg`
+                                            : undefined;
 
                                         return (
                                             <div className={styles.trailerSection}>
@@ -1144,6 +1147,7 @@ export default function WorkDetails() {
                                                         <>
                                                             <OptimizedImage
                                                                 src={trailerThumbnail || ''}
+                                                                fallback={trailerFallback}
                                                                 alt="Trailer Thumbnail"
                                                                 className={styles.trailerThumbnail}
                                                             />
