@@ -34,8 +34,9 @@ export const ReloadPrompt: React.FC = () => {
                     style={{
                         position: 'fixed',
                         bottom: '1.5rem',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
+                        left: '0',
+                        right: '0',
+                        margin: '0 auto',
                         zIndex: 10000,
                         width: 'calc(100% - 2rem)',
                         maxWidth: '450px',
