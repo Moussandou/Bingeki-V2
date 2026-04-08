@@ -1,9 +1,14 @@
 const { onRequest, onCall, HttpsError } = require("firebase-functions/v2/https");
 const { onDocumentWritten } = require("firebase-functions/v2/firestore");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const admin = require("firebase-admin");
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const { TTL_MS, readCache, writeCache, readTranslation, writeTranslation } = require("./cache");
+const { Timestamp, FieldValue } = require("firebase-admin/firestore");
+const { jikanFetch } = require("./jikan");
+const { scrapeFRSynopsis } = require("./scraper");
 
 admin.initializeApp();
 const app = express();
@@ -690,7 +695,7 @@ exports.onLibraryUpdate = onDocumentWritten('users/{userId}/data/library', async
                 streak,
                 lastActivityDate,
                 bonusXp,
-                lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+                lastUpdated: FieldValue.serverTimestamp()
             }, { merge: true });
 
             // Update Gamification Doc (Data integrity)
@@ -855,7 +860,7 @@ exports.recalculateAllUserStats = onCall({
             batch.set(admin.firestore().collection('users').doc(userId), {
                 ...stats,
                 badges,
-                lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+                lastUpdated: FieldValue.serverTimestamp()
             }, { merge: true });
 
             // Update Gamification Doc
@@ -1072,4 +1077,191 @@ exports.rejectFriendRequestFn = onCall(async (request) => {
 
     console.log(`[Friends] ${currentUserId} rejected/removed ${friendUid}`);
     return { success: true };
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Jikan Proxy + Firestore Cache
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Helper: cache-first fetch pattern with optional background refresh.
+ * @param {string} cacheKey   Firestore document ID in apiCache collection
+ * @param {number} ttl        TTL in milliseconds
+ * @param {() => Promise<*>}  fetchFn  Called on cache miss to get fresh data
+ */
+async function cachedFetch(cacheKey, ttl, fetchFn) {
+  const cached = await readCache(cacheKey, ttl);
+  if (cached.hit) {
+    if (cached.stale) {
+      console.log(`[cachedFetch] Stale — refreshing in background: ${cacheKey}`);
+      fetchFn().then((data) => data !== null && writeCache(cacheKey, data)).catch((err) => {
+        console.warn(`[cachedFetch] Background refresh failed for ${cacheKey}:`, err.message);
+      });
+    }
+    return cached.data;
+  }
+  console.log(`[cachedFetch] Calling Jikan for: ${cacheKey}`);
+  const t0 = Date.now();
+  const data = await fetchFn();
+  console.log(`[cachedFetch] Jikan responded in ${Date.now() - t0}ms for: ${cacheKey}`);
+  if (data !== null) await writeCache(cacheKey, data);
+  return data;
+}
+
+// GET /anime|manga/{id}/full
+exports.getWorkDetails = onCall(async (request) => {
+  const { id, type } = request.data;
+  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+  console.log(`[getWorkDetails] id=${id} type=${type}`);
+  const key = `${type}_details_${id}`;
+  return cachedFetch(key, TTL_MS.DETAILS, () => jikanFetch(`/${type}/${id}/full`));
+});
+
+// Search anime or manga
+exports.searchWorks = onCall(async (request) => {
+  const { query, type, page = 1 } = request.data;
+  if (!query || !type) throw new HttpsError('invalid-argument', 'query and type are required');
+  const key = `search_${type}_${Buffer.from(`${query}_p${page}`).toString('base64').slice(0, 40)}`;
+  return cachedFetch(key, TTL_MS.SEARCH, () =>
+    jikanFetch(`/${type}?q=${encodeURIComponent(query)}&page=${page}&sfw=true`, true)
+  );
+});
+
+// Characters
+exports.getWorkCharacters = onCall(async (request) => {
+  const { id, type } = request.data;
+  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+  const key = `${type}_characters_${id}`;
+  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/${type}/${id}/characters`));
+});
+
+// Relations
+exports.getWorkRelations = onCall(async (request) => {
+  const { id, type } = request.data;
+  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+  const key = `${type}_relations_${id}`;
+  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/${type}/${id}/relations`));
+});
+
+// Pictures
+exports.getWorkPictures = onCall(async (request) => {
+  const { id, type } = request.data;
+  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+  const key = `${type}_pictures_${id}`;
+  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/${type}/${id}/pictures`));
+});
+
+// Statistics
+exports.getWorkStatistics = onCall(async (request) => {
+  const { id, type } = request.data;
+  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+  const key = `${type}_stats_${id}`;
+  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/${type}/${id}/statistics`));
+});
+
+// Recommendations
+exports.getWorkRecommendations = onCall(async (request) => {
+  const { id, type } = request.data;
+  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+  const key = `${type}_recs_${id}`;
+  return cachedFetch(key, TTL_MS.RECOMMENDATIONS, () => jikanFetch(`/${type}/${id}/recommendations`));
+});
+
+// Anime episodes (paginated)
+exports.getAnimeEpisodes = onCall(async (request) => {
+  const { id, page = 1 } = request.data;
+  if (!id) throw new HttpsError('invalid-argument', 'id is required');
+  const key = `anime_episodes_${id}_p${page}`;
+  return cachedFetch(key, TTL_MS.EPISODES, () => jikanFetch(`/anime/${id}/episodes?page=${page}`, true));
+});
+
+// Anime streaming links
+exports.getAnimeStreaming = onCall(async (request) => {
+  const { id } = request.data;
+  if (!id) throw new HttpsError('invalid-argument', 'id is required');
+  const key = `anime_streaming_${id}`;
+  return cachedFetch(key, TTL_MS.STREAMING, () => jikanFetch(`/anime/${id}/streaming`));
+});
+
+// Anime staff
+exports.getAnimeStaff = onCall(async (request) => {
+  const { id } = request.data;
+  if (!id) throw new HttpsError('invalid-argument', 'id is required');
+  const key = `anime_staff_${id}`;
+  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/anime/${id}/staff`));
+});
+
+// Anime themes (openings/endings)
+exports.getAnimeThemes = onCall(async (request) => {
+  const { id } = request.data;
+  if (!id) throw new HttpsError('invalid-argument', 'id is required');
+  const key = `anime_themes_${id}`;
+  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/anime/${id}/themes`));
+});
+
+// Reviews
+exports.getWorkReviews = onCall(async (request) => {
+  const { id, type } = request.data;
+  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+  const key = `${type}_reviews_${id}`;
+  return cachedFetch(key, TTL_MS.SECONDARY, () =>
+    jikanFetch(`/${type}/${id}/reviews?spoilers=false&preliminary=false`)
+  );
+});
+
+// French synopsis from Nautiljon
+exports.getFRTranslation = onCall(async (request) => {
+  const { id, type, titleFrench, titleRomaji } = request.data;
+  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+
+  console.log(`[getFRTranslation] id=${id} type=${type} titleFrench="${titleFrench}" titleRomaji="${titleRomaji}"`);
+  const key = `fr_${type}_${id}`;
+  const cached = await readTranslation(key);
+  if (cached.hit) {
+    if (cached.notFound) {
+      console.log(`[getFRTranslation] Negative cache hit — no FR translation for ${key}`);
+      return null;
+    }
+    console.log(`[getFRTranslation] Cache hit — returning stored FR synopsis for ${key}`);
+    return cached.synopsis;
+  }
+
+  console.log(`[getFRTranslation] Scraping Nautiljon for ${key}...`);
+  const synopsis = await scrapeFRSynopsis(titleFrench, titleRomaji, type);
+  if (synopsis) {
+    console.log(`[getFRTranslation] Scraped synopsis (${synopsis.length} chars) for ${key}`);
+  } else {
+    console.log(`[getFRTranslation] No FR synopsis found on Nautiljon for ${key}`);
+  }
+  await writeTranslation(key, synopsis);
+  return synopsis;
+});
+
+// Scheduled background sync — refresh stale cache entries (runs daily at 3am UTC)
+exports.syncStaleCache = onSchedule('0 3 * * *', async () => {
+  const db = admin.firestore();
+  const now = Date.now();
+  // Refresh details entries older than 20h (before 24h TTL expires)
+  const staleThreshold = Timestamp.fromMillis(now - 20 * 60 * 60 * 1000);
+
+  const snapshot = await db.collection('apiCache')
+    .where('fetchedAt', '<', staleThreshold)
+    .limit(50)
+    .get();
+
+  const refreshPromises = snapshot.docs.map(async (doc) => {
+    const key = doc.id;
+    const match = key.match(/^(anime|manga)_details_(\d+)$/);
+    if (!match) return;
+    const [, type, id] = match;
+    try {
+      const data = await jikanFetch(`/${type}/${id}/full`);
+      if (data) await writeCache(key, data);
+    } catch (err) {
+      console.warn(`[SyncStale] Failed to refresh ${key}:`, err.message);
+    }
+  });
+
+  await Promise.allSettled(refreshPromises);
+  console.log(`[SyncStale] Refreshed ${snapshot.docs.length} entries`);
 });

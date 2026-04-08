@@ -37,7 +37,21 @@ export default defineConfig({
       },
       workbox: {
         navigateFallbackDenylist: [/^\/sitemap\.xml$/, /^\/robots\.txt$/],
-        globIgnores: ['**/sitemap.xml', '**/robots.txt']
+        globIgnores: ['**/sitemap.xml', '**/robots.txt'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/cdn\.myanimelist\.net\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'mal-images',
+              expiration: {
+                maxEntries: 500,
+                maxAgeSeconds: 7 * 24 * 60 * 60, // 7 jours
+              },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
       }
     })
   ],

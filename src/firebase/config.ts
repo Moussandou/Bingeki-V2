@@ -1,10 +1,10 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { initializeFirestore, memoryLocalCache } from 'firebase/firestore';
+import { initializeFirestore, memoryLocalCache, connectFirestoreEmulator } from 'firebase/firestore';
 import { getAnalytics } from 'firebase/analytics';
 import { getStorage } from 'firebase/storage';
 import { getMessaging } from 'firebase/messaging';
-import { getFunctions } from 'firebase/functions';
+import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -26,3 +26,8 @@ export const storage = getStorage(app);
 export const analytics = getAnalytics(app);
 export const messaging = getMessaging(app);
 export const functions = getFunctions(app);
+
+if (import.meta.env.DEV && import.meta.env.VITE_USE_EMULATORS === 'true') {
+    connectFunctionsEmulator(functions, 'localhost', 5001);
+    connectFirestoreEmulator(db, 'localhost', 8080);
+}

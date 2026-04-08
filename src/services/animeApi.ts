@@ -1,5 +1,20 @@
 import { queuedFetch } from '@/utils/apiQueue';
 import { useSettingsStore } from '@/store/settingsStore';
+import {
+    getWorkDetailsFn,
+    searchWorksFn,
+    getWorkCharactersFn,
+    getWorkRelationsFn,
+    getWorkPicturesFn,
+    getWorkStatisticsFn,
+    getWorkRecommendationsFn,
+    getAnimeEpisodesFn,
+    getAnimeStreamingFn,
+    getAnimeStaffFn,
+    getAnimeThemesFn,
+    getWorkReviewsFn,
+} from '@/firebase/functions';
+import type { HttpsCallable } from 'firebase/functions';
 
 const BASE_URL = 'https://api.jikan.moe/v4';
  
@@ -45,29 +60,129 @@ const CACHE_TTL_SHORT = 10 * 60 * 1000;   // 10 min — search results, trending
 const CACHE_TTL_MEDIUM = 60 * 60 * 1000;  // 1 hour — reviews, stats, staff
 const CACHE_TTL_LONG = 4 * 60 * 60 * 1000; // 4 hours — anime details, characters, episodes
 
+const LS_PREFIX = 'bgk_c_';
+
+/** Read from localStorage into the in-memory map (lazy, on first access per key). */
+const hydrateFromLS = (key: string): void => {
+    if (API_CACHE.has(key)) return;
+    try {
+        const raw = localStorage.getItem(LS_PREFIX + key);
+        if (raw) {
+            const entry = JSON.parse(raw) as CacheEntry<unknown>;
+            API_CACHE.set(key, entry);
+        }
+    } catch {
+        // localStorage unavailable or corrupted — ignore
+    }
+};
+
+/** Persist an entry to localStorage, silently skip if quota exceeded. */
+const persistToLS = (key: string, entry: CacheEntry<unknown>): void => {
+    try {
+        localStorage.setItem(LS_PREFIX + key, JSON.stringify(entry));
+    } catch {
+        // Quota exceeded — remove oldest bgk_c_ entries and retry once
+        try {
+            const lsKeys = Object.keys(localStorage).filter(k => k.startsWith(LS_PREFIX));
+            if (lsKeys.length > 0) {
+                // Remove the one with the oldest timestamp
+                let oldest = lsKeys[0];
+                let oldestTs = Infinity;
+                for (const k of lsKeys) {
+                    try {
+                        const e = JSON.parse(localStorage.getItem(k) || '{}') as CacheEntry<unknown>;
+                        if (e.timestamp < oldestTs) { oldestTs = e.timestamp; oldest = k; }
+                    } catch { /* skip */ }
+                }
+                localStorage.removeItem(oldest);
+                localStorage.setItem(LS_PREFIX + key, JSON.stringify(entry));
+            }
+        } catch { /* still no space — skip silently */ }
+    }
+};
+
 const getCached = <T>(key: string, ttl: number = CACHE_TTL_SHORT): T | null => {
+    hydrateFromLS(key);
     const cached = API_CACHE.get(key) as CacheEntry<T> | undefined;
     if (cached && Date.now() - cached.timestamp < ttl) {
-        if (cached.isError) return null; // Treat negative cache as miss for list functions
+        if (cached.isError) return null;
         return cached.data;
     }
-    if (cached) API_CACHE.delete(key);
+    if (cached) {
+        API_CACHE.delete(key);
+        try { localStorage.removeItem(LS_PREFIX + key); } catch { /* ignore */ }
+    }
     return null;
 };
 
 const getCachedDetail = <T>(key: string, ttl: number = CACHE_TTL_LONG): T | 'NOT_FOUND' | null => {
+    hydrateFromLS(key);
     const cached = API_CACHE.get(key) as CacheEntry<T> | undefined;
     if (cached && Date.now() - cached.timestamp < ttl) {
         if (cached.isError) return 'NOT_FOUND';
         return cached.data;
     }
-    if (cached) API_CACHE.delete(key);
+    if (cached) {
+        API_CACHE.delete(key);
+        try { localStorage.removeItem(LS_PREFIX + key); } catch { /* ignore */ }
+    }
     return null;
 };
 
 const setCache = <T>(key: string, data: T, isError: boolean = false) => {
-    API_CACHE.set(key, { data, timestamp: Date.now(), isError } as CacheEntry<unknown>);
+    const entry: CacheEntry<unknown> = { data, timestamp: Date.now(), isError };
+    API_CACHE.set(key, entry);
+    persistToLS(key, entry);
 };
+
+/** In-flight requests — prevents duplicate concurrent calls (e.g. React StrictMode double-mount) */
+const inflight = new Map<string, Promise<any>>();
+
+/**
+ * Call a Cloud Function proxy with session cache.
+ * Checks in-memory session cache first, then calls the Function.
+ * Deduplicates concurrent calls with the same key.
+ * Falls back to defaultValue on error if provided, otherwise re-throws.
+ */
+async function callProxy<T, I = any>(
+    fn: HttpsCallable<I, any>,
+    args: I,
+    cacheKey: string,
+    ttl: number,
+    defaultValue?: T
+): Promise<T> {
+    const sessionCached = getCached<T>(cacheKey, ttl);
+    if (sessionCached !== null) {
+        console.debug(`%c[Cache] SESSION HIT`, 'color: #22c55e; font-weight: bold', cacheKey);
+        return sessionCached;
+    }
+    if (inflight.has(cacheKey)) {
+        console.debug(`%c[Cache] IN-FLIGHT`, 'color: #a855f7; font-weight: bold', cacheKey);
+        return inflight.get(cacheKey) as Promise<T>;
+    }
+    console.debug(`%c[Cache] SESSION MISS — calling Cloud Function`, 'color: #f59e0b; font-weight: bold', cacheKey, args);
+    const promise = (async () => {
+        try {
+            const t0 = performance.now();
+            const result = await fn(args);
+            const data = result.data as T;
+            setCache<T>(cacheKey, data);
+            console.debug(`%c[Cloud Function] OK`, 'color: #3b82f6; font-weight: bold', cacheKey, `${Math.round(performance.now() - t0)}ms`);
+            return data;
+        } catch (error) {
+            console.error(`%c[Cloud Function] ERROR`, 'color: #ef4444; font-weight: bold', cacheKey, error);
+            if (defaultValue !== undefined) {
+                console.warn(`%c[Cloud Function] Falling back to default value for`, 'color: #f97316', cacheKey);
+                return defaultValue;
+            }
+            throw error;
+        } finally {
+            inflight.delete(cacheKey);
+        }
+    })();
+    inflight.set(cacheKey, promise);
+    return promise;
+}
 
 // Check Jikan API status
 export const checkJikanStatus = async (): Promise<JikanStatusResponse> => {
@@ -169,37 +284,19 @@ export interface SearchFilters {
 export const searchWorks = async (
     query: string,
     type: 'anime' | 'manga' = 'manga',
-    filters?: SearchFilters
+    filters?: SearchFilters,
+    page: number = 1
 ): Promise<JikanResult[]> => {
     const { nsfwMode } = useSettingsStore.getState();
-    const cacheKey = `search_${type}_${query}_${JSON.stringify(filters || {})}_nsfw_${nsfwMode}`;
-    const cached = getCached<JikanResult[]>(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const params = new URLSearchParams({
-            q: query,
-            limit: '24',
-            sfw: (!nsfwMode).toString(),
-        });
-
-        if (filters) {
-            Object.entries(filters).forEach(([key, value]) => {
-                if (value !== undefined) {
-                    params.append(key, String(value));
-                }
-            });
-        }
-
-        const response = await queuedFetch(`${BASE_URL}/${type}?${params.toString()}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        setCache<JikanResult[]>(cacheKey, data.data);
-        return data.data as JikanResult[];
-    } catch (error) {
-        console.error('API Error:', error);
-        return [];
-    }
+    const cacheKey = `search_${type}_${query}_${JSON.stringify(filters || {})}_nsfw_${nsfwMode}_p${page}`;
+    const result = await callProxy<{ data: JikanResult[] }>(
+        searchWorksFn,
+        { query, type, page, filters, nsfwMode },
+        cacheKey,
+        CACHE_TTL_SHORT,
+        { data: [] }
+    );
+    return result?.data ?? [];
 };
 
 export const getTopWorks = async (
@@ -258,19 +355,13 @@ export interface JikanEpisode {
 
 export const getAnimeEpisodes = async (id: number, page: number = 1): Promise<{ data: JikanEpisode[]; pagination: JikanPagination }> => {
     const cacheKey = `anime_${id}_episodes_p${page}`;
-    const cached = getCached<{ data: JikanEpisode[]; pagination: JikanPagination }>(cacheKey, CACHE_TTL_LONG);
-    if (cached) return cached;
-    try {
-        const response = await queuedFetch(`${BASE_URL}/anime/${id}/episodes?page=${page}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        const result = { data: data.data as JikanEpisode[], pagination: data.pagination };
-        setCache(cacheKey, result);
-        return result;
-    } catch (error) {
-        console.error('API Error:', error);
-        return { data: [], pagination: { has_next_page: false, last_visible_page: 1 } };
-    }
+    return callProxy(
+        getAnimeEpisodesFn,
+        { id, page },
+        cacheKey,
+        CACHE_TTL_LONG,
+        { data: [], pagination: { has_next_page: false, last_visible_page: 1 } }
+    );
 };
 
 export const getAnimeEpisodeDetails = async (id: number, episodeId: number): Promise<{ synopsis: string; duration: number } | null> => {
@@ -292,29 +383,27 @@ export const getAnimeEpisodeDetails = async (id: number, episodeId: number): Pro
 
 export const getWorkDetails = async (id: number, type: 'anime' | 'manga'): Promise<JikanResult> => {
     const cacheKey = `${type}_${id}_details`;
-    const cached = getCachedDetail<JikanResult>(cacheKey, CACHE_TTL_LONG);
-    if (cached === 'NOT_FOUND') throw new ApiError(404, `${type} with ID ${id} not found (cached)`);
-    if (cached) return cached;
+    const sessionCached = getCachedDetail<JikanResult>(cacheKey, CACHE_TTL_LONG);
+    if (sessionCached === 'NOT_FOUND') throw new ApiError(404, `${type} with ID ${id} not found (cached)`);
+    if (sessionCached) {
+        console.debug(`%c[Cache] SESSION HIT`, 'color: #22c55e; font-weight: bold', cacheKey);
+        return sessionCached;
+    }
 
+    console.debug(`%c[Cache] SESSION MISS — calling Cloud Function getWorkDetails`, 'color: #f59e0b; font-weight: bold', { id, type });
     try {
-        const response = await queuedFetch(`${BASE_URL}/${type}/${id}`);
-        if (response.status === 404) {
-             setCache(cacheKey, null, true);
-             throw new ApiError(404, `${type} with ID ${id} not found`);
+        const t0 = performance.now();
+        const result = await getWorkDetailsFn({ id, type });
+        if (!result.data) {
+            setCache(cacheKey, null, true);
+            throw new ApiError(404, `${type} with ID ${id} not found`);
         }
-        if (!response.ok) {
-            throw new ApiError(response.status, `Jikan API error: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
-        
-        if (data.status === 404 || (data.error && data.error.includes('not found'))) {
-             throw new ApiError(404, `${type} with ID ${id} not found (API response)`);
-        }
-        
-        setCache<JikanResult>(cacheKey, data.data);
-        return data.data as JikanResult;
+        const data = result.data as JikanResult;
+        setCache<JikanResult>(cacheKey, data);
+        console.debug(`%c[Cloud Function] getWorkDetails OK`, 'color: #3b82f6; font-weight: bold', `${Math.round(performance.now() - t0)}ms`);
+        return data;
     } catch (error) {
-        console.error(`API Error fetching ${type} ${id}:`, error);
+        console.error(`%c[Cloud Function] getWorkDetails ERROR`, 'color: #ef4444; font-weight: bold', error);
         throw error;
     }
 };
@@ -332,29 +421,27 @@ export interface JikanResultFull extends JikanResult {
 
 export const getWorkFull = async (id: number, type: 'anime' | 'manga'): Promise<JikanResultFull> => {
     const cacheKey = `${type}_${id}_full`;
-    const cached = getCachedDetail<JikanResultFull>(cacheKey, CACHE_TTL_LONG);
-    if (cached === 'NOT_FOUND') throw new ApiError(404, `Full ${type} with ID ${id} not found (cached)`);
-    if (cached) return cached;
+    const sessionCached = getCachedDetail<JikanResultFull>(cacheKey, CACHE_TTL_LONG);
+    if (sessionCached === 'NOT_FOUND') throw new ApiError(404, `Full ${type} with ID ${id} not found (cached)`);
+    if (sessionCached) {
+        console.debug(`%c[Cache] SESSION HIT`, 'color: #22c55e; font-weight: bold', cacheKey);
+        return sessionCached;
+    }
 
+    console.debug(`%c[Cache] SESSION MISS — calling Cloud Function getWorkFull`, 'color: #f59e0b; font-weight: bold', { id, type });
     try {
-        const response = await queuedFetch(`${BASE_URL}/${type}/${id}/full`);
-        if (response.status === 404) {
-             setCache(cacheKey, null, true);
-             throw new ApiError(404, `Full ${type} with ID ${id} not found`);
+        const t0 = performance.now();
+        const result = await getWorkDetailsFn({ id, type });
+        if (!result.data) {
+            setCache(cacheKey, null, true);
+            throw new ApiError(404, `Full ${type} with ID ${id} not found`);
         }
-        if (!response.ok) {
-            throw new ApiError(response.status, `Jikan API error: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
-
-        if (data.status === 404 || (data.error && data.error.includes('not found'))) {
-             throw new ApiError(404, `Full ${type} with ID ${id} not found (API response)`);
-        }
-
-        setCache<JikanResultFull>(cacheKey, data.data);
-        return data.data as JikanResultFull;
+        const data = result.data as JikanResultFull;
+        setCache<JikanResultFull>(cacheKey, data);
+        console.debug(`%c[Cloud Function] getWorkFull OK`, 'color: #3b82f6; font-weight: bold', `${Math.round(performance.now() - t0)}ms`);
+        return data;
     } catch (error) {
-        console.error(`API Error fetching full ${type} ${id}:`, error);
+        console.error(`%c[Cloud Function] getWorkFull ERROR`, 'color: #ef4444; font-weight: bold', error);
         throw error;
     }
 };
@@ -390,21 +477,7 @@ export interface JikanCharacter {
 }
 
 export const getWorkCharacters = async (id: number, type: 'anime' | 'manga'): Promise<JikanCharacter[]> => {
-    const cacheKey = `${type}_${id}_characters`;
-    const cached = getCached<JikanCharacter[]>(cacheKey, CACHE_TTL_LONG);
-    if (cached) return cached;
-
-    try {
-        const response = await queuedFetch(`${BASE_URL}/${type}/${id}/characters`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        const chars = data.data as JikanCharacter[];
-        setCache<JikanCharacter[]>(cacheKey, chars);
-        return chars;
-    } catch (error) {
-        console.error('API Error:', error);
-        return [];
-    }
+    return callProxy(getWorkCharactersFn, { id, type }, `${type}_${id}_characters`, CACHE_TTL_LONG, []);
 };
 
 export interface JikanRelation {
@@ -418,20 +491,7 @@ export interface JikanRelation {
 }
 
 export const getWorkRelations = async (id: number, type: 'anime' | 'manga'): Promise<JikanRelation[]> => {
-    const cacheKey = `${type}_${id}_relations`;
-    const cached = getCached<JikanRelation[]>(cacheKey, CACHE_TTL_LONG);
-    if (cached) return cached;
-
-    try {
-        const response = await queuedFetch(`${BASE_URL}/${type}/${id}/relations`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        setCache<JikanRelation[]>(cacheKey, data.data);
-        return data.data as JikanRelation[];
-    } catch (error) {
-        console.error('API Error:', error);
-        return [];
-    }
+    return callProxy(getWorkRelationsFn, { id, type }, `${type}_${id}_relations`, CACHE_TTL_LONG, []);
 };
 
 export interface JikanRecommendation {
@@ -450,21 +510,7 @@ export interface JikanRecommendation {
 }
 
 export const getWorkRecommendations = async (id: number, type: 'anime' | 'manga'): Promise<JikanRecommendation[]> => {
-    const cacheKey = `${type}_${id}_recommendations`;
-    const cached = getCached<JikanRecommendation[]>(cacheKey, CACHE_TTL_MEDIUM);
-    if (cached) return cached;
-
-    try {
-        const response = await queuedFetch(`${BASE_URL}/${type}/${id}/recommendations`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        const recs = (data.data as JikanRecommendation[]).slice(0, 12); // Limit to 12 recs
-        setCache<JikanRecommendation[]>(cacheKey, recs);
-        return recs;
-    } catch (error) {
-        console.error('API Error:', error);
-        return [];
-    }
+    return callProxy(getWorkRecommendationsFn, { id, type }, `${type}_${id}_recommendations`, CACHE_TTL_MEDIUM, []);
 };
 
 export interface JikanPicture {
@@ -474,21 +520,8 @@ export interface JikanPicture {
     };
 }
 
-export const getWorkPictures = async (id: number, type: 'anime' | 'manga') => {
-    const cacheKey = `${type}_${id}_pictures`;
-    const cached = getCached<JikanPicture[]>(cacheKey, CACHE_TTL_LONG);
-    if (cached) return cached;
-
-    try {
-        const response = await queuedFetch(`${BASE_URL}/${type}/${id}/pictures`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        setCache<JikanPicture[]>(cacheKey, data.data);
-        return data.data as JikanPicture[];
-    } catch (error) {
-        console.error('API Error:', error);
-        return [];
-    }
+export const getWorkPictures = async (id: number, type: 'anime' | 'manga'): Promise<JikanPicture[]> => {
+    return callProxy(getWorkPicturesFn, { id, type }, `${type}_${id}_pictures`, CACHE_TTL_LONG, []);
 };
 
 export interface JikanTheme {
@@ -497,20 +530,7 @@ export interface JikanTheme {
 }
 
 export const getWorkThemes = async (id: number): Promise<JikanTheme> => {
-    const cacheKey = `anime_${id}_themes`;
-    const cached = getCached<JikanTheme>(cacheKey, CACHE_TTL_LONG);
-    if (cached) return cached;
-
-    try {
-        const response = await queuedFetch(`${BASE_URL}/anime/${id}/themes`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        setCache<JikanTheme>(cacheKey, data.data);
-        return data.data as JikanTheme;
-    } catch (error) {
-        console.error('API Error:', error);
-        return { openings: [], endings: [] };
-    }
+    return callProxy(getAnimeThemesFn, { id }, `anime_${id}_themes`, CACHE_TTL_LONG, { openings: [], endings: [] });
 };
 
 export interface JikanStatistics {
@@ -528,20 +548,7 @@ export interface JikanStatistics {
 }
 
 export const getWorkStatistics = async (id: number, type: 'anime' | 'manga'): Promise<JikanStatistics> => {
-    const cacheKey = `${type}_${id}_statistics`;
-    const cached = getCached<JikanStatistics>(cacheKey, CACHE_TTL_MEDIUM);
-    if (cached) return cached;
-
-    try {
-        const response = await queuedFetch(`${BASE_URL}/${type}/${id}/statistics`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        setCache<JikanStatistics>(cacheKey, data.data);
-        return data.data as JikanStatistics;
-    } catch (error) {
-        console.error(`API Error fetching ${type} ${id} statistics:`, error);
-        throw error;
-    }
+    return callProxy(getWorkStatisticsFn, { id, type }, `${type}_${id}_statistics`, CACHE_TTL_MEDIUM);
 };
 
 export interface JikanStreaming {
@@ -549,21 +556,8 @@ export interface JikanStreaming {
     url: string;
 }
 
-export const getAnimeStreaming = async (id: number) => {
-    const cacheKey = `anime_${id}_streaming`;
-    const cached = getCached<JikanStreaming[]>(cacheKey, CACHE_TTL_LONG);
-    if (cached) return cached;
-
-    try {
-        const response = await queuedFetch(`${BASE_URL}/anime/${id}/streaming`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        setCache<JikanStreaming[]>(cacheKey, data.data);
-        return data.data as JikanStreaming[];
-    } catch (error) {
-        console.error('API Error:', error);
-        return [];
-    }
+export const getAnimeStreaming = async (id: number): Promise<JikanStreaming[]> => {
+    return callProxy(getAnimeStreamingFn, { id }, `anime_${id}_streaming`, CACHE_TTL_LONG, []);
 };
 
 export interface JikanStaff {
@@ -582,19 +576,7 @@ export interface JikanStaff {
 
 
 export const getAnimeStaff = async (id: number): Promise<JikanStaff[]> => {
-    const cacheKey = `anime_${id}_staff`;
-    const cached = getCached<JikanStaff[]>(cacheKey, CACHE_TTL_LONG);
-    if (cached) return cached;
-    try {
-        const response = await queuedFetch(`${BASE_URL}/anime/${id}/staff`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        setCache(cacheKey, data.data as JikanStaff[]);
-        return data.data as JikanStaff[];
-    } catch (error) {
-        console.error('API Error:', error);
-        return [];
-    }
+    return callProxy(getAnimeStaffFn, { id }, `anime_${id}_staff`, CACHE_TTL_LONG, []);
 };
 
 export const getAnimeSchedule = async (filter?: string) => {
@@ -659,19 +641,13 @@ export interface JikanReview {
 }
 
 export const getWorkReviews = async (id: number, type: 'anime' | 'manga') => {
-    const cacheKey = `${type}_${id}_reviews`;
-    const cached = getCached<JikanReview[]>(cacheKey, CACHE_TTL_MEDIUM);
-    if (cached) return cached;
-    try {
-        const response = await queuedFetch(`${BASE_URL}/${type}/${id}/reviews?spoilers=false&preliminary=false`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        setCache(cacheKey, data.data as JikanReview[]);
-        return data.data as JikanReview[];
-    } catch (error) {
-        console.error('API Error:', error);
-        return [];
-    }
+    return callProxy<JikanReview[]>(
+        getWorkReviewsFn,
+        { id, type },
+        `${type}_${id}_reviews`,
+        CACHE_TTL_MEDIUM,
+        []
+    );
 };
 
 // ==================== CHARACTER & PERSON ENDPOINTS ====================

@@ -198,6 +198,20 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // ==================== API CACHE (Cloud Functions only) ====================
+
+    // Shared Jikan API cache — readable by all, writable only by Cloud Functions (Admin SDK)
+    match /apiCache/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // French translations from Nautiljon — same policy
+    match /translations/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     // ==================== LEGACY / ROOT ACCESS ====================
     // DELETED: Legacy root collections removed for security.
     // All data must go through users/{userId}/data/ subcollections.

@@ -199,7 +199,8 @@ export default function Social() {
         } finally {
             setLoading(false);
         }
-    }, [activeTab, leaderboardCategory, user, fetchFriends, friends, leaderboardLoaded, friendsEnriched, activityLoaded]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeTab, leaderboardCategory, user, leaderboardLoaded, friendsEnriched, activityLoaded]);
 
     // Reset tab-specific loading states when filters change
     useEffect(() => {
@@ -208,7 +209,9 @@ export default function Social() {
 
     useEffect(() => {
         loadData();
-    }, [loadData]);
+    // loadData is intentionally omitted — we depend on its stable inputs above
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeTab, leaderboardCategory, user, leaderboardLoaded, friendsEnriched, activityLoaded]);
 
 
     useEffect(() => {

@@ -26,6 +26,7 @@ import {
     getWorkCharacters, getWorkRecommendations, getWorkPictures, getWorkStatistics, type JikanCharacter, type JikanRelation, type JikanRecommendation, type JikanPicture, type JikanTheme, type JikanStatistics, type JikanStreaming,
     getAnimeStaff, type JikanStaff, getWorkReviews, type JikanReview, getWorkFull, ApiError
 } from '../services/animeApi';
+import { getFRTranslationFn } from '@/firebase/functions';
 import { handleProgressUpdateWithXP } from '@/utils/progressUtils';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { SEO } from '@/components/layout/SEO';
@@ -292,7 +293,7 @@ const RecursiveComment = memo(function RecursiveComment({
 export default function WorkDetails() {
     const { id } = useParams();
     const navigate = useLocalizedNavigate();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { addToast } = useToast(); // Initialize hook
     const { getWork, addWork, updateStatus, updateWorkDetails, removeWork } = useLibraryStore(); // Add removeWork
     const { recalculateStats } = useGamificationStore();
@@ -305,6 +306,7 @@ export default function WorkDetails() {
     const [fetchedWork, setFetchedWork] = useState<DetailedWork | null>(null);
     const [isFetchingDetails, setIsFetchingDetails] = useState(false);
     const [fetchError, setFetchError] = useState<{ status: number; message: string } | null>(null);
+    const [synopsisFr, setSynopsisFr] = useState<string | null>(null);
 
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 
@@ -452,6 +454,12 @@ export default function WorkDetails() {
                     setFetchedWork(mapped);
                     setFetchError(null);
                     setIsFetchingDetails(false);
+
+                    // Fetch French synopsis from Nautiljon in background
+                    const titleFrench = res.titles?.find((entry: { type: string; title: string }) => entry.type === 'French')?.title;
+                    getFRTranslationFn({ id: res.mal_id, type: internalType === 'manga' ? 'manga' : 'anime', titleFrench, titleRomaji: res.title })
+                        .then(result => { if (result.data) setSynopsisFr(result.data as string); })
+                        .catch(() => {});
                 } catch (err) {
                     if (!isRetry && err instanceof ApiError && err.status === 404) {
                         const nextType = type === 'anime' ? 'manga' : 'anime';
@@ -1035,7 +1043,7 @@ export default function WorkDetails() {
                                                 maxHeight: isSynopsisExpanded ? 'none' : '100px',
                                                 WebkitLineClamp: isSynopsisExpanded ? 'none' : 4,
                                             }}>
-                                                {work.synopsis}
+                                                {synopsisFr && i18n.language.startsWith('fr') ? synopsisFr : work.synopsis}
                                             </p>
                                             {!isSynopsisExpanded && (
                                                 <div style={{
