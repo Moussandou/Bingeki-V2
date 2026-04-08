@@ -954,7 +954,8 @@ const resources = {
                     cancel: "Annuler",
                     delete_confirm_title: "SUPPRIMER DÉFINITIVEMENT ?",
                     delete_confirm_desc: "Cette action supprimera votre compte, votre bibliothèque et toute votre progression. Impossible d'annuler.",
-                    goodbye: "ADIEU"
+                    goodbye: "ADIEU",
+                    deleting: "Suppression..."
                 },
                 about: {
                     title: "À PROPOS",
@@ -2394,7 +2395,8 @@ const resources = {
                     cancel: "Cancel",
                     delete_confirm_title: "PERMANENTLY DELETE?",
                     delete_confirm_desc: "This action will delete your account, your library, and all your progress. Cannot be undone.",
-                    goodbye: "GOODBYE"
+                    goodbye: "GOODBYE",
+                    deleting: "Deleting..."
                 },
                 about: {
                     title: "ABOUT",
