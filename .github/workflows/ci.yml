@@ -41,7 +41,7 @@ jobs:
         run: npm run test:coverage
         
       - name: Upload Coverage Report
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: code-coverage-report
@@ -126,7 +126,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - name: Run Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v13
+        uses: treosh/lighthouse-ci-action@v12
         with:
           uploadArtifacts: true
           configPath: ./lighthouserc.json
