@@ -1,26 +1,49 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as animeApi from '../animeApi';
 import * as firebaseFunctions from '@/firebase/functions';
 
-// Mock localStorage
-const localStorageMock = {};
+// Mock localStorage with proper typing for TS
+interface MockStorage extends Storage {
+    [key: string]: any;
+}
+
+const localStorageMock: MockStorage = {} as any;
+
 Object.defineProperties(localStorageMock, {
-    getItem: { value: vi.fn(function(key: string) { return this[key] || null; }), enumerable: false },
-    setItem: { value: vi.fn(function(key: string, value: string) { 
-        this[key] = value.toString(); 
-    }), enumerable: false },
-    removeItem: { value: vi.fn(function(key: string) { 
-        delete this[key]; 
-    }), enumerable: false },
-    clear: { value: vi.fn(function() { 
-        Object.keys(this).forEach(key => delete this[key]);
-    }), enumerable: false },
-    key: { value: vi.fn(function(index: number) {
-        return Object.keys(this)[index] || null;
-    }), enumerable: false },
-    length: { get: function() {
-        return Object.keys(this).length;
-    }, enumerable: false }
+    getItem: { 
+        value: vi.fn(function(this: MockStorage, key: string) { return this[key] || null; }), 
+        enumerable: false 
+    },
+    setItem: { 
+        value: vi.fn(function(this: MockStorage, key: string, value: string) { 
+            this[key] = value.toString(); 
+        }), 
+        enumerable: false 
+    },
+    removeItem: { 
+        value: vi.fn(function(this: MockStorage, key: string) { 
+            delete this[key]; 
+        }), 
+        enumerable: false 
+    },
+    clear: { 
+        value: vi.fn(function(this: MockStorage) { 
+            Object.keys(this).forEach(key => delete this[key]);
+        }), 
+        enumerable: false 
+    },
+    key: { 
+        value: vi.fn(function(this: MockStorage, index: number) {
+            return Object.keys(this)[index] || null;
+        }), 
+        enumerable: false 
+    },
+    length: { 
+        get: function(this: MockStorage) {
+            return Object.keys(this).length;
+        }, 
+        enumerable: false 
+    }
 });
 
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
@@ -33,7 +56,6 @@ describe('Anime API Service - callProxy & Caching', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         localStorageMock.clear();
-        // Clear internal MAPs in animeApi if possible (here we just rely on fresh IDs)
     });
 
     it('should call the Cloud Function on first call (Cache MISS)', async () => {
@@ -101,7 +123,7 @@ describe('Anime API Service - callProxy & Caching', () => {
 
         // Mock setItem to fail on first attempt, then succeed
         let attempts = 0;
-        localStorageMock.setItem.mockImplementation(function(key, value) {
+        (localStorageMock.setItem as any).mockImplementation(function(this: MockStorage, key: string, value: string) {
             attempts++;
             if (attempts === 1) {
                 throw new Error('QuotaExceededError');
