@@ -83,8 +83,13 @@ interface LibraryState {
     removeFavoriteCharacter: (id: number) => void;
     isFavoriteCharacter: (id: number) => boolean;
     setFavoriteCharacters: (chars: FavoriteCharacter[]) => void;
-    resetStore: () => void;
     reorderWorks: (newWorks: Work[]) => void;
+    viewMode: 'grid' | 'list';
+    sortBy: string;
+    setViewMode: (mode: 'grid' | 'list') => void;
+    setSortBy: (sort: string) => void;
+    resetStoreBase: () => void;
+    resetStore: () => void;
 }
 
 export const useLibraryStore = create<LibraryState>()(
@@ -180,8 +185,22 @@ export const useLibraryStore = create<LibraryState>()(
             })),
             isFavoriteCharacter: (id: number) => get().favoriteCharacters.some((c) => c.id === id),
             setFavoriteCharacters: (chars) => set({ favoriteCharacters: chars }),
-            resetStore: () => set({ works: [], folders: [], favoriteCharacters: [] }),
             reorderWorks: (newWorks) => set({ works: newWorks }),
+            viewMode: 'grid',
+            sortBy: 'updated',
+            setViewMode: (mode) => set({ viewMode: mode }),
+            setSortBy: (sort) => set({ sortBy: sort }),
+            resetStoreBase: () => set({
+                works: [],
+                folders: [],
+                favoriteCharacters: [],
+                viewMode: 'grid',
+                sortBy: 'updated'
+            }),
+            resetStore: () => {
+                get().resetStoreBase();
+                // Clear any other state if needed
+            }
         }),
         {
             name: 'bingeki-library-storage',

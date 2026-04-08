@@ -14,7 +14,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { auth } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 import {
-  loadLibraryFromFirestore,
+  loadFullLibraryData,
   loadGamificationFromFirestore,
   saveLibraryToFirestore,
   saveGamificationToFirestore,
@@ -174,6 +174,8 @@ function App() {
 
   const libraryWorks = useLibraryStore((s) => s.works);
   const libraryFolders = useLibraryStore((s) => s.folders);
+  const libraryViewMode = useLibraryStore((s) => s.viewMode);
+  const librarySortBy = useLibraryStore((s) => s.sortBy);
   const gamificationState = useGamificationStore(useShallow((s) => ({
     level: s.level,
     xp: s.xp,
@@ -253,35 +255,49 @@ function App() {
         if (profileUnsubscribe) profileUnsubscribe(); // Cleanup previous if any
         profileUnsubscribe = useAuthStore.getState().subscribeToProfile(firebaseUser.uid);
 
-        // Load cloud data
-        const cloudLibrary = await loadLibraryFromFirestore(firebaseUser.uid);
-        const cloudGamification = await loadGamificationFromFirestore(firebaseUser.uid);
+        // Load cloud data with error handling
+        try {
+          const cloudLibraryData = await loadFullLibraryData(firebaseUser.uid);
+          const cloudGamification = await loadGamificationFromFirestore(firebaseUser.uid);
 
-        // Smart merge: combine local and cloud data safely
-        const mergedLibrary = mergeLibraryData(localLibrary, cloudLibrary);
-        const mergedGamification = mergeGamificationData(
-          {
-            ...localGamification,
-            badges: localGamification.badges || []
-          },
-          cloudGamification
-        );
+          const cloudWorks = cloudLibraryData?.works || null;
 
-        // Update stores with merged data
-        isInitialSync.current = true; // Mark as initial sync to prevent immediate re-save
-        useLibraryStore.setState({ works: mergedLibrary });
-        useGamificationStore.setState(mergedGamification);
+          // Smart merge: combine local and cloud data safely
+          const mergedLibrary = mergeLibraryData(localLibrary, cloudWorks);
+          const mergedGamification = mergeGamificationData(
+            {
+              ...localGamification,
+              badges: localGamification.badges || []
+            },
+            cloudGamification
+          );
 
-        logger.log('[App] Data merged successfully:', {
-          libraryCount: mergedLibrary.length,
-          level: mergedGamification.level,
-          totalXp: mergedGamification.totalXp
-        });
+          // Update stores with merged data
+          isInitialSync.current = true; // Mark as initial sync to prevent immediate re-save
+          useLibraryStore.setState({ 
+            works: mergedLibrary,
+            folders: cloudLibraryData?.folders || useLibraryStore.getState().folders,
+            viewMode: cloudLibraryData?.viewMode || useLibraryStore.getState().viewMode,
+            sortBy: cloudLibraryData?.sortBy || useLibraryStore.getState().sortBy
+          });
+          useGamificationStore.setState(mergedGamification);
 
-        // Migration: If totalXp is 0 but user has content/level, force recalculate
-        if (mergedGamification.totalXp === 0 && (mergedGamification.level > 1 || mergedLibrary.length > 0)) {
-          logger.log('[App] Migrating totalXp for existing user...');
-          useGamificationStore.getState().recalculateStats(mergedLibrary);
+          logger.log('[App] Data merged successfully:', {
+            libraryCount: mergedLibrary.length,
+            level: mergedGamification.level,
+            totalXp: mergedGamification.totalXp
+          });
+
+          // Migration: If totalXp is 0 but user has content/level, force recalculate
+          if (mergedGamification.totalXp === 0 && (mergedGamification.level > 1 || mergedLibrary.length > 0)) {
+            logger.log('[App] Migrating totalXp for existing user...');
+            useGamificationStore.getState().recalculateStats(mergedLibrary);
+          }
+        } catch (error) {
+          logger.error('[App] Error during initial data sync:', error);
+          // Fallback to local data only if cloud fails
+          setLoading(false);
+          return;
         }
       } else {
         // User logged out - cleanup
@@ -342,11 +358,11 @@ function App() {
 
     // Save library changes to Firestore
     const timeout = setTimeout(() => {
-      saveLibraryToFirestore(user.uid, libraryWorks, libraryFolders);
+      saveLibraryToFirestore(user.uid, libraryWorks, libraryFolders, libraryViewMode, librarySortBy);
     }, 3000); // Increased to 3s to reduce save conflicts
 
     return () => clearTimeout(timeout);
-  }, [libraryWorks, libraryFolders, user]);
+  }, [libraryWorks, libraryFolders, libraryViewMode, librarySortBy, user]);
 
   useEffect(() => {
     if (!user || !shouldSaveGamification) return;

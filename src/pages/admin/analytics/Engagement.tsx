@@ -51,7 +51,7 @@ export default function EngagementAnalytics() {
                 <Card variant="manga" style={{ padding: '2rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)' }}>
                     <h3 style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontSize: '1.5rem', marginBottom: '2rem' }}>Détail des Actions</h3>
                     <div style={{ height: '300px', display: 'flex', alignItems: 'center' }}>
-                        <ResponsiveContainer width="60%" height="100%" minHeight={300}>
+                        <ResponsiveContainer width="60%" height="100%" minHeight={300} minWidth={0}>
                             <PieChart>
                                 <Pie data={pieData} innerRadius={80} outerRadius={100} paddingAngle={5} dataKey="value">
                                     {pieData.map((_entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
@@ -86,7 +86,7 @@ export default function EngagementAnalytics() {
             <Card variant="manga" style={{ padding: '2rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)' }}>
                 <h3 style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontSize: '1.5rem', marginBottom: '2rem' }}>Contenus les plus populaires</h3>
                 <div style={{ height: '400px' }}>
-                    <ResponsiveContainer width="100%" height="100%" minHeight={400}>
+                    <ResponsiveContainer width="100%" height="100%" minHeight={400} minWidth={0}>
                         <BarChart data={topContent} layout="vertical" margin={{ left: 50 }}>
                             <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
                             <XAxis type="number" hide />

@@ -158,11 +158,13 @@ export default function Settings() {
 
     const [showConfirmAccountDelete, setShowConfirmAccountDelete] = useState(false);
     const [showMALImportModal, setShowMALImportModal] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const handleDeleteAccount = async () => {
-        if (!user) return;
+        if (!user || isDeleting) return;
 
         try {
+            setIsDeleting(true);
             // 1. Delete Firestore Data
             await deleteUserData(user.uid);
 
@@ -183,6 +185,8 @@ export default function Settings() {
             } else {
                 addToast(t('settings.toast.delete_error'), 'error');
             }
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -514,9 +518,9 @@ export default function Settings() {
                                                     {t('settings.data.delete_confirm_desc')}
                                                 </p>
                                                 <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                                                    <Button variant="ghost" size="sm" onClick={() => setShowConfirmAccountDelete(false)}>{t('settings.data.cancel')}</Button>
-                                                    <Button variant="primary" size="sm" onClick={handleDeleteAccount} style={{ background: '#ef4444' }}>
-                                                        {t('settings.data.goodbye')}
+                                                    <Button variant="ghost" size="sm" onClick={() => setShowConfirmAccountDelete(false)} disabled={isDeleting}>{t('settings.data.cancel')}</Button>
+                                                    <Button variant="primary" size="sm" onClick={handleDeleteAccount} style={{ background: '#ef4444' }} disabled={isDeleting}>
+                                                        {isDeleting ? t('settings.data.deleting') : t('settings.data.goodbye')}
                                                     </Button>
                                                 </div>
                                             </div>

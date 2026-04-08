@@ -78,7 +78,20 @@ export default function Library() {
     const [searchParams] = useSearchParams();
     const { user: currentUser } = useAuthStore();
     const { addToast } = useToast();
-    const { works: localWorks, removeWork, folders, createFolder, addToFolder, updateFolder, deleteFolder, reorderWorks } = useLibraryStore();
+    const { 
+        works: localWorks, 
+        removeWork, 
+        folders, 
+        createFolder, 
+        addToFolder, 
+        updateFolder, 
+        deleteFolder, 
+        reorderWorks,
+        viewMode,
+        setViewMode,
+        sortBy,
+        setSortBy
+    } = useLibraryStore();
     const { recalculateStats } = useGamificationStore();
 
     // Friend Library State
@@ -210,7 +223,6 @@ export default function Library() {
 
     // UI State
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [searchQuery, setSearchQuery] = useState('');
     const [workToDelete, setWorkToDelete] = useState<Work | null>(null);
 
@@ -218,7 +230,6 @@ export default function Library() {
     const [filterOpen, setFilterOpen] = useState(false);
     const [filterType, setFilterType] = useState<'all' | 'manga' | 'anime'>('all');
     const [filterStatus, setFilterStatus] = useState<'all' | 'reading' | 'completed' | 'plan_to_read'>('all');
-    const [sortBy, setSortBy] = useState<'updated' | 'added' | 'alphabetical' | 'progress' | 'custom'>('updated');
     const [sortOpen, setSortOpen] = useState(false);
     const [showMALImportModal, setShowMALImportModal] = useState(false);
     const [showFolderModal, setShowFolderModal] = useState(false);

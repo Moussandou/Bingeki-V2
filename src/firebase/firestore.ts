@@ -3,6 +3,7 @@ import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy, limit,
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from './config';
 import { logger } from '@/utils/logger';
+import { deleteUserStorage } from './storage';
 import type { Work, Folder } from '@/store/libraryStore';
 // import type { Badge } from '@/types/badge'; // Removed unused import, already in GamificationData
 import type { FavoriteCharacter } from '@/types/character';
@@ -22,6 +23,8 @@ import {
 interface LibraryData {
     works: Work[];
     folders?: Folder[];
+    viewMode?: 'grid' | 'list';
+    sortBy?: string;
     lastUpdated: number;
     version?: number;
     sharing?: {
@@ -182,7 +185,13 @@ export async function uploadProfilePicture(uid: string, file: File): Promise<str
 }
 
 // Save library data to Firestore (with safe merge)
-export async function saveLibraryToFirestore(userId: string, works: Work[], folders?: Folder[]): Promise<void> {
+export async function saveLibraryToFirestore(
+    userId: string, 
+    works: Work[], 
+    folders?: Folder[],
+    viewMode?: 'grid' | 'list',
+    sortBy?: string
+): Promise<void> {
     try {
         const docRef = doc(db, 'users', userId, 'data', 'library');
 
@@ -201,6 +210,8 @@ export async function saveLibraryToFirestore(userId: string, works: Work[], fold
         await setDoc(docRef, {
             works: mergedWorks,
             folders: folders ?? existing?.folders ?? [],
+            viewMode: viewMode ?? existing?.viewMode ?? 'grid',
+            sortBy: sortBy ?? existing?.sortBy ?? 'updated',
             lastUpdated: Date.now(),
             version: (existing?.version || 0) + 1
         } as LibraryData);
@@ -1349,10 +1360,10 @@ export async function deleteUserData(userId: string): Promise<void> {
     try {
         // We use individual deletions or batch for safety
         // Delete user libraries
-        await deleteDoc(doc(db, 'libraries', userId));
+        await deleteDoc(doc(db, 'users', userId, 'data', 'library'));
 
         // Delete user gamification
-        await deleteDoc(doc(db, 'gamification', userId));
+        await deleteDoc(doc(db, 'users', userId, 'data', 'gamification'));
 
         // Delete activities related to user
         const activitiesQuery = query(collection(db, 'activities'), where('userId', '==', userId));
@@ -1366,7 +1377,35 @@ export async function deleteUserData(userId: string): Promise<void> {
         const tierListDeletions = tierListsSnap.docs.map(d => deleteDoc(d.ref));
         await Promise.all(tierListDeletions);
 
-        // Delete user profile (Delete this last to ensure we can still find the user if needed during process)
+        // Delete comments related to user
+        const commentsQuery = query(collection(db, 'comments'), where('userId', '==', userId));
+        const commentsSnap = await getDocs(commentsQuery);
+        const commentDeletions = commentsSnap.docs.map(d => deleteDoc(d.ref));
+        await Promise.all(commentDeletions);
+
+        // Delete watch parties created by user
+        const partiesQuery = query(collection(db, 'watchparties'), where('creatorId', '==', userId));
+        const partiesSnap = await getDocs(partiesQuery);
+        const partyDeletions = partiesSnap.docs.map(d => deleteDoc(d.ref));
+        await Promise.all(partyDeletions);
+
+        // Delete subcollections manually (Firestore doesn't auto-delete subcollections)
+        const subcollections = ['friends', 'notifications'];
+        for (const sub of subcollections) {
+            const snap = await getDocs(collection(db, 'users', userId, sub));
+            const deletions = snap.docs.map(d => deleteDoc(d.ref));
+            await Promise.all(deletions);
+        }
+
+        // Delete Storage assets
+        try {
+            await deleteUserStorage(userId);
+        } catch (storageError) {
+            logger.error('[Firestore] Error cleaning up storage during deletion:', storageError);
+            // Non-critical, continue
+        }
+
+        // Delete user profile (Delete this last)
         await deleteDoc(doc(db, 'users', userId));
 
         logger.log('[Firestore] All user data deleted for:', userId);

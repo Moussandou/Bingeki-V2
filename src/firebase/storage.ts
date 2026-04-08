@@ -39,3 +39,35 @@ export async function deleteFeedbackImages(feedbackId: string): Promise<void> {
         throw error;
     }
 }
+
+/**
+ * Deletes all files in a user-specific storage folder.
+ * Used during account deletion.
+ * @param userId The UID of the user
+ */
+export async function deleteUserStorage(userId: string): Promise<void> {
+    const folders = [`avatars/${userId}`, `users/${userId}`];
+
+    for (const folderPath of folders) {
+        try {
+            await deleteFolderRecursive(folderPath);
+            logger.log(`[Storage] Cleaned up folder: ${folderPath}`);
+        } catch (error) {
+            // Log but don't fail the whole process if a folder doesn't exist
+            logger.warn(`[Storage] Skip/Error cleaning up folder ${folderPath}:`, error);
+        }
+    }
+}
+
+async function deleteFolderRecursive(folderPath: string): Promise<void> {
+    const folderRef = ref(storage, folderPath);
+    const res = await listAll(folderRef);
+
+    // Delete all files in this folder
+    const fileDeletions = res.items.map((itemRef) => deleteObject(itemRef));
+    await Promise.all(fileDeletions);
+
+    // Recursively delete subfolders
+    const folderDeletions = res.prefixes.map((prefixRef) => deleteFolderRecursive(prefixRef.fullPath));
+    await Promise.all(folderDeletions);
+}

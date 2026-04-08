@@ -57,7 +57,7 @@ service cloud.firestore {
         // Update: Allow owners to sync their progress/XP (verified by frontend data protector)
         // Admin: Full control for maintenance
         allow update: if isOwner(userId) || isAdmin();
-        allow delete: if isAdmin();
+        allow delete: if isOwner(userId) || isAdmin();
         
         // Owner Create: Allow initial creation only (first login setup)
         allow create: if isOwner(userId);
@@ -123,8 +123,9 @@ service cloud.firestore {
                     (isOwner(resource.data.userId) || 
                      get(/databases/$(database)/documents/users/$(resource.data.userId)).data.showActivityStatus != false);
       
-      // Write: BLOCKED for clients. Activities are auto-logged server-side.
-      allow write: if false; 
+      // Write: BLOCKED for clients, except for owners deleting their own logs.
+      allow create, update: if false; 
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
 
     // COMMENTS
