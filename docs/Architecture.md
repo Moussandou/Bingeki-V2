@@ -115,8 +115,38 @@ The manga aesthetic is achieved via thick borders, solid shadows, and high-energ
 -   `src/store/`: **Global State** - Business logic and data persistence.
 -   `src/services/`: **External APIs** - Pure functions for API calls (Jikan, Firestore).
 
-## 🤖 SEO & Performance Highlights
+---
+
+## 💾 Performance & Caching Strategy
+
+Bingeki employs a multi-layered caching system to ensure lightning-fast interactions and minimize expensive Cloud Function / Jikan API calls.
+
+### 1. Layers of Cache
+| Layer | Target | Technology | Persistence |
+| :--- | :--- | :--- | :--- |
+| **L1: Memory** | Client | In-memory `Map` | session only |
+| **L2: LocalStorage** | Client | `bgk_c_` prefixed entries | persistent (expired by TTL) |
+| **L3: Server Cache** | Cloud | Firestore `apiCache` collection | persistent (background sync) |
+
+### 2. Request Deduplication (`inflight`)
+To prevent duplicate concurrent calls (common in React StrictMode or navigation racing), the `animeApi` service uses an `inflight` Map. Concurrent requests for the same key will wait for the same Promise instead of spawning multiple network calls.
+
+### 3. Smart LocalStorage Management
+The service automatically manages `localStorage` quota. If a `QuotaExceededError` occurs, it identifies the oldest entry by timestamp, removes it, and retries the save operation.
+
+---
+
+## 🤖 SEO & Dynamic Metadata
+
+Bingeki handles SEO via a specialized hybrid approach:
+
+1.  **Dynamic Rendering**: A dedicated `seoHandler` Cloud Function intercepts requests.
+2.  **Meta Injection**: It reads the database (Firestore) to inject relevant `og:title`, `og:description`, and `og:image` tags directly into the HTML.
+3.  **Automatic OG Images**: A specialized endpoint (`/api/og-image`) generates on-the-fly SVG versions of Hunter Licenses and News cards for social sharing.
+
+## 🚀 Performance Highlights
 
 1.  **Hybrid Rendering**: Core shell is CSR (Client-Side Rendering) for speed, while `scripts/prerender.ts` generates static snapshots for SEO.
 2.  **Edge Interception**: Firebase Cloud Functions (`seoHandler`) inject dynamic OG tags for social sharing.
-3.  **Image Proxying**: Uses `wsrv.nl` for real-time resizing and WebP conversion to maintain a near-perfect Lighthouse score.
+3.  **Image Proxying**: Uses `wsrv.nl` for real-time resizing and WebP conversion.
+4.  **Service Worker Caching**: Workbox rules in `vite.config.ts` cache MAL images with a `CacheFirst` strategy for 7 days.

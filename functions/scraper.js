@@ -20,25 +20,9 @@ function toNautiljonSlug(title) {
  * Tries titleFrench first, then titleRomaji as fallback slug.
  * Returns the synopsis string, or null if not found.
  */
-/**
- * Generate slug variants: original + stripped of season suffix.
- * e.g. "Re:Zero kara Hajimeru Isekai Seikatsu 4th Season"
- *   → ["re-zero-kara-hajimeru-isekai-seikatsu-4th-season",
- *      "re-zero-kara-hajimeru-isekai-seikatsu"]
- */
-function slugVariants(title) {
-  const base = toNautiljonSlug(title);
-  // Strip trailing season/part/cour markers
-  const stripped = base
-    .replace(/-(?:\d+(?:st|nd|rd|th)-season|saison-\d+|part-\d+|cour-\d+|season-\d+|\d+)$/, '')
-    .replace(/-+$/, '');
-  return stripped !== base ? [base, stripped] : [base];
-}
-
 async function scrapeFRSynopsis(titleFrench, titleRomaji, type) {
   const slugType = type === 'manga' ? 'mangas' : 'animes';
-  const rawTitles = [titleFrench, titleRomaji].filter(Boolean);
-  const candidates = [...new Set(rawTitles.flatMap(slugVariants))];
+  const candidates = [titleFrench, titleRomaji].filter(Boolean).map(toNautiljonSlug);
 
   for (const slug of candidates) {
     const url = `https://www.nautiljon.com/${slugType}/${slug}.html`;

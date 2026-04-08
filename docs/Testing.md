@@ -102,7 +102,7 @@ Every Pull Request undergoes automated audits via **GitHub Actions**:
 
 | Command | Purpose |
 | :--- | :--- |
-| `npm run test` | Run Vitest unit & component tests. |
+| `npm run test` | Run Vitest unit & component tests (Store, Services, Utils). |
 | `npm run test:ui` | Open Vitest interactive UI. |
 | `npm run e2e` | Run Playwright E2E tests (requires `npm run build`). |
 | `npm run audit` | Run full build, lint, and type-check suite. |

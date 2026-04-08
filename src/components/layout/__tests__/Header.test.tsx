@@ -8,6 +8,7 @@ import { useGamificationStore } from '@/store/gamificationStore';
 vi.mock('@/firebase/config', () => ({
     auth: { onAuthStateChanged: vi.fn() },
     db: {},
+    functions: {},
 }));
 
 // Mock Firestore functions
