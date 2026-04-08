@@ -807,7 +807,8 @@ exports.onLibraryUpdate = onDocumentWritten('users/{userId}/data/library', async
  */
 exports.recalculateAllUserStats = onCall({
     timeoutSeconds: 540,
-    memory: '1GiB'
+    memory: '1GiB',
+    cors: true
 }, async (request) => {
     // Check admin permissions
     if (!request.auth) {
@@ -898,7 +899,7 @@ exports.recalculateAllUserStats = onCall({
  * Public: Server-side leaderboard query.
  * Returns authoritative rankings from root user docs.
  */
-exports.getLeaderboard = onCall(async (request) => {
+exports.getLeaderboard = onCall({ cors: true }, async (request) => {
     const data = request.data || {};
     const category = data.category || 'xp';
     const limitCount = Math.min(data.limit || 20, 100);
@@ -951,7 +952,7 @@ exports.getLeaderboard = onCall(async (request) => {
 /**
  * Send a friend request. Creates entries in both users' friend subcollections atomically.
  */
-exports.sendFriendRequestFn = onCall(async (request) => {
+exports.sendFriendRequestFn = onCall({ cors: true }, async (request) => {
     if (!request.auth) {
         throw new HttpsError('unauthenticated', 'Must be logged in.');
     }
@@ -1015,7 +1016,7 @@ exports.sendFriendRequestFn = onCall(async (request) => {
 /**
  * Accept a friend request. Updates both entries atomically.
  */
-exports.acceptFriendRequestFn = onCall(async (request) => {
+exports.acceptFriendRequestFn = onCall({ cors: true }, async (request) => {
     if (!request.auth) {
         throw new HttpsError('unauthenticated', 'Must be logged in.');
     }
@@ -1055,7 +1056,7 @@ exports.acceptFriendRequestFn = onCall(async (request) => {
 /**
  * Reject or remove a friend. Deletes both entries atomically.
  */
-exports.rejectFriendRequestFn = onCall(async (request) => {
+exports.rejectFriendRequestFn = onCall({ cors: true }, async (request) => {
     if (!request.auth) {
         throw new HttpsError('unauthenticated', 'Must be logged in.');
     }
@@ -1109,7 +1110,7 @@ async function cachedFetch(cacheKey, ttl, fetchFn) {
 }
 
 // GET /anime|manga/{id}/full
-exports.getWorkDetails = onCall(async (request) => {
+exports.getWorkDetails = onCall({ cors: true }, async (request) => {
   const { id, type } = request.data;
   if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
   console.log(`[getWorkDetails] id=${id} type=${type}`);
@@ -1118,7 +1119,7 @@ exports.getWorkDetails = onCall(async (request) => {
 });
 
 // Search anime or manga
-exports.searchWorks = onCall(async (request) => {
+exports.searchWorks = onCall({ cors: true }, async (request) => {
   const { query, type, page = 1 } = request.data;
   if (!query || !type) throw new HttpsError('invalid-argument', 'query and type are required');
   const key = `search_${type}_${Buffer.from(`${query}_p${page}`).toString('base64').slice(0, 40)}`;
@@ -1128,7 +1129,7 @@ exports.searchWorks = onCall(async (request) => {
 });
 
 // Characters
-exports.getWorkCharacters = onCall(async (request) => {
+exports.getWorkCharacters = onCall({ cors: true }, async (request) => {
   const { id, type } = request.data;
   if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
   const key = `${type}_characters_${id}`;
@@ -1136,7 +1137,7 @@ exports.getWorkCharacters = onCall(async (request) => {
 });
 
 // Relations
-exports.getWorkRelations = onCall(async (request) => {
+exports.getWorkRelations = onCall({ cors: true }, async (request) => {
   const { id, type } = request.data;
   if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
   const key = `${type}_relations_${id}`;
@@ -1144,7 +1145,7 @@ exports.getWorkRelations = onCall(async (request) => {
 });
 
 // Pictures
-exports.getWorkPictures = onCall(async (request) => {
+exports.getWorkPictures = onCall({ cors: true }, async (request) => {
   const { id, type } = request.data;
   if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
   const key = `${type}_pictures_${id}`;
@@ -1152,7 +1153,7 @@ exports.getWorkPictures = onCall(async (request) => {
 });
 
 // Statistics
-exports.getWorkStatistics = onCall(async (request) => {
+exports.getWorkStatistics = onCall({ cors: true }, async (request) => {
   const { id, type } = request.data;
   if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
   const key = `${type}_stats_${id}`;
@@ -1160,7 +1161,7 @@ exports.getWorkStatistics = onCall(async (request) => {
 });
 
 // Recommendations
-exports.getWorkRecommendations = onCall(async (request) => {
+exports.getWorkRecommendations = onCall({ cors: true }, async (request) => {
   const { id, type } = request.data;
   if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
   const key = `${type}_recs_${id}`;
@@ -1168,7 +1169,7 @@ exports.getWorkRecommendations = onCall(async (request) => {
 });
 
 // Anime episodes (paginated)
-exports.getAnimeEpisodes = onCall(async (request) => {
+exports.getAnimeEpisodes = onCall({ cors: true }, async (request) => {
   const { id, page = 1 } = request.data;
   if (!id) throw new HttpsError('invalid-argument', 'id is required');
   const key = `anime_episodes_${id}_p${page}`;
@@ -1176,7 +1177,7 @@ exports.getAnimeEpisodes = onCall(async (request) => {
 });
 
 // Anime streaming links
-exports.getAnimeStreaming = onCall(async (request) => {
+exports.getAnimeStreaming = onCall({ cors: true }, async (request) => {
   const { id } = request.data;
   if (!id) throw new HttpsError('invalid-argument', 'id is required');
   const key = `anime_streaming_${id}`;
@@ -1184,7 +1185,7 @@ exports.getAnimeStreaming = onCall(async (request) => {
 });
 
 // Anime staff
-exports.getAnimeStaff = onCall(async (request) => {
+exports.getAnimeStaff = onCall({ cors: true }, async (request) => {
   const { id } = request.data;
   if (!id) throw new HttpsError('invalid-argument', 'id is required');
   const key = `anime_staff_${id}`;
@@ -1192,7 +1193,7 @@ exports.getAnimeStaff = onCall(async (request) => {
 });
 
 // Anime themes (openings/endings)
-exports.getAnimeThemes = onCall(async (request) => {
+exports.getAnimeThemes = onCall({ cors: true }, async (request) => {
   const { id } = request.data;
   if (!id) throw new HttpsError('invalid-argument', 'id is required');
   const key = `anime_themes_${id}`;
@@ -1200,7 +1201,7 @@ exports.getAnimeThemes = onCall(async (request) => {
 });
 
 // Reviews
-exports.getWorkReviews = onCall(async (request) => {
+exports.getWorkReviews = onCall({ cors: true }, async (request) => {
   const { id, type } = request.data;
   if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
   const key = `${type}_reviews_${id}`;
@@ -1210,7 +1211,7 @@ exports.getWorkReviews = onCall(async (request) => {
 });
 
 // French synopsis from Nautiljon
-exports.getFRTranslation = onCall(async (request) => {
+exports.getFRTranslation = onCall({ cors: true }, async (request) => {
   const { id, type, titleFrench, titleRomaji } = request.data;
   if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
 

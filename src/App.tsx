@@ -74,6 +74,7 @@ import { XPGainToast } from '@/components/gamification/XPGainToast';
 import { LevelUpModal } from '@/components/gamification/LevelUpModal';
 import { AvatarSelectionModal } from '@/components/auth/AvatarSelectionModal';
 import { ReloadPrompt } from '@/components/pwa/ReloadPrompt';
+import { ScrollToTop } from '@/components/layout/ScrollToTop';
 
 // Global hook for hydration safety
 import { useMounted } from '@/hooks/useMounted';
@@ -471,6 +472,7 @@ function App() {
   return (
     <ToastProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <UsernameSelectionModal />
         <AvatarSelectionModal />
         <XPGainToast />
