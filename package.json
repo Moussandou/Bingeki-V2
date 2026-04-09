@@ -55,6 +55,7 @@
     "zustand": "^5.0.12"
   },
   "overrides": {
+    "vite": "$vite",
     "node-forge": "^1.4.0",
     "tmp": "^0.2.3",
     "flatted": "^3.4.2",
