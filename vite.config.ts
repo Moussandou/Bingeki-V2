@@ -63,13 +63,13 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/storage', 'firebase/messaging'],
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-ui': ['framer-motion', 'lucide-react'],
-          'vendor-charts': ['recharts'],
-          'vendor-i18n': ['i18next', 'react-i18next'],
-          'vendor-state': ['zustand'],
+        manualChunks(id) {
+          if (id.includes('node_modules/firebase')) return 'vendor-firebase';
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/') || id.includes('node_modules/react-router-dom/')) return 'vendor-react';
+          if (id.includes('node_modules/framer-motion/') || id.includes('node_modules/lucide-react/')) return 'vendor-ui';
+          if (id.includes('node_modules/recharts/')) return 'vendor-charts';
+          if (id.includes('node_modules/i18next/') || id.includes('node_modules/react-i18next/')) return 'vendor-i18n';
+          if (id.includes('node_modules/zustand/')) return 'vendor-state';
         }
       }
     }
