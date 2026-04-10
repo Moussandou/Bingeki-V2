@@ -210,6 +210,12 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // REPAIR HISTORY
+    match /admin_repair_history/{historyId} {
+      // Only admins can read/write repair history (from self-healing scans)
+      allow read, write: if isAdmin();
+    }
+
     // ==================== API CACHE (Cloud Functions only) ====================
 
     // Shared Jikan API cache — readable by all, writable only by Cloud Functions (Admin SDK)

@@ -88,7 +88,7 @@ export default function RetentionAnalytics() {
             <Card variant="manga" style={{ padding: '2rem', background: 'white', border: '3px solid black', boxShadow: '8px 8px 0px black' }}>
                 <h3 style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontSize: '1.5rem', marginBottom: '2rem' }}>Entonnoir de Conversion (Tunnel)</h3>
                 <div style={{ height: '350px' }}>
-                    <ResponsiveContainer width="100%" height="100%" minHeight={350} minWidth={0}>
+                    <ResponsiveContainer width="99%" height="100%" debounce={100}>
                         <BarChart layout="vertical" data={funnelData} margin={{ left: 60, right: 60 }}>
                             <XAxis type="number" hide />
                             <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} width={150} style={{ fontSize: '14px', fontWeight: 900 }} />
@@ -109,7 +109,7 @@ export default function RetentionAnalytics() {
             <Card variant="manga" style={{ padding: '2rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)' }}>
                 <h3 style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontSize: '1.5rem', marginBottom: '2rem' }}>Activité Journalière (DAU)</h3>
                 <div style={{ height: '300px' }}>
-                    <ResponsiveContainer width="100%" height="100%" minHeight={300} minWidth={0}>
+                    <ResponsiveContainer width="99%" height="100%" debounce={100}>
                         <AreaChart data={trends}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                             <XAxis dataKey="date" />

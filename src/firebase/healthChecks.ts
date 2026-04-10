@@ -177,16 +177,18 @@ export async function checkStorage(): Promise<ServiceHealthResult> {
     try {
         const rootRef = ref(storage);
         try {
+            // Attempt a listing to check connectivity. 
+            // This may fail with 403 if the user is not an admin, which is expected.
             await list(rootRef, { maxResults: 1 });
-        } catch (innerError: unknown) {
-            const msg = innerError instanceof Error ? innerError.message : '';
-            if (msg.includes('unauthorized') || msg.includes('403') || msg.includes('permission')) {
+        } catch (innerError: any) {
+            // Handle expected permission errors gracefully
+            if (innerError?.code === 'storage/unauthorized' || innerError?.message?.includes('403')) {
                 const elapsed = Math.round(performance.now() - start);
                 return {
                     service: 'Storage',
                     status: 'operational',
                     responseTime: elapsed,
-                    message: 'Bucket reachable (auth-gated)',
+                    message: 'Connected (Restricted Access)',
                     checkedAt: Date.now()
                 };
             }
@@ -197,7 +199,7 @@ export async function checkStorage(): Promise<ServiceHealthResult> {
             service: 'Storage',
             status: 'operational',
             responseTime: elapsed,
-            message: 'Bucket accessible',
+            message: 'Connected (Full Access)',
             checkedAt: Date.now()
         };
     } catch (error) {

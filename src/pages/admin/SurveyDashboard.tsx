@@ -173,7 +173,7 @@ export default function SurveyDashboard() {
                         </h3>
                         <div className={styles.chartContainer} style={{ minWidth: 0 }}>
                             {isMounted ? (
-                                <ResponsiveContainer width="100%" height="100%" minHeight={280}>
+                                <ResponsiveContainer width="99%" height="100%" debounce={100}>
                                     <PieChart>
                                         <Pie
                                             data={stats?.age}
@@ -208,7 +208,7 @@ export default function SurveyDashboard() {
                         </h3>
                         <div className={styles.chartContainer} style={{ minWidth: 0 }}>
                             {isMounted ? (
-                                <ResponsiveContainer width="100%" height="100%" minHeight={280}>
+                                <ResponsiveContainer width="99%" height="100%" debounce={100}>
                                     <BarChart data={stats?.interest}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
                                         <XAxis dataKey="name" tick={{ fontSize: 10 }} />
@@ -233,7 +233,7 @@ export default function SurveyDashboard() {
                         </h3>
                         <div className={styles.chartContainer} style={{ minWidth: 0 }}>
                             {isMounted ? (
-                                <ResponsiveContainer width="100%" height="100%" minHeight={280}>
+                                <ResponsiveContainer width="99%" height="100%" debounce={100}>
                                     <BarChart layout="vertical" data={stats?.features.slice(0, 5)} margin={{ left: 20 }}>
                                         <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--color-border)" />
                                         <XAxis type="number" hide />
@@ -257,7 +257,7 @@ export default function SurveyDashboard() {
                         </h3>
                         <div className={styles.chartContainer} style={{ minWidth: 0 }}>
                             {isMounted ? (
-                                <ResponsiveContainer width="100%" height="100%" minHeight={280}>
+                                <ResponsiveContainer width="99%" height="100%" debounce={100}>
                                     <PieChart>
                                         <Pie
                                             data={stats?.status}
