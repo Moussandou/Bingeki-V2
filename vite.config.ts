@@ -36,6 +36,9 @@ export default defineConfig({
         ]
       },
       workbox: {
+        // Disable navigateFallback — let the server serve prerendered HTML
+        // instead of the SW returning a cached empty app shell
+        navigateFallback: undefined,
         navigateFallbackDenylist: [/^\/sitemap\.xml$/, /^\/robots\.txt$/],
         globIgnores: ['**/sitemap.xml', '**/robots.txt'],
         runtimeCaching: [

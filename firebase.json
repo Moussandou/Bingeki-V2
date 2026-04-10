@@ -41,16 +41,8 @@
                 "function": "seoHandler"
             },
             {
-                "source": "/en/**",
-                "function": "seoHandler"
-            },
-            {
-                "source": "/fr/**",
-                "function": "seoHandler"
-            },
-            {
-                "source": "{!(assets/**),**}",
-                "function": "seoHandler"
+                "source": "**",
+                "destination": "/index.html"
             }
         ],
         "headers": [
