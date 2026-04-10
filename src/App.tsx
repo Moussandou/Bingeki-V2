@@ -9,19 +9,12 @@ import { useLibraryStore } from '@/store/libraryStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { usePWAStore } from '@/store/pwaStore';
-import type { BeforeInstallPromptEvent } from '@/store/pwaStore';
 import { useShallow } from 'zustand/react/shallow';
-import { auth } from '@/firebase/config';
-import { onAuthStateChanged } from 'firebase/auth';
 import {
-  loadFullLibraryData,
-  loadGamificationFromFirestore,
   saveLibraryToFirestore,
   saveGamificationToFirestore,
-  saveUserProfileToFirestore,
   subscribeToGlobalConfig
 } from '@/firebase/firestore';
-import { mergeLibraryData, mergeGamificationData } from '@/utils/dataProtection';
 import { ToastProvider } from '@/context/ToastContext';
 import { isBot } from '@/utils/isBot';
 
@@ -76,7 +69,10 @@ import { AvatarSelectionModal } from '@/components/auth/AvatarSelectionModal';
 import { ReloadPrompt } from '@/components/pwa/ReloadPrompt';
 import { ScrollToTop } from '@/components/layout/ScrollToTop';
 
-// Global hook for hydration safety
+// Hooks
+import { useAuthSync } from '@/hooks/useAuthSync';
+import { usePWAHandler } from '@/hooks/usePWAHandler';
+import { useThemeManager } from '@/hooks/useThemeManager';
 import { useMounted } from '@/hooks/useMounted';
 
 // Bot aware suspense to avoid blank screen during hydration for screenshot tools
@@ -167,15 +163,21 @@ const RootRedirect = () => {
 };
 
 function App() {
-  const { setUser, setUserProfile, setLoading, user, userProfile, loading } = useAuthStore();
+  const { user, userProfile, loading, setLoading } = useAuthStore();
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [configLoaded, setConfigLoaded] = useState(false);
-  const isInitialSync = React.useRef(false);
+  const { showInstallModal, setShowInstallModal } = usePWAStore();
+  
+  // Custom Hooks
+  const { isInitialSync } = useAuthSync();
+  usePWAHandler();
+  useThemeManager();
 
   const libraryWorks = useLibraryStore((s) => s.works);
   const libraryFolders = useLibraryStore((s) => s.folders);
   const libraryViewMode = useLibraryStore((s) => s.viewMode);
   const librarySortBy = useLibraryStore((s) => s.sortBy);
+  
   const gamificationState = useGamificationStore(useShallow((s) => ({
     level: s.level,
     xp: s.xp,
@@ -192,148 +194,15 @@ function App() {
     bonusXp: s.bonusXp,
   })));
 
-  // Detect bot and apply class to body for CSS targeting (e.g. disabling animations)
-  useEffect(() => {
-    if (isBot()) {
-      document.body.classList.add('is-bot');
-    }
-
-    // Handle ChunkLoadError - this happens when a new version is deployed
-    // and the user's browser tries to fetch a chunk that no longer exists
-    const handleChunkError = (e: ErrorEvent) => {
-      // Safely ignore benign ResizeObserver error from Recharts/browser that triggers Vite's grey error overlay
-      if (e.message === 'ResizeObserver loop limit exceeded' || e.message === 'ResizeObserver loop completed with undelivered notifications.') {
-        e.stopImmediatePropagation();
-        
-        // Hide Vite's error overlay if it appears in dev
-        const viteOverlay = document.querySelector('vite-error-overlay');
-        if (viteOverlay) viteOverlay.remove();
-        
-        return;
-      }
-
-      if (e.message && (e.message.includes('ChunkLoadError') || e.message.includes('Loading chunk'))) {
-        logger.warn('[App] ChunkLoadError detected, reloading page...');
-        window.location.reload();
-      }
-    };
-    
-    // Also catch promise rejections (for some async chunk loads)
-    const handlePromiseError = (e: PromiseRejectionEvent) => {
-      if (e.reason && (e.reason.message?.includes('ChunkLoadError') || e.reason.message?.includes('Loading chunk'))) {
-        logger.warn('[App] Promise ChunkLoadError detected, reloading page...');
-        window.location.reload();
-      }
-    };
-
-    window.addEventListener('error', handleChunkError);
-    window.addEventListener('unhandledrejection', handlePromiseError);
-    
-    return () => {
-      window.removeEventListener('error', handleChunkError);
-      window.removeEventListener('unhandledrejection', handlePromiseError);
-    };
-  }, []);
-
-  // Auth state listener + Firestore sync
-  useEffect(() => {
-    let profileUnsubscribe: (() => void) | undefined;
-
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
-
-      if (firebaseUser) {
-        // DON'T clear stores - we'll merge instead to avoid data loss
-        // Get current local state before loading cloud
-        const localLibrary = useLibraryStore.getState().works;
-        const localGamification = useGamificationStore.getState();
-
-        // Sync user profile (email, name, photo)
-        await saveUserProfileToFirestore(firebaseUser);
-
-        // REAL-TIME: Subscribe to profile changes (handling admin status updates instantly)
-        if (profileUnsubscribe) profileUnsubscribe(); // Cleanup previous if any
-        profileUnsubscribe = useAuthStore.getState().subscribeToProfile(firebaseUser.uid);
-
-        // Load cloud data with error handling
-        try {
-          const cloudLibraryData = await loadFullLibraryData(firebaseUser.uid);
-          const cloudGamification = await loadGamificationFromFirestore(firebaseUser.uid);
-
-          const cloudWorks = cloudLibraryData?.works || null;
-
-          // Smart merge: combine local and cloud data safely
-          const mergedLibrary = mergeLibraryData(localLibrary, cloudWorks);
-          const mergedGamification = mergeGamificationData(
-            {
-              ...localGamification,
-              badges: localGamification.badges || []
-            },
-            cloudGamification
-          );
-
-          // Update stores with merged data
-          isInitialSync.current = true; // Mark as initial sync to prevent immediate re-save
-          useLibraryStore.setState({ 
-            works: mergedLibrary,
-            folders: cloudLibraryData?.folders || useLibraryStore.getState().folders,
-            viewMode: cloudLibraryData?.viewMode || useLibraryStore.getState().viewMode,
-            sortBy: cloudLibraryData?.sortBy || useLibraryStore.getState().sortBy
-          });
-          useGamificationStore.setState(mergedGamification);
-
-          logger.log('[App] Data merged successfully:', {
-            libraryCount: mergedLibrary.length,
-            level: mergedGamification.level,
-            totalXp: mergedGamification.totalXp
-          });
-
-          // Migration: If totalXp is 0 but user has content/level, force recalculate
-          if (mergedGamification.totalXp === 0 && (mergedGamification.level > 1 || mergedLibrary.length > 0)) {
-            logger.log('[App] Migrating totalXp for existing user...');
-            useGamificationStore.getState().recalculateStats(mergedLibrary);
-          }
-        } catch (error) {
-          logger.error('[App] Error during initial data sync:', error);
-          // Fallback to local data only if cloud fails
-          setLoading(false);
-          return;
-        }
-      } else {
-        // User logged out - cleanup
-        if (profileUnsubscribe) {
-          profileUnsubscribe();
-          profileUnsubscribe = undefined;
-        }
-
-        // Clear local stores
-        useLibraryStore.getState().resetStore();
-        useGamificationStore.getState().resetStore();
-        setUserProfile(null);
-      }
-
-      setLoading(false);
-    });
-
-    return () => {
-      unsubscribe();
-      if (profileUnsubscribe) profileUnsubscribe();
-    };
-  }, [setUser, setLoading, setUserProfile]);
-
-  // Save gamification changes to Firestore ONLY if the change wasn't from a sync
+  // Sync state from profile changes (e.g. from other devices/admin)
   const [shouldSaveGamification, setShouldSaveGamification] = useState(false);
   
   useEffect(() => {
     if (!user || userProfile === undefined) return;
     
-    const syncGamification = useGamificationStore.getState().syncFromProfile;
-    const syncSettings = useSettingsStore.getState().syncFromProfile;
-    
     if (userProfile) {
-      // Syncing from profile should NOT trigger a save back to Firestore
-      syncGamification(userProfile);
-      syncSettings(userProfile);
+      useGamificationStore.getState().syncFromProfile(userProfile);
+      useSettingsStore.getState().syncFromProfile(userProfile);
       setShouldSaveGamification(false);
     }
   }, [userProfile, user]);
@@ -341,121 +210,41 @@ function App() {
   // Set flag to allow saving when gamification state changes, but ONLY after initial sync
   useEffect(() => {
     if (!user) return;
-    
-    // If this was an initial sync from login/profile, don't trigger an immediate save
     if (isInitialSync.current) {
       isInitialSync.current = false;
       setShouldSaveGamification(false);
       return;
     }
-
     setShouldSaveGamification(true);
   }, [gamificationState, user]);
 
   // Auto-save to Firestore when data changes (debounced)
   useEffect(() => {
     if (!user) return;
-
-    // Save library changes to Firestore
     const timeout = setTimeout(() => {
       saveLibraryToFirestore(user.uid, libraryWorks, libraryFolders, libraryViewMode, librarySortBy);
-    }, 3000); // Increased to 3s to reduce save conflicts
-
+    }, 3000);
     return () => clearTimeout(timeout);
   }, [libraryWorks, libraryFolders, libraryViewMode, librarySortBy, user]);
 
   useEffect(() => {
     if (!user || !shouldSaveGamification) return;
-
-    // Save gamification changes to Firestore
     const timeout = setTimeout(() => {
       saveGamificationToFirestore(user.uid, gamificationState);
-    }, 3000); // Increased to 3s to reduce save conflicts
-
+    }, 3000);
     return () => clearTimeout(timeout);
   }, [gamificationState, user, shouldSaveGamification]);
-
-  // PWA Global Listeners
-  const { setDeferredPrompt, setIsInstalled, clearPrompt } = usePWAStore();
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      logger.log('👋 PWA Install Prompt captured!');
-    };
-
-    const handleAppInstalled = () => {
-      // Hide the app-provided install promotion
-      clearPrompt();
-      setIsInstalled(true);
-      logger.log('✅ PWA Installed successfully!');
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    window.addEventListener('appinstalled', handleAppInstalled);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
-    };
-  }, [setDeferredPrompt, setIsInstalled, clearPrompt]);
-
-  // Global Auto-install check from QR code URL
-  const { triggerInstall, showInstallModal, setShowInstallModal } = usePWAStore();
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('install') === '1') {
-      const timer = setTimeout(() => {
-        triggerInstall();
-        // Clean up URL parameter
-        const newUrl = window.location.pathname + window.location.hash;
-        window.history.replaceState({}, '', newUrl);
-      }, 1500); // 1.5s to ensure app is ready
-      return () => clearTimeout(timer);
-    }
-  }, [triggerInstall]);
-
-  // Apply theme to document
-  const theme = useSettingsStore(s => s.theme);
-  useEffect(() => {
-    const finalTheme = isBot() ? 'dark' : theme;
-    document.documentElement.setAttribute('data-theme', finalTheme);
-  }, [theme]);
-
-  // Apply global accent color
-  const accentColor = useSettingsStore(s => s.accentColor);
-  useEffect(() => {
-    document.documentElement.style.setProperty('--color-primary', accentColor);
-    // Also update glow for consistency
-    const hexToRgb = (hex: string) => {
-      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : null;
-    }
-    const rgb = hexToRgb(accentColor);
-    if (rgb) {
-      document.documentElement.style.setProperty('--color-primary-glow', `rgba(${rgb}, 0.5)`);
-      // Update gradient to use the accent color (using theme-aware end color?)
-      // Note: We keep the hardcoded end colors for now or we could make them dynamic relative to theme
-      // For now, let's just update the start color which is the primary one
-      // document.documentElement.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${accentColor} 0%, ${accentColor} 100%)`);
-    }
-  }, [accentColor]);
 
   // Subscribe to global config for maintenance mode
   useEffect(() => {
     const unsubscribe = subscribeToGlobalConfig((config) => {
-      if (config) {
-        setIsMaintenance(config.maintenance);
-      }
+      if (config) setIsMaintenance(config.maintenance);
       setConfigLoaded(true);
     });
     return () => unsubscribe();
   }, []);
 
   // Safety timeout: force loading to finish if it hangs too long (5s)
-  // This ensures bots and slow connections eventually see the app
   useEffect(() => {
     if (loading || !configLoaded) {
       const timer = setTimeout(() => {
@@ -467,20 +256,13 @@ function App() {
     }
   }, [loading, configLoaded, setLoading]);
 
-  // Show loading screen while initializing auth or config
-  // Skip loading screen for bots OR if we are on a prerendered page
-  // This avoids flickering the loading screen over static content
   const isPrerendered = typeof document !== 'undefined' && document.body.classList.contains('is-prerendered');
   
   if ((loading || !configLoaded) && !isBot() && !isPrerendered) {
     return <LoadingScreen />;
   }
 
-  // Show maintenance screen if active and user is not admin
-  // We allow the check to pass if userProfile.isAdmin is true
-  // We also allow access to the auth page so admins can log in
   const isAuthPage = window.location.pathname.includes('/auth');
-
   if (isMaintenance && userProfile?.isSuperAdmin !== true && !isAuthPage) {
     return <MaintenanceScreen />;
   }

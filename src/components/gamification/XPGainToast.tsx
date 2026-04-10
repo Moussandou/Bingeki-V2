@@ -11,15 +11,19 @@ export function XPGainToast() {
     useEffect(() => {
         if (!xpGained) return;
 
-        const id = Math.random().toString(36).substr(2, 9);
-        setXpList(prev => [...prev, { id, amount: xpGained.amount }]);
+        const id = Math.random().toString(36).substring(2, 11);
+        const amount = xpGained.amount;
+        
+        setXpList(prev => [...prev, { id, amount }]);
 
-        // Clear it immediately from the store so it doesn't re-trigger
+        // Clear the global state so other components don't re-process it
         clearXpGained();
 
-        setTimeout(() => {
+        const timer = setTimeout(() => {
             setXpList(prev => prev.filter(item => item.id !== id));
         }, 3000);
+
+        return () => clearTimeout(timer);
     }, [xpGained, clearXpGained]);
 
     return (

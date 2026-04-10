@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
@@ -64,15 +64,19 @@ export function ContentList({
     const [loadingIds, setLoadingIds] = useState<number[]>([]);
     const [pageInput, setPageInput] = useState('');
 
-    useEffect(() => {
-        setPageInput('');
-    }, [page]);
+    // Reset state when props change (Adjusting state during rendering pattern)
+    const [prevPage, setPrevPage] = useState(page);
+    const [prevItems, setPrevItems] = useState(items);
 
-    // Reset visible count when items (page) changes
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (page !== prevPage) {
+        setPrevPage(page);
+        setPageInput('');
+    }
+
+    if (items !== prevItems) {
+        setPrevItems(items);
         setVisibleCount(25);
-    }, [items]);
+    }
 
     const toggleExpand = async (id: number, number: number) => {
         if (expandedIds.includes(id)) {

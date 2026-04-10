@@ -101,57 +101,29 @@ export function MALImportModal({ isOpen, onClose }: MALImportModalProps) {
         }
     }, [handleFileSelect, addToast, t]);
 
-    // Handle duplicate resolution
-    const handleDuplicateAction = useCallback((action: 'overwrite' | 'skip') => {
-        const conflict = duplicates[currentDuplicateIndex];
-
-        if (action === 'overwrite') {
-            // Mark for overwrite (will be handled during import)
-            conflict.entry.rawData = { action: 'overwrite' };
-        } else {
-            // Mark for skip
-            conflict.entry.rawData = { action: 'skip' };
-        }
-
-        if (currentDuplicateIndex < duplicates.length - 1) {
-            setCurrentDuplicateIndex(currentDuplicateIndex + 1);
-        } else {
-            // All duplicates resolved, start import
-            startImport();
-        }
-    }, [duplicates, currentDuplicateIndex]);
 
     // Start import process
-    const startImport = useCallback(async () => {
+    const startImport = useCallback(async (toImportEntries: MALEntry[], allEntries: MALEntry[], conflictConflicts: DuplicateConflict[]) => {
         setPhase('importing');
         const results = { imported: 0, skipped: 0, errors: 0 };
-        const toImport = entries.filter((entry) => {
-            const isDuplicate = duplicates.find((d) => d.entry.malId === entry.malId);
-            if (isDuplicate) {
-                return entry.rawData?.action === 'overwrite';
-            }
-            return true;
-        });
+        
+        setProgress({ current: 0, total: toImportEntries.length, message: '' });
 
-        setProgress({ current: 0, total: toImport.length, message: '' });
-
-        for (let i = 0; i < toImport.length; i++) {
-            const entry = toImport[i];
+        for (let i = 0; i < toImportEntries.length; i++) {
+            const entry = toImportEntries[i];
             setProgress({
                 current: i + 1,
-                total: toImport.length,
+                total: toImportEntries.length,
                 message: `${entry.title}...`,
             });
 
             try {
                 const work = await enrichWithJikan(entry);
 
-                const existingDuplicate = duplicates.find((d) => d.entry.malId === entry.malId);
+                const existingDuplicate = conflictConflicts.find((d) => d.entry.malId === entry.malId);
                 if (existingDuplicate) {
-                    // Overwrite existing
-                    updateWorkDetails(work.id, work);
+                    updateWorkDetails(existingDuplicate.existingWork.id, work);
                 } else {
-                    // Add new
                     addWork(work);
                 }
                 results.imported++;
@@ -160,22 +132,52 @@ export function MALImportModal({ isOpen, onClose }: MALImportModalProps) {
                 results.errors++;
             }
 
-            // Rate limiting: 400ms delay between Jikan calls
-            if (i < toImport.length - 1) {
+            if (i < toImportEntries.length - 1) {
                 await delay(400);
             }
         }
 
-        // Count skipped
-        results.skipped = entries.length - toImport.length;
-
+        results.skipped = allEntries.length - toImportEntries.length;
         setImportResults(results);
         setPhase('complete');
 
-        // Recalculate XP/stats based on updated library
         const updatedWorks = useLibraryStore.getState().works;
         recalculateStats(updatedWorks);
-    }, [entries, duplicates, addWork, updateWorkDetails, recalculateStats]);
+    }, [addWork, updateWorkDetails, recalculateStats]);
+
+    // Handle duplicate resolution
+    const handleDuplicateAction = useCallback((action: 'overwrite' | 'skip') => {
+        setEntries(prevEntries => {
+            const currentConflict = duplicates[currentDuplicateIndex];
+            const updatedEntries = prevEntries.map(entry => {
+                if (entry.malId === currentConflict.entry.malId) {
+                    return {
+                        ...entry,
+                        rawData: { ...entry.rawData, action }
+                    };
+                }
+                return entry;
+            });
+
+            // If all duplicates resolved, trigger import with the updated entries
+            if (currentDuplicateIndex === duplicates.length - 1) {
+                const toImport = updatedEntries.filter(entry => {
+                    const isDup = duplicates.find(d => d.entry.malId === entry.malId);
+                    if (isDup) {
+                        return entry.rawData?.action === 'overwrite';
+                    }
+                    return true;
+                });
+                startImport(toImport, updatedEntries, duplicates);
+            }
+
+            return updatedEntries;
+        });
+
+        if (currentDuplicateIndex < duplicates.length - 1) {
+            setCurrentDuplicateIndex(prev => prev + 1);
+        }
+    }, [duplicates, currentDuplicateIndex, startImport]);
 
     // Handle close
     const handleClose = useCallback(() => {
@@ -250,7 +252,7 @@ export function MALImportModal({ isOpen, onClose }: MALImportModalProps) {
                                 if (duplicates.length > 0) {
                                     setPhase('duplicates');
                                 } else {
-                                    startImport();
+                                    startImport(entries, entries, duplicates);
                                 }
                             }}>
                                 {duplicates.length > 0

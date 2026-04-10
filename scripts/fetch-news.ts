@@ -23,9 +23,10 @@ try {
         credential: admin.credential.cert(serviceAccount)
     });
     console.log("Firebase Admin initialized successfully.");
-} catch (parseError: any) {
+} catch (parseError: unknown) {
+    const error = parseError as Error;
     console.error("FATAL: Failed to parse Firebase Service Account JSON.");
-    console.error("Error details:", parseError.message);
+    console.error("Error details:", error.message);
     // Log the first few characters of the string to help identifying encoding issues
     console.log(`String preview (first 20 chars): ${serviceAccountKeyStr.substring(0, 20)}...`);
     process.exit(1);
@@ -38,7 +39,35 @@ const parser = new Parser({
     }
 });
 
-const FEEDS = [
+interface FeedConfig {
+    name: string;
+    url: string;
+    selector?: string;
+    limit?: number;
+}
+
+interface RSSItem extends Parser.Item {
+    'media:thumbnail'?: { $: { url: string } };
+    'media:content'?: { $: { url: string } };
+    'content:encoded'?: string;
+    categories?: string[];
+}
+
+interface ArticleData {
+    title: string;
+    slug: string;
+    content: string;
+    contentSnippet: string;
+    sourceUrl: string;
+    sourceName: string;
+    publishedAt: string;
+    tags: string[];
+    imageUrl: string | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
+const FEEDS: FeedConfig[] = [
     {
         name: "Anime News Network",
         url: "https://www.animenewsnetwork.com/news/rss.xml",
@@ -65,7 +94,7 @@ function generateSlug(title: string): string {
         .replace(/(^-|-$)+/g, '');
 }
 
-async function processItem(item: any, feedConfig: any, forceUpdate: boolean) {
+async function processItem(item: RSSItem, feedConfig: FeedConfig, forceUpdate: boolean): Promise<void> {
     if (!item.title || !item.link) return;
 
     const slug = generateSlug(item.title);
@@ -247,17 +276,17 @@ async function processItem(item: any, feedConfig: any, forceUpdate: boolean) {
     const tags = item.categories || [];
     if (tags.length === 0) tags.push('News');
 
-    const articleData = {
-        title: item.title,
+    const articleData: ArticleData = {
+        title: item.title || 'Untitled',
         slug: slug,
         content: cleanContent,
-        contentSnippet: (item.contentSnippet || item.title).substring(0, 300),
-        sourceUrl: item.link,
+        contentSnippet: (item.contentSnippet || item.title || '').substring(0, 300),
+        sourceUrl: item.link || '',
         sourceName: feedConfig.name,
         publishedAt: item.isoDate || item.pubDate || new Date().toISOString(),
         tags: tags,
         imageUrl: imageUrl,
-        createdAt: docSnap.exists ? (docSnap.data()?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+        createdAt: docSnap.exists ? (docSnap.data() as ArticleData)?.createdAt || new Date().toISOString() : new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
 
