@@ -47,7 +47,7 @@ export default function EngagementAnalytics() {
                 </h1>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
                 <Card variant="manga" style={{ padding: '2rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)' }}>
                     <h3 style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontSize: '1.5rem', marginBottom: '2rem' }}>Détail des Actions</h3>
                     <div style={{ height: '300px', display: 'flex', alignItems: 'center' }}>

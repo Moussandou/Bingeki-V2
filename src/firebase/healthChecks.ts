@@ -54,6 +54,7 @@ export interface CommunityContentStats {
 export interface ApiQueueStats {
     pending: number;
     processing: boolean;
+    error?: string;
     checkedAt: number;
 }
 
@@ -400,12 +401,21 @@ export async function getCommunityContentStats(): Promise<CommunityContentStats>
 // ─── API Queue Stats ────────────────────────────────────────────────
 
 export function getApiQueueStats(): ApiQueueStats {
-    const status = jikanQueue.status;
-    return {
-        pending: status.pending,
-        processing: status.processing,
-        checkedAt: Date.now()
-    };
+    try {
+        const status = jikanQueue.status;
+        return {
+            pending: status.pending,
+            processing: status.processing,
+            checkedAt: Date.now()
+        };
+    } catch (error) {
+        return {
+            pending: 0,
+            processing: false,
+            error: error instanceof Error ? error.message : 'Queue unavailable',
+            checkedAt: Date.now()
+        };
+    }
 }
 
 // ─── Editorial Stats ────────────────────────────────────────────────

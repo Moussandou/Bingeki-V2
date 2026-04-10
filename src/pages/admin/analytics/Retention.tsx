@@ -70,7 +70,7 @@ export default function RetentionAnalytics() {
                 </h1>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
                 <Card variant="manga" style={{ padding: '1.5rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)' }}>
                     <p style={{ textTransform: 'uppercase', fontWeight: 900, color: 'var(--color-text-dim)', fontSize: '0.8rem' }}>DAU (Actifs 24h)</p>
                     <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '3rem' }}>{stats?.dau}</h2>

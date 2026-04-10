@@ -151,6 +151,7 @@ export default function AdminHealth() {
     const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
     const [scoreHistory, setScoreHistory] = useState<ScoreHistoryEntry[]>([]);
     const [repairHistory, setRepairHistory] = useState<RepairSession[]>([]);
+    const [hasPermissionError, setHasPermissionError] = useState(false);
     const [expandedSession, setExpandedSession] = useState<string | null>(null);
 
     const { userProfile } = useAuthStore();
@@ -179,6 +180,7 @@ export default function AdminHealth() {
             setAdminStats(stats);
             setScoreHistory(history as any);
             setRepairHistory(repairLog);
+            setHasPermissionError(false);
             setLastRefresh(new Date());
 
             // Auto-report to Discord if critical (score < 50 OR any service is DOWN)
@@ -194,8 +196,11 @@ export default function AdminHealth() {
                     localStorage.setItem('bingeki_last_discord_alert', now.toString());
                 }
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('[Health] Failed to fetch health data:', error);
+            if (error?.code === 'permission-denied' || error?.message?.includes('permissions')) {
+                setHasPermissionError(true);
+            }
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -295,6 +300,15 @@ export default function AdminHealth() {
     return (
         <div className={styles.healthPage}>
             {/* ─── Alert Banner (Local Overlays for critical state) ─── */}
+            {hasPermissionError && (
+                <div className={styles.permissionWarning}>
+                    <Shield size={16} />
+                    <span>
+                        {t('admin.health.permission_error', "Accès restreint détecté. Certaines données d'historique peuvent être manquantes. Vérifiez que votre profil a bien les droits Admin dans Firestore.")}
+                    </span>
+                </div>
+            )}
+
             {report.overallScore < 50 && (
                 <div className={styles.alertBanner}>
                     <div className={styles.alertLeft}>
@@ -481,10 +495,16 @@ export default function AdminHealth() {
                                 </div>
                             </div>
                         </div>
-                        <div className={styles.queueNote}>
+                        <div className={styles.queueNote} title="Le système est en veille quand aucune synchronisation n'est en cours.">
                             <Clock size={12} />
-                            <span>{t('admin.health.queue_throttle', 'Throttle: 400ms/requête (2.5 req/s)')}</span>
+                            <span>{t('admin.health.queue_throttle', 'Throttle: 400ms/requête')}</span>
                         </div>
+                        {report.apiQueue.error && (
+                            <div className={styles.queueError}>
+                                <AlertTriangle size={12} />
+                                <span>{report.apiQueue.error}</span>
+                            </div>
+                        )}
                     </div>
                 </div>
 

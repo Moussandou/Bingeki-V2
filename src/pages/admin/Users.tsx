@@ -164,9 +164,9 @@ export default function AdminUsers() {
                     </p>
                 </div>
 
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', width: '100%' }}>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', width: '100%', justifyContent: 'space-between' }}>
                     {/* Search */}
-                    <div style={{ position: 'relative', flex: '1', minWidth: '300px' }}>
+                    <div style={{ position: 'relative', flex: '1', minWidth: '280px' }}>
                         <input
                             type="text"
                             placeholder={t('admin.users.search_placeholder')}
@@ -179,10 +179,11 @@ export default function AdminUsers() {
                                 width: '100%',
                                 outline: 'none',
                                 background: 'var(--color-surface)',
-                                color: 'var(--color-text)'
+                                color: 'var(--color-text)',
+                                fontSize: '0.9rem'
                             }}
                         />
-                        <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-dim)' }} />
+                        <Search size={16} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-dim)' }} />
                     </div>
 
                     {/* Sort */}
@@ -422,8 +423,8 @@ export default function AdminUsers() {
                     ))}
                 </div>
             ) : (
-                <div style={{ background: 'var(--color-surface)', border: '3px solid var(--color-border)', overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '1000px' }}>
+                <div style={{ background: 'var(--color-surface)', border: '3px solid var(--color-border)', overflowX: 'auto', width: '100%', marginTop: '0.5rem' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '900px' }}>
                         <thead style={{ background: 'var(--color-text)', color: 'var(--color-surface)' }}>
                             <tr>
                                 <th style={{ padding: '1rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>User</th>

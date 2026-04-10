@@ -148,44 +148,7 @@ export default function AdminDashboard() {
 
     const COLORS = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
 
-    const containerStyle = {
-        display: 'flex',
-        flexDirection: 'column' as const,
-        gap: '2rem',
-        animation: 'fadeIn 0.5s ease',
-        paddingBottom: '3rem'
-    };
 
-    const headerStyle = {
-        fontFamily: 'var(--font-heading)',
-        fontSize: '2.5rem',
-        textTransform: 'uppercase' as const,
-        marginBottom: '0.5rem'
-    };
-
-    const gridRow1 = {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: '1.5rem'
-    };
-
-    const gridRow2 = {
-        display: 'grid',
-        gridTemplateColumns: '3fr 2fr',
-        gap: '1.5rem'
-    };
-
-    const gridRow3 = {
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '1.5rem'
-    };
-
-    const gridRow4 = {
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '1.5rem'
-    };
 
     const statCardStyle = {
         padding: '1.5rem',
@@ -224,11 +187,11 @@ export default function AdminDashboard() {
     };
 
     return (
-        <div style={containerStyle}>
+        <div className={styles.container}>
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
-                    <h1 style={headerStyle}>{t('admin.dashboard.title')}</h1>
+                    <h1 className={styles.title}>{t('admin.dashboard.title')}</h1>
                     <p style={{ borderLeft: '4px solid var(--color-border)', paddingLeft: '1rem', fontFamily: 'monospace', color: 'var(--color-text-dim)' }}>
                         {t('admin.dashboard.subtitle')}
                     </p>
@@ -259,7 +222,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Row 1: Key Metrics (KPIs) */}
-            <div style={gridRow1}>
+            <div className={styles.kpiGrid}>
                 <Card variant="manga" style={statCardStyle} onClick={() => navigate('/admin/users')}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
@@ -326,7 +289,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Row 2: Main Growth & Activity Curves */}
-            <div style={gridRow2}>
+            <div className={styles.mainChartsGrid}>
                 <Card variant="manga" style={chartCardStyle} onClick={() => navigate('/admin/analytics/growth')}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <h3 style={sectionTitleStyle}><TrendingUp size={20} /> {t('admin.dashboard.activity_volume')}</h3>
@@ -375,7 +338,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Row 3: Engagement Breakdown & Funnel */}
-            <div style={gridRow3}>
+            <div className={styles.secondaryChartsGrid}>
                 <Card variant="manga" style={chartCardStyle} onClick={() => navigate('/admin/analytics/engagement')}>
                     <h3 style={sectionTitleStyle}><Clipboard size={20} /> {t('admin.dashboard.engagement_breakdown')}</h3>
                     {engagementData && Object.values(engagementData).some(v => (v as number) > 0) ? (
@@ -442,7 +405,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Row 4: Top Content & Utility */}
-            <div style={gridRow4}>
+            <div className={styles.secondaryChartsGrid}>
                 <div>
                     <h3 style={sectionTitleStyle}><Clipboard size={20} /> {t('admin.dashboard.top_content')}</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

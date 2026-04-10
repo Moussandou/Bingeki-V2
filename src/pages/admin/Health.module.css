@@ -141,6 +141,15 @@
     margin-bottom: var(--space-xl);
 }
 
+@media (max-width: 768px) {
+    .overallScoreCard {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-md);
+        padding: var(--space-md);
+    }
+}
+
 .scoreCircle {
     width: 100px;
     height: 100px;
@@ -504,6 +513,20 @@
     letter-spacing: 0.05em;
 }
 
+.queueError {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-top: var(--space-xs);
+    padding: 4px 8px;
+    background: #fef2f2;
+    border: 2px solid #fee2e2;
+    color: #ef4444;
+    font-family: 'Courier New', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+}
+
 /* ─── Editorial Last ─── */
 .editorialLast {
     display: flex;
@@ -629,6 +652,23 @@
     height: 8px;
     background: #22c55e;
     animation: pulse 2s ease-in-out infinite;
+}
+
+/* ─── Permission Warning ─── */
+.permissionWarning {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-lg);
+    background: #fffbeb;
+    color: #92400e;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 3px solid #fef3c7;
+    border-left: 8px solid #f59e0b;
+    margin-bottom: var(--space-md);
+    box-shadow: 4px 4px 0 rgba(245, 158, 11, 0.1);
 }
 
 /* ─── Alert Banner ─── */
@@ -1006,6 +1046,8 @@
 .sessionDetails {
     padding: var(--space-md);
     background: var(--color-surface);
+    overflow-x: auto;
+    width: 100%;
 }
 
 .noActions {
@@ -1019,6 +1061,7 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 0.8rem;
+    min-width: 600px;
 }
 
 .detailsTable th {
