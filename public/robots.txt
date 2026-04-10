@@ -9,7 +9,9 @@ Sitemap: https://bingeki.web.app/sitemap.xml
 Disallow: /admin
 Disallow: /*/admin
 Disallow: /*/admin/*
-Disallow: /assets
+
+# Allow assets (JS, CSS) — required for Googlebot to render pages
+Allow: /assets/
 
 # Allow all public pages (language-prefixed)
 Allow: /fr/
