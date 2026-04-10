@@ -1,4 +1,5 @@
-import { queuedFetch } from '@/utils/apiQueue';
+import { jikanQueue } from '@/utils/apiQueue';
+import type { QueueOptions } from '@/utils/apiQueue';
 import { useSettingsStore } from '@/store/settingsStore';
 import {
     getWorkDetailsFn,
@@ -13,11 +14,23 @@ import {
     getAnimeStaffFn,
     getAnimeThemesFn,
     getWorkReviewsFn,
+    getTopWorksFn,
+    getSeasonalAnimeFn,
+    getAnimeScheduleFn,
+    getCharacterByIdFn,
+    getCharacterFullFn,
+    searchCharactersFn,
+    getPersonByIdFn,
+    getPersonFullFn,
+    searchPeopleFn,
+    getAnimeEpisodeDetailsFn,
+    getRandomAnimeFn,
+    getJikanStatusFn,
 } from '@/firebase/functions';
 import type { HttpsCallable } from 'firebase/functions';
 
-const BASE_URL = 'https://api.jikan.moe/v4';
- 
+export type CallOptions = QueueOptions;
+
 export class ApiError extends Error {
     status: number;
     constructor(status: number, message: string) {
@@ -140,7 +153,7 @@ const inflight = new Map<string, Promise<any>>();
 
 /**
  * Call a Cloud Function proxy with session cache.
- * Checks in-memory session cache first, then calls the Function.
+ * Checks in-memory session cache first, then calls the Function via PriorityQueue.
  * Deduplicates concurrent calls with the same key.
  * Falls back to defaultValue on error if provided, otherwise re-throws.
  */
@@ -149,7 +162,8 @@ async function callProxy<T, I = any>(
     args: I,
     cacheKey: string,
     ttl: number,
-    defaultValue?: T
+    defaultValue?: T,
+    options?: CallOptions
 ): Promise<T> {
     const sessionCached = getCached<T>(cacheKey, ttl);
     if (sessionCached !== null) {
@@ -161,63 +175,43 @@ async function callProxy<T, I = any>(
         return inflight.get(cacheKey) as Promise<T>;
     }
     console.debug(`%c[Cache] SESSION MISS — calling Cloud Function`, 'color: #f59e0b; font-weight: bold', cacheKey, args);
-    const promise = (async () => {
-        try {
+
+    const promise = jikanQueue.run<T>(
+        async () => {
             const t0 = performance.now();
             const result = await fn(args);
             const data = result.data as T;
             setCache<T>(cacheKey, data);
             console.debug(`%c[Cloud Function] OK`, 'color: #3b82f6; font-weight: bold', cacheKey, `${Math.round(performance.now() - t0)}ms`);
             return data;
-        } catch (error) {
-            console.error(`%c[Cloud Function] ERROR`, 'color: #ef4444; font-weight: bold', cacheKey, error);
-            if (defaultValue !== undefined) {
-                console.warn(`%c[Cloud Function] Falling back to default value for`, 'color: #f97316', cacheKey);
-                return defaultValue;
-            }
-            throw error;
-        } finally {
-            inflight.delete(cacheKey);
+        },
+        options
+    ).catch((error: unknown) => {
+        console.error(`%c[Cloud Function] ERROR`, 'color: #ef4444; font-weight: bold', cacheKey, error);
+        if (defaultValue !== undefined) {
+            console.warn(`%c[Cloud Function] Falling back to default value for`, 'color: #f97316', cacheKey);
+            return defaultValue;
         }
-    })();
-    inflight.set(cacheKey, promise);
+        throw error;
+    });
+
+    inflight.set(cacheKey, promise as Promise<unknown>);
+    promise.finally(() => inflight.delete(cacheKey));
     return promise;
 }
 
 // Check Jikan API status
 export const checkJikanStatus = async (): Promise<JikanStatusResponse> => {
-    const startTime = Date.now();
-    try {
-        const response = await queuedFetch(`${BASE_URL}/anime/1`, {
-            method: 'HEAD', // Use HEAD to minimize data transfer
-            signal: AbortSignal.timeout(5000) // 5 second timeout
-        });
-
-        const responseTime = Date.now() - startTime;
-
-        if (response.ok) {
-            return {
-                status: 'online',
-                responseTime,
-                timestamp: Date.now()
-            };
-        } else {
-            return {
-                status: 'error',
-                responseTime,
-                message: `HTTP ${response.status}: ${response.statusText}`,
-                timestamp: Date.now()
-            };
-        }
-    } catch (error) {
-        const responseTime = Date.now() - startTime;
-        return {
-            status: 'offline',
-            responseTime,
-            message: error instanceof Error ? error.message : 'Unknown error',
-            timestamp: Date.now()
-        };
-    }
+    // Use a throwaway key (status checks should never be cached)
+    const cacheKey = `jikan_status_${Date.now()}`;
+    const result = await callProxy<JikanStatusResponse>(
+        getJikanStatusFn,
+        {},
+        cacheKey,
+        0,
+        { status: 'offline', responseTime: 0, message: 'Failed to check status', timestamp: Date.now() }
+    );
+    return result;
 };
 
 
@@ -285,7 +279,8 @@ export const searchWorks = async (
     query: string,
     type: 'anime' | 'manga' = 'manga',
     filters?: SearchFilters,
-    page: number = 1
+    page: number = 1,
+    options?: CallOptions
 ): Promise<JikanResult[]> => {
     const { nsfwMode } = useSettingsStore.getState();
     const cacheKey = `search_${type}_${query}_${JSON.stringify(filters || {})}_nsfw_${nsfwMode}_p${page}`;
@@ -294,7 +289,8 @@ export const searchWorks = async (
         { query, type, page, filters, nsfwMode },
         cacheKey,
         CACHE_TTL_SHORT,
-        { data: [] }
+        { data: [] },
+        options
     );
     return result?.data ?? [];
 };
@@ -302,42 +298,32 @@ export const searchWorks = async (
 export const getTopWorks = async (
     type: 'anime' | 'manga' = 'manga',
     filter: 'airing' | 'upcoming' | 'bypopularity' | 'favorite' = 'bypopularity',
-    limit: number = 24
+    limit: number = 24,
+    options?: CallOptions
 ): Promise<JikanResult[]> => {
     const { nsfwMode } = useSettingsStore.getState();
     const cacheKey = `top_${type}_${filter}_${limit}_nsfw_${nsfwMode}`;
-    const cached = getCached<JikanResult[]>(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const response = await queuedFetch(`${BASE_URL}/top/${type}?filter=${filter}&limit=${limit}&sfw=${!nsfwMode}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        setCache<JikanResult[]>(cacheKey, data.data);
-        return data.data as JikanResult[];
-    } catch (error) {
-        console.error('API Error:', error);
-        return [];
-    }
+    return callProxy<JikanResult[]>(
+        getTopWorksFn,
+        { type, filter, limit, nsfwMode },
+        cacheKey,
+        CACHE_TTL_SHORT,
+        [],
+        options
+    );
 };
 
-export const getSeasonalAnime = async (limit: number = 24): Promise<JikanResult[]> => {
+export const getSeasonalAnime = async (limit: number = 24, options?: CallOptions): Promise<JikanResult[]> => {
     const { nsfwMode } = useSettingsStore.getState();
     const cacheKey = `seasonal_${limit}_nsfw_${nsfwMode}`;
-    const cached = getCached<JikanResult[]>(cacheKey);
-    if (cached) return cached;
-
-    try {
-        // Fetches current season's anime
-        const response = await queuedFetch(`${BASE_URL}/seasons/now?limit=${limit}&sfw=${!nsfwMode}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        setCache<JikanResult[]>(cacheKey, data.data);
-        return data.data as JikanResult[];
-    } catch (error) {
-        console.error('API Error:', error);
-        return [];
-    }
+    return callProxy<JikanResult[]>(
+        getSeasonalAnimeFn,
+        { limit, nsfwMode },
+        cacheKey,
+        CACHE_TTL_SHORT,
+        [],
+        options
+    );
 };
 
 export interface JikanEpisode {
@@ -364,21 +350,20 @@ export const getAnimeEpisodes = async (id: number, page: number = 1): Promise<{ 
     );
 };
 
-export const getAnimeEpisodeDetails = async (id: number, episodeId: number): Promise<{ synopsis: string; duration: number } | null> => {
+export const getAnimeEpisodeDetails = async (
+    id: number,
+    episodeId: number,
+    options?: CallOptions
+): Promise<{ synopsis: string; duration: number } | null> => {
     const cacheKey = `anime_${id}_episode_${episodeId}`;
-    const cached = getCached<{ synopsis: string; duration: number }>(cacheKey, CACHE_TTL_LONG);
-    if (cached) return cached;
-    try {
-        const response = await queuedFetch(`${BASE_URL}/anime/${id}/episodes/${episodeId}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        const result = data.data as { synopsis: string; duration: number; };
-        setCache(cacheKey, result);
-        return result;
-    } catch (error) {
-        console.error('API Error:', error);
-        return null;
-    }
+    return callProxy<{ synopsis: string; duration: number } | null>(
+        getAnimeEpisodeDetailsFn,
+        { id, episodeId },
+        cacheKey,
+        CACHE_TTL_LONG,
+        null,
+        options
+    );
 };
 
 export const getWorkDetails = async (id: number, type: 'anime' | 'manga'): Promise<JikanResult> => {
@@ -579,34 +564,31 @@ export const getAnimeStaff = async (id: number): Promise<JikanStaff[]> => {
     return callProxy(getAnimeStaffFn, { id }, `anime_${id}_staff`, CACHE_TTL_LONG, []);
 };
 
-export const getAnimeSchedule = async (filter?: string) => {
+export const getAnimeSchedule = async (filter?: string, options?: CallOptions): Promise<JikanResult[]> => {
     const { nsfwMode } = useSettingsStore.getState();
-    try {
-        const url = filter
-            ? `${BASE_URL}/schedules?filter=${filter}&sfw=${!nsfwMode}`
-            : `${BASE_URL}/schedules?sfw=${!nsfwMode}`;
-
-        const response = await queuedFetch(url);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        return data.data as JikanResult[];
-    } catch (error) {
-        console.error('API Error:', error);
-        return [];
-    }
+    const cacheKey = `schedule_${filter || 'all'}_nsfw_${nsfwMode}`;
+    return callProxy<JikanResult[]>(
+        getAnimeScheduleFn,
+        { filter, nsfwMode },
+        cacheKey,
+        CACHE_TTL_SHORT,
+        [],
+        options
+    );
 };
 
-export const getRandomAnime = async () => {
+export const getRandomAnime = async (options?: CallOptions): Promise<JikanResult | null> => {
     const { nsfwMode } = useSettingsStore.getState();
-    try {
-        const response = await queuedFetch(`${BASE_URL}/random/anime?sfw=${!nsfwMode}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        return data.data as JikanResult;
-    } catch (error) {
-        console.error('API Error:', error);
-        return null;
-    }
+    // No caching — random by nature. Use a throwaway key that never hits cache.
+    const cacheKey = `random_anime_${Date.now()}`;
+    return callProxy<JikanResult | null>(
+        getRandomAnimeFn,
+        { nsfwMode },
+        cacheKey,
+        0, // TTL 0 = never cache
+        null,
+        options
+    );
 };
 
 export interface JikanReview {
@@ -686,16 +668,16 @@ export interface JikanCharacterVoice {
     };
 }
 
-export const getCharacterById = async (id: number) => {
-    try {
-        const response = await queuedFetch(`${BASE_URL}/characters/${id}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        return data.data as JikanCharacterFull;
-    } catch (error) {
-        console.error('API Error:', error);
-        return null;
-    }
+export const getCharacterById = async (id: number, options?: CallOptions) => {
+    const cacheKey = `character_${id}`;
+    return callProxy<JikanCharacterFull | null>(
+        getCharacterByIdFn,
+        { id },
+        cacheKey,
+        CACHE_TTL_LONG,
+        null,
+        options
+    );
 };
 
 export interface JikanCharacterManga {
@@ -708,20 +690,20 @@ export interface JikanCharacterManga {
     };
 }
 
-export const getCharacterFull = async (id: number) => {
-    try {
-        const response = await queuedFetch(`${BASE_URL}/characters/${id}/full`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        return data.data as JikanCharacterFull & {
-            anime: JikanCharacterAnime[];
-            manga: JikanCharacterManga[];
-            voices: JikanCharacterVoice[];
-        };
-    } catch (error) {
-        console.error('API Error:', error);
-        return null;
-    }
+export const getCharacterFull = async (id: number, options?: CallOptions) => {
+    const cacheKey = `character_full_${id}`;
+    return callProxy<(JikanCharacterFull & {
+        anime: JikanCharacterAnime[];
+        manga: JikanCharacterManga[];
+        voices: JikanCharacterVoice[];
+    }) | null>(
+        getCharacterFullFn,
+        { id },
+        cacheKey,
+        CACHE_TTL_LONG,
+        null,
+        options
+    );
 };
 
 export interface JikanPersonFull {
@@ -754,53 +736,53 @@ export interface JikanPersonVoice {
     };
 }
 
-export const getPersonById = async (id: number) => {
-    try {
-        const response = await queuedFetch(`${BASE_URL}/people/${id}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        return data.data as JikanPersonFull;
-    } catch (error) {
-        console.error('API Error:', error);
-        return null;
-    }
+export const getPersonById = async (id: number, options?: CallOptions) => {
+    const cacheKey = `person_${id}`;
+    return callProxy<JikanPersonFull | null>(
+        getPersonByIdFn,
+        { id },
+        cacheKey,
+        CACHE_TTL_LONG,
+        null,
+        options
+    );
 };
 
-export const getPersonFull = async (id: number) => {
-    try {
-        const response = await queuedFetch(`${BASE_URL}/people/${id}/full`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        return data.data as JikanPersonFull & {
-            voices: JikanPersonVoice[];
-            anime: { position: string; anime: { mal_id: number; title: string; images: { jpg: { image_url: string } } } }[];
-        };
-    } catch (error) {
-        console.error('API Error:', error);
-        return null;
-    }
+export const getPersonFull = async (id: number, options?: CallOptions) => {
+    const cacheKey = `person_full_${id}`;
+    return callProxy<(JikanPersonFull & {
+        voices: JikanPersonVoice[];
+        anime: { position: string; anime: { mal_id: number; title: string; images: { jpg: { image_url: string } } } }[];
+    }) | null>(
+        getPersonFullFn,
+        { id },
+        cacheKey,
+        CACHE_TTL_LONG,
+        null,
+        options
+    );
 };
 
-export const searchCharacters = async (query: string, limit: number = 25) => {
-    try {
-        const response = await queuedFetch(`${BASE_URL}/characters?q=${encodeURIComponent(query)}&limit=${limit}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        return data.data as JikanCharacterFull[];
-    } catch (error) {
-        console.error('API Error:', error);
-        return [];
-    }
+export const searchCharacters = async (query: string, limit: number = 25, options?: CallOptions): Promise<JikanCharacterFull[]> => {
+    const cacheKey = `search_chars_${query}_${limit}`;
+    return callProxy<JikanCharacterFull[]>(
+        searchCharactersFn,
+        { query, limit },
+        cacheKey,
+        CACHE_TTL_SHORT,
+        [],
+        options
+    );
 };
 
-export const searchPeople = async (query: string, limit: number = 15) => {
-    try {
-        const response = await queuedFetch(`${BASE_URL}/people?q=${encodeURIComponent(query)}&limit=${limit}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        return data.data as JikanPersonFull[];
-    } catch (error) {
-        console.error('API Error:', error);
-        return [];
-    }
+export const searchPeople = async (query: string, limit: number = 15, options?: CallOptions): Promise<JikanPersonFull[]> => {
+    const cacheKey = `search_people_${query}_${limit}`;
+    return callProxy<JikanPersonFull[]>(
+        searchPeopleFn,
+        { query, limit },
+        cacheKey,
+        CACHE_TTL_SHORT,
+        [],
+        options
+    );
 };
