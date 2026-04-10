@@ -24,14 +24,17 @@ export class PriorityQueue {
     private queues: Record<Priority, QueuedTask[]> = { high: [], medium: [], low: [] };
     private activeSlots = 0;
 
+    private readonly baseRetryDelay: number;
+    private readonly maxConcurrent: number;
+
     /**
      * @param baseRetryDelay Base delay in ms for exponential backoff (default 1000). Pass 0 in tests.
      * @param maxConcurrent  Max parallel tasks (default 4).
      */
-    constructor(
-        private readonly baseRetryDelay: number = 1000,
-        private readonly maxConcurrent: number = DEFAULT_MAX_CONCURRENT
-    ) {}
+    constructor(baseRetryDelay: number = 1000, maxConcurrent: number = DEFAULT_MAX_CONCURRENT) {
+        this.baseRetryDelay = baseRetryDelay;
+        this.maxConcurrent = maxConcurrent;
+    }
 
     run<T>(fn: () => Promise<T>, options?: QueueOptions): Promise<T> {
         const { priority = 'medium', signal } = options ?? {};
