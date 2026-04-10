@@ -92,6 +92,7 @@ export function NewsCard({ title, slug, imageUrl, sourceName, publishedAt, tags 
                         color: 'var(--color-text)',
                         display: '-webkit-box',
                         WebkitLineClamp: featured ? 4 : 3,
+                        lineClamp: featured ? 4 : 3,
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
                         lineHeight: 1.3,
@@ -161,6 +162,7 @@ export function NewsCard({ title, slug, imageUrl, sourceName, publishedAt, tags 
                     .news-card-wrapper.featured .news-title {
                         font-size: 1.5rem !important;
                         -webkit-line-clamp: 3 !important;
+                        line-clamp: 3 !important;
                     }
                 }
                 `}

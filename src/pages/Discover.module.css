@@ -83,54 +83,50 @@
 @media (max-width: 768px) {
     .heroSection {
         height: auto;
-        min-height: auto;
-        padding-bottom: 3rem;
+        min-height: 0;
+        padding-bottom: 0;
+        overflow: hidden;
     }
 
     .heroContainer {
-        padding-top: 1rem;
-        /* Layout already handles header spacing */
+        padding: 1.5rem 1rem 2rem;
         gap: 1rem;
         flex-direction: row-reverse;
-        /* Image on Right, Text on Left */
-        align-items: flex-start;
-        /* Align to top */
-        padding-bottom: 1rem;
+        flex-wrap: nowrap;          /* never wrap — prevents overflow at any size */
+        align-items: flex-end;
+        justify-content: flex-start;
     }
 
-    /* Side-by-side image styling */
     .heroImageContainer {
-        display: block;
-        width: 100px;
-        /* Thumbnail size */
-        height: 150px;
-        margin: 0;
+        flex: 0 0 80px;             /* fixed — never grow or shrink */
+        width: 80px;
+        height: 120px;
         border-width: 2px;
-        box-shadow: var(--shadow-brutal);
-        flex-shrink: 0;
-        /* Keep size fixed */
+        box-shadow: 4px 4px 0 var(--color-shadow-solid);
     }
 
     .heroContent {
         flex: 1;
-        /* Take remaining width */
-        min-width: 0;
-        /* Prevent overflow */
-        padding-top: 0.5rem;
-        /* Align visual top with image */
+        min-width: 0;               /* crucial: lets flex child shrink below content size */
+        overflow: hidden;
+        padding-top: 0;
     }
 
     .heroTitle {
-        font-size: 1.8rem;
-        /* Smaller title for side-by-side */
+        font-size: clamp(1rem, 5vw, 1.6rem);
         line-height: 1.1;
         margin-bottom: 0.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
     .heroSynopsis {
-        font-size: 0.9rem;
-        -webkit-line-clamp: 3;
-        line-clamp: 3;
+        font-size: 0.85rem;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        overflow: hidden;
         margin-bottom: 1rem;
     }
 
@@ -143,8 +139,7 @@
     .heroActions button {
         width: 100%;
         justify-content: center;
-        font-size: 0.9rem;
-        /* Smaller buttons */
+        font-size: 0.85rem;
         padding: 0.5rem;
     }
 }
