@@ -1246,6 +1246,121 @@ exports.getFRTranslation = onCall({ cors: true }, async (request) => {
   return synopsis;
 });
 
+// ── Catalog ────────────────────────────────────────────────────────────────
+
+// Top anime or manga (trending/popular/upcoming)
+exports.getTopWorks = onCall({ cors: true }, async (request) => {
+  const { type, filter = 'bypopularity', limit = 24, nsfwMode = false } = request.data;
+  if (!type) throw new HttpsError('invalid-argument', 'type is required');
+  const key = `top_${type}_${filter}_${limit}_nsfw_${nsfwMode}`;
+  return cachedFetch(key, TTL_MS.SEARCH, () =>
+    jikanFetch(`/top/${type}?filter=${filter}&limit=${limit}&sfw=${!nsfwMode}`)
+  );
+});
+
+// Current season anime
+exports.getSeasonalAnime = onCall({ cors: true }, async (request) => {
+  const { limit = 24, nsfwMode = false } = request.data;
+  const key = `seasonal_${limit}_nsfw_${nsfwMode}`;
+  return cachedFetch(key, TTL_MS.SEARCH, () =>
+    jikanFetch(`/seasons/now?limit=${limit}&sfw=${!nsfwMode}`)
+  );
+});
+
+// Weekly broadcast schedule
+exports.getAnimeSchedule = onCall({ cors: true }, async (request) => {
+  const { filter, nsfwMode = false } = request.data;
+  const key = `schedule_${filter || 'all'}_nsfw_${nsfwMode}`;
+  const url = filter
+    ? `/schedules?filter=${filter}&sfw=${!nsfwMode}`
+    : `/schedules?sfw=${!nsfwMode}`;
+  return cachedFetch(key, TTL_MS.SEARCH, () => jikanFetch(url));
+});
+
+// ── Characters ─────────────────────────────────────────────────────────────
+
+exports.getCharacterById = onCall({ cors: true }, async (request) => {
+  const { id } = request.data;
+  if (!id) throw new HttpsError('invalid-argument', 'id is required');
+  const key = `character_${id}`;
+  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/characters/${id}`));
+});
+
+exports.getCharacterFull = onCall({ cors: true }, async (request) => {
+  const { id } = request.data;
+  if (!id) throw new HttpsError('invalid-argument', 'id is required');
+  const key = `character_full_${id}`;
+  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/characters/${id}/full`));
+});
+
+exports.searchCharacters = onCall({ cors: true }, async (request) => {
+  const { query, limit = 25 } = request.data;
+  if (!query) throw new HttpsError('invalid-argument', 'query is required');
+  const key = `search_chars_${Buffer.from(query).toString('base64').slice(0, 40)}_${limit}`;
+  return cachedFetch(key, TTL_MS.SEARCH, () =>
+    jikanFetch(`/characters?q=${encodeURIComponent(query)}&limit=${limit}`)
+  );
+});
+
+// ── People ─────────────────────────────────────────────────────────────────
+
+exports.getPersonById = onCall({ cors: true }, async (request) => {
+  const { id } = request.data;
+  if (!id) throw new HttpsError('invalid-argument', 'id is required');
+  const key = `person_${id}`;
+  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/people/${id}`));
+});
+
+exports.getPersonFull = onCall({ cors: true }, async (request) => {
+  const { id } = request.data;
+  if (!id) throw new HttpsError('invalid-argument', 'id is required');
+  const key = `person_full_${id}`;
+  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/people/${id}/full`));
+});
+
+exports.searchPeople = onCall({ cors: true }, async (request) => {
+  const { query, limit = 15 } = request.data;
+  if (!query) throw new HttpsError('invalid-argument', 'query is required');
+  const key = `search_people_${Buffer.from(query).toString('base64').slice(0, 40)}_${limit}`;
+  return cachedFetch(key, TTL_MS.SEARCH, () =>
+    jikanFetch(`/people?q=${encodeURIComponent(query)}&limit=${limit}`)
+  );
+});
+
+// ── Misc ───────────────────────────────────────────────────────────────────
+
+// Single episode details
+exports.getAnimeEpisodeDetails = onCall({ cors: true }, async (request) => {
+  const { id, episodeId } = request.data;
+  if (!id || !episodeId) throw new HttpsError('invalid-argument', 'id and episodeId are required');
+  const key = `anime_episode_detail_${id}_${episodeId}`;
+  return cachedFetch(key, TTL_MS.EPISODES, () =>
+    jikanFetch(`/anime/${id}/episodes/${episodeId}`)
+  );
+});
+
+// Random anime — no cache (result changes by nature)
+exports.getRandomAnime = onCall({ cors: true }, async (request) => {
+  const { nsfwMode = false } = request.data;
+  return jikanFetch(`/random/anime?sfw=${!nsfwMode}`);
+});
+
+// Jikan availability check — no cache
+exports.getJikanStatus = onCall({ cors: true }, async () => {
+  const startTime = Date.now();
+  try {
+    await jikanFetch('/anime/1');
+    return { status: 'online', responseTime: Date.now() - startTime, timestamp: Date.now() };
+  } catch (error) {
+    return {
+      status: 'offline',
+      responseTime: Date.now() - startTime,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: Date.now(),
+    };
+  }
+});
+
 // Scheduled background sync — refresh stale cache entries (runs daily at 3am UTC)
 exports.syncStaleCache = onSchedule('0 3 * * *', async () => {
   const db = admin.firestore();
