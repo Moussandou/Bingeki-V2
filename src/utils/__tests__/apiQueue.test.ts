@@ -1,50 +1,152 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { ApiQueue, jikanQueue } from '../apiQueue';
+import { PriorityQueue, jikanQueue } from '../apiQueue';
 
-describe('apiQueue', () => {
-    describe('jikanQueue singleton', () => {
-        it('should export jikanQueue object', () => {
-            expect(jikanQueue).toBeDefined();
+describe('PriorityQueue', () => {
+    describe('singleton export', () => {
+        it('exports jikanQueue as PriorityQueue instance', () => {
+            expect(jikanQueue).toBeInstanceOf(PriorityQueue);
         });
 
-        it('should have a fetch method', () => {
-            expect(typeof jikanQueue.fetch).toBe('function');
+        it('has a run method', () => {
+            expect(typeof jikanQueue.run).toBe('function');
         });
     });
 
-    describe('ApiQueue implementation', () => {
-        let testQueue: ApiQueue;
-
-        beforeEach(() => {
-            testQueue = new ApiQueue();
-            vi.useFakeTimers();
+    describe('basic execution', () => {
+        it('resolves the return value of the task', async () => {
+            const queue = new PriorityQueue(0);
+            const result = await queue.run(async () => 42);
+            expect(result).toBe(42);
         });
 
-        afterEach(() => {
-            testQueue.clear();
-            vi.useRealTimers();
-            vi.restoreAllMocks();
+        it('rejects when the task throws', async () => {
+            const queue = new PriorityQueue(0);
+            await expect(
+                queue.run(async () => { throw new Error('boom'); })
+            ).rejects.toThrow('boom');
+        });
+    });
+
+    describe('priority ordering', () => {
+        it('drains high before medium before low', async () => {
+            // Use 1 slot so ordering is deterministic
+            const queue = new PriorityQueue(0, 1);
+            const order: string[] = [];
+
+            // Block the single slot
+            let releaseBlocker!: () => void;
+            const blocker = queue.run(() => new Promise<void>(r => { releaseBlocker = r; }));
+
+            // Queue in reverse priority order
+            const low = queue.run(async () => { order.push('low'); }, { priority: 'low' });
+            const medium = queue.run(async () => { order.push('medium'); }, { priority: 'medium' });
+            const high = queue.run(async () => { order.push('high'); }, { priority: 'high' });
+
+            releaseBlocker();
+            await Promise.all([blocker, low, medium, high]);
+
+            expect(order).toEqual(['high', 'medium', 'low']);
+        });
+    });
+
+    describe('concurrency', () => {
+        it('runs at most maxConcurrent tasks simultaneously', async () => {
+            const queue = new PriorityQueue(0, 4);
+            let active = 0;
+            let maxActive = 0;
+
+            const tasks = Array.from({ length: 8 }, () =>
+                queue.run(async () => {
+                    active++;
+                    maxActive = Math.max(maxActive, active);
+                    await new Promise(r => setTimeout(r, 10));
+                    active--;
+                })
+            );
+
+            await Promise.all(tasks);
+            expect(maxActive).toBeLessThanOrEqual(4);
+            expect(maxActive).toBeGreaterThan(1); // actually concurrent
+        });
+    });
+
+    describe('abort signal', () => {
+        it('rejects immediately with AbortError when signal is already aborted', async () => {
+            const queue = new PriorityQueue(0);
+            const controller = new AbortController();
+            controller.abort();
+
+            await expect(
+                queue.run(async () => 'result', { signal: controller.signal })
+            ).rejects.toMatchObject({ name: 'AbortError' });
         });
 
-        it('should sequence requests based on minInterval', async () => {
-            const mockFetch = vi.fn().mockResolvedValue({
-                ok: true,
-                json: () => Promise.resolve({ data: 'ok' }),
-            });
-            vi.stubGlobal('fetch', mockFetch);
+        it('does not execute task if signal is aborted while waiting in queue', async () => {
+            const queue = new PriorityQueue(0, 1);
+            const fn = vi.fn().mockResolvedValue('result');
+            const controller = new AbortController();
 
-            const p1 = testQueue.fetch('url1');
-            const p2 = testQueue.fetch('url2');
-            
-            // Premier appel immédiat
-            await vi.advanceTimersByTimeAsync(0);
-            expect(mockFetch).toHaveBeenCalledTimes(1);
+            // Block the single slot
+            let releaseBlocker!: () => void;
+            const blocker = queue.run(() => new Promise<void>(r => { releaseBlocker = r; }));
 
-            // Second appel après intervalle (800ms par défaut dans ApiQueue)
-            await vi.advanceTimersByTimeAsync(801);
-            expect(mockFetch).toHaveBeenCalledTimes(2);
-            
-            await Promise.all([p1, p2]);
+            // Queue the task, then abort before the slot opens
+            const p = queue.run(fn, { signal: controller.signal });
+            controller.abort();
+
+            releaseBlocker();
+            await blocker;
+            await p.catch(() => {}); // suppress rejection
+
+            expect(fn).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('retry with exponential backoff', () => {
+        it('retries up to 3 times on generic errors', async () => {
+            const queue = new PriorityQueue(0); // 0ms delay for fast tests
+            const fn = vi.fn()
+                .mockRejectedValueOnce(new Error('server error'))
+                .mockRejectedValueOnce(new Error('server error'))
+                .mockResolvedValue('ok');
+
+            const result = await queue.run(fn);
+            expect(result).toBe('ok');
+            expect(fn).toHaveBeenCalledTimes(3);
+        });
+
+        it('fails after exhausting all retries', async () => {
+            const queue = new PriorityQueue(0);
+            const fn = vi.fn().mockRejectedValue(new Error('always fails'));
+
+            await expect(queue.run(fn)).rejects.toThrow('always fails');
+            expect(fn).toHaveBeenCalledTimes(4); // 1 initial + 3 retries
+        });
+
+        it('does not retry on 4xx errors', async () => {
+            const queue = new PriorityQueue(0);
+            const error = Object.assign(new Error('Not Found'), { status: 404 });
+            const fn = vi.fn().mockRejectedValue(error);
+
+            await expect(queue.run(fn)).rejects.toMatchObject({ status: 404 });
+            expect(fn).toHaveBeenCalledTimes(1);
+        });
+
+        it('does not retry on AbortError', async () => {
+            const queue = new PriorityQueue(0);
+            const fn = vi.fn().mockRejectedValue(
+                Object.assign(new Error('Aborted'), { name: 'AbortError' })
+            );
+
+            await expect(queue.run(fn)).rejects.toMatchObject({ name: 'AbortError' });
+            expect(fn).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('status', () => {
+        it('reports zero active and pending when idle', () => {
+            const queue = new PriorityQueue(0);
+            expect(queue.status).toEqual({ active: 0, pending: 0 });
         });
     });
 });
