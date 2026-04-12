@@ -1,9 +1,8 @@
-# https://www.robotstxt.org/robotstxt.html
-User-agent: *
-Allow: /
-
 # Sitemap location
 Sitemap: https://bingeki.web.app/sitemap.xml
+
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
 
 # Disallow admin pages for search engines
 Disallow: /admin

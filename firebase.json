@@ -11,6 +11,8 @@
             "**/.*",
             "**/node_modules/**"
         ],
+        "cleanUrls": true,
+        "trailingSlash": false,
         "rewrites": [
             {
                 "source": "/api/og-image/**",
@@ -65,24 +67,6 @@
                 ]
             },
             {
-                "source": "/sitemap.xml",
-                "headers": [
-                    {
-                        "key": "Content-Type",
-                        "value": "application/xml; charset=utf-8"
-                    }
-                ]
-            },
-            {
-                "source": "/robots.txt",
-                "headers": [
-                    {
-                        "key": "Content-Type",
-                        "value": "text/plain; charset=utf-8"
-                    }
-                ]
-            },
-            {
                 "source": "**",
                 "headers": [
                     {
@@ -120,6 +104,52 @@
                     {
                         "key": "Permissions-Policy",
                         "value": "camera=(), microphone=(), geolocation=()"
+                    }
+                ]
+            },
+            {
+                "source": "/sitemap.xml",
+                "headers": [
+                    {
+                        "key": "Content-Type",
+                        "value": "text/xml"
+                    },
+                    {
+                        "key": "Cache-Control",
+                        "value": "public, max-age=3600"
+                    },
+                    {
+                        "key": "Content-Security-Policy",
+                        "value": "default-src 'self'"
+                    },
+                    {
+                        "key": "X-Frame-Options",
+                        "value": "ALLOWALL"
+                    },
+                    {
+                        "key": "X-Content-Type-Options",
+                        "value": "nosniff"
+                    }
+                ]
+            },
+            {
+                "source": "/robots.txt",
+                "headers": [
+                    {
+                        "key": "Content-Type",
+                        "value": "text/plain"
+                    },
+                    {
+                        "key": "Cache-Control",
+                        "value": "public, max-age=3600"
+                    },
+                    {
+                        "key": "Content-Security-Policy",
+                        "value": "default-src 'self'"
+                    },
+                    {
+                        "key": "X-Frame-Options",
+                        "value": "ALLOWALL"
                     }
                 ]
             }
