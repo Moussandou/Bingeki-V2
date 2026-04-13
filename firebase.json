@@ -19,32 +19,8 @@
         "function": "seoHandler"
       },
       {
-        "source": "/profile/**",
-        "function": "seoHandler"
-      },
-      {
-        "source": "/en/profile/**",
-        "function": "seoHandler"
-      },
-      {
-        "source": "/fr/profile/**",
-        "function": "seoHandler"
-      },
-      {
-        "source": "/news/article/**",
-        "function": "seoHandler"
-      },
-      {
-        "source": "/en/news/article/**",
-        "function": "seoHandler"
-      },
-      {
-        "source": "/fr/news/article/**",
-        "function": "seoHandler"
-      },
-      {
         "source": "**",
-        "destination": "/index.html"
+        "function": "seoHandler"
       }
     ],
     "headers": [

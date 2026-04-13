@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 const DEFAULT_BASE_URL = 'https://bingeki.web.app';
+const DEFAULT_TIMEOUT_MS = 12000;
+const DEFAULT_RETRIES = 2;
 const DEFAULT_PATHS = [
   '/fr',
   '/en',
@@ -26,6 +28,21 @@ function getArg(name) {
 
 function hasFlag(name) {
   return process.argv.includes(name);
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function normalizeComparableUrl(input) {
+  try {
+    const parsed = new URL(input);
+    const pathname = parsed.pathname.replace(/\/+$/, '') || '/';
+    const search = parsed.search || '';
+    return `${parsed.origin}${pathname}${search}`;
+  } catch {
+    return input;
+  }
 }
 
 function extractTitle(html) {
@@ -64,11 +81,41 @@ function testTag(label, value, validator) {
 
 async function testUrl(baseUrl, path) {
   const url = `${baseUrl}${path}`;
-  const response = await fetch(url, {
-    headers: {
-      'user-agent': 'seo-test-script/1.0 (+bot-like-check)'
+  const timeoutMs = Number(getArg('--timeout') || DEFAULT_TIMEOUT_MS);
+  const retries = Number(getArg('--retries') || DEFAULT_RETRIES);
+  let response = null;
+  let lastError = null;
+
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      response = await fetch(url, {
+        headers: {
+          'user-agent': 'seo-test-script/1.1 (+seo-check)'
+        },
+        signal: controller.signal
+      });
+      clearTimeout(timer);
+      lastError = null;
+      break;
+    } catch (error) {
+      clearTimeout(timer);
+      lastError = error;
+      if (attempt < retries) {
+        await sleep(400 * (attempt + 1));
+      }
     }
-  });
+  }
+
+  if (!response) {
+    return {
+      url,
+      ok: false,
+      errors: [`request failed after ${retries + 1} attempt(s): ${lastError instanceof Error ? lastError.message : String(lastError)}`]
+    };
+  }
 
   if (!response.ok) {
     return {
@@ -112,7 +159,7 @@ async function testUrl(baseUrl, path) {
     if (!result.ok) errors.push(`${label}: ${result.reason}`);
   }
 
-  if (canonical && ogUrl && canonical !== ogUrl) {
+  if (canonical && ogUrl && normalizeComparableUrl(canonical) !== normalizeComparableUrl(ogUrl)) {
     errors.push(`canonical and og:url mismatch (${canonical} vs ${ogUrl})`);
   }
 
