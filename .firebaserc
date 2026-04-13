@@ -1,5 +1,7 @@
 {
   "projects": {
     "default": "bingeki"
-  }
+  },
+  "targets": {},
+  "etags": {}
 }

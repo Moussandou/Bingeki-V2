@@ -1,180 +1,192 @@
 {
-    "hosting": {
-        "predeploy": [
-            "cp dist/index.html functions/index.html",
-            "cp dist/index-en.html functions/index-en.html"
-        ],
-        "site": "bingeki",
-        "public": "dist",
-        "ignore": [
-            "firebase.json",
-            "**/.*",
-            "**/node_modules/**"
-        ],
-        "cleanUrls": true,
-        "trailingSlash": false,
-        "rewrites": [
-            {
-                "source": "/api/og-image/**",
-                "function": "seoHandler"
-            },
-            {
-                "source": "/profile/**",
-                "function": "seoHandler"
-            },
-            {
-                "source": "/en/profile/**",
-                "function": "seoHandler"
-            },
-            {
-                "source": "/fr/profile/**",
-                "function": "seoHandler"
-            },
-            {
-                "source": "/news/article/**",
-                "function": "seoHandler"
-            },
-            {
-                "source": "/en/news/article/**",
-                "function": "seoHandler"
-            },
-            {
-                "source": "/fr/news/article/**",
-                "function": "seoHandler"
-            },
-            {
-                "source": "**",
-                "destination": "/index.html"
-            }
-        ],
+  "hosting": {
+    "predeploy": [
+      "cp dist/index.html functions/index.html",
+      "cp dist/index-en.html functions/index-en.html"
+    ],
+    "site": "bingeki",
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "rewrites": [
+      {
+        "source": "/api/og-image/**",
+        "function": "seoHandler"
+      },
+      {
+        "source": "/profile/**",
+        "function": "seoHandler"
+      },
+      {
+        "source": "/en/profile/**",
+        "function": "seoHandler"
+      },
+      {
+        "source": "/fr/profile/**",
+        "function": "seoHandler"
+      },
+      {
+        "source": "/news/article/**",
+        "function": "seoHandler"
+      },
+      {
+        "source": "/en/news/article/**",
+        "function": "seoHandler"
+      },
+      {
+        "source": "/fr/news/article/**",
+        "function": "seoHandler"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/{index.html,index-en.html,sw.js,manifest.webmanifest}",
         "headers": [
-            {
-                "source": "/{index.html,index-en.html,sw.js,manifest.webmanifest}",
-                "headers": [
-                    {
-                        "key": "Cache-Control",
-                        "value": "no-cache, no-store, must-revalidate"
-                    }
-                ]
-            },
-            {
-                "source": "/assets/**",
-                "headers": [
-                    {
-                        "key": "Cache-Control",
-                        "value": "public, max-age=31536000, immutable"
-                    }
-                ]
-            },
-            {
-                "source": "**",
-                "headers": [
-                    {
-                        "key": "Cross-Origin-Opener-Policy",
-                        "value": "same-origin-allow-popups"
-                    },
-                    {
-                        "key": "Cross-Origin-Embedder-Policy",
-                        "value": "unsafe-none"
-                    },
-                    {
-                        "key": "Content-Security-Policy",
-                        "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://www.google-analytics.com https://ssl.google-analytics.com https://*.google-analytics.com https://www.gstatic.com https://www.googletagmanager.com https://*.googletagmanager.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://accounts.google.com https://www.instagram.com https://*.instagram.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.jikan.moe https://api.trace.moe https://graphql.anilist.co https://*.googleapis.com https://firebase.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://www.google-analytics.com https://*.google-analytics.com https://accounts.google.com https://discord.com https://cdn.myanimelist.net https://api.dicebear.com https://www.googletagmanager.com https://*.googletagmanager.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://stats.g.doubleclick.net https://ep1.adtrafficquality.google https://*.adtrafficquality.google; frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://discord.com https://www.instagram.com https://*.instagram.com https://www.youtube.com https://www.youtube-nocookie.com https://googleads.g.doubleclick.net https://*.doubleclick.net https://www.google.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://tpc.googlesyndication.com; object-src 'none';"
-                    },
-                    {
-                        "key": "Strict-Transport-Security",
-                        "value": "max-age=31536000; includeSubDomains; preload"
-                    },
-                    {
-                        "key": "X-Content-Type-Options",
-                        "value": "nosniff"
-                    },
-                    {
-                        "key": "X-Frame-Options",
-                        "value": "DENY"
-                    },
-                    {
-                        "key": "X-XSS-Protection",
-                        "value": "1; mode=block"
-                    },
-                    {
-                        "key": "Referrer-Policy",
-                        "value": "strict-origin-when-cross-origin"
-                    },
-                    {
-                        "key": "Permissions-Policy",
-                        "value": "camera=(), microphone=(), geolocation=()"
-                    }
-                ]
-            },
-            {
-                "source": "/sitemap.xml",
-                "headers": [
-                    {
-                        "key": "Content-Type",
-                        "value": "text/xml"
-                    },
-                    {
-                        "key": "Cache-Control",
-                        "value": "public, max-age=3600"
-                    },
-                    {
-                        "key": "Content-Security-Policy",
-                        "value": "default-src 'self'"
-                    },
-                    {
-                        "key": "X-Frame-Options",
-                        "value": "ALLOWALL"
-                    },
-                    {
-                        "key": "X-Content-Type-Options",
-                        "value": "nosniff"
-                    }
-                ]
-            },
-            {
-                "source": "/robots.txt",
-                "headers": [
-                    {
-                        "key": "Content-Type",
-                        "value": "text/plain"
-                    },
-                    {
-                        "key": "Cache-Control",
-                        "value": "public, max-age=3600"
-                    },
-                    {
-                        "key": "Content-Security-Policy",
-                        "value": "default-src 'self'"
-                    },
-                    {
-                        "key": "X-Frame-Options",
-                        "value": "ALLOWALL"
-                    }
-                ]
-            }
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
         ]
+      },
+      {
+        "source": "/assets/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
+      },
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Cross-Origin-Opener-Policy",
+            "value": "same-origin-allow-popups"
+          },
+          {
+            "key": "Cross-Origin-Embedder-Policy",
+            "value": "unsafe-none"
+          },
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://www.google-analytics.com https://ssl.google-analytics.com https://*.google-analytics.com https://www.gstatic.com https://www.googletagmanager.com https://*.googletagmanager.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://accounts.google.com https://www.instagram.com https://*.instagram.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.jikan.moe https://api.trace.moe https://graphql.anilist.co https://*.googleapis.com https://firebase.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://www.google-analytics.com https://*.google-analytics.com https://accounts.google.com https://discord.com https://cdn.myanimelist.net https://api.dicebear.com https://www.googletagmanager.com https://*.googletagmanager.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://stats.g.doubleclick.net https://ep1.adtrafficquality.google https://*.adtrafficquality.google; frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://discord.com https://www.instagram.com https://*.instagram.com https://www.youtube.com https://www.youtube-nocookie.com https://googleads.g.doubleclick.net https://*.doubleclick.net https://www.google.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://tpc.googlesyndication.com; object-src 'none';"
+          },
+          {
+            "key": "Strict-Transport-Security",
+            "value": "max-age=31536000; includeSubDomains; preload"
+          },
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "DENY"
+          },
+          {
+            "key": "X-XSS-Protection",
+            "value": "1; mode=block"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          },
+          {
+            "key": "Permissions-Policy",
+            "value": "camera=(), microphone=(), geolocation=()"
+          }
+        ]
+      },
+      {
+        "source": "/sitemap.xml",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          },
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self'"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "ALLOWALL"
+          },
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          }
+        ]
+      },
+      {
+        "source": "/robots.txt",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          },
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self'"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "ALLOWALL"
+          }
+        ]
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "functions": {
+    "source": "functions",
+    "codebase": "default",
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-hadolint.log"
+    ]
+  },
+  "emulators": {
+    "functions": {
+      "port": 5001
     },
     "firestore": {
-        "rules": "firestore.rules",
-        "indexes": "firestore.indexes.json"
+      "port": 8080
     },
-    "storage": {
-        "rules": "storage.rules"
-    },
-    "functions": {
-        "source": "functions",
-        "codebase": "default",
-        "ignore": [
-            "node_modules",
-            ".git",
-            "firebase-debug.log",
-            "firebase-hadolint.log"
-        ]
-    },
-    "emulators": {
-        "functions": { "port": 5001 },
-        "firestore": { "port": 8080 },
-        "ui": { "enabled": true, "port": 4000 }
+    "ui": {
+      "enabled": true,
+      "port": 4000
     }
+  },
+  "auth": {
+    "providers": {
+      "anonymous": true
+    }
+  }
 }
