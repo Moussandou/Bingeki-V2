@@ -220,7 +220,7 @@ async function processItem(item: RSSItem, feedConfig: FeedConfig, forceUpdate: b
             }
         }
 
-    } catch (scrapeError) {
+    } catch {
         console.error(`     ! Error scraping ${item.link}`);
     }
 

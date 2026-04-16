@@ -27,16 +27,16 @@ describe('Header Component', () => {
         vi.clearAllMocks();
         
         // Default gamification state
-        (useGamificationStore as unknown as any).mockReturnValue({
+        vi.mocked(useGamificationStore).mockReturnValue({
             level: 5,
             xp: 120,
             streak: 3,
-        });
+        }); 
     });
 
     it('renders login button for guest users', () => {
         // Mock guest state
-        (useAuthStore as unknown as any).mockReturnValue({
+        vi.mocked(useAuthStore).mockReturnValue({
             user: null,
             userProfile: null,
         });
@@ -50,7 +50,7 @@ describe('Header Component', () => {
 
     it('renders user stats and library link for authenticated users', () => {
         // Mock logged in state
-        (useAuthStore as unknown as any).mockReturnValue({
+        vi.mocked(useAuthStore).mockReturnValue({
             user: { uid: '123' },
             userProfile: { displayName: 'Test User' },
         });
@@ -64,7 +64,7 @@ describe('Header Component', () => {
     });
 
     it('does not show the tier list link for guest users in mobile dock', () => {
-        (useAuthStore as unknown as any).mockReturnValue({
+        vi.mocked(useAuthStore).mockReturnValue({
             user: null,
         });
 

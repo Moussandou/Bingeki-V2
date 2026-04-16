@@ -39,7 +39,7 @@ export function ScrollToTop() {
           window.scrollTo({
             top: 0,
             left: 0,
-            behavior: 'instant' as any
+            behavior: 'auto'
           });
         } else {
           (target as HTMLElement).scrollTop = 0;

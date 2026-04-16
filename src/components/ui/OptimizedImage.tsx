@@ -57,7 +57,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
                 url.hostname === domain || url.hostname.endsWith('.' + domain)
             );
             return isSafe ? 'anonymous' : undefined;
-        } catch (e) {
+        } catch {
             // Not a valid URL or a relative path, default to no CORS
             return undefined;
         }
@@ -65,10 +65,15 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 
     const [isLoaded, setIsLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
-    const [startTime, setStartTime] = useState(Date.now());
+    const startTimeRef = React.useRef(0);
     const [placeholderLoaded, setPlaceholderLoaded] = useState(false);
     const [isVisible, setIsVisible] = useState(priority);
     const containerRef = React.useRef<HTMLDivElement>(null);
+
+    // Initialize start time on mount
+    useEffect(() => {
+        startTimeRef.current = Date.now();
+    }, []);
 
     // Intersection Observer to prevent over-loading
     useEffect(() => {
@@ -78,7 +83,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
             ([entry]) => {
                 if (entry.isIntersecting) {
                     setIsVisible(true);
-                    setStartTime(Date.now()); // Restart timer for accuracy
+                    startTimeRef.current = Date.now(); // Restart timer for accuracy
                     observer.disconnect();
                 }
             },
@@ -97,12 +102,14 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     const finalSrc = getProxiedImageUrl(effectiveSrc) || fallback;
 
     // Reset state when src changes
-    useEffect(() => {
+    const [prevSrc, setPrevSrc] = useState(src);
+    if (src !== prevSrc) {
+        setPrevSrc(src);
         setIsLoaded(false);
         setHasError(false);
         setPlaceholderLoaded(false);
         if (!priority) setIsVisible(false);
-    }, [src, priority]);
+    }
 
     const wrapperStyles: React.CSSProperties = {
         ...(fill ? { position: 'absolute', inset: 0 } : {}),
@@ -110,7 +117,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     };
 
     const handleLoad = () => {
-        const duration = Date.now() - startTime;
+        const duration = Date.now() - startTimeRef.current;
         setIsLoaded(true);
         
         // Log timing and if it beat the placeholder

@@ -152,11 +152,11 @@ const setCache = <T>(key: string, data: T, isError: boolean = false) => {
 };
 
 /** In-flight requests — prevents duplicate concurrent calls (e.g. React StrictMode double-mount) */
-const inflight = new Map<string, Promise<any>>();
+const inflight = new Map<string, Promise<unknown>>();
 
 
-async function callProxy<T, I = any>(
-    fn: HttpsCallable<I, any>,
+async function callProxy<T, I = unknown>(
+    fn: HttpsCallable<I, unknown>,
     args: I,
     cacheKey: string,
     ttl: number,
@@ -193,7 +193,7 @@ async function callProxy<T, I = any>(
         throw error;
     });
 
-    inflight.set(cacheKey, promise as Promise<unknown>);
+    inflight.set(cacheKey, promise);
     promise.finally(() => inflight.delete(cacheKey));
     return promise;
 }

@@ -126,12 +126,17 @@ export default function Opening() {
             try {
                 const topManga = await getTopWorks('manga', 'bypopularity', 6);
                 if (topManga.length > 0) {
-                    setQgMangaList(topManga.map((m: any) => ({
+                    setQgMangaList(topManga.map((m: { 
+                        mal_id: number; 
+                        title: string; 
+                        score?: number | null; 
+                        images: { jpg: { large_image_url?: string; image_url?: string } } 
+                    }) => ({
                         id: m.mal_id,
                         title: m.title,
                         type: 'Manga',
                         score: m.score || 0,
-                        image: m.images.jpg.large_image_url || m.images.jpg.image_url
+                        image: m.images.jpg.large_image_url || m.images.jpg.image_url || ''
                     })));
                     dataFetched.current = true;
                 }

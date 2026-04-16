@@ -1,7 +1,7 @@
 /**
  * Share Modal component (library)
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
@@ -40,13 +40,18 @@ export const ShareModal: React.FC<ShareModalProps> = ({
     const [access, setAccess] = useState<'public' | 'friends'>(currentSharing?.access ?? 'public');
     const [copied, setCopied] = useState(false);
 
-    useEffect(() => {
+    const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+    const [prevSharing, setPrevSharing] = useState(currentSharing);
+
+    if (isOpen !== prevIsOpen || currentSharing !== prevSharing) {
+        setPrevIsOpen(isOpen);
+        setPrevSharing(currentSharing);
         if (isOpen) {
             setEnabled(currentSharing?.enabled ?? false);
             setAccess(currentSharing?.access ?? 'public');
             setCopied(false);
         }
-    }, [isOpen, currentSharing]);
+    }
 
     const handleSave = () => {
         onSave({ enabled, access });

@@ -17,7 +17,7 @@ import { useAuthSync } from './useAuthSync';
 
 export function useFirestoreSync() {
   const { user, userProfile } = useAuthStore();
-  const { isInitialSync } = useAuthSync();
+  const { isInitialSync: isInitialSyncRef } = useAuthSync();
   const [shouldSaveGamification, setShouldSaveGamification] = useState(false);
 
   const libraryWorks = useLibraryStore((s) => s.works);
@@ -46,22 +46,22 @@ export function useFirestoreSync() {
     if (!user || userProfile === undefined) return;
     
     if (userProfile) {
-      useGamificationStore.getState().syncFromProfile(userProfile);
-      useSettingsStore.getState().syncFromProfile(userProfile);
-      setShouldSaveGamification(false);
+      useGamificationStore.getState().syncFromProfile(userProfile as unknown as Record<string, unknown>);
+      useSettingsStore.getState().syncFromProfile(userProfile as unknown as Record<string, unknown>);
+      setTimeout(() => setShouldSaveGamification(false), 0);
     }
   }, [userProfile, user]);
 
   // Skip first save after initial sync to avoid write loop
   useEffect(() => {
     if (!user) return;
-    if (isInitialSync.current) {
-      isInitialSync.current = false;
-      setShouldSaveGamification(false);
+    if (isInitialSyncRef.current) {
+      isInitialSyncRef.current = false;
+      setTimeout(() => setShouldSaveGamification(false), 0);
       return;
     }
-    setShouldSaveGamification(true);
-  }, [gamificationState, user]);
+    setTimeout(() => setShouldSaveGamification(true), 0);
+  }, [gamificationState, user, isInitialSyncRef]);
 
   // Auto-save library (3s debounce)
   useEffect(() => {

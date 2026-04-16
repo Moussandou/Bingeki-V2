@@ -3,17 +3,12 @@
  * check-translations.ts
  * 
  * Checks for missing translation keys between French and English locales.
- * Also scans the codebase for translation key usage.
- * 
- * Usage:
- *   npx tsx scripts/check-translations.ts
- *   npx tsx scripts/check-translations.ts --check-unused
+ * Supports multiple namespaces in public/locales/{{lng}}/{{ns}}.json.
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Colors for terminal output
 const colors = {
     reset: '\x1b[0m',
     red: '\x1b[31m',
@@ -23,73 +18,47 @@ const colors = {
     bold: '\x1b[1m'
 };
 
-// Read i18n.ts and extract the resources object
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function extractResources(): { fr: Record<string, any>, en: Record<string, any> } {
-    const i18nPath = path.join(process.cwd(), 'src', 'i18n.ts');
-    const content = fs.readFileSync(i18nPath, 'utf-8');
+const LOCALES_DIR = path.join(process.cwd(), 'public', 'locales');
+const SRC_DIR = path.join(process.cwd(), 'src');
 
-    // Extract the resources object using regex
-    const resourcesMatch = content.match(/const resources\s*=\s*(\{[\s\S]*?\n\};)/);
-    if (!resourcesMatch) {
-        throw new Error('Could not find resources object in i18n.ts');
-    }
-
-
-    // Use a different approach - import the actual file
-    try {
-        // Dynamic import workaround - read and eval
-        const evalContent = content
-            .replace(/import.*from.*['"].*['"];?\n?/g, '')
-            .replace(/export default.*/, '')
-            .replace(/i18n\s*\.use[\s\S]*/, '');
-
-        const fn = new Function(`
-            ${evalContent}
-            return resources;
-        `);
-        return fn();
-    } catch (e) {
-        console.error('Failed to parse resources:', e);
-        throw e;
-    }
-}
-
-// Recursively get all keys from an object
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getAllKeys(obj: Record<string, any>, prefix = ''): string[] {
+function getAllKeys(obj: Record<string, unknown>, prefix = ''): string[] {
     const keys: string[] = [];
-
     for (const [key, value] of Object.entries(obj)) {
         const fullKey = prefix ? `${prefix}.${key}` : key;
-
         if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-            keys.push(...getAllKeys(value, fullKey));
+            keys.push(...getAllKeys(value as Record<string, unknown>, fullKey));
         } else {
             keys.push(fullKey);
         }
     }
-
     return keys;
 }
 
-// Scan source files for t('...') calls
+function loadLocales(lng: string): Record<string, Set<string>> {
+    const lngDir = path.join(LOCALES_DIR, lng);
+    const result: Record<string, Set<string>> = {};
+
+    if (!fs.existsSync(lngDir)) return result;
+
+    const files = fs.readdirSync(lngDir).filter(f => f.endsWith('.json'));
+    for (const file of files) {
+        const ns = path.basename(file, '.json');
+        const content = JSON.parse(fs.readFileSync(path.join(lngDir, file), 'utf-8'));
+        result[ns] = new Set(getAllKeys(content));
+    }
+    return result;
+}
+
 function findUsedTranslationKeys(): Set<string> {
     const usedKeys = new Set<string>();
-    const srcDir = path.join(process.cwd(), 'src');
-
     function scanDir(dir: string) {
         const entries = fs.readdirSync(dir, { withFileTypes: true });
-
         for (const entry of entries) {
             const fullPath = path.join(dir, entry.name);
-
             if (entry.isDirectory() && !entry.name.startsWith('.')) {
                 scanDir(fullPath);
             } else if (entry.isFile() && /\.(tsx?|jsx?)$/.test(entry.name)) {
                 const content = fs.readFileSync(fullPath, 'utf-8');
-
-                // Match t('key') or t("key") patterns
                 const matches = content.matchAll(/\bt\(\s*['"`]([^'"`]+)['"`]/g);
                 for (const match of matches) {
                     usedKeys.add(match[1]);
@@ -97,135 +66,81 @@ function findUsedTranslationKeys(): Set<string> {
             }
         }
     }
-
-    scanDir(srcDir);
+    scanDir(SRC_DIR);
     return usedKeys;
 }
 
-// Main function
 function main() {
-    console.log(`${colors.bold}${colors.cyan}🔍 Translation Key Checker${colors.reset}\n`);
+    console.log(`${colors.bold}${colors.cyan}🔍 Translation Key Checker (Namespaces Mode)${colors.reset}\n`);
 
-    const checkUnused = process.argv.includes('--check-unused');
+    const frLocales = loadLocales('fr');
+    const enLocales = loadLocales('en');
+    const namespaces = Object.keys(frLocales);
 
-    try {
-        const resources = extractResources();
-
-        const frKeys = new Set(getAllKeys(resources.fr.translation));
-        const enKeys = new Set(getAllKeys(resources.en.translation));
-
-        console.log(`${colors.cyan}Found:${colors.reset}`);
-        console.log(`  • French keys: ${frKeys.size}`);
-        console.log(`  • English keys: ${enKeys.size}\n`);
-
-        // Find missing in English
-        const missingInEn: string[] = [];
-        for (const key of frKeys) {
-            if (!enKeys.has(key)) {
-                missingInEn.push(key);
-            }
-        }
-
-        // Find missing in French
-        const missingInFr: string[] = [];
-        for (const key of enKeys) {
-            if (!frKeys.has(key)) {
-                missingInFr.push(key);
-            }
-        }
-
-        // Report missing keys
-        if (missingInEn.length > 0) {
-            console.log(`${colors.red}${colors.bold}❌ Missing in English (${missingInEn.length}):${colors.reset}`);
-            for (const key of missingInEn.slice(0, 20)) {
-                console.log(`   ${colors.red}• ${key}${colors.reset}`);
-            }
-            if (missingInEn.length > 20) {
-                console.log(`   ${colors.yellow}... and ${missingInEn.length - 20} more${colors.reset}`);
-            }
-            console.log();
-        }
-
-        if (missingInFr.length > 0) {
-            console.log(`${colors.red}${colors.bold}❌ Missing in French (${missingInFr.length}):${colors.reset}`);
-            for (const key of missingInFr.slice(0, 20)) {
-                console.log(`   ${colors.red}• ${key}${colors.reset}`);
-            }
-            if (missingInFr.length > 20) {
-                console.log(`   ${colors.yellow}... and ${missingInFr.length - 20} more${colors.reset}`);
-            }
-            console.log();
-        }
-
-        // Check for unused keys
-        if (checkUnused) {
-            console.log(`${colors.cyan}Scanning codebase for unused keys...${colors.reset}\n`);
-
-            const usedKeys = findUsedTranslationKeys();
-            const allDefinedKeys = new Set([...frKeys, ...enKeys]);
-
-            const unusedKeys: string[] = [];
-            for (const key of allDefinedKeys) {
-                if (!usedKeys.has(key)) {
-                    unusedKeys.push(key);
-                }
-            }
-
-            if (unusedKeys.length > 0) {
-                console.log(`${colors.yellow}${colors.bold}⚠️  Potentially unused keys (${unusedKeys.length}):${colors.reset}`);
-                for (const key of unusedKeys.slice(0, 15)) {
-                    console.log(`   ${colors.yellow}• ${key}${colors.reset}`);
-                }
-                if (unusedKeys.length > 15) {
-                    console.log(`   ${colors.yellow}... and ${unusedKeys.length - 15} more${colors.reset}`);
-                }
-                console.log();
-            }
-        }
-
-        // Check for keys used in code but missing in resources (CRITICAL)
-        console.log(`${colors.cyan}Verifying that all used keys exist in translations...${colors.reset}\n`);
-        const usedKeys = findUsedTranslationKeys();
-        const missingDefinitions: string[] = [];
-
-        for (const key of usedKeys) {
-            // Skip dynamic keys (containing ${)
-            if (key.includes('${')) continue;
-
-            // Check if key exists in either FR or EN (should exist in both ideally, but at least one to start)
-            // Stricter: Must exist in BOTH.
-            if (!frKeys.has(key) && !enKeys.has(key)) {
-                missingDefinitions.push(key);
-            }
-        }
-
-        if (missingDefinitions.length > 0) {
-            console.log(`${colors.red}${colors.bold}❌ Used in code but missing in i18n.ts (${missingDefinitions.length}):${colors.reset}`);
-            for (const key of missingDefinitions.slice(0, 20)) {
-                console.log(`   ${colors.red}• ${key}${colors.reset}`);
-            }
-            if (missingDefinitions.length > 20) {
-                console.log(`   ${colors.yellow}... and ${missingDefinitions.length - 20} more${colors.reset}`);
-            }
-            console.log();
-        }
-
-        // Summary
-        if (missingInEn.length === 0 && missingInFr.length === 0 && missingDefinitions.length === 0) {
-            console.log(`${colors.green}${colors.bold}✅ All translations are in sync and valid!${colors.reset}`);
-        } else {
-            console.log(`${colors.yellow}${colors.bold}⚠️  Issues found:${colors.reset}`);
-            if (missingInEn.length > 0) console.log(`   - ${missingInEn.length} missing in English`);
-            if (missingInFr.length > 0) console.log(`   - ${missingInFr.length} missing in French`);
-            if (missingDefinitions.length > 0) console.log(`   - ${missingDefinitions.length} missing definitions`);
-
-            process.exit(1);
-        }
-
-    } catch (error) {
-        console.error(`${colors.red}Error: ${error}${colors.reset}`);
+    if (namespaces.length === 0) {
+        console.error(`${colors.red}No namespaces found in ${LOCALES_DIR}/fr${colors.reset}`);
         process.exit(1);
     }
+
+    let hasErrors = false;
+
+    // 1. Cross-language check
+    for (const ns of namespaces) {
+        console.log(`${colors.bold}${colors.cyan}Namespace: ${ns}${colors.reset}`);
+        const frKeys = frLocales[ns];
+        const enKeys = enLocales[ns] || new Set();
+
+        const missingInEn = [...frKeys].filter(k => !enKeys.has(k));
+        const missingInFr = [...enKeys].filter(k => !frKeys.has(k));
+
+        if (missingInEn.length > 0) {
+            console.log(`  ${colors.red}❌ Missing in English (${missingInEn.length}):${colors.reset}`);
+            missingInEn.slice(0, 10).forEach(k => console.log(`     • ${k}`));
+            hasErrors = true;
+        }
+        if (missingInFr.length > 0) {
+            console.log(`  ${colors.red}❌ Missing in French (${missingInFr.length}):${colors.reset}`);
+            missingInFr.slice(0, 10).forEach(k => console.log(`     • ${k}`));
+            hasErrors = true;
+        }
+        if (missingInEn.length === 0 && missingInFr.length === 0) {
+            console.log(`  ${colors.green}✅ In sync (${frKeys.size} keys)${colors.reset}`);
+        }
+        console.log();
+    }
+
+    // 2. Code usage check
+    console.log(`${colors.bold}${colors.cyan}Verifying code usage...${colors.reset}`);
+    const usedKeys = findUsedTranslationKeys();
+    const allDefinedKeys = new Set<string>();
+    
+    // Build a map of all defined keys across all namespaces
+    for (const [ns, keys] of Object.entries(frLocales)) {
+        for (const key of keys) {
+            // Support both 'ns:key' and just 'key' (due to global fallbackNS)
+            allDefinedKeys.add(`${ns}:${key}`);
+            allDefinedKeys.add(key);
+        }
+    }
+
+    const missingDefinitions: string[] = [];
+    for (const key of usedKeys) {
+        if (key.includes('${')) continue; // Skip dynamic keys
+        if (!allDefinedKeys.has(key)) {
+            missingDefinitions.push(key);
+        }
+    }
+
+    if (missingDefinitions.length > 0) {
+        console.log(`${colors.red}❌ Used in code but missing in JSON (${missingDefinitions.length}):${colors.reset}`);
+        missingDefinitions.slice(0, 20).forEach(k => console.log(`   • ${k}`));
+        hasErrors = true;
+    } else {
+        console.log(`${colors.green}✅ All used keys are defined!${colors.reset}`);
+    }
+
+    console.log('\n' + (hasErrors ? `${colors.red}⚠️  Issues found.` : `${colors.green}🎉 All good!`));
+    process.exit(hasErrors ? 1 : 0);
 }
 
 main();

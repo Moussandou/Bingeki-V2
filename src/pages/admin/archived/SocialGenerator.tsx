@@ -88,7 +88,8 @@ export default function SocialGenerator() {
 
     // Jikan Search states
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState<any[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [searchResults, setSearchResults] = useState<Record<string, any>[]>([]);
     const [isSearching, setIsSearching] = useState(false);
 
     const currentFormat = FORMATS.find(f => f.id === format) || FORMATS[0];

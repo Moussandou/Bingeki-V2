@@ -689,13 +689,13 @@ export default function Profile() {
                                     </div>
                                     <div style={{ flex: 1, minWidth: 0 }}>
                                         <div style={{ 
-                                            fontSize: ((displayStats as any).totalXp?.toLocaleString() || '').length > 7 ? '1.15rem' : (((displayStats as any).totalXp?.toLocaleString() || '').length > 5 ? '1.35rem' : '1.75rem'), 
+                                            fontSize: (extendedProfile.totalXp?.toLocaleString() || '').length > 7 ? '1.15rem' : ((extendedProfile.totalXp?.toLocaleString() || '').length > 5 ? '1.35rem' : '1.75rem'), 
                                             fontWeight: 900,
                                             whiteSpace: 'nowrap',
                                             overflow: 'hidden',
                                             textOverflow: 'ellipsis'
                                         }}>
-                                            {(displayStats as any).totalXp?.toLocaleString() || 0}
+                                            {extendedProfile.totalXp?.toLocaleString() || 0}
                                         </div>
                                         <p style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', opacity: 0.6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('profile.xp_total')}</p>
                                     </div>
@@ -1115,7 +1115,11 @@ export default function Profile() {
                                                 <select key={index} value={editForm.top3Favorites[index] || ''}
                                                     onChange={(e) => {
                                                         const newTop3 = [...editForm.top3Favorites];
-                                                        e.target.value === "" ? newTop3.splice(index, 1) : newTop3[index] = e.target.value;
+                                                        if (e.target.value === "") {
+                                                            newTop3.splice(index, 1);
+                                                        } else {
+                                                            newTop3[index] = e.target.value;
+                                                        }
                                                         setEditForm(prev => ({ ...prev, top3Favorites: newTop3 }));
                                                     }}
                                                     style={{ width: '100%', padding: '0.8rem', border: '3px solid var(--color-text)', fontWeight: '900', background: 'var(--color-surface)', color: 'var(--color-text)', borderRadius: 0, boxShadow: '4px 4px 0 var(--color-shadow-solid)' }}

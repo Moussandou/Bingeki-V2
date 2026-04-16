@@ -17,16 +17,20 @@ export function XPGainToast() {
         const id = Math.random().toString(36).substring(2, 11);
         const amount = xpGained.amount;
         
-        setXpList(prev => [...prev, { id, amount }]);
-
-        // Clear the global state so other components don't re-process it
-        clearXpGained();
-
+        // Defer state updates to avoid cascading render warning
         const timer = setTimeout(() => {
+            setXpList(prev => [...prev, { id, amount }]);
+            clearXpGained();
+        }, 0);
+
+        const removeTimer = setTimeout(() => {
             setXpList(prev => prev.filter(item => item.id !== id));
         }, 3000);
 
-        return () => clearTimeout(timer);
+        return () => {
+            clearTimeout(timer);
+            clearTimeout(removeTimer);
+        };
     }, [xpGained, clearXpGained]);
 
     return (

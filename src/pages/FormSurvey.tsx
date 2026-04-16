@@ -3,7 +3,7 @@
  */
 import { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormSetValue, type UseFormWatch } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Globe } from 'lucide-react';
 import { InstagramIcon } from '@/components/ui/BrandIcons';
@@ -77,8 +77,8 @@ const RadioOption = ({
   value: string, 
   label: string, 
   questionIndex?: number,
-  watch: any,
-  setValue: any,
+  watch: UseFormWatch<FormData>, 
+  setValue: UseFormSetValue<FormData>, 
   visibleQuestions: number,
   setVisibleQuestions: (val: number | ((prev: number) => number)) => void
 }) => {
@@ -113,8 +113,8 @@ const CheckboxOption = ({
   name: keyof FormData, 
   value: string, 
   label: string,
-  watch: any,
-  setValue: any
+  watch: UseFormWatch<FormData>, 
+  setValue: UseFormSetValue<FormData>
 }) => {
   const currentValues = watch(name) as string[] || [];
   const isSelected = currentValues.includes(value);
@@ -253,7 +253,7 @@ export default function FormSurvey() {
       const sanitizedAnswers = Object.entries(data).reduce((acc, [key, value]) => {
         acc[key] = value === undefined ? '' : value;
         return acc;
-      }, {} as any);
+      }, {} as Record<string, unknown>);
 
       const docData = {
         surveyId: 'main-survey',

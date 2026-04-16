@@ -1,7 +1,7 @@
 /**
  * Feedback page
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 import { useAuthStore } from '@/store/authStore';
@@ -62,9 +62,9 @@ export default function Feedback() {
         setSearchParams({ tab: 'tickets', id });
     };
 
-    const closeTicket = () => {
+    const closeTicket = useCallback(() => {
         setSearchParams({ tab: 'tickets' });
-    };
+    }, [setSearchParams]);
 
     // Load Tickets using auth user
     useEffect(() => {
@@ -105,7 +105,7 @@ export default function Feedback() {
         };
 
         loadDetail();
-    }, [selectedTicketId, user, addToast, t]);
+    }, [selectedTicketId, user, addToast, t, closeTicket]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

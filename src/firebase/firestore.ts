@@ -546,7 +546,7 @@ export function subscribeToUserProfile(uid: string, callback: (profile: UserProf
 }
 
 // Send Friend Request (via Cloud Function)
-export async function sendFriendRequest(_currentUserId: string, _currentUserData: { displayName: string, photoURL: string }, targetUser: UserProfile): Promise<void> {
+export async function sendFriendRequest(currentUserId: string, currentUserData: { displayName: string, photoURL: string }, targetUser: UserProfile): Promise<void> {
     try {
         const { httpsCallable } = await import('firebase/functions');
         const { functions } = await import('./config');
@@ -560,7 +560,7 @@ export async function sendFriendRequest(_currentUserId: string, _currentUserData
 }
 
 // Accept Friend Request (via Cloud Function)
-export async function acceptFriendRequest(_currentUserId: string, friendUid: string): Promise<void> {
+export async function acceptFriendRequest(currentUserId: string, friendUid: string): Promise<void> {
     try {
         const { httpsCallable } = await import('firebase/functions');
         const { functions } = await import('./config');
@@ -574,7 +574,7 @@ export async function acceptFriendRequest(_currentUserId: string, friendUid: str
 }
 
 // Reject/Remove Friend Request (via Cloud Function)
-export async function rejectFriendRequest(_currentUserId: string, friendUid: string): Promise<void> {
+export async function rejectFriendRequest(currentUserId: string, friendUid: string): Promise<void> {
     try {
         const { httpsCallable } = await import('firebase/functions');
         const { functions } = await import('./config');
@@ -644,7 +644,7 @@ export const getLeaderboard = async (limitCount = 10, _period: 'week' | 'month' 
 // Log an activity event
 // DEPRECATED: Activity logging is now handled server-side by onLibraryUpdate trigger.
 // Firestore rules block client writes to /activities. This function is kept for reference.
-export async function logActivity(_userId: string, _event: Omit<ActivityEvent, 'id' | 'timestamp'>): Promise<void> {
+export async function logActivity(): Promise<void> {
     logger.warn('[Firestore] logActivity is deprecated. Activities are now logged server-side.');
 }
 
@@ -659,7 +659,7 @@ export async function getFriendsActivity(userId: string, limitCount: number = 20
         const friendIds = friends.filter(f => f.status === 'accepted').map(f => f.uid);
         if (friendIds.length === 0) return [];
 
-                let allActivities: ActivityEvent[] = [];
+                const allActivities: ActivityEvent[] = [];
         
         // Loop through friends in chunks of 30
         for (let i = 0; i < friendIds.length; i += 30) {

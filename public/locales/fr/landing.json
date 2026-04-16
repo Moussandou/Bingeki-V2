@@ -1,0 +1,106 @@
+{
+  "landing": {
+    "hero": {
+      "title": "VOTRE HISTOIRE<br />COMMENCE",
+      "subtitle": "Ne soyez plus un simple spectateur. Devenez le protagoniste.",
+      "cta": "COMMENCER L'AVENTURE",
+      "cta_logged_in": "ACCÉDER AU Q.G."
+    },
+    "features": {
+      "qg": {
+        "title": "LE Q.G.",
+        "description_1": "Organisez votre vidéothèque comme un stratège.",
+        "description_2": "Séparez vos lectures en cours, vos pauses, et vos archives. Ne perdez plus jamais le fil de vos intrigues favorites.",
+        "check_chapters": "CHAPITRES",
+        "check_episodes": "ÉPISODES",
+        "check_volumes": "TOMES"
+      },
+      "progression": {
+        "title": "PROGRESSION",
+        "description_1": "Chaque chapitre lu vous rend plus fort.",
+        "description_2": "Gagnez de l'XP en mettant à jour votre liste. Débloquez des <strong>Badges Holographiques</strong> et grimpez les rangs de la Hunter Society.",
+        "stats_title": "STATISTIQUES DÉTAILLÉES"
+      },
+      "exploration": {
+        "title": "EXPLORATION",
+        "description_1": "Une base de données infinie à portée de main.",
+        "description_2": "Recherchez parmis des milliers d'Anime et Manga. Filtrez par genre, score, ou popularité. Trouvez votre prochaine addiction en quelques secondes.",
+        "search_placeholder": "Rechercher un anime, un manga...",
+        "genres": {
+          "seinen": "Seinen",
+          "shonen": "Shonen",
+          "romance": "Romance",
+          "horror": "Horreur",
+          "isekai": "Isekai"
+        }
+      },
+      "community": {
+        "title": "COMMUNAUTÉ",
+        "description_1": "Vous n'êtes pas seul dans ce monde.",
+        "description_2": "Suivez l'activité de vos amis. Partagez vos avis sans spoil. Comparez vos collections et vos badges.",
+        "friends": "AMIS",
+        "debates": "DÉBATS",
+        "share": "PARTAGE",
+        "see_discussion": "VOIR LA DISCUSSION",
+        "comments": {
+          "levi": "Ce chapitre était incroyable !! 🔥",
+          "armin": "Je ne m'attendais pas à ça...",
+          "mikasa": "Eren..."
+        }
+      },
+      "details": {
+        "title": "TOUT SAVOIR",
+        "description_1": "Plongez au cœur de vos œuvres.",
+        "description_2": "Synopsis, staff, statistiques détaillées, personnages... Accédez à une fiche d'identité complète pour chaque Anime et Manga. Ne ratez aucun détail.",
+        "mock_card": {
+          "general": "GÉNÉRAL",
+          "chapters": "CHAPITRES",
+          "stats": "STATS",
+          "reviews": "AVIS",
+          "manga": "MANGA",
+          "ongoing": "EN COURS",
+          "view_full": "VOIR LA FICHE COMPLÈTE",
+          "synopsis": "Pour sauver ses amis, Yuji Itadori avale un doigt maudit et partage désormais son corps avec Ryomen Sukuna, le plus puissant des fléaux."
+        }
+      },
+      "wip": {
+        "title": "WORK IN PROGRESS",
+        "description_1": "Bingeki est vivant. Il évolue.",
+        "description_2": "Je construis cette plateforme avec vous. Suivez chaque mise à jour, suggérez des fonctionnalités, et voyez vos idées prendre vie.",
+        "roadmap_btn": "VOIR LA ROADMAP",
+        "timeline": {
+          "feedback_title": "Feedback & Changelog 2.0",
+          "feedback_desc": "Refonte complète du système de feedback et de l'affichage des mises à jour.",
+          "guilds_title": "Système de \"Guildes\"",
+          "guilds_desc": "Créez votre propre clan, participez à des guerres de guildes et dominez le classement.",
+          "soon": "SOON"
+        }
+      },
+      "support": {
+        "sfx": "MECÈNE",
+        "tag": "TIPS FOR DEVS",
+        "title": "SOUTENEZ LE PROJET",
+        "description_1": "Bingeki est développé avec ❤️ en open-source",
+        "description_2": "Si Bingeki enrichit votre expérience manga/anime, aidez à financer le développement de nouvelles fonctionnalités. Chaque café compte ! ☕",
+        "features": "Nouvelles features",
+        "servers": "Serveurs performants",
+        "premium": "Support premium",
+        "kofi_alt": "Support me on Ko-fi"
+      },
+      "mobile": {
+        "title": "BINGEKI DANS VOTRE POCHE",
+        "description_1": "Emportez votre collection partout. Une expérience fluide, rapide et conçue pour le mobile.",
+        "feature_1": "Installable (PWA)",
+        "feature_2": "Mode Hors-ligne",
+        "feature_3": "Notifications Push (Bientôt)",
+        "scan_qr": "Scannez pour installer"
+      },
+      "final_cta": {
+        "title": "REJOIGNEZ L'ÉLITE",
+        "title_logged_in": "PRÊT À REPRENDRE ?",
+        "button": "CRÉER MON COMPTE",
+        "button_logged_in": "ACCÉDER AU Q.G."
+      }
+    }
+  }
+}

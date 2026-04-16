@@ -2,13 +2,7 @@
 /**
  * add-translations.ts
  * 
- * Automatically adds new translation keys to i18n.ts for both FR and EN.
- * 
- * Usage:
- *   npx tsx scripts/add-translations.ts --ns="profile" --key="new_key" --fr="Texte" --en="Text"
- *   
- * Or interactive mode:
- *   npx tsx scripts/add-translations.ts
+ * Automatically adds new translation keys to JSON files in public/locales/.
  */
 
 import * as fs from 'fs';
@@ -24,6 +18,8 @@ const colors = {
     bold: '\x1b[1m'
 };
 
+const LOCALES_DIR = path.join(process.cwd(), 'public', 'locales');
+
 interface TranslationEntry {
     namespace: string;
     key: string;
@@ -33,7 +29,6 @@ interface TranslationEntry {
 
 function parseArgs(): Partial<TranslationEntry> {
     const args: Partial<TranslationEntry> = {};
-
     for (const arg of process.argv.slice(2)) {
         const match = arg.match(/^--(\w+)=(.+)$/);
         if (match) {
@@ -44,16 +39,11 @@ function parseArgs(): Partial<TranslationEntry> {
             else if (key === 'en') args.en = value;
         }
     }
-
     return args;
 }
 
 async function prompt(question: string): Promise<string> {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
-
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
     return new Promise((resolve) => {
         rl.question(question, (answer) => {
             rl.close();
@@ -62,100 +52,49 @@ async function prompt(question: string): Promise<string> {
     });
 }
 
-async function getTranslationEntry(partial: Partial<TranslationEntry>): Promise<TranslationEntry> {
-    console.log(`${colors.cyan}${colors.bold}📝 Add Translation${colors.reset}\n`);
-
-    const namespace = partial.namespace || await prompt(`${colors.cyan}Namespace${colors.reset} (e.g. profile, header): `);
-    const key = partial.key || await prompt(`${colors.cyan}Key${colors.reset} (e.g. my_new_key): `);
-    const fr = partial.fr || await prompt(`${colors.cyan}French text${colors.reset}: `);
-    const en = partial.en || await prompt(`${colors.cyan}English text${colors.reset}: `);
-
-    return { namespace, key, fr, en };
+function setNestedKey(obj: Record<string, unknown>, keyPath: string, value: unknown) {
+    const keys = keyPath.split('.');
+    let current = obj;
+    for (let i = 0; i < keys.length - 1; i++) {
+        if (!current[keys[i]]) current[keys[i]] = {};
+        current = current[keys[i]];
+    }
+    current[keys[keys.length - 1]] = value;
 }
 
-function addTranslationToFile(entry: TranslationEntry): boolean {
-    const i18nPath = path.join(process.cwd(), 'src', 'i18n.ts');
-    let content = fs.readFileSync(i18nPath, 'utf-8');
-
-    const escapedKey = entry.key;
-    const escapedFr = entry.fr.replace(/"/g, '\\"');
-    const escapedEn = entry.en.replace(/"/g, '\\"');
-
-    // Find the namespace in FR block
-    const frNamespaceRegex = new RegExp(
-        `(fr:\\s*\\{[\\s\\S]*?translation:\\s*\\{[\\s\\S]*?${entry.namespace}:\\s*\\{)([\\s\\S]*?)(\\n\\s*\\},)`,
-        'm'
-    );
-
-    const frMatch = content.match(frNamespaceRegex);
-    if (!frMatch) {
-        console.log(`${colors.red}❌ Could not find namespace "${entry.namespace}" in FR translations${colors.reset}`);
-        console.log(`${colors.yellow}Tip: Create the namespace first, then add keys to it${colors.reset}`);
-        return false;
+function updateJsonFile(lng: string, ns: string, key: string, value: string) {
+    const filePath = path.join(LOCALES_DIR, lng, `${ns}.json`);
+    const dirPath = path.dirname(filePath);
+    
+    if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true });
     }
 
-    // Check if key already exists
-    if (frMatch[2].includes(`${escapedKey}:`)) {
-        console.log(`${colors.yellow}⚠️  Key "${entry.key}" already exists in FR/${entry.namespace}${colors.reset}`);
-        return false;
+    let data = {};
+    if (fs.existsSync(filePath)) {
+        data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
     }
 
-    // Add to FR block
-    const frNewContent = `${frMatch[1]}${frMatch[2]}                ${escapedKey}: "${escapedFr}",\n${frMatch[3]}`;
-    content = content.replace(frNamespaceRegex, frNewContent);
-
-    // Find the namespace in EN block
-    const enNamespaceRegex = new RegExp(
-        `(en:\\s*\\{[\\s\\S]*?translation:\\s*\\{[\\s\\S]*?${entry.namespace}:\\s*\\{)([\\s\\S]*?)(\\n\\s*\\},)`,
-        'm'
-    );
-
-    const enMatch = content.match(enNamespaceRegex);
-    if (!enMatch) {
-        console.log(`${colors.yellow}⚠️  Could not find namespace "${entry.namespace}" in EN translations${colors.reset}`);
-        console.log(`${colors.yellow}Adding only to FR for now...${colors.reset}`);
-    } else {
-        // Add to EN block
-        const enNewContent = `${enMatch[1]}${enMatch[2]}                ${escapedKey}: "${escapedEn}",\n${enMatch[3]}`;
-        content = content.replace(enNamespaceRegex, enNewContent);
-    }
-
-    // Write back
-    fs.writeFileSync(i18nPath, content, 'utf-8');
-
-    return true;
+    setNestedKey(data, key, value);
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
 }
 
 async function main() {
+    console.log(`${colors.cyan}${colors.bold}📝 Add Translation (JSON Mode)${colors.reset}\n`);
+
     const partial = parseArgs();
+    
+    const namespace = partial.namespace || await prompt(`${colors.cyan}Namespace${colors.reset} (default: translation): `) || 'translation';
+    const key = partial.key || await prompt(`${colors.cyan}Key${colors.reset} (e.g. settings.title): `);
+    const fr = partial.fr || await prompt(`${colors.cyan}French text${colors.reset}: `);
+    const en = partial.en || await prompt(`${colors.cyan}English text${colors.reset}: `);
 
-    // If all args provided, skip interactive mode
-    const hasAllArgs = partial.namespace && partial.key && partial.fr && partial.en;
+    updateJsonFile('fr', namespace, key, fr);
+    updateJsonFile('en', namespace, key, en);
 
-    if (hasAllArgs) {
-        const entry = partial as TranslationEntry;
-        console.log(`${colors.cyan}Adding translation:${colors.reset}`);
-        console.log(`  Namespace: ${entry.namespace}`);
-        console.log(`  Key: ${entry.key}`);
-        console.log(`  FR: "${entry.fr}"`);
-        console.log(`  EN: "${entry.en}"\n`);
-
-        if (addTranslationToFile(entry)) {
-            console.log(`${colors.green}${colors.bold}✅ Translation added successfully!${colors.reset}`);
-        }
-    } else {
-        // Interactive mode
-        const entry = await getTranslationEntry(partial);
-
-        console.log(`\n${colors.cyan}Adding:${colors.reset}`);
-        console.log(`  ${entry.namespace}.${entry.key}`);
-        console.log(`  FR: "${entry.fr}"`);
-        console.log(`  EN: "${entry.en}"\n`);
-
-        if (addTranslationToFile(entry)) {
-            console.log(`${colors.green}${colors.bold}✅ Translation added successfully!${colors.reset}`);
-        }
-    }
+    console.log(`\n${colors.green}${colors.bold}✅ Added to ${namespace}.json:${colors.reset}`);
+    console.log(`  FR: ${key} -> "${fr}"`);
+    console.log(`  EN: ${key} -> "${en}"`);
 }
 
 main().catch(console.error);

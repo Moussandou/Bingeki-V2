@@ -4,10 +4,10 @@ import * as firebaseFunctions from '@/firebase/functions';
 
 // Mock localStorage with proper typing for TS
 interface MockStorage extends Storage {
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
-const localStorageMock: MockStorage = {} as any;
+const localStorageMock = {} as MockStorage;
 
 Object.defineProperties(localStorageMock, {
     getItem: { 
@@ -60,7 +60,7 @@ describe('Anime API Service - callProxy & Caching', () => {
 
     it('should call the Cloud Function on first call (Cache MISS)', async () => {
         const mockData = [{ mal_id: 1, review: 'Test' }];
-        (firebaseFunctions.getWorkReviewsFn as any).mockResolvedValue({ data: mockData });
+        vi.mocked(firebaseFunctions.getWorkReviewsFn).mockResolvedValue({ data: mockData } as unknown as { data: unknown });
 
         const result = await animeApi.getWorkReviews(123, 'anime');
 
@@ -70,7 +70,7 @@ describe('Anime API Service - callProxy & Caching', () => {
 
     it('should use memory cache on subsequent calls (Cache HIT)', async () => {
         const mockData = [{ mal_id: 1, review: 'Test' }];
-        (firebaseFunctions.getWorkReviewsFn as any).mockResolvedValue({ data: mockData });
+        vi.mocked(firebaseFunctions.getWorkReviewsFn).mockResolvedValue({ data: mockData } as unknown as { data: unknown });
 
         await animeApi.getWorkReviews(456, 'anime'); // First call
         const result = await animeApi.getWorkReviews(456, 'anime'); // Second call
@@ -82,7 +82,7 @@ describe('Anime API Service - callProxy & Caching', () => {
     it('should deduplicate concurrent in-flight requests', async () => {
         const mockData = [{ mal_id: 1, review: 'Test' }];
         let callCount = 0;
-        (firebaseFunctions.getWorkReviewsFn as any).mockImplementation(() => {
+        vi.mocked(firebaseFunctions.getWorkReviewsFn).mockImplementation(() => {
             callCount++;
             return new Promise(resolve => setTimeout(() => resolve({ data: mockData }), 50));
         });
@@ -123,7 +123,7 @@ describe('Anime API Service - callProxy & Caching', () => {
 
         // Mock setItem to fail on first attempt, then succeed
         let attempts = 0;
-        (localStorageMock.setItem as any).mockImplementation(function(this: MockStorage, key: string, value: string) {
+        vi.mocked(localStorageMock.setItem).mockImplementation(function(this: MockStorage, key: string, value: string) {
             attempts++;
             if (attempts === 1) {
                 throw new Error('QuotaExceededError');
@@ -132,7 +132,7 @@ describe('Anime API Service - callProxy & Caching', () => {
         });
 
         // Trigger a cache set that triggers the quota logic
-        (firebaseFunctions.getWorkReviewsFn as any).mockResolvedValue({ data: mockData });
+        vi.mocked(firebaseFunctions.getWorkReviewsFn).mockResolvedValue({ data: mockData } as unknown as { data: unknown });
         
         // We'll call it with a fresh ID
         await animeApi.getWorkReviews(999, 'anime'); 

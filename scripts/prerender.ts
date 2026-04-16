@@ -129,7 +129,7 @@ async function prerenderRoute(browser: Browser, route: string): Promise<string[]
     }
 
     // Save to dist
-    let outPath = route === '/' ? '/index.html' : `${route}/index.html`;
+    const outPath = route === '/' ? '/index.html' : `${route}/index.html`;
     const fullPath = path.join(distPath, outPath);
     fs.mkdirSync(path.dirname(fullPath), { recursive: true });
     fs.writeFileSync(fullPath, html);

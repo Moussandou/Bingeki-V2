@@ -3,7 +3,7 @@
  * Modal for creating and editing folders
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
@@ -24,7 +24,12 @@ export function FolderModal({ isOpen, onClose, onSave, folder }: FolderModalProp
     const [color, setColor] = useState<string>(FOLDER_COLORS[0]);
     const [emoji, setEmoji] = useState<string>(FOLDER_EMOJIS[0]);
 
-    useEffect(() => {
+    const [prevFolder, setPrevFolder] = useState(folder);
+    const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+
+    if (folder !== prevFolder || isOpen !== prevIsOpen) {
+        setPrevFolder(folder);
+        setPrevIsOpen(isOpen);
         if (folder) {
             setName(folder.name);
             setColor(folder.color);
@@ -34,7 +39,7 @@ export function FolderModal({ isOpen, onClose, onSave, folder }: FolderModalProp
             setColor(FOLDER_COLORS[0]);
             setEmoji(FOLDER_EMOJIS[0]);
         }
-    }, [folder, isOpen]);
+    }
 
     const handleSubmit = () => {
         if (!name.trim()) return;

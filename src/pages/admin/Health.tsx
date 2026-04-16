@@ -137,8 +137,8 @@ function LatencyChart({ services }: { services: ServiceHealthResult[] }) {
 
 export interface ScoreHistoryEntry {
     score: number;
-    timestamp: any;
-    [key: string]: any;
+    timestamp: { seconds: number; nanoseconds: number } | string | number | Date;
+    [key: string]: unknown;
 }
 
 export default function AdminHealth() {
@@ -181,7 +181,7 @@ export default function AdminHealth() {
             ]);
             setReport(healthReport);
             setAdminStats(stats);
-            setScoreHistory(history as any);
+            setScoreHistory(history as ScoreHistoryEntry[]);
             setRepairHistory(repairLog);
             setHasPermissionError(false);
             setLastRefresh(new Date());
@@ -199,7 +199,7 @@ export default function AdminHealth() {
                     localStorage.setItem('bingeki_last_discord_alert', now.toString());
                 }
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('[Health] Failed to fetch health data:', error);
             if (error?.code === 'permission-denied' || error?.message?.includes('permissions')) {
                 setHasPermissionError(true);

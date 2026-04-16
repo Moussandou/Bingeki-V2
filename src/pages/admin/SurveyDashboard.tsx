@@ -64,7 +64,7 @@ export default function SurveyDashboard() {
             addToast(t('admin.survey.delete_success'), 'success');
             setResponses(prev => prev.filter(r => r.id !== id));
             if (expandedRow === id) setExpandedRow(null);
-        } catch (err) {
+        } catch {
             addToast(t('admin.survey.delete_error'), 'error');
         } finally {
             setDeletingId(null);

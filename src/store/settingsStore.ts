@@ -44,7 +44,7 @@ interface SettingsState {
     setProfileVisibility: (visibility: ProfileVisibility) => void;
     toggleActivityStatus: () => void;
 
-    syncFromProfile: (profile: any) => void;
+    syncFromProfile: (profile: Record<string, unknown>) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -85,13 +85,15 @@ export const useSettingsStore = create<SettingsState>()(
             showActivityStatus: true,
             toggleActivityStatus: () => set((state) => ({ showActivityStatus: !state.showActivityStatus })),
 
-            syncFromProfile: (profile) => set((state) => ({
-                titleLanguage: profile.titlePriority || state.titleLanguage,
-                hideScores: profile.hideScores !== undefined ? profile.hideScores : state.hideScores,
-                dataSaver: profile.dataSaver !== undefined ? profile.dataSaver : state.dataSaver,
-                profileVisibility: profile.profileVisibility || state.profileVisibility,
-                showActivityStatus: profile.showActivityStatus !== undefined ? profile.showActivityStatus : state.showActivityStatus,
-            })),
+            syncFromProfile: (profile: Record<string, unknown>) => {
+                set((state) => ({
+                    titleLanguage: (profile.titlePriority as TitleLanguage) || state.titleLanguage,
+                    hideScores: profile.hideScores !== undefined ? (profile.hideScores as boolean) : state.hideScores,
+                    dataSaver: profile.dataSaver !== undefined ? (profile.dataSaver as boolean) : state.dataSaver,
+                    profileVisibility: (profile.profileVisibility as ProfileVisibility) || state.profileVisibility,
+                    showActivityStatus: profile.showActivityStatus !== undefined ? (profile.showActivityStatus as boolean) : state.showActivityStatus,
+                }));
+            },
         }),
         {
             name: 'bingeki-settings',

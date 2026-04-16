@@ -1,0 +1,93 @@
+{
+  "legal": {
+    "back": "RETOUR",
+    "title": "MENTIONS LÉGALES & RGPD",
+    "section1_title": "1. ÉDITEUR DU SITE",
+    "name": "Nom :",
+    "address": "Adresse :",
+    "contact": "Contact :",
+    "status": "Statut :",
+    "status_value": "Développeur Freelance / Projet Personnel",
+    "section2_title": "2. HÉBERGEMENT",
+    "hosting_text": "Ce site est hébergé par Firebase (Google LLC).",
+    "hosting_data": "Certaines données (images) peuvent être stockées via d'autres services tiers.",
+    "section3_title": "3. PROPRIÉTÉ INTELLECTUELLE",
+    "ip_design": "Le design, la structure et le code de \"Bingeki Experience\" sont la propriété exclusive de l'éditeur.",
+    "ip_images": "Les images d'œuvres (mangas/animes) sont utilisées à titre d'illustration et restent la propriété de leurs ayants droit respectifs.",
+    "section4_title": "4. DONNÉES PERSONNELLES (RGPD)",
+    "gdpr_intro": "Conformément au Règlement Général sur la Protection des Données (RGPD), nous vous informons que :",
+    "gdpr_collect_title": "Collecte :",
+    "gdpr_collect": "Les données collectées (email, image de profil, progression) sont uniquement utilisées pour le fonctionnement de l'application (sauvegarde de la bibliothèque, gamification).",
+    "gdpr_responsible_title": "Responsable :",
+    "gdpr_responsible": "Moussandou Mroivili est le responsable du traitement des données.",
+    "gdpr_access_title": "Droit d'accès :",
+    "gdpr_access": "Vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Vous pouvez supprimer votre compte et toutes les données associées directement depuis les paramètres de l'application ou en nous contactant.",
+    "gdpr_share_title": "Partage :",
+    "gdpr_share": "Vos données ne sont ni vendues, ni louées, ni cédées à des tiers.",
+    "gdpr_cookies_title": "Cookies :",
+    "gdpr_cookies": "Nous utilisons des cookies techniques essentiels pour maintenir votre session. Pour en savoir plus, consultez notre Politique de Confidentialité.",
+    "ai_title": "Transparence Intelligence Artificielle (AI Act)",
+    "ai_text": "Conformément aux principes de transparence, nous informons nos utilisateurs que des outils basés sur l'intelligence artificielle ont été utilisés pour assister la création d'éléments graphiques (comme des logos) ainsi qu'une partie du code source de ce site web. Tous les contenus générés ont fait l'objet d'une révision et d'une validation humaine.",
+    "section5_title": "5. CONTACT",
+    "contact_text": "Pour toute question, demande d'information ou réclamation, vous pouvez nous contacter à l'adresse suivante :"
+  },
+  "privacy": {
+    "title": "POLITIQUE DE CONFIDENTIALITÉ",
+    "intro": "La protection de votre vie privée est importante pour nous.",
+    "cookies_title": "Cookies",
+    "cookies_desc": "Ce site utilise des cookies (y compris des cookies tiers) pour personnaliser le contenu et analyser notre trafic.",
+    "ads_title": "Publicités Google (AdSense)",
+    "ads_desc": "Des fournisseurs tiers, y compris Google, utilisent des cookies pour diffuser des annonces en fonction des visites antérieures des utilisateurs sur votre site web ou sur d'autres sites web. L'utilisation de cookies publicitaires par Google permet à Google et à ses partenaires de diffuser des annonces auprès de vos utilisateurs en fonction de leur visite sur vos sites et/ou d'autres sites sur Internet.",
+    "data_title": "Collecte de données",
+    "data_desc": "Nous recueillons certaines données (comme votre progression de lecture) uniquement pour vous fournir nos services. Nous ne vendons en aucun cas vos données personnelles à des tiers."
+  },
+  "terms": {
+    "title": "CONDITIONS GÉNÉRALES D'UTILISATION",
+    "intro": "En utilisant Bingeki, vous acceptez de respecter ces conditions d'utilisation.",
+    "rules_title": "Règles de bonne conduite",
+    "rules_desc": "Soyez respectueux envers les autres membres de la communauté. Aucun contenu abusif ou illégal ne sera toléré."
+  },
+  "contact": {
+    "title": "CONTACTER L'ÉQUIPE",
+    "intro": "Une question, une suggestion ou un problème technique ? N'hésitez pas à nous contacter.",
+    "email_label": "Email direct :"
+  },
+  "about": {
+    "title": "À PROPOS DE BINGEKI",
+    "vision_title": "Une plateforme pour les passionnés",
+    "vision_p1": "Bingeki est une plateforme pensée pour les passionnés d’animé et de manga qui souhaitent vivre leur passion de manière plus immersive, organisée et interactive. À l’ère du streaming et de la consommation massive de contenus culturels, l’accès aux animés et aux mangas n’a jamais été aussi simple. Pourtant, malgré cette abondance de contenus, l’expérience utilisateur reste souvent fragmentée et limitée. Les fans utilisent différents sites pour suivre leurs séries, découvrir de nouvelles œuvres ou échanger avec d’autres passionnés, sans qu’il existe réellement d’espace centralisé capable de rassembler toutes ces dimensions.",
+    "vision_p2": "C’est précisément ce constat qui a donné naissance à Bingeki.",
+    "problem_p1": "Aujourd’hui, la plupart des outils disponibles permettent surtout de consulter des bases de données ou de gérer des listes de visionnage. Ils remplissent une fonction utile, mais restent majoritairement statiques. L’utilisateur peut noter un animé, indiquer qu’il l’a terminé ou l’ajouter à une liste, mais l’expérience s’arrête souvent là. Or, la manière dont les fans consomment la culture anime et manga a évolué : ils veulent suivre leur progression, partager leurs découvertes, comparer leurs expériences et s’inscrire dans une communauté qui valorise leur engagement.",
+    "problem_p2": "Bingeki a été conçu pour répondre à cette évolution.",
+    "evolution_p1": "La plateforme transforme le simple suivi d’animé et de manga en une véritable expérience personnelle et sociale. Elle permet aux utilisateurs de centraliser leur consommation de contenus, de suivre facilement leur progression dans les séries et les mangas qu’ils regardent ou lisent, et de découvrir de nouvelles œuvres adaptées à leurs goûts. L’objectif n’est pas seulement d’organiser l’information, mais de créer un environnement dynamique dans lequel chaque interaction contribue à enrichir l’expérience utilisateur.",
+    "core_p1": "Au cœur de Bingeki se trouve une idée simple : la passion pour les animés et les mangas mérite une plateforme à la hauteur de l’engagement de ses fans.",
+    "features_p1": "La plateforme propose ainsi un ensemble de fonctionnalités pensées pour accompagner les utilisateurs dans leur quotidien de fans. Les utilisateurs peuvent créer et gérer leurs listes de visionnage, suivre leur progression dans les épisodes ou les chapitres, accéder à des fiches détaillées sur les œuvres et explorer de nouveaux contenus. Bingeki facilite également la découverte en mettant en avant des recommandations et des informations sur les saisons d’animé en cours.",
+    "features_p2": "Mais l’expérience ne s’arrête pas au suivi personnel.",
+    "social_p1": "Bingeki intègre également une dimension sociale qui permet aux fans d’interagir, de partager leur activité et de découvrir ce que regarde ou lit la communauté. Les profils utilisateurs deviennent ainsi une vitrine de la passion de chacun, où l’on peut retrouver ses statistiques, ses œuvres favorites et sa progression globale. Cette approche transforme l’expérience individuelle en une expérience collective, où les utilisateurs peuvent échanger, comparer leurs goûts et découvrir de nouvelles recommandations à travers l’activité des autres membres.",
+    "gamification_p1": "Un autre aspect important de Bingeki est la notion de progression. La plateforme valorise l’engagement des utilisateurs en intégrant des mécanismes inspirés des systèmes de progression présents dans les jeux vidéo. En suivant des animés, en découvrant de nouvelles œuvres ou en interagissant avec la plateforme, les utilisateurs peuvent voir évoluer leur profil et leur activité. Cette approche gamifiée permet de rendre l’expérience plus motivante et plus immersive, tout en renforçant le sentiment d’appartenance à la communauté.",
+    "design_p1": "L’ergonomie et l’accessibilité ont également été des priorités dans la conception de Bingeki. La plateforme est développée comme une application web moderne, optimisée pour une utilisation fluide sur ordinateur, tablette et smartphone. L’interface a été pensée pour être claire, rapide et agréable à utiliser au quotidien, afin que les utilisateurs puissent accéder facilement à leurs contenus et à leur progression, où qu’ils soient.",
+    "audience_p1": "Bingeki s’adresse principalement à une nouvelle génération de fans : des utilisateurs connectés, habitués aux applications modernes et à la personnalisation de leur expérience numérique. Étudiants, jeunes adultes ou passionnés de longue date, tous partagent le même besoin : disposer d’un espace simple, moderne et engageant pour suivre leur passion pour les animés et les mangas.",
+    "future_p1": "Le projet est encore en évolution et continue de s’améliorer au fil du temps. De nouvelles fonctionnalités sont régulièrement développées afin d’enrichir l’expérience utilisateur et de renforcer l’aspect communautaire de la plateforme. Cette démarche progressive permet de construire Bingeki avec une vision claire : créer un espace durable, capable d’accompagner les fans dans leur passion sur le long terme.",
+    "ecosystem_p1": "Au-delà d’une simple application, Bingeki ambitionne de devenir un véritable écosystème pour les fans d’animé et de manga. Un lieu où l’on peut organiser sa consommation de contenus, découvrir de nouvelles œuvres, partager son expérience et se connecter à une communauté qui partage la même passion.",
+    "closing_p1": "Parce que suivre des animés et des mangas ne devrait pas être seulement une liste à remplir, mais une expérience à vivre et à partager."
+  },
+  "credits": {
+    "title": "CRÉDITS",
+    "role": "DEVELOPER & CREATOR",
+    "description_1": "<strong>Bingeki</strong> est né d'une passion pour le manga et l'envie de créer une expérience utilisateur unique.",
+    "description_2": "Développé avec amour, café et beaucoup de CSS. Ce projet est une démonstration de ce qui est possible quand on mélange design brutaliste et technologies modernes.",
+    "made_with": "Fait avec",
+    "in_marseille": "à Marseille"
+  },
+  "donors": {
+    "title": "NOS HÉROS",
+    "subtitle": "Un immense merci à ceux qui soutiennent le projet financièrement.",
+    "top_donor": "TOP DONATEUR",
+    "rank_1": "LE ROI DU SUPPORT",
+    "creator_desc": "Créateur de Inazuma DB",
+    "amount": "Don total",
+    "thank_you_title": "MERCI !",
+    "thank_you_desc": "Grâce à vous, Bingeki continue de grandir. Serveurs, domaine, nouvelles features... tout ça, c'est grâce à votre générosité.",
+    "become_donor": "DEVENIR DONATEUR"
+  }
+}

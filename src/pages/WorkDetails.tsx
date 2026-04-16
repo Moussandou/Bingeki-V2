@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal'; // Import Modal
 import { ArrowLeft, Star, BookOpen, Check, Trash2, Tv, FileText, Trophy, AlertTriangle, MessageCircle, Heart, Send, EyeOff, Reply, Video, Calendar, BarChart, Music, Disc, X, ArrowUp, ExternalLink } from 'lucide-react';
 import { YoutubeIcon } from '@/components/ui/BrandIcons';
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 
 
 import { useToast } from '@/context/ToastContext';
@@ -109,20 +109,19 @@ const RecursiveComment = memo(function RecursiveComment({
     setRevealedSpoilers
 }: RecursiveCommentProps) {
     const isRevealed = revealedSpoilers.includes(comment.id);
-    /* eslint-disable-next-line */
-    const [timeAgo, setTimeAgo] = useState<string>('');
+     
     const { t } = useTranslation();
-    
-    useEffect(() => {
-        const timeDiff = Date.now() - comment.timestamp;
+
+    const [now] = useState(() => Date.now());
+    const timeAgo = useMemo(() => {
+        const timeDiff = now - comment.timestamp;
         const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-        const formatted = hours < 1 
+        return hours < 1 
             ? t('work_details.comments.time_now') 
             : hours < 24 
                 ? t('work_details.comments.time_hours', { hours }) 
                 : t('work_details.comments.time_days', { days: Math.floor(hours / 24) });
-        setTimeAgo(formatted);
-    }, [comment.timestamp, t]);
+    }, [comment.timestamp, t, now]);
     const isReplying = replyingTo === comment.id;
 
     return (

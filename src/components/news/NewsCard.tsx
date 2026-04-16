@@ -25,7 +25,7 @@ export function NewsCard({ title, slug, imageUrl, sourceName, publishedAt, tags 
     let timeAgo = '';
     try {
         timeAgo = formatDistanceToNow(new Date(publishedAt), { addSuffix: true, locale: dateLocale });
-    } catch (e) {
+    } catch {
         timeAgo = publishedAt;
     }
 

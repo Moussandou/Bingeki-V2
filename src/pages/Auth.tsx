@@ -86,10 +86,11 @@ export default function Auth() {
                 setUser(user);
                 navigate('/dashboard');
             }
-        } catch (err: any) {
+        } catch (err) {
             console.error('[Auth] Discord login error:', err);
+            const firebaseError = err as { code?: string };
             // Don't show error if user just closed the popup
-            if (err?.code !== 'auth/popup-closed-by-user' && err?.code !== 'auth/cancelled-popup-request') {
+            if (firebaseError.code !== 'auth/popup-closed-by-user' && firebaseError.code !== 'auth/cancelled-popup-request') {
                 setError(t('auth.error_generic'));
             }
         } finally {
@@ -114,10 +115,11 @@ export default function Auth() {
                 setUser(user);
                 navigate('/dashboard');
             }
-        } catch (err: any) {
+        } catch (err) {
             console.error('[Auth] Google login error:', err);
+            const firebaseError = err as { code?: string };
             // Don't show error if user just closed the popup
-            if (err?.code !== 'auth/popup-closed-by-user' && err?.code !== 'auth/cancelled-popup-request') {
+            if (firebaseError.code !== 'auth/popup-closed-by-user' && firebaseError.code !== 'auth/cancelled-popup-request') {
                 setError(t('auth.error_generic'));
             }
         } finally {

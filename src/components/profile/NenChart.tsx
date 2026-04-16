@@ -2,9 +2,10 @@
  * Nen Chart component (profile)
  */
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useMounted } from '@/hooks/useMounted';
 
 interface NenChartProps {
     stats: {
@@ -42,13 +43,8 @@ export function NenChart({ stats, themeColor = '#FF2E63' }: NenChartProps) {
         { subject: t('stats.completion'), A: Math.min(safeStats.totalWorksCompleted * 5, 100), fullMark: 100 },
     ];
 
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
 
-    // Ensure we only render the ResponsiveContainer after the component has mounted
-    // This helps it correctly measure its parent's dimensions and avoids -1 warnings.
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     return (
         <div style={{ width: '100%', minHeight: '200px', height: '100%', position: 'relative', overflow: 'hidden' }}>

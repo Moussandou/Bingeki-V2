@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { getPublicTierLists } from '@/firebase/firestore';
 import type { TierList } from '@/firebase/firestore';
@@ -29,7 +29,7 @@ export default function TierListFeed() {
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
     // Mock data for initial empty state
-    const mockTierLists: TierList[] = [
+    const mockTierLists: TierList[] = useMemo(() => [
         {
             id: 'mock-1',
             userId: 'system',
@@ -103,7 +103,23 @@ export default function TierListFeed() {
                 }
             ]
         }
-    ];
+    ], []);
+
+    // Load More
+    const fetchMoreLists = useCallback(async () => {
+        if (!lastVisible || loadingMore) return;
+        setLoadingMore(true);
+        try {
+            const { lists: moreLists, lastVisible: last } = await getPublicTierLists(12, lastVisible, filter);
+            setLists(prev => [...prev, ...moreLists]);
+            setLastVisible(last);
+            setHasMore(moreLists.length === 12);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoadingMore(false);
+        }
+    }, [lastVisible, loadingMore, filter]);
 
     // Infinite Scroll Intersection Observer
     const observer = useRef<IntersectionObserver | null>(null);
@@ -116,7 +132,7 @@ export default function TierListFeed() {
             }
         });
         if (node) observer.current.observe(node);
-    }, [loading, hasMore, loadingMore]);
+    }, [loading, hasMore, loadingMore, fetchMoreLists]);
 
     // Initial Fetch
     useEffect(() => {
@@ -140,23 +156,7 @@ export default function TierListFeed() {
         };
 
         fetchInitial();
-    }, [filter]);
-
-    // Load More
-    const fetchMoreLists = async () => {
-        if (!lastVisible || loadingMore) return;
-        setLoadingMore(true);
-        try {
-            const { lists: moreLists, lastVisible: last } = await getPublicTierLists(12, lastVisible, filter);
-            setLists(prev => [...prev, ...moreLists]);
-            setLastVisible(last);
-            setHasMore(moreLists.length === 12);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoadingMore(false);
-        }
-    };
+    }, [filter, mockTierLists]);
 
     const handleCardClick = (list: TierList) => {
         setSelectedTierList(list);

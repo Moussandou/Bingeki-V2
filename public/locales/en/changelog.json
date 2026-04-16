@@ -1,0 +1,293 @@
+{
+  "changelog": {
+    "title": "LOGBOOK",
+    "subtitle": "The history of Bingeki platform updates.",
+    "updates": "Updates",
+    "current_version": "Current Version",
+    "new": "NEW",
+    "to_be_continued": "TO BE CONTINUED...",
+    "entries": {
+      "v3_9": {
+        "date": "03 April 2026",
+        "title": "Health Dashboard & System Hardening",
+        "description": "A major step forward for admin monitoring and infrastructure robustness.",
+        "changes": [
+          "Admin: New Health Dashboard with real-time monitoring of infrastructure and data integrity.",
+          "Admin: Added visual metrics, latency charts, and Data Shield logs.",
+          "Security: Hardened rules and restricted access to system history.",
+          "UI: Simplified Settings page and refined Login/Auth layouts.",
+          "Navigation: Standardized routes and improved internal linking.",
+          "Performance: Cleaned up legacy dependencies to optimize bundle size.",
+          "I18n: Global synchronization of translation keys."
+        ]
+      },
+      "v3_8": {
+        "date": "02 April 2026",
+        "title": "Image & SEO Optimization",
+        "description": "Massive migration to OptimizedImage, SEO handler redesign and social feed improvement.",
+        "changes": [
+          "Tech: Full migration of all <img> tags to the custom OptimizedImage component.",
+          "Tech: Integration of wsrv.nl as default image proxy for better reliability.",
+          "OptimizedImage: Support for priority (eager loading) and fill (ratio management) props.",
+          "SEO: Secured Cloud Function handler to block access to static files.",
+          "SEO: Updated Permissions-Policy to include browsing-topics.",
+          "Social: New 'Manga Grid' design for the friend activity feed.",
+          "Social: Integration of custom icons for Discord and TikTok throughout the app.",
+          "Gamification: Redesigned XP synchronization to ensure data integrity on load.",
+          "UI: Persistent removal of image loading skeletons in favor of native fade-in."
+        ]
+      },
+      "v3_7": {
+        "date": "March 17, 2026",
+        "title": "Survey & Admin Revolution",
+        "description": "Complete survey redesign, admin dashboard, and social integration.",
+        "changes": [
+          "Survey: Redesigned UX with sequential display and smooth auto-scroll.",
+          "Admin: New Dashboard for real-time visualization of survey results.",
+          "Social: Full Instagram and TikTok integration (Footer + Survey).",
+          "I18n: Added a dynamic language switcher to the form.",
+          "Security: Updated Firestore rules to secure responses.",
+          "Fix: Correction of the official Discord link across the platform."
+        ]
+      },
+      "v3_6": {
+        "date": "March 07, 2026",
+        "title": "Anime News & Security Update",
+        "description": "Full news feed, scraper optimizations, and major security fixes.",
+        "changes": [
+          "News: New dedicated section with optimized SEO and auto summary.",
+          "Scraper: Fetch parallelization and intelligent formatting for Crunchyroll/ANN.",
+          "Security: 100% resolution of critical vulnerabilities via overrides.",
+          "UI: Improved visibility for the back-to-top button.",
+          "Automation: Switched to a 4-hour update cycle."
+        ]
+      },
+      "v3_5": {
+        "date": "February 13, 2026",
+        "title": "Visual Assets & Core Sync",
+        "description": "Introduction of high-fidelity mockups and admin synchronization.",
+        "changes": [
+          "Assets: Complete library of CSS mockups (Discover, Library, Social, Auth).",
+          "Admin: Real-time profile synchronization for immediate access.",
+          "Auth: Secure access to the login page during maintenance.",
+          "Core: Deployment scripts cleanup and maintenance logic optimization."
+        ]
+      },
+      "v3_4": {
+        "date": "February 01, 2026",
+        "title": "Haptic Feedback",
+        "description": "Enhanced tactile experience for better immersion.",
+        "changes": [
+          "Haptic: Tactile feedback on all buttons for a physical feel.",
+          "UI: Better responsiveness via light vibrations.",
+          "Tech: New useHaptics hook to manage vibrations."
+        ]
+      },
+      "v3_3": {
+        "date": "January 22, 2026",
+        "title": "Mobile Experience & PWA",
+        "description": "Major optimization for mobile devices and application installation.",
+        "changes": [
+          "New: Installable App (PWA) with offline support.",
+          "UI: New mobile promotion section on Landing Page.",
+          "UI: Install button moved to footer for clarity.",
+          "UX: Automatic scroll-to-top on navigation.",
+          "Fix: Resolved mobile display issues (Header, Search, Library)."
+        ]
+      },
+      "v3_2": {
+        "date": "January 16, 2026",
+        "title": "Social & Security",
+        "description": "Friend library access, Discord Login, and security hardening.",
+        "changes": [
+          "New: View your friends' library in read-only mode.",
+          "New: Discord OAuth login.",
+          "Security: Enhanced XSS protection on image URLs.",
+          "Security: Strict user level validation (max 100).",
+          "Fix: Confirmation before marking a work as completed.",
+          "Tech: ESLint audit and code error fixes."
+        ]
+      },
+      "v3_1": {
+        "date": "January 16, 2026",
+        "title": "SEO & Global I18n Fix",
+        "description": "Massive SEO improvement and global translation system correction.",
+        "changes": [
+          "SEO: SEO component integration on Details pages (Animes, Characters, Staff).",
+          "I18n: Complete restructuring of namespaces for better key resolution.",
+          "I18n: Full translation of PersonDetails sheet.",
+          "Fix: Correction of theme keys (Openings/Endings) and loading titles.",
+          "Git: Migration to origin/main with automatic deployment."
+        ]
+      },
+      "v3_0": {
+        "date": "January 14, 2026",
+        "title": "Data Shield & Support",
+        "description": "A critical update for your data protection and project support.",
+        "changes": [
+          "Critical Fix: Data protection system (Anti-reset for level/XP).",
+          "New: \"Tips for Devs\" section with Ko-fi integration.",
+          "Tech: Automatic backups and intelligent cloud/local data merging.",
+          "UI: Visual improvement of support buttons on home and footer."
+        ]
+      },
+      "v2_9": {
+        "date": "January 03, 2026",
+        "title": "Trailer & UI Polish",
+        "description": "Critical fix for the trailer player and interface optimization.",
+        "changes": [
+          "Fix: The trailer's \"Close\" button is now always visible (Z-Index fix).",
+          "Tech: Use of React Portals for full-screen modals.",
+          "UI: Improved contrast for interaction buttons."
+        ]
+      },
+      "v2_8": {
+        "date": "January 03, 2026",
+        "title": "Showcase & Accessibility",
+        "description": "Highlighting work details and opening to the public.",
+        "changes": [
+          "New: \"Learn Everything\" section on the Landing Page (Brutalist Showcase)",
+          "Accessibility: Schedule and Changelog now accessible to guests",
+          "New: Credits and legal mentions page",
+          "UI: Harmonization of Jujutsu Kaisen visuals on the showcase"
+        ]
+      },
+      "v2_7": {
+        "date": "January 03, 2026",
+        "title": "Characters and Seiyuu",
+        "description": "Explore detailed character and voice actor profiles with a wiki style.",
+        "changes": [
+          "New: Dedicated Character pages with wiki sheet (Age, Clan, Kekkei Genkai, etc.)",
+          "New: Dedicated Seiyuu pages with structured info (Twitter, Birthplace, etc.)",
+          "Navigation: Click on characters/seiyuu from the casting section",
+          "UI: Streaming service logos (Crunchyroll, Netflix, ADN, etc.)",
+          "UI: Collapsible Extended Universe with adaptive cards",
+          "Responsive: Mobile improvement for Feedback and WorkDetails pages"
+        ]
+      },
+      "v2_6": {
+        "date": "January 03, 2026",
+        "title": "Community Voices & Discovery",
+        "description": "Integration of community reviews and search improvements.",
+        "changes": [
+          "New: \"Reviews\" tab on sheets (MyAnimeList integration)",
+          "New: Studio filter in advanced search",
+          "UI: Brutalist redesign of the loading screen",
+          "UI: Improvement of the reviews grid and search filters"
+        ]
+      },
+      "v2_5": {
+        "date": "January 03, 2026",
+        "title": "Weekly Follow-up",
+        "description": "Never miss an episode again with the new Release Schedule.",
+        "changes": [
+          "New Schedule: View anime releases day by day.",
+          "Quick access via Header (Calendar icon).",
+          "Updated streaming buttons for more clarity.",
+          "Broadcasting times indicated on schedule cards."
+        ]
+      },
+      "v2_4": {
+        "date": "January 03, 2026",
+        "title": "Data Depth",
+        "description": "Full immersion with casting details and community statistics.",
+        "changes": [
+          "Enriched Casting: Discover original Seiyuu (voice actors) under each character.",
+          "Statistics: Visualize popularity and score distribution of the work.",
+          "Brutalist Visualization: New charts for scores and watching status.",
+          "Optimization of the Details page structure."
+        ]
+      },
+      "v2_3": {
+        "date": "January 03, 2026",
+        "title": "Discovery & Immersion",
+        "description": "Visual enrichment and discovery of new gems.",
+        "changes": [
+          "New 'Gallery' tab: Explore official artworks in high quality.",
+          " 'You Might Also Like' section: Recommendations based on community votes.",
+          "Integration of a 'Click-to-Zoom' modal for images.",
+          "UX Improvement: Video autoplay stop and grid optimization.",
+          "New 'MUSIC' tab: Listen to all openings and endings with integrated YouTube search."
+        ]
+      },
+      "v2_2": {
+        "date": "January 03, 2026",
+        "title": "Deep Dive Update",
+        "description": "Dive into your favorite works with Casting and Extended Universe.",
+        "changes": [
+          "Added 'Casting' section: Top 10 main characters at a glance.",
+          "Added 'Extended Universe' section: Easy navigation between prequels, sequels, and side-stories.",
+          "New 'Invisible' horizontal scroll style for an ultra-clean aesthetic.",
+          "API performance optimization (Parallel details loading)."
+        ]
+      },
+      "v2_1": {
+        "date": "January 03, 2026",
+        "title": "The Details Era",
+        "description": "A major update to enrich anime and manga sheets.",
+        "changes": [
+          "Added trailers directly on the details page.",
+          "New info: Studios, Rank, Popularity, Season, and Year.",
+          "New Changelog page to track update history.",
+          "Improved API vs Library data synchronization."
+        ]
+      },
+      "v1_5": {
+        "date": "December 19, 2025",
+        "title": "Mobile & Social Optimization",
+        "description": "Focus on mobile experience and stability.",
+        "changes": [
+          "Complete redesign of Social display on mobile.",
+          "Fixed chart display issues.",
+          "Firestore permissions optimization.",
+          "Resolved duplicates in Discovery page."
+        ]
+      },
+      "v1_4": {
+        "date": "December 18, 2025",
+        "title": "Mobile First & Stability",
+        "description": "Crucial improvements for small screen navigation.",
+        "changes": [
+          "Global improvement of 'Bingeki Style' responsivity on mobile.",
+          "Fixed chart resizing issues.",
+          "Correct injection of user IDs in profiles."
+        ]
+      },
+      "v1_3": {
+        "date": "December 17, 2025",
+        "title": "Community & Feedback",
+        "description": "Introduction of community features.",
+        "changes": [
+          "Advanced commenting system with mentions.",
+          "New Feedback page and admin interface.",
+          "Added 'Level 100' special rank.",
+          "Enhanced user data security.",
+          "Brutalist style applied to text areas."
+        ]
+      },
+      "v1_2": {
+        "date": "December 17, 2025",
+        "title": "Profile 2.0 & Gamification",
+        "description": "Major overhaul of user identity and progression system.",
+        "changes": [
+          "New Profile: Nen Chart, Top 3 Favorites, and Badges.",
+          "Challenge invitation system and Watch Party controls.",
+          "Improved profile banner management.",
+          "XP and progression logic update.",
+          "'SFW' content filter enabled by default."
+        ]
+      },
+      "v1_1": {
+        "date": "December 17, 2025",
+        "title": "Discover & UI Polish",
+        "description": "Discovery improvement and visual harmonization.",
+        "changes": [
+          "New immersive 'Discover' interface.",
+          "Functional genre filters via API.",
+          "Harmonization of buttons and brutalist cards.",
+          "Fixed library styles."
+        ]
+      }
+    }
+  }
+}

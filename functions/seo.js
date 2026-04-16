@@ -9,6 +9,182 @@ const { getPathContext, resolveStaticSeo } = require("./seoResolver");
 
 // ==================== SVG GENERATORS ====================
 
+function generateBrutalistBaseSVG({ title, subtitle, badges = [], lang = 'fr', type = 'generic' }) {
+    const isDark = true; // Most OG images look better in dark mode for Bingeki
+    const primaryColor = '#FF2E63';
+    const bgColor = '#121212';
+    const borderColor = '#000000';
+    const textColor = '#ffffff';
+    const subTextColor = '#FF2E63';
+
+    const cleanTitle = escapeHtml(title || 'Bingeki');
+    const cleanSubtitle = escapeHtml(subtitle || '');
+
+    // Layout configuration based on type
+    const showHeader = ['library', 'social', 'trending', 'challenges', 'tierlist', 'lens', 'changelog'].includes(type);
+    const headerTitle = {
+        library: lang === 'en' ? 'LIBRARY' : 'BIBLIOTHÈQUE',
+        social: lang === 'en' ? 'COMMUNITY' : 'COMMUNAUTÉ',
+        trending: lang === 'en' ? 'TRENDING' : 'TENDANCES',
+        challenges: lang === 'en' ? 'CHALLENGES' : 'DÉFIS',
+        tierlist: 'TIER LISTS',
+        lens: 'LENS',
+        changelog: 'CHANGELOG'
+    }[type] || 'BINGEKI';
+
+    return `
+    <svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <defs>
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@900&amp;family=Inter:wght@400;700;800&amp;display=swap');
+                .heading { font-family: 'Outfit', sans-serif; font-weight: 900; text-transform: uppercase; }
+                .body { font-family: 'Inter', sans-serif; }
+                .text-outline { 
+                    paint-order: stroke fill;
+                    stroke: #000;
+                    stroke-width: 8px;
+                    stroke-linecap: round;
+                    stroke-linejoin: round;
+                }
+                .manga-title {
+                    font-family: 'Outfit', sans-serif;
+                    font-weight: 900;
+                    text-transform: uppercase;
+                }
+            </style>
+            <pattern id="mangaDots" width="30" height="30" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="1.5" fill="white" fill-opacity="0.1" />
+            </pattern>
+            <filter id="brutalistShadow">
+                <feOffset dx="8" dy="8" />
+                <feColorMatrix type="matrix" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 1 0" />
+                <feMerge>
+                    <feMergeNode />
+                    <feMergeNode in="SourceGraphic" />
+                </feMerge>
+            </filter>
+        </defs>
+
+        <!-- Background Layer -->
+        <rect width="1200" height="630" fill="${bgColor}" />
+        <rect width="1200" height="630" fill="url(#mangaDots)" />
+        
+        <!-- Speedlines (Simulated with Rays) -->
+        <g opacity="0.05">
+            ${Array.from({ length: 12 }).map((_, i) => {
+                const angle = (i * 30) * (Math.PI / 180);
+                const x2 = 600 + 1000 * Math.cos(angle);
+                const y2 = 315 + 1000 * Math.sin(angle);
+                return `<line x1="600" y1="315" x2="${x2}" y2="${y2}" stroke="white" stroke-width="20" />`;
+            }).join('')}
+        </g>
+
+        <!-- Main Panel -->
+        <rect x="40" y="40" width="1120" height="550" fill="none" stroke="${borderColor}" stroke-width="12" />
+        
+        ${showHeader ? `
+            <rect x="40" y="40" width="1120" height="100" fill="${borderColor}" />
+            <text x="70" y="110" class="heading" font-size="60" fill="white" letter-spacing="4">${headerTitle}</text>
+            <rect x="1110" y="40" width="50" height="100" fill="${primaryColor}" />
+        ` : `
+            <!-- Hero Centered Layout -->
+            <text x="600" y="120" text-anchor="middle" class="heading" font-size="120" fill="white" opacity="0.1" letter-spacing="20">BINGEKI</text>
+        `}
+
+        <g transform="translate(0, ${showHeader ? 40 : 0})">
+            <!-- Center Content -->
+            <text x="600" y="320" text-anchor="middle" class="heading text-outline" font-size="100" fill="white" letter-spacing="-2">${cleanTitle}</text>
+            <text x="600" y="400" text-anchor="middle" class="body" font-size="32" font-weight="800" fill="${primaryColor}" letter-spacing="2" text-transform="uppercase">${cleanSubtitle}</text>
+        </g>
+
+        <!-- Bottom Accents -->
+        <rect x="40" y="550" width="1120" height="40" fill="${borderColor}" />
+        <text x="1130" y="578" text-anchor="end" class="heading" font-size="18" fill="white" opacity="0.6" letter-spacing="2">BINGEKI.WEB.APP</text>
+        
+        <!-- Badges / Accents -->
+        <g transform="translate(1000, 480)">
+             <rect x="0" y="0" width="120" height="60" fill="${primaryColor}" stroke="${borderColor}" stroke-width="4" transform="rotate(-5)" />
+             <text x="60" y="42" text-anchor="middle" class="heading" font-size="24" fill="white" transform="rotate(-5)">QUEST</text>
+        </g>
+    </svg>`;
+}
+
+function generateLibrarySVG(lang) {
+    const title = lang === 'en' ? 'MANGA ADVENTURE' : 'VOTRE AVENTURE';
+    const subtitle = lang === 'en' ? 'TRACK YOUR JOURNEY' : 'SUIVEZ VOTRE QUÊTE';
+    
+    // Replicating elements of MockupLibrary
+    const svgBase = generateBrutalistBaseSVG({ title, subtitle, lang, type: 'library' });
+    
+    // Inject library specific elements (Mock cards)
+    const cards = `
+        <g transform="translate(80, 200)">
+            ${[0, 1, 2, 3].map((i) => `
+                <g transform="translate(${i * 260}, 0)">
+                    <rect width="220" height="300" fill="#1e1e1e" stroke="black" stroke-width="5" />
+                    <rect y="240" width="220" height="60" fill="black" />
+                    <text x="110" y="275" text-anchor="middle" class="heading" font-size="14" fill="white">MANGA ${i + 1}</text>
+                    <rect x="20" y="220" width="180" height="8" fill="#333" rx="4" />
+                    <rect x="20" y="220" width="${40 + i * 30}" height="8" fill="#FF2E63" rx="4" />
+                </g>
+            `).join('')}
+        </g>
+    `;
+    
+    return svgBase.replace('</svg>', `${cards}</svg>`);
+}
+
+function generateSocialSVG(lang) {
+    const title = lang === 'en' ? 'LEADERBOARD' : 'CLASSEMENT';
+    const subtitle = lang === 'en' ? 'COMPETE WITH FRIENDS' : 'DÉFIEZ VOS AMIS';
+    const svgBase = generateBrutalistBaseSVG({ title, subtitle, lang, type: 'social' });
+    
+    // Podium logic
+    const podium = `
+        <g transform="translate(600, 480)">
+            <!-- 2nd -->
+            <rect x="-250" y="-120" width="140" height="120" fill="silver" stroke="black" stroke-width="5" opacity="0.8" />
+            <circle cx="-180" cy="-170" r="40" fill="#333" stroke="white" stroke-width="3" />
+            <!-- 1st -->
+            <rect x="-70" y="-180" width="140" height="180" fill="#FFD700" stroke="black" stroke-width="5" />
+            <circle cx="0" cy="-240" r="50" fill="#333" stroke="#FFD700" stroke-width="5" />
+            <text x="0" y="-290" text-anchor="middle" font-size="40">👑</text>
+            <!-- 3rd -->
+            <rect x="110" y="-80" width="140" height="80" fill="#cd7f32" stroke="black" stroke-width="5" opacity="0.8" />
+            <circle cx="180" cy="-130" r="35" fill="#333" stroke="white" stroke-width="3" />
+        </g>
+    `;
+    return svgBase.replace('</svg>', `${podium}</svg>`);
+}
+
+function generateTrendingSVG(lang) {
+    const title = lang === 'en' ? 'TRENDING ART' : 'TENDANCES';
+    const subtitle = lang === 'en' ? 'WHAT\'S HOT NOW' : 'LES INCONTOURNABLES';
+    const svgBase = generateBrutalistBaseSVG({ title, subtitle, lang, type: 'trending' });
+    
+    const trending = `
+        <g transform="translate(100, 180)">
+             <rect width="1000" height="300" fill="none" stroke="#FF2E63" stroke-width="4" stroke-dasharray="20 10" />
+             <text x="500" y="160" text-anchor="middle" class="heading" font-size="80" fill="#FF2E63" opacity="0.2">TOP MANGA</text>
+        </g>
+    `;
+    return svgBase.replace('</svg>', `${trending}</svg>`);
+}
+
+function generateGenericBrutalistSVG(lang, type) {
+    const titles = {
+        challenges: lang === 'en' ? 'MISSION BOARD' : 'TABLEAU DES DÉFIS',
+        tierlist: lang === 'en' ? 'COMMUNITY TIERS' : 'TIER LISTS COMMUNAUTÉ',
+        lens: lang === 'en' ? 'BINGEKI LENS' : 'EXPLORATION LENS',
+        changelog: lang === 'en' ? 'NEW UPDATES' : 'MISES À JOUR'
+    };
+    const title = titles[type] || 'BINGEKI';
+    const subtitle = lang === 'en' ? 'LEVEL UP YOUR EXPERIENCE' : 'BOOSTEZ VOTRE AVENTURE';
+    return generateBrutalistBaseSVG({ title, subtitle, lang, type });
+}
+
+// ==================== SVG GENERATORS ====================
+
 function generateProfileSVG(userData, lang) {
     const displayName = escapeHtml(userData.displayName || 'Chasseur');
     const level = userData.level || 1;
@@ -241,7 +417,22 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
     const lang = req.query.lang || 'fr';
     const title = req.query.title || '';
     const desc = req.query.desc || '';
-    
+    const forceSvg = req.query.force_svg === 'true';
+
+    // Performance Optimization: Redirect static routes to pre-rendered PNGs
+    if (!type && !id && req.query.path && !forceSvg) {
+        const p = req.query.path;
+        const staticImageTypes = ['home', 'discover', 'social', 'schedule', 'news', 'changelog', 'trending', 'challenges', 'library', 'tierlist', 'lens'];
+        const pageType = p === '/' ? 'home' : p.replace(/^\//, '').split('/')[0];
+        
+        if (staticImageTypes.includes(pageType)) {
+            const filename = pageType === 'news' ? 'newsIndex' : pageType;
+            // Map common aliases
+            const finalFilename = filename === 'newsIndex' ? 'news' : filename;
+            return res.redirect(301, `https://bingeki.web.app/og-images/${finalFilename}-${lang}.png`);
+        }
+    }
+
     try {
         let svg = '';
         if (type === 'profile' && id) {
@@ -254,6 +445,12 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
             if (newsDoc.exists) {
                 svg = generateNewsSVG(newsDoc.data(), lang);
             }
+        } else if (['library', 'social', 'trending', 'challenges', 'tierlist', 'lens', 'changelog'].includes(type || id)) {
+            const pageType = type || id;
+            if (pageType === 'library') svg = generateLibrarySVG(lang);
+            else if (pageType === 'social') svg = generateSocialSVG(lang);
+            else if (pageType === 'trending') svg = generateTrendingSVG(lang);
+            else svg = generateGenericBrutalistSVG(lang, pageType);
         } else if (type === 'work' || type === 'character' || type === 'person' || type === 'tierlist') {
             const kindLabel = {
                 work: lang === 'en' ? 'Work Details' : 'Fiche oeuvre',

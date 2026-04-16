@@ -56,7 +56,7 @@ export default function NewsArticle() {
                     const data = docSnap.data() as NewsItem;
 
                     // Clean up content string before DOM parsing (handles escaped HTML artifacts from Firestore)
-                    let cleanedContent = data.content
+                    const cleanedContent = data.content
                         // Remove fr-mk spans (both as real HTML and as escaped text)
                         .replace(/<span[^>]*class="fr-mk"[^>]*>[\s\S]*?<\/span>/gi, '')
                         .replace(/&lt;span[^&]*class="fr-mk"[^&]*&gt;[\s\S]*?&lt;\/span&gt;/gi, '')
@@ -162,7 +162,9 @@ export default function NewsArticle() {
     let formattedDate = article.publishedAt;
     try {
         formattedDate = format(new Date(article.publishedAt), 'PPP', { locale: dateLocale });
-    } catch (e) { }
+    } catch {
+        // Fallback to original string if date parsing fails
+    }
 
     return (
         <Layout>

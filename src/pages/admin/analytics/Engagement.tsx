@@ -11,8 +11,8 @@ import { useTranslation } from 'react-i18next';
 
 export default function EngagementAnalytics() {
     const { t } = useTranslation();
-    const [engagementData, setEngagementData] = useState<any>(null);
-    const [topContent, setTopContent] = useState<any[]>([]);
+    const [engagementData, setEngagementData] = useState<Record<string, number> | null>(null);
+    const [topContent, setTopContent] = useState<{ title: string; count: number }[]>([]);
     const [loading, setLoading] = useState(true);
 
     const COLORS = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
@@ -24,7 +24,7 @@ export default function EngagementAnalytics() {
                     getEngagementBreakdown(),
                     getTopContentStats(10)
                 ]);
-                setEngagementData(engagement);
+                setEngagementData(engagement as Record<string, number>);
                 setTopContent(top);
             } catch (e) {
                 console.error("Failed to load engagement analytics", e);
@@ -63,7 +63,7 @@ export default function EngagementAnalytics() {
                             </PieChart>
                         </ResponsiveContainer>
                         <div style={{ width: '40%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            {pieData.map((item: any, idx) => (
+                            {pieData.map((item: { name: string; value: number }, idx) => (
                                 <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                     <div style={{ width: '12px', height: '12px', background: COLORS[idx % COLORS.length] }} />
                                     <span style={{ fontSize: '0.9rem', textTransform: 'capitalize' }}>
@@ -79,7 +79,7 @@ export default function EngagementAnalytics() {
                     <h3 style={{ fontFamily: 'var(--font-heading)', textTransform: 'uppercase', fontSize: '1.5rem', marginBottom: '2rem' }}>Volume d'activité total</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', alignItems: 'center' }}>
                         <div style={{ fontSize: '5rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>
-                            {pieData.reduce((acc, curr: any) => acc + (curr.value as number), 0)}
+                            {pieData.reduce((acc, curr: { value: number }) => acc + (curr.value as number), 0)}
                         </div>
                         <p style={{ textTransform: 'uppercase', fontWeight: 900, color: 'var(--color-text-dim)' }}>Interactions cumulées</p>
                     </div>

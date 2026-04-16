@@ -18,7 +18,7 @@ import { logger } from '@/utils/logger';
 
 export function useAuthSync() {
     const { setUser, setUserProfile, setLoading } = useAuthStore();
-    const isInitialSync = useRef(false);
+    const isInitialSyncRef = useRef(false);
 
     useEffect(() => {
         let profileUnsubscribe: (() => void) | undefined;
@@ -56,7 +56,7 @@ export function useAuthSync() {
                     );
 
 
-                    isInitialSync.current = true;
+                    isInitialSyncRef.current = true;
                     useLibraryStore.setState({ 
                         works: mergedLibrary,
                         folders: cloudLibraryData?.folders || useLibraryStore.getState().folders,
@@ -89,5 +89,5 @@ export function useAuthSync() {
         };
     }, [setUser, setLoading, setUserProfile]);
 
-    return { isInitialSync };
+    return { isInitialSync: isInitialSyncRef };
 }

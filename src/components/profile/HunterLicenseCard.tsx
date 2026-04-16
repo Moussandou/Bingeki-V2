@@ -8,7 +8,7 @@ import { BADGE_ICONS } from '@/utils/badges';
 import { NenChart } from './NenChart';
 import styles from './HunterLicenseCard.module.css';
 import { useTranslation } from 'react-i18next';
-import React, { useMemo } from 'react';
+import React from 'react';
 import Tilt from 'react-parallax-tilt';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
@@ -234,21 +234,34 @@ export function HunterLicenseCard({ user, stats, isOwnProfile, onLogout, feature
 }
 
 // Make sure React is imported at top or we can just use React.useMemo
+interface Particle {
+    id: number;
+    size: number;
+    duration: number;
+    delay: number;
+    left: number;
+    top: number;
+    x: number;
+    y: number;
+    maxOpacity: number;
+}
+
 function ParticleBackground() {
-    const particles = useMemo(() => {
-        return Array.from({ length: 30 }).map((_, i) => {
-            return {
-                id: i,
-                size: Math.random() * 8 + 4,
-                duration: Math.random() * 4 + 4,
-                delay: Math.random() * 8,
-                left: Math.random() * 100,
-                top: Math.random() * 100,
-                x: (Math.random() - 0.5) * 200,
-                y: (Math.random() - 1) * 200,
-                maxOpacity: Math.random() * 0.4 + 0.4
-            };
-        });
+    const [particles, setParticles] = React.useState<Particle[]>([]);
+
+    React.useEffect(() => {
+        const newParticles = Array.from({ length: 30 }).map((_, i) => ({
+            id: i,
+            size: Math.random() * 8 + 4,
+            duration: Math.random() * 4 + 4,
+            delay: Math.random() * 8,
+            left: Math.random() * 100,
+            top: Math.random() * 100,
+            x: (Math.random() - 0.5) * 200,
+            y: (Math.random() - 1) * 200,
+            maxOpacity: Math.random() * 0.4 + 0.4
+        }));
+        setParticles(newParticles);
     }, []);
 
     return (
@@ -263,7 +276,6 @@ function ParticleBackground() {
                             height: `${p.size}px`,
                             left: `${p.left}%`,
                             top: `${p.top}%`,
-                            // @ts-ignore
                             '--duration': `${p.duration}s`,
                             '--delay': `${p.delay}s`,
                             '--x': `${p.x}px`,

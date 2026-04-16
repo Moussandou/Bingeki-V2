@@ -29,6 +29,7 @@ interface GamificationState {
     totalWorksAdded: number;
     totalWorksCompleted: number;
 
+
     addXp: (amount: number, isBonus?: boolean) => void;
     recordActivity: () => void;
     unlockBadge: (badgeId: string) => void;
@@ -39,7 +40,7 @@ interface GamificationState {
     recalculateStats: (works: Work[]) => void;
     clearLevelUpData: () => void;
     clearXpGained: () => void;
-    syncFromProfile: (profile: any) => void;
+    syncFromProfile: (profile: Record<string, unknown>) => void;
 }
 
 const LEVEL_BASE = 100;
@@ -297,25 +298,25 @@ export const useGamificationStore = create<GamificationState>()(
                 });
             },
 
-            syncFromProfile: (profile: any) => {
-                if (!profile) return;
+            syncFromProfile: (profile: Record<string, unknown>) => {
+                if (!profile || typeof profile !== 'object') return;
 
 
                 if (profile.level === undefined && profile.xp === undefined) return;
 
                 const state = get();
-                const level = profile.level || 1;
-                const xp = profile.xp || 0;
-                const streak = profile.streak || 0;
-                const totalChaptersRead = profile.totalChaptersRead ?? state.totalChaptersRead;
-                const totalAnimeEpisodesWatched = profile.totalAnimeEpisodesWatched ?? state.totalAnimeEpisodesWatched;
-                const totalMoviesWatched = profile.totalMoviesWatched ?? state.totalMoviesWatched;
-                const totalWorksAdded = profile.totalWorksAdded ?? state.totalWorksAdded;
-                const totalWorksCompleted = profile.totalWorksCompleted ?? state.totalWorksCompleted;
-                const bonusXp = profile.bonusXp ?? state.bonusXp;
+                const level = (profile.level as number) || 1;
+                const xp = (profile.xp as number) || 0;
+                const streak = (profile.streak as number) || 0;
+                const totalChaptersRead = (profile.totalChaptersRead as number) ?? state.totalChaptersRead;
+                const totalAnimeEpisodesWatched = (profile.totalAnimeEpisodesWatched as number) ?? state.totalAnimeEpisodesWatched;
+                const totalMoviesWatched = (profile.totalMoviesWatched as number) ?? state.totalMoviesWatched;
+                const totalWorksAdded = (profile.totalWorksAdded as number) ?? state.totalWorksAdded;
+                const totalWorksCompleted = (profile.totalWorksCompleted as number) ?? state.totalWorksCompleted;
+                const bonusXp = (profile.bonusXp as number) ?? state.bonusXp;
 
                 // Use most recent lastActivityDate for streak continuity
-                const cloudLastActivity = profile.lastActivityDate || null;
+                const cloudLastActivity = (profile.lastActivityDate as string) || null;
                 const localLastActivity = state.lastActivityDate || null;
                 let lastActivityDate = localLastActivity;
                 if (cloudLastActivity) {
@@ -381,6 +382,7 @@ export const useGamificationStore = create<GamificationState>()(
             name: 'bingeki-gamification-storage',
 
             partialize: (state: GamificationState) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { xpGained, levelUpData, recentUnlock, ...rest } = state;
                 return rest;
             },

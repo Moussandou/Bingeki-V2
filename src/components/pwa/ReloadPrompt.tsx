@@ -13,11 +13,11 @@ export const ReloadPrompt: React.FC = () => {
         updateServiceWorker,
     } = useRegisterSW({
         onRegistered(r: ServiceWorkerRegistration | undefined) {
-            // eslint-disable-next-line no-console
+             
             console.log('SW Registered: ' + r);
         },
-        onRegisterError(error: any) {
-            // eslint-disable-next-line no-console
+        onRegisterError(error: unknown) {
+             
             console.error('SW registration error', error);
         },
     });

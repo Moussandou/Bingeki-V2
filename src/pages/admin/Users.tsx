@@ -62,7 +62,7 @@ export default function AdminUsers() {
     }, []);
 
     const filteredUsers = useMemo(() => {
-        let filtered = users.filter(user => {
+        const filtered = users.filter(user => {
             const matchesSearch = 
                 (user.displayName?.toLowerCase().includes(searchTerm.toLowerCase())) ||
                 (user.email?.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -85,7 +85,7 @@ export default function AdminUsers() {
                 default: return 0;
             }
         });
-    }, [users, searchTerm, sortBy]);
+    }, [users, searchTerm, sortBy, filter]);
 
     const handleBan = async (uid: string, currentStatus?: boolean) => {
         const action = currentStatus ? t('admin.users.action_unban') : t('admin.users.action_ban');

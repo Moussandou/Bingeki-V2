@@ -23,6 +23,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { auth } from '@/firebase/config';
+import { Timestamp } from 'firebase/firestore';
 import styles from './Header.module.css';
 import { useTranslation } from 'react-i18next';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -134,7 +135,7 @@ function NotificationDropdown() {
                                                             if (!n.createdAt) return 'Just now';
                                                             if (typeof n.createdAt === 'number') return new Date(n.createdAt).toLocaleDateString();
                                                             // Handle Firestore Timestamp
-                                                            const seconds = (n.createdAt as any).seconds;
+                                                            const seconds = n.createdAt instanceof Timestamp ? n.createdAt.seconds : (n.createdAt as { seconds?: number }).seconds;
                                                             if (seconds) return new Date(seconds * 1000).toLocaleDateString();
                                                             return 'Just now';
                                                         })()}

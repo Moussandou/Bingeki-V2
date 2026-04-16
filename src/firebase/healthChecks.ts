@@ -104,7 +104,7 @@ export interface RepairAction {
 
 export interface RepairSession {
     id?: string;
-    timestamp: any;
+    timestamp: unknown;
     adminName: string;
     repairedCount: number;
     errorsCount: number;
@@ -184,9 +184,10 @@ export async function checkStorage(): Promise<ServiceHealthResult> {
             // Attempt a listing to check connectivity. 
             // This may fail with 403 if the user is not an admin, which is expected.
             await list(rootRef, { maxResults: 1 });
-        } catch (innerError: any) {
+        } catch (innerError) {
+            const err = innerError as { code?: string; message?: string };
             // Handle expected permission errors gracefully
-            if (innerError?.code === 'storage/unauthorized' || innerError?.message?.includes('403')) {
+            if (err?.code === 'storage/unauthorized' || err?.message?.includes('403')) {
                 const elapsed = Math.round(performance.now() - start);
                 return {
                     service: 'Storage',
@@ -233,7 +234,7 @@ export async function checkJikan(): Promise<ServiceHealthResult> {
             message: `MyAnimeList proxy – ${result.status}`,
             checkedAt: Date.now()
         };
-    } catch (error) {
+    } catch {
         const elapsed = Math.round(performance.now() - start);
         return {
             service: 'Jikan API',

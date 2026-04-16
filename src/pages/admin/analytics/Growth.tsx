@@ -11,8 +11,8 @@ import { useTranslation } from 'react-i18next';
 
 export default function GrowthAnalytics() {
     const { t } = useTranslation();
-    const [stats, setStats] = useState<any>(null);
-    const [trends, setTrends] = useState<any[]>([]);
+    const [stats, setStats] = useState<{ totalUsers: number; newUsersToday: number } | null>(null);
+    const [trends, setTrends] = useState<{ date: string; newUsers: number; totalUsers: number }[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -23,7 +23,7 @@ export default function GrowthAnalytics() {
                     getHistoricalTrends(30)
                 ]);
                 setStats(basicStats);
-                setTrends(historicalData);
+                setTrends(historicalData.map(d => ({ date: d.date, newUsers: d.inscriptions, totalUsers: d.activeUsers })));
             } catch (e) {
                 console.error("Failed to load growth analytics", e);
             } finally {
@@ -57,7 +57,7 @@ export default function GrowthAnalytics() {
                 </Card>
                 <Card variant="manga" style={{ padding: '1.5rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)' }}>
                     <p style={{ textTransform: 'uppercase', fontWeight: 900, color: 'var(--color-text-dim)', fontSize: '0.8rem' }}>Taux de Croissance</p>
-                    <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '3rem', color: '#3b82f6' }}>+{Math.round((stats?.newUsersToday / (stats?.totalUsers || 1)) * 100)}%</h2>
+                    <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '3rem', color: '#3b82f6' }}>+{Math.round(((stats?.newUsersToday || 0) / (stats?.totalUsers || 1)) * 100)}%</h2>
                 </Card>
             </div>
 

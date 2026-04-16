@@ -6,7 +6,7 @@ import { httpsCallable } from 'firebase/functions';
 import { functions } from './config';
 
 export const getWorkDetailsFn     = httpsCallable<{ id: number; type: string }, unknown>(functions, 'getWorkDetails');
-export const searchWorksFn         = httpsCallable<{ query: string; type: string; page?: number; filters?: any; nsfwMode?: boolean }, unknown>(functions, 'searchWorks');
+export const searchWorksFn         = httpsCallable<{ query: string; type: string; page?: number; filters?: Record<string, unknown>; nsfwMode?: boolean }, unknown>(functions, 'searchWorks');
 export const getWorkCharactersFn   = httpsCallable<{ id: number; type: string }, unknown>(functions, 'getWorkCharacters');
 export const getWorkRelationsFn    = httpsCallable<{ id: number; type: string }, unknown>(functions, 'getWorkRelations');
 export const getWorkPicturesFn     = httpsCallable<{ id: number; type: string }, unknown>(functions, 'getWorkPictures');

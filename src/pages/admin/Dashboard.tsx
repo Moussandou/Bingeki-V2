@@ -49,9 +49,9 @@ export default function AdminDashboard() {
     });
     const [recentUsers, setRecentUsers] = useState<UserProfile[]>([]);
     const [chartData, setChartData] = useState<ChartData[]>([]);
-    const [engagementData, setEngagementData] = useState<any>(null);
-    const [topContent, setTopContent] = useState<any[]>([]);
-    const [funnelData, setFunnelData] = useState<any[]>([]);
+    const [engagementData, setEngagementData] = useState<Record<string, number> | null>(null);
+    const [topContent, setTopContent] = useState<{ title: string; image?: string; count: number }[]>([]);
+    const [funnelData, setFunnelData] = useState<{ name: string; value: number }[]>([]);
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState(30);
     const [recalculating, setRecalculating] = useState(false);
@@ -97,7 +97,7 @@ export default function AdminDashboard() {
                 if (Array.isArray(weeklyStats)) {
                     setChartData(weeklyStats.filter((item): item is ChartData => item !== undefined));
                 }
-                setEngagementData(engagement);
+                setEngagementData(engagement as Record<string, number>);
                 setTopContent(top);
                 setFunnelData(funnel);
 
@@ -163,7 +163,7 @@ export default function AdminDashboard() {
         cursor: 'pointer',
         transition: 'transform 0.2s ease',
         ':hover': { transform: 'translateY(-4px)' }
-    } as any;
+    } as React.CSSProperties;
 
     const chartCardStyle = {
         padding: '1.5rem',

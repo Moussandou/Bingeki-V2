@@ -7,7 +7,7 @@
  * 
  * Usage:
  *   npx tsx scripts/auto-translate.ts                    # Dry run (preview)
- *   npx tsx scripts/auto-translate.ts --apply            # Apply changes
+ *   npx tsx scripts/auto-translate.ts --apply            # Apply changes (to translation.json)
  *   npx tsx scripts/auto-translate.ts --file=src/...     # Single file
  */
 
@@ -200,7 +200,7 @@ function scanFile(filePath: string): TranslationFix[] {
 // Find all TSX files
 function findTsxFiles(dir: string): string[] {
     const files: string[] = [];
-    const skipDirs = ['node_modules', 'dist', 'build', '.git', 'scripts'];
+    const skipDirs = ['node_modules', 'dist', 'build', '.git', 'scripts', 'public/locales'];
 
     function scan(currentDir: string) {
         const entries = fs.readdirSync(currentDir, { withFileTypes: true });

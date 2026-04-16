@@ -95,7 +95,8 @@ const skipPaths = [
     'build',
     '.git',
     'scripts',
-    'i18n.ts',  // The translation file itself
+    'public/locales',
+    'i18n.ts',  // The config file
     '.d.ts',
     // Blacklisted files (internal/presentation pages)
     'AssetsPage.tsx',

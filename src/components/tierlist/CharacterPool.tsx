@@ -1,6 +1,7 @@
 /**
  * Character Pool component (tierlist)
  */
+/* eslint-disable react-refresh/only-export-components */
 
 import React, { useState, useEffect } from 'react';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';

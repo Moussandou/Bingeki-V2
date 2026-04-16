@@ -1,0 +1,93 @@
+{
+  "legal": {
+    "back": "BACK",
+    "title": "LEGAL & GDPR",
+    "section1_title": "1. SITE PUBLISHER",
+    "name": "Name:",
+    "address": "Address:",
+    "contact": "Contact:",
+    "status": "Status:",
+    "status_value": "Freelance Developer / Personal Project",
+    "section2_title": "2. HOSTING",
+    "hosting_text": "This site is hosted by Firebase (Google LLC).",
+    "hosting_data": "Some data (images) may be stored via other third-party services.",
+    "section3_title": "3. INTELLECTUAL PROPERTY",
+    "ip_design": "The design, structure, and code of \"Bingeki Experience\" are the exclusive property of the publisher.",
+    "ip_images": "Images of works (manga/anime) are used for illustration purposes and remain the property of their respective rights holders.",
+    "section4_title": "4. PERSONAL DATA (GDPR)",
+    "gdpr_intro": "In accordance with the General Data Protection Regulation (GDPR), we inform you that:",
+    "gdpr_collect_title": "Collection:",
+    "gdpr_collect": "The data collected (email, profile picture, progress) is only used for the application's operation (library backup, gamification).",
+    "gdpr_responsible_title": "Responsible:",
+    "gdpr_responsible": "Moussandou Mroivili is the data controller.",
+    "gdpr_access_title": "Right of access:",
+    "gdpr_access": "You have the right to access, rectify, and delete your data. You can delete your account and all associated data directly from the application settings or by contacting us.",
+    "gdpr_share_title": "Sharing:",
+    "gdpr_share": "Your data is neither sold, rented, nor transferred to third parties.",
+    "gdpr_cookies_title": "Cookies:",
+    "gdpr_cookies": "We use essential technical cookies to maintain your session. To learn more, see our Privacy Policy.",
+    "ai_title": "Artificial Intelligence Transparency (AI Act)",
+    "ai_text": "In accordance with transparency principles, we inform our users that artificial intelligence-based tools were used to assist in the creation of graphic elements (such as logos) as well as part of the source code for this website. All generated content has undergone human review and validation.",
+    "section5_title": "5. CONTACT",
+    "contact_text": "For any questions, information requests or complaints, you can contact us at the following address:"
+  },
+  "privacy": {
+    "title": "PRIVACY POLICY",
+    "intro": "Protecting your privacy is important to us.",
+    "cookies_title": "Cookies",
+    "cookies_desc": "This site uses cookies (including third-party cookies) to personalize content and analyze our traffic.",
+    "ads_title": "Google Ads (AdSense)",
+    "ads_desc": "Third party vendors, including Google, use cookies to serve ads based on a user's prior visits to your website or other websites. Google's use of advertising cookies enables it and its partners to serve ads to your users based on their visit to your sites and/or other sites on the Internet.",
+    "data_title": "Data Collection",
+    "data_desc": "We collect certain data (such as your reading progress) solely to provide you with our services. We never sell your personal data to third parties."
+  },
+  "terms": {
+    "title": "TERMS OF SERVICE",
+    "intro": "By using Bingeki, you agree to comply with these terms of use.",
+    "rules_title": "Rules of Conduct",
+    "rules_desc": "Be respectful to other members of the community. No abusive or illegal content will be tolerated."
+  },
+  "contact": {
+    "title": "CONTACT US",
+    "intro": "A question, a suggestion or a technical issue? Feel free to contact us.",
+    "email_label": "Direct email:"
+  },
+  "about": {
+    "title": "ABOUT BINGEKI",
+    "vision_title": "A platform for enthusiasts",
+    "vision_p1": "Bingeki is a platform designed for anime and manga enthusiasts who want to experience their passion in a more immersive, organized, and interactive way. In the age of streaming and mass consumption of cultural content, access to anime and manga has never been easier. Yet, despite this abundance of content, the user experience often remains fragmented and limited. Fans use different sites to track their series, discover new works or exchange with other enthusiasts, without there really being a centralized space capable of bringing all these dimensions together.",
+    "vision_p2": "It is precisely this realization that gave birth to Bingeki.",
+    "problem_p1": "Today, most available tools primarily allow for consulting databases or managing watchlists. They serve a useful function but remain mostly static. Users can rate an anime, indicate they've finished it, or add it to a list, but the experience often ends there. However, the way fans consume anime and manga culture has evolved: they want to track their progress, share their discoveries, compare their experiences, and be part of a community that values their engagement.",
+    "problem_p2": "Bingeki was designed to respond to this evolution.",
+    "evolution_p1": "The platform transforms simple anime and manga tracking into a truly personal and social experience. It allows users to centralize their content consumption, easily track their progress in the series and manga they watch or read, and discover new works tailored to their tastes. The goal is not just to organize information, but to create a dynamic environment in which every interaction contributes to enriching the user experience.",
+    "core_p1": "At the heart of Bingeki lies a simple idea: passion for anime and manga deserves a platform that matches the level of commitment of its fans.",
+    "features_p1": "The platform thus offers a set of features designed to accompany users in their daily life as fans. Users can create and manage their watchlists, track their progress in episodes or chapters, access detailed info sheets on works, and explore new content. Bingeki also facilitates discovery by highlighting recommendations and information on currently airing anime seasons.",
+    "features_p2": "But the experience doesn't stop at personal tracking.",
+    "social_p1": "Bingeki also integrates a social dimension that allows fans to interact, share their activity, and discover what the community is watching or reading. User profiles thus become a showcase of everyone's passion, where one can find their statistics, favorite works, and overall progression. This approach transforms the individual experience into a collective one, where users can exchange, compare tastes, and discover new recommendations through the activity of other members.",
+    "gamification_p1": "Another important aspect of Bingeki is the notion of progression. The platform values user engagement by integrating mechanisms inspired by progression systems found in video games. By following anime, discovering new works, or interacting with the platform, users can see their profile and activity evolve. This gamified approach makes the experience more motivating and immersive, while strengthening the sense of belonging to the community.",
+    "design_p1": "Ergonomics and accessibility have also been priorities in the design of Bingeki. The platform is developed as a modern web application, optimized for fluid use on computer, tablet, and smartphone. The interface has been designed to be clear, fast, and pleasant to use daily, so that users can easily access their content and progress wherever they are.",
+    "audience_p1": "Bingeki primarily targets a new generation of fans: connected users, accustomed to modern applications and personalization of their digital experience. Students, young adults, or long-time enthusiasts, all share the same need: to have a simple, modern, and engaging space to follow their passion for anime and manga.",
+    "future_p1": "The project is still evolving and continues to improve over time. New features are regularly developed to enrich the user experience and strengthen the community aspect of the platform. This progressive approach allows Bingeki to be built with a clear vision: creating a sustainable space capable of accompanying fans in their passion over the long term.",
+    "ecosystem_p1": "Beyond a simple application, Bingeki aims to become a true ecosystem for anime and manga fans. A place where one can organize their content consumption, discover new works, share their experience, and connect to a community that shares the same passion.",
+    "closing_p1": "Because following anime and manga should not just be a list to fill, but an experience to live and share."
+  },
+  "credits": {
+    "title": "CREDITS",
+    "role": "DEVELOPER & CREATOR",
+    "description_1": "<strong>Bingeki</strong> was born from a passion for manga and the desire to create a unique user experience.",
+    "description_2": "Developed with love, coffee, and a lot of CSS. This project is a demonstration of what's possible when you mix brutalist design with modern technologies.",
+    "made_with": "Made with",
+    "in_marseille": "in Marseille"
+  },
+  "donors": {
+    "title": "OUR HEROES",
+    "subtitle": "A huge thank you to those who support the project financially.",
+    "top_donor": "TOP DONOR",
+    "rank_1": "THE KING OF SUPPORT",
+    "creator_desc": "Creator of Inazuma DB",
+    "amount": "Total donation",
+    "thank_you_title": "THANK YOU!",
+    "thank_you_desc": "Thanks to you, Bingeki keeps growing. Servers, domain, new features... all this is thanks to your generosity.",
+    "become_donor": "BECOME A DONOR"
+  }
+}

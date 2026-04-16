@@ -1,0 +1,106 @@
+{
+  "landing": {
+    "hero": {
+      "title": "YOUR STORY<br />BEGINS",
+      "subtitle": "Don't just be a spectator. Become the protagonist.",
+      "cta": "START THE ADVENTURE",
+      "cta_logged_in": "ACCESS H.Q."
+    },
+    "features": {
+      "qg": {
+        "title": "THE H.Q.",
+        "description_1": "Organize your library like a strategist.",
+        "description_2": "Separate your current reads, pauses, and archives. Never lose track of your favorite plots again.",
+        "check_chapters": "CHAPTERS",
+        "check_episodes": "EPISODES",
+        "check_volumes": "VOLUMES"
+      },
+      "mobile": {
+        "title": "BINGEKI IN YOUR POCKET",
+        "description_1": "Take your collection everywhere. A smooth, fast experience designed for mobile.",
+        "feature_1": "Installable (PWA)",
+        "feature_2": "Offline Mode",
+        "feature_3": "Push Notifications (Soon)",
+        "scan_qr": "Scan to install"
+      },
+      "progression": {
+        "title": "PROGRESSION",
+        "description_1": "Every chapter read makes you stronger.",
+        "description_2": "Gain XP by updating your list. Unlock <strong>Holographic Badges</strong> and climb the ranks of the Hunter Society.",
+        "stats_title": "DETAILED STATS"
+      },
+      "exploration": {
+        "title": "EXPLORATION",
+        "description_1": "An infinite database at your fingertips.",
+        "description_2": "Search among thousands of Anime and Manga. Filter by genre, score, or popularity. Find your next addiction in seconds.",
+        "search_placeholder": "Search for an anime, a manga...",
+        "genres": {
+          "seinen": "Seinen",
+          "shonen": "Shonen",
+          "romance": "Romance",
+          "horror": "Horror",
+          "isekai": "Isekai"
+        }
+      },
+      "community": {
+        "title": "COMMUNITY",
+        "description_1": "You are not alone in this world.",
+        "description_2": "Follow your friend's activities. Share your reviews without spoilers. Compare your collections and badges.",
+        "friends": "FRIENDS",
+        "debates": "DEBATES",
+        "share": "SHARE",
+        "see_discussion": "SEE DISCUSSION",
+        "comments": {
+          "levi": "This chapter was incredible !! 🔥",
+          "armin": "I didn't expect that...",
+          "mikasa": "Eren..."
+        }
+      },
+      "details": {
+        "title": "KNOW EVERYTHING",
+        "description_1": "Dive into the heart of your works.",
+        "description_2": "Synopsis, staff, detailed stats, characters... Access a complete identity card for each Anime and Manga. Don't miss any detail.",
+        "mock_card": {
+          "general": "GENERAL",
+          "chapters": "CHAPTERS",
+          "stats": "STATS",
+          "reviews": "REVIEWS",
+          "manga": "MANGA",
+          "ongoing": "ONGOING",
+          "view_full": "VIEW FULL DETAILS",
+          "synopsis": "To save his friends, Yuji Itadori swallows a cursed finger and now shares his body with Ryomen Sukuna, the most powerful of curses."
+        }
+      },
+      "wip": {
+        "title": "WORK IN PROGRESS",
+        "description_1": "Bingeki is alive. It evolves.",
+        "description_2": "I am building this platform with you. Follow every update, suggest features, and see your ideas come to life.",
+        "roadmap_btn": "VIEW ROADMAP",
+        "timeline": {
+          "feedback_title": "Feedback & Changelog 2.0",
+          "feedback_desc": "Complete overhaul of the feedback system and update display.",
+          "guilds_title": "\"Guild\" System",
+          "guilds_desc": "Create your own clan, participate in guild wars, and dominate the ranking.",
+          "soon": "SOON"
+        }
+      },
+      "support": {
+        "sfx": "PATRON",
+        "tag": "TIPS FOR DEVS",
+        "title": "SUPPORT THE PROJECT",
+        "description_1": "Bingeki is developed with ❤️ as open-source",
+        "description_2": "If Bingeki enriches your manga/anime experience, help finance the development of new features. Every coffee counts! ☕",
+        "features": "New features",
+        "servers": "High-performance servers",
+        "premium": "Premium support",
+        "kofi_alt": "Support me on Ko-fi"
+      },
+      "final_cta": {
+        "title": "JOIN THE ELITE",
+        "title_logged_in": "READY TO CONTINUE?",
+        "button": "CREATE MY ACCOUNT",
+        "button_logged_in": "GO TO HQ"
+      }
+    }
+  }
+}

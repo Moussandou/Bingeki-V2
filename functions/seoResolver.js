@@ -57,7 +57,7 @@ function resolveStaticSeo(localPath, lang) {
   else if (normalizedPath === '/auth' || normalizedPath === '/login') pageType = 'home';
 
   if (staticEntry) {
-    const staticImageTypes = ['home', 'discover', 'social', 'schedule', 'newsIndex'];
+    const staticImageTypes = ['home', 'discover', 'social', 'schedule', 'newsIndex', 'trending', 'challenges', 'library', 'tierlist', 'lens', 'changelog'];
     let image = defaults.image;
     
     if (staticImageTypes.includes(pageType)) {
@@ -91,7 +91,7 @@ function resolveStaticSeo(localPath, lang) {
 
   // Fallback for primary pages if not in staticEntry but identified as pageType
   let image = defaults.image;
-  const staticImageTypes = ['home', 'discover', 'social', 'schedule', 'newsIndex'];
+  const staticImageTypes = ['home', 'discover', 'social', 'schedule', 'newsIndex', 'trending', 'challenges', 'library', 'tierlist', 'lens', 'changelog'];
   if (staticImageTypes.includes(pageType)) {
     const filename = pageType === 'newsIndex' ? 'news' : pageType;
     image = `https://bingeki.web.app/og-images/${filename}-${lang}.png`;

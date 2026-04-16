@@ -418,7 +418,7 @@ export default function CreateTierList() {
                     } else {
                         throw new Error('Invalid format');
                     }
-                } catch (error) {
+                } catch {
                     addToast(t('tierlist.import_error'), 'error');
                 }
             };

@@ -54,7 +54,7 @@ const keysToReplace = [
     'VITE_FIREBASE_MEASUREMENT_ID'
 ];
 
-let missingKeys: string[] = [];
+const missingKeys: string[] = [];
 
 keysToReplace.forEach(key => {
     const value = allEnv[key];

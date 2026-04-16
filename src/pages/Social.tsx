@@ -54,9 +54,9 @@ export default function Social() {
     const { addToast } = useToast();
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const initialTab = (searchParams.get('tab') as any) || 'ranking';
+    const initialTab = searchParams.get('tab') || 'ranking';
     const [activeTab, setActiveTab] = useState<'feed' | 'ranking' | 'friends' | 'activity' | 'challenges' | 'parties'>(
-        ['feed', 'ranking', 'friends', 'activity', 'challenges', 'parties'].includes(initialTab) ? initialTab : 'ranking'
+        (['feed', 'ranking', 'friends', 'activity', 'challenges', 'parties'].includes(initialTab!) ? initialTab : 'ranking') as 'feed' | 'ranking' | 'friends' | 'activity' | 'challenges' | 'parties'
     );
     const [leaderboard, setLeaderboard] = useState<UserProfile[]>([]);
     const [friends, setFriends] = useState<(Friend & { banner?: string; xp?: number; totalXp?: number; level?: number; showActivityStatus?: boolean })[]>([]);
@@ -145,7 +145,7 @@ export default function Social() {
             }
         }
         return friends;
-    }, [user, friends, friendsEnriched, getUserProfiles]);
+    }, [user, friends, friendsEnriched]);
 
     const loadData = useCallback(async () => {
         if (!user) return;
@@ -201,8 +201,7 @@ export default function Social() {
         } finally {
             setLoading(false);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeTab, leaderboardCategory, user, leaderboardLoaded, friendsEnriched, activityLoaded]);
+    }, [activeTab, leaderboardCategory, user, leaderboardLoaded, friendsEnriched, activityLoaded, friends, fetchFriends]);
 
     // Reset tab-specific loading states when filters change
     useEffect(() => {
@@ -211,9 +210,7 @@ export default function Social() {
 
     useEffect(() => {
         loadData();
-    // loadData is intentionally omitted — we depend on its stable inputs above
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeTab, leaderboardCategory, user, leaderboardLoaded, friendsEnriched, activityLoaded]);
+    }, [loadData]);
 
 
     useEffect(() => {
@@ -298,6 +295,8 @@ export default function Social() {
             loadData(); // Revert state on error handling
         }
     };
+
+
 
     return (
         <Layout>
