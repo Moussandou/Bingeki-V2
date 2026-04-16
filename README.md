@@ -2,7 +2,7 @@
 
 ![Build & Deploy](https://github.com/Moussandou/Bingeki-V2/actions/workflows/deploy.yml/badge.svg)
 ![CI Status](https://github.com/Moussandou/Bingeki-V2/actions/workflows/ci.yml/badge.svg)
-![License](https://img.shields.io/github/license/Moussandou/Bingeki-V2)
+![License](https://img.shields.io/badge/license-AGPL--3.0-orange)
 ![Version](https://img.shields.io/badge/version-3.3-blue)
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/H2H41S9PFY)
 
@@ -60,6 +60,6 @@ Contributions are welcome! Please read our **[Contributing Guide](docs/Contribut
 
 ## 📄 License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the **GNU Affero General Public License v3.0**. See `LICENSE` for more information.
 
 ---
