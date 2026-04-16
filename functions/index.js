@@ -580,7 +580,6 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
                 const avatarUrl = userData.photoURL;
                 const bannerUrl = userData.banner;
 
-                // Fetch images in parallel
                 const [base64Avatar, base64Banner] = await Promise.all([
                     fetchImageAsBase64(avatarUrl),
                     fetchImageAsBase64(bannerUrl)
@@ -592,15 +591,14 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
             const newsDoc = await admin.firestore().collection('news').doc(id).get();
             if (newsDoc.exists) {
                 const newsData = newsDoc.data();
-                const imageUrl = newsData.imageUrl || newsData.image; // Fix: Support both field names
+                const imageUrl = newsData.imageUrl || newsData.image; 
                 const base64Image = await fetchImageAsBase64(imageUrl);
                 svg = generateNewsSVG(newsData, lang, base64Image);
             }
         } else if (type === 'work' && id) {
-            // New case for specific work details
             const workType = req.query.workType || 'anime';
             const cacheKey = `${workType}_details_${id}`;
-            const cached = await readCache(cacheKey, 86400000 * 7); // 7 days TTL for SEO images
+            const cached = await readCache(cacheKey, 86400000 * 7);
             let workData = cached.hit ? cached.data : null;
 
             if (!workData) {
@@ -612,6 +610,9 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
                 }
             }
 
+            if (workData) {
+                const imageUrl = workData.images?.webp?.large_image_url || workData.images?.jpg?.large_image_url;
+                const base64Image = await fetchImageAsBase64(imageUrl);
                 svg = generateWorkSVG(workData, lang, base64Image);
             } else {
                 svg = generateGenericSVG(title, desc, lang);
@@ -632,16 +633,8 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
             svg = generateGenericSVG(lang === 'en' ? 'LATEST NEWS' : 'DERNIÈRES NEWS', '', lang);
         } else if (type === 'character' || type === 'person' || type === 'tierlist') {
             const kindLabels = {
-                fr: {
-                    character: 'Personnage',
-                    person: 'Personnalité',
-                    tierlist: 'Tier List'
-                },
-                en: {
-                    character: 'Character',
-                    person: 'Person',
-                    tierlist: 'Tier List'
-                }
+                fr: { character: 'Personnage', person: 'Personnalité', tierlist: 'Tier List' },
+                en: { character: 'Character', person: 'Person', tierlist: 'Tier List' }
             };
             const kindLabel = kindLabels[lang]?.[type] || kindLabels['fr'][type] || '';
             svg = generateGenericSVG(kindLabel || title, desc, lang);
@@ -651,18 +644,14 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
             svg = generateGenericSVG(title, desc, lang);
         }
 
-        // Convert SVG to PNG using Resvg
         const resvg = new Resvg(svg, {
-            fitTo: {
-                mode: 'width',
-                value: 1200,
-            },
+            fitTo: { mode: 'width', value: 1200 },
         });
         const pngData = resvg.render();
         const pngBuffer = pngData.asPng();
 
         res.set('Content-Type', 'image/png');
-        res.set('Cache-Control', 'public, max-age=86400, s-maxage=86400'); // 24h cache for images
+        res.set('Cache-Control', 'public, max-age=86400, s-maxage=86400');
         return res.send(pngBuffer);
     } catch (e) {
         console.error('[OG-IMAGE] Error generating PNG:', e);
