@@ -108,11 +108,11 @@ export default function Settings() {
 
     const resetAll = async () => {
         try {
-            // Reset Zustand stores
+            // 1. Reset Zustand stores (Library & Gamification)
             useLibraryStore.getState().resetStore();
             useGamificationStore.getState().resetStore();
 
-            // Save empty data to Firestore
+            // 2. Clear Cloud Data in Firestore (Wipe collections)
             if (user) {
                 await saveLibraryToFirestore(user.uid, []);
                 await saveGamificationToFirestore(user.uid, {
@@ -132,16 +132,16 @@ export default function Settings() {
                 });
             }
 
-            // Clear localStorage
-            localStorage.clear();
+            // Note: We NO LONGER use localStorage.clear() here as it would destroy 
+            // settings, themes, and auth state. We trust the store resets.
 
             addToast(t('settings.toast.reset_success'), 'success');
 
-            // Reload after a short delay to show the toast
+            // Refresh the UI state after a short delay
             setTimeout(() => window.location.reload(), 1000);
         } catch (error) {
             addToast(t('settings.toast.reset_error'), 'error');
-            console.error(error);
+            console.error('Cloud Reset Error:', error);
         }
     };
 
@@ -172,6 +172,7 @@ export default function Settings() {
             // 1. Clear Local State IMMEDIATELY for clean feedback
             useLibraryStore.getState().resetStore();
             useGamificationStore.getState().resetStore();
+            // We use localStorage.clear() ONLY for full account deletion to be absolutely thorough
             localStorage.clear();
 
             // 2. Delete Auth Account (This triggers the Firebase Extension)
@@ -448,10 +449,10 @@ export default function Settings() {
                             </div>
                         </section>
 
-                        {/* Stockage & Données */}
+                        {/* Maintenance & Maintenance */}
                         <section>
                             <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)', fontWeight: 900, color: 'var(--color-text)' }}>
-                                <HardDrive size={20} /> {t('settings.data.title')}
+                                <HardDrive size={20} /> {t('settings.data.title', 'DATA MANAGEMENT')}
                             </h2>
                             <div className="manga-panel" style={{ padding: '1.5rem', background: 'var(--color-surface)', color: 'var(--color-text)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
