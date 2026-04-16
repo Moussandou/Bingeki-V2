@@ -39,7 +39,7 @@
 ```bash
 # 1. Clone
 git clone https://github.com/Moussandou/Bingeki.git
-cd Bingeki-V2
+cd Bingeki
 
 # 2. Install
 npm install
