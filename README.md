@@ -15,22 +15,22 @@
 ## 🚀 Quick Links
 
 ### 📚 Documentation
-- **[Getting Started](docs/Getting-Started.md)** - Setup & Local Emulation.
-- **[Architecture](docs/Architecture.md)** - Tech stack & folder structure.
-- **[Design System](docs/Design-System.md)** - Style guide, tokens & motion.
+- **[Getting Started](docs/01-Getting-Started/Getting-Started.md)** - Setup & Local Emulation.
+- **[Architecture](docs/02-Architecture/Architecture.md)** - Tech stack & folder structure.
+- **[Design System](docs/04-Design/Design-System.md)** - Style guide, tokens & motion.
 
 ### 🏗️ Infrastructure
-- **[Firebase & Backend](docs/Firebase-Backend.md)** - Firestore, Functions & Storage.
-- **[Testing Strategy](docs/Testing.md)** - Vitest, Playwright & Lighthouse.
-- **[Internationalization](docs/Internationalization.md)** - Multi-language support.
-- **[Admin Backoffice](docs/Admin-Backoffice.md)** - CMS & Health Dashboard.
-- **[Maintenance](docs/Maintenance.md)** - Build scripts & SW.
+- **[Firebase & Backend](docs/02-Architecture/Firebase-Backend.md)** - Firestore, Functions & Storage.
+- **[Testing Strategy](docs/01-Getting-Started/Testing.md)** - Vitest, Playwright & Lighthouse.
+- **[Internationalization](docs/01-Getting-Started/Internationalization.md)** - Multi-language support.
+- **[Admin Backoffice](docs/05-Management/Admin-Backoffice.md)** - CMS & Health Dashboard.
+- **[Maintenance](docs/05-Management/Maintenance.md)** - Build scripts & SW.
 
 ### ✨ Features
-- **[Gamification](docs/Features/Gamification.md)** - XP, Badges, Nen Chart.
-- **[Social](docs/Features/Social.md)** - Friends, Watch Parties.
-- **[Library & API](docs/Features/Library%20&%20API.md)** - Jikan integration.
-- **[PWA & Mobile](docs/Features/PWA%20&%20Mobile.md)** - Mobile UX & Push.
+- **[Gamification](docs/03-Features/Gamification.md)** - XP, Badges, Nen Chart.
+- **[Social](docs/03-Features/Social.md)** - Friends, Watch Parties.
+- **[Library & API](docs/03-Features/Library-API.md)** - Jikan integration.
+- **[PWA & Mobile](docs/03-Features/PWA-Mobile.md)** - Mobile UX & Push.
 
 ---
 
@@ -56,7 +56,7 @@ npm run dev
 
 ## 🤝 Contribution
 
-Contributions are welcome! Please read our **[Contributing Guide](docs/Contributing.md)**.
+Contributions are welcome! Please read our **[Contributing Guide](docs/01-Getting-Started/Contributing.md)**.
 
 ## 📄 License
 

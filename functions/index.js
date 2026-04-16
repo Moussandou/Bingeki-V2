@@ -12,6 +12,7 @@ const { jikanFetch } = require("./jikan");
 const { scrapeFRSynopsis } = require("./scraper");
 
 admin.initializeApp();
+const { Resvg } = require("@resvg/resvg-js");
 const app = express();
 
 function escapeHtml(unsafe) {
@@ -24,9 +25,23 @@ function escapeHtml(unsafe) {
         .replace(/'/g, "&#039;");
 }
 
+async function fetchImageAsBase64(url) {
+    if (!url) return '';
+    try {
+        const response = await fetch(url);
+        if (!response.ok) return '';
+        const buffer = await response.arrayBuffer();
+        const contentType = response.headers.get('content-type') || 'image/jpeg';
+        return `data:${contentType};base64,${Buffer.from(buffer).toString('base64')}`;
+    } catch (e) {
+        console.error('[SEO] Error fetching image for base64:', e);
+        return '';
+    }
+}
+
 // SVG Template Helper - Hunter License Style
 // SVG Template Helper - Hunter License Style
-function generateProfileSVG(userData, lang) {
+function generateProfileSVG(userData, lang, base64Avatar = '', base64Banner = '') {
     const displayName = escapeHtml(userData.displayName || 'Chasseur');
     const level = userData.level || 1;
     const xp = userData.xp || 0;
@@ -96,35 +111,35 @@ function generateProfileSVG(userData, lang) {
                 <circle cx="2" cy="2" r="1.5" fill="white" fill-opacity="0.05" />
             </pattern>
             <clipPath id="avatarClip">
-                <rect x="150" y="220" width="160" height="160" rx="8" />
-            </clipPath>
-        </defs>
-        
-        <!-- Background -->
-        <rect width="1200" height="630" fill="#121212" />
-        <rect width="1200" height="630" fill="url(#mangaDots)" />
-        
-        <!-- Outer Border -->
-        <rect x="50" y="50" width="1100" height="530" rx="15" fill="none" stroke="${borderColor}" stroke-width="10" />
-        
-        <!-- Main Card Panel -->
-        <rect x="50" y="50" width="1100" height="530" rx="15" fill="url(#panelGrad)" />
+            <rect x="150" y="220" width="160" height="160" rx="8" />
+        </clipPath>
+    </defs>
+    
+    <!-- Background -->
+    <rect width="1200" height="630" fill="#121212" />
+    <rect width="1200" height="630" fill="url(#mangaDots)" />
+    
+    <!-- Outer Border -->
+    <rect x="50" y="50" width="1100" height="530" rx="15" fill="none" stroke="${borderColor}" stroke-width="10" />
+    
+    <!-- Main Card Panel -->
+    <rect x="50" y="50" width="1100" height="530" rx="15" fill="url(#panelGrad)" />
 
-        <!-- Banner -->
-        <rect x="50" y="50" width="1100" height="140" fill="${primaryColor}" />
-        ${banner ? `<image x="50" y="50" width="1100" height="140" xlink:href="${banner}" preserveAspectRatio="xMidYMid slice" />` : ''}
-        <rect x="50" y="188" width="1100" height="2" fill="${borderColor}" />
+    <!-- Banner -->
+    <rect x="50" y="50" width="1100" height="140" fill="${primaryColor}" />
+    ${base64Banner ? `<image x="50" y="50" width="1100" height="140" xlink:href="${base64Banner}" preserveAspectRatio="xMidYMid slice" />` : ''}
+    <rect x="50" y="188" width="1100" height="2" fill="${borderColor}" />
 
-        <!-- Header Strip -->
-        <rect x="50" y="190" width="1100" height="40" fill="${borderColor}" />
-        <text x="75" y="217" class="heading" font-size="20" fill="white" letter-spacing="2">${labels.title}</text>
-        <text x="1125" y="217" text-anchor="end" class="heading" font-size="20" fill="white" letter-spacing="1">ID: ${uid}</text>
+    <!-- Header Strip -->
+    <rect x="50" y="190" width="1100" height="40" fill="${borderColor}" />
+    <text x="75" y="217" class="heading" font-size="20" fill="white" letter-spacing="2">${labels.title}</text>
+    <text x="1125" y="217" text-anchor="end" class="heading" font-size="20" fill="white" letter-spacing="1">ID: ${uid}</text>
 
-        <!-- Avatar Section -->
-        <rect x="145" y="215" width="170" height="170" rx="10" fill="${borderColor}" />
-        <image x="150" y="220" width="160" height="160" xlink:href="${photoURL}" clip-path="url(#avatarClip)" preserveAspectRatio="xMidYMid slice" />
-        
-        <!-- Level Badge -->
+    <!-- Avatar Section -->
+    <rect x="145" y="215" width="170" height="170" rx="10" fill="${borderColor}" />
+    ${base64Avatar ? `<image x="150" y="220" width="160" height="160" xlink:href="${base64Avatar}" clip-path="url(#avatarClip)" preserveAspectRatio="xMidYMid slice" />` : ''}
+    
+    <!-- Level Badge -->
         <rect x="260" y="340" width="90" height="45" fill="${primaryColor}" stroke="${borderColor}" stroke-width="3" transform="rotate(-5, 305, 362)" />
         <text x="305" y="372" text-anchor="middle" class="heading" font-size="22" fill="white" transform="rotate(-5, 305, 362)">${labels.lvl} ${level}</text>
 
@@ -178,10 +193,90 @@ function generateProfileSVG(userData, lang) {
     </svg>`;
 }
 
+// SVG Template for Anime/Manga Works
+function generateWorkSVG(workData, lang, base64Image = '') {
+    const title = escapeHtml((lang === 'en' ? workData.title_english : workData.title) || workData.title || 'Work Details');
+    const type = escapeHtml(workData.type || 'Manga');
+    const status = escapeHtml(workData.status || '');
+    const score = workData.score || 'N/A';
+    const image = workData.images?.webp?.large_image_url || workData.images?.jpg?.large_image_url || '';
+    const genres = (workData.genres || []).slice(0, 3).map(g => g.name).join(' • ');
+    
+    const primaryColor = '#FF2E63';
+
+    return `
+    <svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <defs>
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@900&amp;family=Inter:wght@400;700&amp;display=swap');
+                .heading { font-family: 'Outfit', sans-serif; font-weight: 900; text-transform: uppercase; }
+                .body { font-family: 'Inter', sans-serif; }
+            </style>
+            <linearGradient id="workGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:rgba(18,18,18,0.2)" />
+                <stop offset="100%" style="stop-color:rgba(18,18,18,1)" />
+            </linearGradient>
+            <pattern id="halftone" width="10" height="10" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="1" fill="white" fill-opacity="0.1" />
+            </pattern>
+        </defs>
+        
+        <!-- Background Layer -->
+        <rect width="1200" height="630" fill="#121212" />
+        
+        <!-- Poster Background (Full height, blurred or darkened) -->
+        ${base64Image ? `
+        <image x="0" y="-100" width="1200" height="1000" xlink:href="${base64Image}" preserveAspectRatio="xMidYMid slice" opacity="0.4" />
+        <rect width="1200" height="630" fill="url(#workGrad)" />
+        ` : ''}
+        
+        <rect width="1200" height="630" fill="url(#halftone)" />
+
+        <!-- Sidebar Accent -->
+        <rect x="0" y="0" width="15" height="630" fill="${primaryColor}" />
+
+        <!-- Main Poster -->
+        <g transform="translate(80, 80)">
+            <rect x="0" y="0" width="320" height="470" fill="#000" rx="10" />
+            ${base64Image ? `<image x="5" y="5" width="310" height="460" xlink:href="${base64Image}" preserveAspectRatio="xMidYMid slice" clip-path="inset(0% round 8px)" />` : ''}
+            <rect x="0" y="0" width="320" height="470" fill="none" stroke="${primaryColor}" stroke-width="4" rx="10" />
+        </g>
+
+        <!-- Content Section -->
+        <g transform="translate(450, 150)">
+            <!-- Type Badge -->
+            <rect x="0" y="0" width="100" height="30" fill="${primaryColor}" transform="skewX(-15)" />
+            <text x="50" y="21" text-anchor="middle" class="heading" font-size="16" fill="white">${type}</text>
+
+            <!-- Title -->
+            <foreignObject x="0" y="40" width="670" height="220">
+                <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 64px; color: white; line-height: 1.1; text-transform: uppercase;">
+                    ${title}
+                </div>
+            </foreignObject>
+
+            <!-- Genres & Status -->
+            <text x="0" y="280" class="heading" font-size="22" fill="${primaryColor}" letter-spacing="2">${genres}</text>
+            <text x="0" y="315" class="body" font-size="20" fill="white" opacity="0.6">${status}</text>
+            
+            <!-- Rating / Score -->
+            <g transform="translate(0, 360)">
+                <rect x="0" y="0" width="180" height="60" fill="none" stroke="white" stroke-width="2" transform="skewX(-10)" />
+                <text x="20" y="40" class="heading" font-size="36" fill="white">★ ${score}</text>
+                <text x="110" y="40" class="body" font-size="14" fill="white" opacity="0.5">/ 10</text>
+            </g>
+        </g>
+
+        <!-- Branding -->
+        <text x="1150" y="580" text-anchor="end" class="heading" font-size="30" fill="white" opacity="0.1" letter-spacing="10">BINGEKI</text>
+        <rect x="1100" y="600" width="50" height="5" fill="${primaryColor}" />
+    </svg>`;
+}
+
 // SVG Template for News
 // SVG Template for News
-function generateNewsSVG(newsData, lang) {
-    const title = escapeHtml((lang === 'en' ? newsData.title_en : newsData.title_fr) || newsData.title || 'Bingeki News');
+function generateNewsSVG(newsData, lang, base64Image = '') {
+    const title = escapeHtml((lang === 'en' ? newsData.title_en : newsData.title_fr) || newsData.title || newsData.title || 'Bingeki News');
     const source = escapeHtml(newsData.sourceName || 'Actualité Manga');
     const date = newsData.publishedAt ? new Date(newsData.publishedAt).toLocaleDateString(lang === 'en' ? 'en-US' : 'fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
     const image = newsData.image || '';
@@ -227,7 +322,7 @@ function generateNewsSVG(newsData, lang) {
                 <rect x="100" y="100" width="400" height="430" rx="20 0 0 20" />
             </clipPath>
             <rect x="100" y="100" width="400" height="430" rx="20" fill="#333" />
-            ${image ? `<image x="100" y="100" width="400" height="430" xlink:href="${image}" clip-path="url(#newsImgClip)" preserveAspectRatio="xMidYMid slice" />` : ''}
+            ${base64Image ? `<image x="100" y="100" width="400" height="430" xlink:href="${base64Image}" clip-path="url(#newsImgClip)" preserveAspectRatio="xMidYMid slice" />` : ''}
             
             <!-- Gradient Overlay for Image -->
             <rect x="100" y="100" width="400" height="430" fill="rgba(255,46,99,0.1)" clip-path="url(#newsImgClip)" />
@@ -329,25 +424,65 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
     const desc = req.query.desc || '';
     
     try {
-        let svg = '';
-        if (type === 'profile' && id) {
+             if (type === 'profile' && id) {
             const userDoc = await admin.firestore().collection('users').doc(id).get();
             if (userDoc.exists) {
-                // generateProfileSVG now takes (userData, lang)
-                svg = generateProfileSVG(userDoc.data(), lang);
+                const userData = userDoc.data();
+                const avatarUrl = userData.photoURL;
+                const bannerUrl = userData.banner;
+                
+                // Fetch images in parallel
+                const [base64Avatar, base64Banner] = await Promise.all([
+                    fetchImageAsBase64(avatarUrl),
+                    fetchImageAsBase64(bannerUrl)
+                ]);
+                
+                svg = generateProfileSVG(userData, lang, base64Avatar, base64Banner);
             }
         } else if (type === 'news' && id) {
             const newsDoc = await admin.firestore().collection('news').doc(id).get();
             if (newsDoc.exists) {
-                svg = generateNewsSVG(newsDoc.data(), lang);
+                const newsData = newsDoc.data();
+                const base64Image = await fetchImageAsBase64(newsData.image);
+                svg = generateNewsSVG(newsData, lang, base64Image);
             }
-        } else if (type === 'work' || type === 'character' || type === 'person' || type === 'tierlist') {
-            const kindLabel = {
-                work: lang === 'en' ? 'Work Details' : 'Fiche oeuvre',
-                character: lang === 'en' ? 'Character' : 'Personnage',
-                person: lang === 'en' ? 'Person' : 'Personnalite',
-                tierlist: 'Tier List'
-            }[type] || '';
+        } else if (type === 'work' && id) {
+            // New case for specific work details
+            const workType = req.query.workType || 'anime';
+            const cacheKey = `${workType}_details_${id}`;
+            const cached = await readCache(cacheKey, 86400000 * 7); // 7 days TTL for SEO images
+            let workData = cached.hit ? cached.data : null;
+            
+            if (!workData) {
+                try {
+                    workData = await jikanFetch(`/${workType}/${id}/full`);
+                    if (workData) await writeCache(cacheKey, workData);
+                } catch (e) {
+                    console.error('[OG-IMAGE] Failed to fetch fallback work data:', e);
+                }
+            }
+            
+            if (workData) {
+                const imageUrl = workData.images?.webp?.large_image_url || workData.images?.jpg?.large_image_url;
+                const base64Image = await fetchImageAsBase64(imageUrl);
+                svg = generateWorkSVG(workData, lang, base64Image);
+            } else {
+                svg = generateGenericSVG(title, desc, lang);
+            }
+        } else if (type === 'character' || type === 'person' || type === 'tierlist') {
+            const kindLabels = {
+                fr: {
+                    character: 'Personnage',
+                    person: 'Personnalité',
+                    tierlist: 'Tier List'
+                },
+                en: {
+                    character: 'Character',
+                    person: 'Person',
+                    tierlist: 'Tier List'
+                }
+            };
+            const kindLabel = kindLabels[lang]?.[type] || kindLabels['fr'][type] || '';
             svg = generateGenericSVG(kindLabel || title, desc, lang);
         }
         
@@ -355,11 +490,21 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
             svg = generateGenericSVG(title, desc, lang);
         }
 
-        res.set('Content-Type', 'image/svg+xml');
-        res.set('Cache-Control', 'public, max-age=3600, s-maxage=3600');
-        return res.send(svg);
+        // Convert SVG to PNG using Resvg
+        const resvg = new Resvg(svg, {
+            fitTo: {
+                mode: 'width',
+                value: 1200,
+            },
+        });
+        const pngData = resvg.render();
+        const pngBuffer = pngData.asPng();
+
+        res.set('Content-Type', 'image/png');
+        res.set('Cache-Control', 'public, max-age=86400, s-maxage=86400'); // 24h cache for images
+        return res.send(pngBuffer);
     } catch (e) {
-        console.error('[OG-IMAGE] Error generating SVG:', e);
+        console.error('[OG-IMAGE] Error generating PNG:', e);
         return res.status(500).send('Internal Error');
     }
 });
@@ -393,7 +538,7 @@ app.get('/*', async (req, res) => {
                 const userData = userDoc.data();
                 title = lang === 'en' ? `${userData.displayName || 'User'}'s Profile | Bingeki` : `Profil de ${userData.displayName || 'Utilisateur'} | Bingeki`;
                 description = userData.bio || (lang === 'en' ? `Check out ${userData.displayName || 'User'}'s progress on Bingeki!` : `Découvrez la progression de ${userData.displayName || 'Utilisateur'} sur Bingeki !`);
-                image = `https://bingeki.web.app/api/og-image/profile/${profileUid}?lang=${lang}`;
+                image = `https://bingeki.web.app/api/og-image/profile/${profileUid}?lang=${lang}&v=${userData.lastUpdated?.seconds || Date.now()}`;
             }
         } catch (e) {
             console.error('[SEO] Firestore error (Profile):', e);
@@ -410,13 +555,42 @@ app.get('/*', async (req, res) => {
         } catch (e) {
             console.error('[SEO] Firestore error (News):', e);
         }
+    } else if (workId) {
+        try {
+            // For work pages, we try to get data to have a beautiful OG image
+            const workType = localPath.startsWith('/anime') ? 'anime' : 'manga';
+            const cacheKey = `${workType}_details_${workId}`;
+            const cached = await readCache(cacheKey, TTL_MS.DETAILS);
+            
+            let workData = cached.hit ? cached.data : null;
+            if (!workData) {
+                workData = await jikanFetch(`/${workType}/${workId}/full`);
+                if (workData) await writeCache(cacheKey, workData);
+            }
+
+            if (workData) {
+                title = (lang === 'en' ? workData.title_english : workData.title) || workData.title || title;
+                description = (lang === 'en' ? workData.synopsis : (await readTranslation(`fr_${workType}_${workId}`)).synopsis || workData.synopsis) || description;
+                description = description.substring(0, 200).replace(/<[^>]*>/g, '') + '...';
+                image = `https://bingeki.web.app/api/og-image/work/${workId}?lang=${lang}&workType=${workType}`;
+            }
+        } catch (e) {
+            console.error('[SEO] Error fetching work data for SEO:', e);
+        }
     } else {
         let ogType = 'generic';
-        if (workId) ogType = 'work';
         if (characterId) ogType = 'character';
         if (personId) ogType = 'person';
         if (tierlistId) ogType = 'tierlist';
         image = `https://bingeki.web.app/api/og-image/${ogType}?title=${encodeURIComponent(title)}&desc=${encodeURIComponent(description)}&lang=${lang}`;
+    }
+
+    // Append .png extension hint or ensures it's treated as image
+    if (image && !image.includes('.png') && !image.includes('?')) {
+        image += '.png';
+    } else if (image && !image.includes('.png')) {
+        // Social crawlers sometimes prefer seeing an extension
+        image += '&ext=.png';
     }
 
     const indexFileName = lang === 'en' ? 'index-en.html' : 'index.html';
