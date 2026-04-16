@@ -286,76 +286,101 @@ function generateWorkSVG(workData, lang, base64Image = '') {
     </svg>`;
 }
 
-// SVG Template for News
-// SVG Template for News
+// SVG Template for News (Redesign)
 function generateNewsSVG(newsData, lang, base64Image = '') {
-    const title = escapeHtml((lang === 'en' ? newsData.title_en : newsData.title_fr) || newsData.title || newsData.title || 'Bingeki News');
-    const source = escapeHtml(newsData.sourceName || 'Actualité Manga');
+    const title = escapeHtml((lang === 'en' ? newsData.title_en : newsData.title_fr) || newsData.title || 'Bingeki News');
+    const source = escapeHtml(newsData.sourceName || 'Actu');
     const date = newsData.publishedAt ? new Date(newsData.publishedAt).toLocaleDateString(lang === 'en' ? 'en-US' : 'fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
-    const image = newsData.image || '';
+    const summary = escapeHtml(newsData.contentSnippet || newsData.excerpt || newsData.summary || '');
+    const tag = escapeHtml(newsData.tags?.[0] || (lang === 'en' ? 'News' : 'Actualité'));
+    
+    const primaryColor = '#FF2E63';
+    const orangeBoxColor = '#FF9500';
 
     return `
     <svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
         <defs>
             <style>
-                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@900&amp;family=Inter:wght@400;700&amp;display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@900&amp;family=Inter:wght@400;700;800&amp;display=swap');
                 .heading { font-family: 'Outfit', sans-serif; font-weight: 900; text-transform: uppercase; }
                 .body { font-family: 'Inter', sans-serif; }
             </style>
-            <linearGradient id="newsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:#FF2E63" />
-                <stop offset="100%" style="stop-color:#FF0844" />
-            </linearGradient>
-            <pattern id="mangaDots" width="30" height="30" patternUnits="userSpaceOnUse">
-                <circle cx="3" cy="3" r="2" fill="white" fill-opacity="0.1" />
+            <pattern id="mangaDots" width="20" height="20" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="1.5" fill="white" fill-opacity="0.05" />
             </pattern>
-            <pattern id="speedlines" width="200" height="200" patternUnits="userSpaceOnUse">
-                <line x1="0" y1="0" x2="200" y2="200" stroke="${primaryColor}" stroke-width="1" opacity="0.05" />
+            <pattern id="diagonalLines" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="40" stroke="white" stroke-width="1.5" opacity="0.05" />
             </pattern>
         </defs>
         
         <!-- Background -->
         <rect width="1200" height="630" fill="#121212" />
         <rect width="1200" height="630" fill="url(#mangaDots)" />
-        <rect width="1200" height="630" fill="url(#speedlines)" />
+        <rect width="1200" height="630" fill="url(#diagonalLines)" />
         
-        <!-- Main Content Card (Manga Shadow) -->
-        <rect x="108" y="108" width="1000" height="430" rx="4" fill="#000" />
-        <g>
-            <rect x="100" y="100" width="1000" height="430" rx="4" fill="#1a1a1a" stroke="white" stroke-width="2" />
+        <!-- BINGEKI Background Text -->
+        <text x="600" y="350" text-anchor="middle" class="heading" font-size="280" fill="white" opacity="0.02" letter-spacing="-10">BINGEKI</text>
+
+        <!-- Left Image Section -->
+        <g transform="translate(60, 60)">
+            <!-- Manga Shadow -->
+            <rect x="8" y="8" width="500" height="510" rx="4" fill="#000" />
+            <g clip-path="inset(0% round 4px)">
+                <rect width="500" height="510" fill="#333" />
+                ${base64Image ? `<image width="500" height="510" xlink:href="${base64Image}" preserveAspectRatio="xMidYMid slice" />` : ''}
+                <!-- Bottom Gradient -->
+                <rect y="310" width="500" height="200" fill="rgba(0,0,0,0.8)" />
+            </g>
+            <!-- Border -->
+            <rect width="500" height="510" rx="4" fill="none" stroke="white" stroke-width="3" />
             
-            <!-- News Image (Left side) -->
-            <clipPath id="newsImgClip">
-                <rect x="100" y="100" width="400" height="430" rx="4 0 0 4" />
-            </clipPath>
-            <rect x="100" y="100" width="400" height="430" rx="4" fill="#333" />
-            ${base64Image ? `<image x="100" y="100" width="400" height="430" xlink:href="${base64Image}" clip-path="url(#newsImgClip)" preserveAspectRatio="xMidYMid slice" />` : ''}
+            <!-- Floating Tag Badge -->
+            <g transform="translate(30, 30)">
+                <rect x="4" y="4" width="140" height="40" fill="#000" rx="2" />
+                <rect width="140" height="40" fill="${primaryColor}" rx="2" />
+                <text x="70" y="27" text-anchor="middle" class="heading" font-size="20" fill="white">${tag}</text>
+            </g>
+        </g>
+
+        <!-- Right Content Section -->
+        <g transform="translate(620, 80)">
+            <!-- Top Header -->
+            <text x="0" y="0" class="heading" font-size="20" fill="${primaryColor}" letter-spacing="4">${source} • ${date}</text>
             
-            <!-- Overlay -->
-            <rect x="100" y="100" width="400" height="430" fill="rgba(255,46,99,0.15)" clip-path="url(#newsImgClip)" />
-
-            <!-- Content Section -->
-            <rect x="500" y="100" width="600" height="70" rx="0 4 0 0" fill="${primaryColor}" />
-            <text x="530" y="145" class="heading" font-size="24" fill="white" letter-spacing="4">BINGEKI NEWS</text>
-
-            <!-- Source & Date -->
-            <text x="530" y="210" class="heading" font-size="16" fill="${primaryColor}" opacity="0.8">${source} • ${date}</text>
-
-            <!-- Title (Rotated) -->
-            <g transform="rotate(-1, 800, 300)">
-                <foreignObject x="530" y="240" width="540" height="220">
-                    <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 42px; color: white; line-height: 1.1; text-transform: uppercase; text-shadow: 4px 4px 0px #000;">
+            <!-- Main Title (Rotated & Shadowed) -->
+            <g transform="rotate(-1, 0, 80)">
+                <foreignObject x="0" y="30" width="520" height="200">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 48px; color: white; line-height: 1.1; text-transform: uppercase; text-shadow: 6px 6px 0px #000;">
                         ${title}
                     </div>
                 </foreignObject>
             </g>
-            
-            <!-- Call to action -->
-            <text x="1070" y="500" text-anchor="end" class="heading" font-size="20" fill="#FF2E63">LIRE L'ARTICLE ➔</text>
+
+            <!-- Orange Summary Box (Replica of site) -->
+            <g transform="translate(0, 260)">
+                <!-- Shadow -->
+                <rect x="8" y="8" width="520" height="230" fill="#000" />
+                <!-- Box -->
+                <rect width="520" height="230" fill="${orangeBoxColor}" stroke="#000" stroke-width="3" />
+                
+                <!-- Badge "CLIN D'OEIL" -->
+                <g transform="translate(20, -15) rotate(-2)">
+                    <rect width="160" height="30" fill="#000" />
+                    <text x="80" y="22" text-anchor="middle" class="heading" font-size="14" fill="white">EN UN CLIN D'OEIL</text>
+                </g>
+
+                <!-- Summary Text -->
+                <foreignObject x="25" y="40" width="470" height="170">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 22px; color: #000; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;">
+                        ${summary || title}
+                    </div>
+                </foreignObject>
+            </g>
         </g>
 
-        <!-- Logo/Footer -->
-        <text x="1100" y="590" text-anchor="end" class="heading" font-size="18" fill="white" opacity="0.2">bingeki.web.app</text>
+        <!-- Footer Bottom Corner -->
+        <rect x="1150" y="0" width="50" height="630" fill="${primaryColor}" opacity="0.1" />
+        <text x="1100" y="600" text-anchor="end" class="heading" font-size="14" fill="white" opacity="0.3" letter-spacing="5">BINGEKI.WEB.APP</text>
     </svg>`;
 }
 
