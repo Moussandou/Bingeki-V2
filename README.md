@@ -1,4 +1,4 @@
-# 🏯 Bingeki V2
+# 🏯 Bingeki
 
 ![Build & Deploy](https://github.com/Moussandou/Bingeki-V2/actions/workflows/deploy.yml/badge.svg)
 ![CI Status](https://github.com/Moussandou/Bingeki-V2/actions/workflows/ci.yml/badge.svg)
@@ -38,7 +38,7 @@
 
 ```bash
 # 1. Clone
-git clone https://github.com/Moussandou/Bingeki-V2.git
+git clone https://github.com/Moussandou/Bingeki.git
 cd Bingeki-V2
 
 # 2. Install
