@@ -45,9 +45,10 @@ service cloud.firestore {
                         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned', 'createdAt'])) 
                     || isAdmin();
 
-      // Create & Delete: Allow new users to be created by themselves, and deleted by owner/admin
+      // Create: Allow users to setup their profile.
+      // Delete: Blocked for clients to ensure full cleanup via Auth Extension or Admin SDK.
       allow create: if isOwner(userId);
-      allow delete: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
       
       // --- Subcollection: Data (Library & Gamification) ---
       
@@ -62,7 +63,7 @@ service cloud.firestore {
                            request.resource.data.totalXp >= resource.data.totalXp &&
                            request.resource.data.totalXp <= resource.data.totalXp + 25000
                          )) || isAdmin();
-        allow delete: if isOwner(userId) || isAdmin();
+        allow delete: if isAdmin();
         
         // Owner Create: Allow initial creation only (first login setup)
         allow create: if isOwner(userId);

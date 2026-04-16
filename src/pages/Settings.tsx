@@ -16,7 +16,7 @@ import { SEO } from '@/components/layout/SEO';
 import { useToast } from '@/context/ToastContext';
 import { getLocalStorageSize, exportData, importData, clearImageCache } from '@/utils/storageUtils';
 import { useAuthStore } from '@/store/authStore';
-import { saveLibraryToFirestore, saveGamificationToFirestore, deleteUserData, saveUserProfileToFirestore } from '@/firebase/firestore';
+import { saveLibraryToFirestore, saveGamificationToFirestore, saveUserProfileToFirestore } from '@/firebase/firestore';
 import { deleteUser } from 'firebase/auth';
 import { MALImportModal } from '@/components/library/MALImportModal';
 
@@ -166,25 +166,26 @@ export default function Settings() {
 
         try {
             setIsDeleting(true);
-            // 1. Delete Firestore Data
-            await deleteUserData(user.uid);
+            // 1. Firestore rules now block client-side deletion for security.
+            // 2. The 'Delete User Data' extension will handle this server-side.
 
-            // 2. Delete Auth Account
+            // 1. Delete Auth Account (This triggers the Firebase Extension)
             await deleteUser(user);
 
-            // 3. Clear Local State
+            // 2. Clear Local State for immediate UI feedback
             useLibraryStore.getState().resetStore();
             useGamificationStore.getState().resetStore();
             localStorage.clear();
 
-            addToast(t('settings.toast.account_deleted'), 'success');
+            addToast(t('settings.toast.account_deleted', 'Account successfully deleted'), 'success');
             navigate('/');
         } catch (error) {
             console.error('Delete account error:', error);
+            // Handling the case where Firebase requires a fresh login for sensitive actions
             if ((error as { code?: string }).code === 'auth/requires-recent-login') {
-                addToast(t('settings.toast.relogin_required'), 'error');
+                addToast(t('settings.toast.relogin_required', 'Please log out and log back in to delete your account.'), 'error');
             } else {
-                addToast(t('settings.toast.delete_error'), 'error');
+                addToast(t('settings.toast.delete_error', 'An error occurred during deletion.'), 'error');
             }
         } finally {
             setIsDeleting(false);
