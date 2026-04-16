@@ -707,6 +707,11 @@ export async function getFriendsActivity(userId: string, limitCount: number = 20
         
         return activities;
     } catch (error) {
+        // Silently handle permission errors during auth transitions (logout/deletion)
+        const err = error as { code?: string };
+        if (err.code === 'permission-denied') {
+            return [];
+        }
         logger.error('[Firestore] Error loading friends activity:', error);
         return [];
     }

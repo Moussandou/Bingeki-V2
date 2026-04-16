@@ -34,8 +34,9 @@ service cloud.firestore {
     // ==================== USERS COLLECTION ====================
 
     match /users/{userId} {
-      // Public Read: Allows Search, Leaderboards, and Admin lists
-      allow read: if isAuthenticated();
+      // Public Read: Allows Search, Leaderboards, and SEO. 
+      // Rule: Authenticated users can see any profile. Public profiles are visible to everyone.
+      allow read: if isAuthenticated() || resource.data.profileVisibility == 'public' || resource.data.profileVisibility == null;
       
       // Write:
       // 1. Owner can update their profile (bio, theme, etc.)
@@ -124,16 +125,16 @@ service cloud.firestore {
       // 1. They are the owner or an admin
       // 2. OR the activity is explicitly marked as visible (isVisible == true)
       //    AND the profile visibility matches (Public OR is a Friend)
-      allow read: if isAuthenticated() && (
-                    isOwner(resource.data.userId) || 
-                    isAdmin() || 
+      // Read: Feed access logic
+      // 1. Owner or Admin can always read.
+      // 2. Others can read if the activity is visible AND the profile is public or they are friends.
+      allow read: if (isAuthenticated() && (isOwner(resource.data.userId) || isAdmin())) || 
                     (resource.data.isVisible != false && (
                       resource.data.profileVisibility == 'public' || 
                       resource.data.profileVisibility == null ||
-                      (resource.data.profileVisibility == 'friends' && 
+                      (isAuthenticated() && resource.data.profileVisibility == 'friends' && 
                        exists(/databases/$(database)/documents/users/$(resource.data.userId)/friends/$(request.auth.uid)))
-                    ))
-                  );
+                    ));
       
       // Write: BLOCKED for clients, except for owners deleting their own logs.
       allow create, update: if false; 

@@ -169,13 +169,13 @@ export default function Settings() {
             // 1. Firestore rules now block client-side deletion for security.
             // 2. The 'Delete User Data' extension will handle this server-side.
 
-            // 1. Delete Auth Account (This triggers the Firebase Extension)
-            await deleteUser(user);
-
-            // 2. Clear Local State for immediate UI feedback
+            // 1. Clear Local State IMMEDIATELY for clean feedback
             useLibraryStore.getState().resetStore();
             useGamificationStore.getState().resetStore();
             localStorage.clear();
+
+            // 2. Delete Auth Account (This triggers the Firebase Extension)
+            await deleteUser(user);
 
             addToast(t('settings.toast.account_deleted', 'Account successfully deleted'), 'success');
             navigate('/');

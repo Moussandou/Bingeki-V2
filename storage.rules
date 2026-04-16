@@ -31,7 +31,9 @@ service firebase.storage {
     // Existing rules for other paths...
     match /avatars/{userId} {
       allow read: if true;
-      allow write, list: if request.auth != null && request.auth.uid == userId;
+      allow write, list: if isAuthenticated() && request.auth.uid == userId;
+      // Allow authenticated users to list files in avatars (needed for some UI components)
+      allow list: if isAuthenticated();
     }
 
     // User personal folder (avatars, covers, etc.)
