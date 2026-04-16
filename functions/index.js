@@ -593,6 +593,13 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
     const desc = req.query.desc || '';
 
     try {
+        // Core pages use high-fidelity screenshots instead of generated SVGs
+        const coreTypes = ['home', 'discover', 'schedule', 'social', 'newsIndex'];
+        if (!id && coreTypes.includes(type)) {
+            const filename = type === 'newsIndex' ? 'news' : type;
+            return res.redirect(301, `https://bingeki.web.app/og-images/${filename}-${lang}.png`);
+        }
+
         let svg;
         if (type === 'profile' && id) {
             const userDoc = await admin.firestore().collection('users').doc(id).get();

@@ -4,7 +4,7 @@
       "siteTitle": "Bingeki",
       "title": "Bingeki | Votre aventure Manga",
       "description": "Transformez votre passion manga en quête RPG ! Suivez vos lectures, gagnez de l'XP, débloquez des badges et affrontez vos amis.",
-      "image": "https://bingeki.web.app/bingeki-preview.png",
+      "image": "https://bingeki.web.app/og-images/home-fr.png",
       "locale": "fr_FR",
       "alternateLocale": "en_US"
     },
@@ -12,7 +12,7 @@
       "siteTitle": "Bingeki",
       "title": "Bingeki | Your Manga Adventure",
       "description": "Transform your manga passion into an RPG quest! Track your reading, earn XP, unlock badges and compete with friends.",
-      "image": "https://bingeki.web.app/bingeki-preview-en.png",
+      "image": "https://bingeki.web.app/og-images/home-en.png",
       "locale": "en_US",
       "alternateLocale": "fr_FR"
     }

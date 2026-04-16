@@ -57,10 +57,18 @@ function resolveStaticSeo(localPath, lang) {
   else if (normalizedPath === '/auth' || normalizedPath === '/login') pageType = 'home';
 
   if (staticEntry) {
+    const staticImageTypes = ['home', 'discover', 'social', 'schedule', 'newsIndex'];
+    let image = defaults.image;
+    
+    if (staticImageTypes.includes(pageType)) {
+      const filename = pageType === 'newsIndex' ? 'news' : pageType;
+      image = `https://bingeki.web.app/og-images/${filename}-${lang}.png`;
+    }
+
     return {
       title: staticEntry.title || defaults.title,
       description: staticEntry.description || defaults.description,
-      image: defaults.image,
+      image: image,
       locale: defaults.locale,
       alternateLocale: defaults.alternateLocale,
       pageType: pageType
@@ -81,10 +89,18 @@ function resolveStaticSeo(localPath, lang) {
     }
   }
 
+  // Fallback for primary pages if not in staticEntry but identified as pageType
+  let image = defaults.image;
+  const staticImageTypes = ['home', 'discover', 'social', 'schedule', 'newsIndex'];
+  if (staticImageTypes.includes(pageType)) {
+    const filename = pageType === 'newsIndex' ? 'news' : pageType;
+    image = `https://bingeki.web.app/og-images/${filename}-${lang}.png`;
+  }
+
   return {
     title: defaults.title,
     description: defaults.description,
-    image: defaults.image,
+    image: image,
     locale: defaults.locale,
     alternateLocale: defaults.alternateLocale,
     pageType: pageType
