@@ -40,7 +40,6 @@ async function fetchImageAsBase64(url) {
 }
 
 // SVG Template Helper - Hunter License Style
-// SVG Template Helper - Hunter License Style
 function generateProfileSVG(userData, lang, base64Avatar = '', base64Banner = '') {
     const displayName = escapeHtml(userData.displayName || 'Chasseur');
     const level = userData.level || 1;
@@ -52,7 +51,7 @@ function generateProfileSVG(userData, lang, base64Avatar = '', base64Banner = ''
     const banner = userData.banner || '';
     const bio = escapeHtml(userData.bio || '');
     const uid = userData.uid ? userData.uid.slice(0, 8).toUpperCase() : 'BINGEKI';
-    
+
     // Theme colors
     const primaryColor = userData.themeColor || '#FF2E63';
     const borderColor = userData.borderColor || '#000000';
@@ -74,7 +73,7 @@ function generateProfileSVG(userData, lang, base64Avatar = '', base64Banner = ''
     const centerX = 850;
     const centerY = 330;
     const radius = 120;
-    
+
     const stats = [
         { val: Math.min(level * 2, 100), label: lang === 'en' ? 'Level' : 'Niveau' },
         { val: Math.min(xp / 100, 100), label: lang === 'en' ? 'Passion' : 'Passion' },
@@ -166,10 +165,10 @@ function generateProfileSVG(userData, lang, base64Avatar = '', base64Banner = ''
         
         <!-- Chart Labels -->
         ${stats.map((s, i) => {
-            const p = getPoint(i, 125);
-            const [px, py] = p.split(',');
-            return `<text x="${px}" y="${py}" text-anchor="middle" class="heading" font-size="12" fill="${textColor}" opacity="0.7">${s.label}</text>`;
-        }).join('')}
+        const p = getPoint(i, 125);
+        const [px, py] = p.split(',');
+        return `<text x="${px}" y="${py}" text-anchor="middle" class="heading" font-size="12" fill="${textColor}" opacity="0.7">${s.label}</text>`;
+    }).join('')}
 
         <!-- Bottom Stats Bar -->
         <rect x="145" y="470" width="910" height="80" rx="5" fill="rgba(0,0,0,0.3)" stroke="${borderColor}" stroke-width="2" />
@@ -201,7 +200,7 @@ function generateWorkSVG(workData, lang, base64Image = '') {
     const score = workData.score || 'N/A';
     const image = workData.images?.webp?.large_image_url || workData.images?.jpg?.large_image_url || '';
     const genres = (workData.genres || []).slice(0, 3).map(g => g.name).join(' • ');
-    
+
     const primaryColor = '#FF2E63';
 
     return `
@@ -422,21 +421,21 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
     const lang = req.query.lang || 'fr';
     const title = req.query.title || '';
     const desc = req.query.desc || '';
-    
+
     try {
-             if (type === 'profile' && id) {
+        if (type === 'profile' && id) {
             const userDoc = await admin.firestore().collection('users').doc(id).get();
             if (userDoc.exists) {
                 const userData = userDoc.data();
                 const avatarUrl = userData.photoURL;
                 const bannerUrl = userData.banner;
-                
+
                 // Fetch images in parallel
                 const [base64Avatar, base64Banner] = await Promise.all([
                     fetchImageAsBase64(avatarUrl),
                     fetchImageAsBase64(bannerUrl)
                 ]);
-                
+
                 svg = generateProfileSVG(userData, lang, base64Avatar, base64Banner);
             }
         } else if (type === 'news' && id) {
@@ -452,7 +451,7 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
             const cacheKey = `${workType}_details_${id}`;
             const cached = await readCache(cacheKey, 86400000 * 7); // 7 days TTL for SEO images
             let workData = cached.hit ? cached.data : null;
-            
+
             if (!workData) {
                 try {
                     workData = await jikanFetch(`/${workType}/${id}/full`);
@@ -461,7 +460,7 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
                     console.error('[OG-IMAGE] Failed to fetch fallback work data:', e);
                 }
             }
-            
+
             if (workData) {
                 const imageUrl = workData.images?.webp?.large_image_url || workData.images?.jpg?.large_image_url;
                 const base64Image = await fetchImageAsBase64(imageUrl);
@@ -485,7 +484,7 @@ app.get('/api/og-image/:type?/:id?', async (req, res) => {
             const kindLabel = kindLabels[lang]?.[type] || kindLabels['fr'][type] || '';
             svg = generateGenericSVG(kindLabel || title, desc, lang);
         }
-        
+
         if (!svg) {
             svg = generateGenericSVG(title, desc, lang);
         }
@@ -561,7 +560,7 @@ app.get('/*', async (req, res) => {
             const workType = localPath.startsWith('/anime') ? 'anime' : 'manga';
             const cacheKey = `${workType}_details_${workId}`;
             const cached = await readCache(cacheKey, TTL_MS.DETAILS);
-            
+
             let workData = cached.hit ? cached.data : null;
             if (!workData) {
                 workData = await jikanFetch(`/${workType}/${workId}/full`);
@@ -751,7 +750,7 @@ function calculateUserStats(libraryWorks, bonusXp = 0) {
         const progress = w.currentChapter || w.currentEpisode || 0;
         const total = w.totalChapters || w.totalEpisodes || 0;
         const type = (w.type || 'manga').toLowerCase();
-        
+
         // 1. Calculate base XP for adding the work
         totalXpFromLibrary += XP_REWARDS.ADD_WORK;
 
@@ -760,12 +759,12 @@ function calculateUserStats(libraryWorks, bonusXp = 0) {
         if (total && total > 0) {
             effectiveProgress = Math.min(progress, total);
         }
-        
+
         // 3. Apply Hard Caps for XP calculation
         if (type === 'anime' || type === 'manga') {
             const cap = type === 'anime' ? MAX_EPISODES : MAX_CHAPTERS;
             effectiveProgress = Math.min(effectiveProgress, cap);
-            
+
             if (type === 'anime') {
                 if (w.format === 'Movie') {
                     totalMoviesWatched += (w.status === 'completed' ? 1 : 0);
@@ -825,157 +824,157 @@ function calculateUserStats(libraryWorks, bonusXp = 0) {
  * Trigger: Update user stats, badges, and activity feed whenever their library changes.
  */
 exports.onLibraryUpdate = onDocumentWritten('users/{userId}/data/library', async (event) => {
-        const userId = event.params.userId;
-        const change = event.data;
-        if (!change) return null;
-        const libraryData = change.after.exists ? change.after.data() : { works: [] };
-        const works = libraryData.works || [];
+    const userId = event.params.userId;
+    const change = event.data;
+    if (!change) return null;
+    const libraryData = change.after.exists ? change.after.data() : { works: [] };
+    const works = libraryData.works || [];
 
-        // Previous library state (for activity detection)
-        const prevLibraryData = change.before.exists ? change.before.data() : { works: [] };
-        const prevWorks = prevLibraryData.works || [];
+    // Previous library state (for activity detection)
+    const prevLibraryData = change.before.exists ? change.before.data() : { works: [] };
+    const prevWorks = prevLibraryData.works || [];
 
-        try {
-            // Fetch gamification doc for bonusXp, streak, and existing badges
-            const gamificationSnap = await admin.firestore()
-                .collection('users')
-                .doc(userId)
-                .collection('data')
-                .doc('gamification')
-                .get();
-            
-            const gamData = gamificationSnap.exists ? gamificationSnap.data() : {};
-            const bonusXp = gamData.bonusXp || 0;
-            const streak = gamData.streak || 0;
-            const lastActivityDate = gamData.lastActivityDate || null;
-            const existingBadges = gamData.badges || [];
+    try {
+        // Fetch gamification doc for bonusXp, streak, and existing badges
+        const gamificationSnap = await admin.firestore()
+            .collection('users')
+            .doc(userId)
+            .collection('data')
+            .doc('gamification')
+            .get();
 
-            const stats = calculateUserStats(works, bonusXp);
+        const gamData = gamificationSnap.exists ? gamificationSnap.data() : {};
+        const bonusXp = gamData.bonusXp || 0;
+        const streak = gamData.streak || 0;
+        const lastActivityDate = gamData.lastActivityDate || null;
+        const existingBadges = gamData.badges || [];
 
-            // Calculate badges server-side
-            const badges = calculateBadges(stats, streak, existingBadges);
+        const stats = calculateUserStats(works, bonusXp);
 
-            // Update Root User Profile (Leaderboard source)
-            // Include streak and lastActivityDate so cross-device sync works correctly
-            await admin.firestore().collection('users').doc(userId).set({
+        // Calculate badges server-side
+        const badges = calculateBadges(stats, streak, existingBadges);
+
+        // Update Root User Profile (Leaderboard source)
+        // Include streak and lastActivityDate so cross-device sync works correctly
+        await admin.firestore().collection('users').doc(userId).set({
+            ...stats,
+            badges,
+            streak,
+            lastActivityDate,
+            bonusXp,
+            lastUpdated: FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        // Update Gamification Doc (Data integrity)
+        // Keep streak and lastActivityDate from existing data (managed client-side)
+        await admin.firestore()
+            .collection('users')
+            .doc(userId)
+            .collection('data')
+            .doc('gamification')
+            .set({
                 ...stats,
                 badges,
                 streak,
                 lastActivityDate,
                 bonusXp,
-                lastUpdated: FieldValue.serverTimestamp()
+                lastUpdated: Date.now()
             }, { merge: true });
 
-            // Update Gamification Doc (Data integrity)
-            // Keep streak and lastActivityDate from existing data (managed client-side)
-            await admin.firestore()
-                .collection('users')
-                .doc(userId)
-                .collection('data')
-                .doc('gamification')
-                .set({
-                    ...stats,
-                    badges,
-                    streak,
-                    lastActivityDate,
-                    bonusXp,
-                    lastUpdated: Date.now()
-                }, { merge: true });
+        // --- AUTO ACTIVITY LOGGING ---
+        // Detect changes between previous and current library
+        try {
+            const userDoc = await admin.firestore().collection('users').doc(userId).get();
+            const userData = userDoc.exists ? userDoc.data() : {};
+            const userName = userData.displayName || 'Héros';
+            const userPhoto = userData.photoURL || '';
+            const isVisible = userData.showActivityStatus !== false;
+            const profileVisibility = userData.profileVisibility || 'public';
 
-            // --- AUTO ACTIVITY LOGGING ---
-            // Detect changes between previous and current library
-            try {
-                const userDoc = await admin.firestore().collection('users').doc(userId).get();
-                const userData = userDoc.exists ? userDoc.data() : {};
-                const userName = userData.displayName || 'Héros';
-                const userPhoto = userData.photoURL || '';
-                const isVisible = userData.showActivityStatus !== false;
-                const profileVisibility = userData.profileVisibility || 'public';
+            const prevWorkMap = {};
+            prevWorks.forEach(w => { prevWorkMap[w.id] = w; });
 
-                const prevWorkMap = {};
-                prevWorks.forEach(w => { prevWorkMap[w.id] = w; });
+            const activitiesToLog = [];
 
-                const activitiesToLog = [];
+            for (const work of works) {
+                const prev = prevWorkMap[work.id];
 
-                for (const work of works) {
-                    const prev = prevWorkMap[work.id];
-
-                    if (!prev) {
-                        // New work added
+                if (!prev) {
+                    // New work added
+                    activitiesToLog.push({
+                        userId,
+                        userName,
+                        userPhoto,
+                        type: 'add_work',
+                        workId: work.id,
+                        workTitle: work.title,
+                        workImage: work.image || '',
+                        workType: (work.type || 'manga').toLowerCase(),
+                        isVisible,
+                        profileVisibility,
+                        timestamp: Date.now()
+                    });
+                } else if (work.status === 'completed' && prev.status !== 'completed') {
+                    // Work completed
+                    activitiesToLog.push({
+                        userId,
+                        userName,
+                        userPhoto,
+                        type: 'complete',
+                        workId: work.id,
+                        workTitle: work.title,
+                        workImage: work.image || '',
+                        workType: (work.type || 'manga').toLowerCase(),
+                        isVisible,
+                        profileVisibility,
+                        timestamp: Date.now()
+                    });
+                } else if ((work.currentChapter || 0) > (prev.currentChapter || 0)) {
+                    // Progress update (only log if significant: >= 5 units difference to avoid spam)
+                    const diff = (work.currentChapter || 0) - (prev.currentChapter || 0);
+                    if (diff >= 5) {
+                        const workType = (work.type || 'manga').toLowerCase();
                         activitiesToLog.push({
                             userId,
                             userName,
                             userPhoto,
-                            type: 'add_work',
+                            type: workType === 'anime' ? 'watch' : 'read',
                             workId: work.id,
                             workTitle: work.title,
                             workImage: work.image || '',
-                            workType: (work.type || 'manga').toLowerCase(),
+                            workType: workType,
                             isVisible,
                             profileVisibility,
+                            episodeNumber: work.currentChapter || 0,
                             timestamp: Date.now()
                         });
-                    } else if (work.status === 'completed' && prev.status !== 'completed') {
-                        // Work completed
-                        activitiesToLog.push({
-                            userId,
-                            userName,
-                            userPhoto,
-                            type: 'complete',
-                            workId: work.id,
-                            workTitle: work.title,
-                            workImage: work.image || '',
-                            workType: (work.type || 'manga').toLowerCase(),
-                            isVisible,
-                            profileVisibility,
-                            timestamp: Date.now()
-                        });
-                    } else if ((work.currentChapter || 0) > (prev.currentChapter || 0)) {
-                        // Progress update (only log if significant: >= 5 units difference to avoid spam)
-                        const diff = (work.currentChapter || 0) - (prev.currentChapter || 0);
-                        if (diff >= 5) {
-                            const workType = (work.type || 'manga').toLowerCase();
-                            activitiesToLog.push({
-                                userId,
-                                userName,
-                                userPhoto,
-                                type: workType === 'anime' ? 'watch' : 'read',
-                                workId: work.id,
-                                workTitle: work.title,
-                                workImage: work.image || '',
-                                workType: workType,
-                                isVisible,
-                                profileVisibility,
-                                episodeNumber: work.currentChapter || 0,
-                                timestamp: Date.now()
-                            });
-                        }
                     }
                 }
-
-                // Batch write activities (limit to 5 per update to prevent spam)
-                const batch = admin.firestore().batch();
-                const limitedActivities = activitiesToLog.slice(0, 5);
-                for (const activity of limitedActivities) {
-                    const actRef = admin.firestore().collection('activities').doc();
-                    batch.set(actRef, { ...activity, id: actRef.id });
-                }
-                if (limitedActivities.length > 0) {
-                    await batch.commit();
-                    console.log(`[Activity] Logged ${limitedActivities.length} activities for user ${userId}`);
-                }
-            } catch (actError) {
-                // Don't fail the whole trigger if activity logging fails
-                console.error(`[Activity] Error logging activities for ${userId}:`, actError);
             }
 
-            console.log(`[Gamification] Recalculated stats + badges for user ${userId}`);
-            return null;
-        } catch (error) {
-            console.error(`[Gamification] Error updating user ${userId}:`, error);
-            return null;
+            // Batch write activities (limit to 5 per update to prevent spam)
+            const batch = admin.firestore().batch();
+            const limitedActivities = activitiesToLog.slice(0, 5);
+            for (const activity of limitedActivities) {
+                const actRef = admin.firestore().collection('activities').doc();
+                batch.set(actRef, { ...activity, id: actRef.id });
+            }
+            if (limitedActivities.length > 0) {
+                await batch.commit();
+                console.log(`[Activity] Logged ${limitedActivities.length} activities for user ${userId}`);
+            }
+        } catch (actError) {
+            // Don't fail the whole trigger if activity logging fails
+            console.error(`[Activity] Error logging activities for ${userId}:`, actError);
         }
-    });
+
+        console.log(`[Gamification] Recalculated stats + badges for user ${userId}`);
+        return null;
+    } catch (error) {
+        console.error(`[Gamification] Error updating user ${userId}:`, error);
+        return null;
+    }
+});
 
 
 /**
@@ -1015,7 +1014,7 @@ exports.recalculateAllUserStats = onCall({
                 .collection('data')
                 .doc('library')
                 .get();
-            
+
             const works = librarySnap.exists ? (librarySnap.data().works || []) : [];
 
             const gamificationSnap = await admin.firestore()
@@ -1024,7 +1023,7 @@ exports.recalculateAllUserStats = onCall({
                 .collection('data')
                 .doc('gamification')
                 .get();
-            
+
             const gamData = gamificationSnap.exists ? gamificationSnap.data() : {};
             const bonusXp = gamData.bonusXp || 0;
             const streak = gamData.streak || 0;
@@ -1046,10 +1045,10 @@ exports.recalculateAllUserStats = onCall({
                 .doc(userId)
                 .collection('data')
                 .doc('gamification'), {
-                    ...stats,
-                    badges,
-                    lastUpdated: Date.now()
-                }, { merge: true });
+                ...stats,
+                badges,
+                lastUpdated: Date.now()
+            }, { merge: true });
 
             results.updated++;
             batchCount++;
@@ -1267,293 +1266,293 @@ exports.rejectFriendRequestFn = onCall({ cors: true }, async (request) => {
  * @param {() => Promise<*>}  fetchFn  Called on cache miss to get fresh data
  */
 async function cachedFetch(cacheKey, ttl, fetchFn) {
-  const cached = await readCache(cacheKey, ttl);
-  if (cached.hit) {
-    if (cached.stale) {
-      console.log(`[cachedFetch] Stale — refreshing in background: ${cacheKey}`);
-      fetchFn().then((data) => data !== null && writeCache(cacheKey, data)).catch((err) => {
-        console.warn(`[cachedFetch] Background refresh failed for ${cacheKey}:`, err.message);
-      });
+    const cached = await readCache(cacheKey, ttl);
+    if (cached.hit) {
+        if (cached.stale) {
+            console.log(`[cachedFetch] Stale — refreshing in background: ${cacheKey}`);
+            fetchFn().then((data) => data !== null && writeCache(cacheKey, data)).catch((err) => {
+                console.warn(`[cachedFetch] Background refresh failed for ${cacheKey}:`, err.message);
+            });
+        }
+        return cached.data;
     }
-    return cached.data;
-  }
-  console.log(`[cachedFetch] Calling Jikan for: ${cacheKey}`);
-  const t0 = Date.now();
-  const data = await fetchFn();
-  console.log(`[cachedFetch] Jikan responded in ${Date.now() - t0}ms for: ${cacheKey}`);
-  if (data !== null) await writeCache(cacheKey, data);
-  return data;
+    console.log(`[cachedFetch] Calling Jikan for: ${cacheKey}`);
+    const t0 = Date.now();
+    const data = await fetchFn();
+    console.log(`[cachedFetch] Jikan responded in ${Date.now() - t0}ms for: ${cacheKey}`);
+    if (data !== null) await writeCache(cacheKey, data);
+    return data;
 }
 
 // GET /anime|manga/{id}/full
 exports.getWorkDetails = onCall({ cors: true }, async (request) => {
-  const { id, type } = request.data;
-  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
-  console.log(`[getWorkDetails] id=${id} type=${type}`);
-  const key = `${type}_details_${id}`;
-  return cachedFetch(key, TTL_MS.DETAILS, () => jikanFetch(`/${type}/${id}/full`));
+    const { id, type } = request.data;
+    if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+    console.log(`[getWorkDetails] id=${id} type=${type}`);
+    const key = `${type}_details_${id}`;
+    return cachedFetch(key, TTL_MS.DETAILS, () => jikanFetch(`/${type}/${id}/full`));
 });
 
 // Search anime or manga
 exports.searchWorks = onCall({ cors: true }, async (request) => {
-  const { query, type, page = 1 } = request.data;
-  if (!query || !type) throw new HttpsError('invalid-argument', 'query and type are required');
-  const key = `search_${type}_${Buffer.from(`${query}_p${page}`).toString('base64').slice(0, 40)}`;
-  return cachedFetch(key, TTL_MS.SEARCH, () =>
-    jikanFetch(`/${type}?q=${encodeURIComponent(query)}&page=${page}&sfw=true`, true)
-  );
+    const { query, type, page = 1 } = request.data;
+    if (!query || !type) throw new HttpsError('invalid-argument', 'query and type are required');
+    const key = `search_${type}_${Buffer.from(`${query}_p${page}`).toString('base64').slice(0, 40)}`;
+    return cachedFetch(key, TTL_MS.SEARCH, () =>
+        jikanFetch(`/${type}?q=${encodeURIComponent(query)}&page=${page}&sfw=true`, true)
+    );
 });
 
 // Characters
 exports.getWorkCharacters = onCall({ cors: true }, async (request) => {
-  const { id, type } = request.data;
-  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
-  const key = `${type}_characters_${id}`;
-  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/${type}/${id}/characters`));
+    const { id, type } = request.data;
+    if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+    const key = `${type}_characters_${id}`;
+    return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/${type}/${id}/characters`));
 });
 
 // Relations
 exports.getWorkRelations = onCall({ cors: true }, async (request) => {
-  const { id, type } = request.data;
-  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
-  const key = `${type}_relations_${id}`;
-  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/${type}/${id}/relations`));
+    const { id, type } = request.data;
+    if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+    const key = `${type}_relations_${id}`;
+    return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/${type}/${id}/relations`));
 });
 
 // Pictures
 exports.getWorkPictures = onCall({ cors: true }, async (request) => {
-  const { id, type } = request.data;
-  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
-  const key = `${type}_pictures_${id}`;
-  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/${type}/${id}/pictures`));
+    const { id, type } = request.data;
+    if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+    const key = `${type}_pictures_${id}`;
+    return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/${type}/${id}/pictures`));
 });
 
 // Statistics
 exports.getWorkStatistics = onCall({ cors: true }, async (request) => {
-  const { id, type } = request.data;
-  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
-  const key = `${type}_stats_${id}`;
-  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/${type}/${id}/statistics`));
+    const { id, type } = request.data;
+    if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+    const key = `${type}_stats_${id}`;
+    return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/${type}/${id}/statistics`));
 });
 
 // Recommendations
 exports.getWorkRecommendations = onCall({ cors: true }, async (request) => {
-  const { id, type } = request.data;
-  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
-  const key = `${type}_recs_${id}`;
-  return cachedFetch(key, TTL_MS.RECOMMENDATIONS, () => jikanFetch(`/${type}/${id}/recommendations`));
+    const { id, type } = request.data;
+    if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+    const key = `${type}_recs_${id}`;
+    return cachedFetch(key, TTL_MS.RECOMMENDATIONS, () => jikanFetch(`/${type}/${id}/recommendations`));
 });
 
 // Anime episodes (paginated)
 exports.getAnimeEpisodes = onCall({ cors: true }, async (request) => {
-  const { id, page = 1 } = request.data;
-  if (!id) throw new HttpsError('invalid-argument', 'id is required');
-  const key = `anime_episodes_${id}_p${page}`;
-  return cachedFetch(key, TTL_MS.EPISODES, () => jikanFetch(`/anime/${id}/episodes?page=${page}`, true));
+    const { id, page = 1 } = request.data;
+    if (!id) throw new HttpsError('invalid-argument', 'id is required');
+    const key = `anime_episodes_${id}_p${page}`;
+    return cachedFetch(key, TTL_MS.EPISODES, () => jikanFetch(`/anime/${id}/episodes?page=${page}`, true));
 });
 
 // Anime streaming links
 exports.getAnimeStreaming = onCall({ cors: true }, async (request) => {
-  const { id } = request.data;
-  if (!id) throw new HttpsError('invalid-argument', 'id is required');
-  const key = `anime_streaming_${id}`;
-  return cachedFetch(key, TTL_MS.STREAMING, () => jikanFetch(`/anime/${id}/streaming`));
+    const { id } = request.data;
+    if (!id) throw new HttpsError('invalid-argument', 'id is required');
+    const key = `anime_streaming_${id}`;
+    return cachedFetch(key, TTL_MS.STREAMING, () => jikanFetch(`/anime/${id}/streaming`));
 });
 
 // Anime staff
 exports.getAnimeStaff = onCall({ cors: true }, async (request) => {
-  const { id } = request.data;
-  if (!id) throw new HttpsError('invalid-argument', 'id is required');
-  const key = `anime_staff_${id}`;
-  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/anime/${id}/staff`));
+    const { id } = request.data;
+    if (!id) throw new HttpsError('invalid-argument', 'id is required');
+    const key = `anime_staff_${id}`;
+    return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/anime/${id}/staff`));
 });
 
 // Anime themes (openings/endings)
 exports.getAnimeThemes = onCall({ cors: true }, async (request) => {
-  const { id } = request.data;
-  if (!id) throw new HttpsError('invalid-argument', 'id is required');
-  const key = `anime_themes_${id}`;
-  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/anime/${id}/themes`));
+    const { id } = request.data;
+    if (!id) throw new HttpsError('invalid-argument', 'id is required');
+    const key = `anime_themes_${id}`;
+    return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/anime/${id}/themes`));
 });
 
 // Reviews
 exports.getWorkReviews = onCall({ cors: true }, async (request) => {
-  const { id, type } = request.data;
-  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
-  const key = `${type}_reviews_${id}`;
-  return cachedFetch(key, TTL_MS.SECONDARY, () =>
-    jikanFetch(`/${type}/${id}/reviews?spoilers=false&preliminary=false`)
-  );
+    const { id, type } = request.data;
+    if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+    const key = `${type}_reviews_${id}`;
+    return cachedFetch(key, TTL_MS.SECONDARY, () =>
+        jikanFetch(`/${type}/${id}/reviews?spoilers=false&preliminary=false`)
+    );
 });
 
 // French synopsis from Nautiljon
 exports.getFRTranslation = onCall({ cors: true }, async (request) => {
-  const { id, type, titleFrench, titleRomaji } = request.data;
-  if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
+    const { id, type, titleFrench, titleRomaji } = request.data;
+    if (!id || !type) throw new HttpsError('invalid-argument', 'id and type are required');
 
-  console.log(`[getFRTranslation] id=${id} type=${type} titleFrench="${titleFrench}" titleRomaji="${titleRomaji}"`);
-  const key = `fr_${type}_${id}`;
-  const cached = await readTranslation(key);
-  if (cached.hit) {
-    if (cached.notFound) {
-      console.log(`[getFRTranslation] Negative cache hit — no FR translation for ${key}`);
-      return null;
+    console.log(`[getFRTranslation] id=${id} type=${type} titleFrench="${titleFrench}" titleRomaji="${titleRomaji}"`);
+    const key = `fr_${type}_${id}`;
+    const cached = await readTranslation(key);
+    if (cached.hit) {
+        if (cached.notFound) {
+            console.log(`[getFRTranslation] Negative cache hit — no FR translation for ${key}`);
+            return null;
+        }
+        console.log(`[getFRTranslation] Cache hit — returning stored FR synopsis for ${key}`);
+        return cached.synopsis;
     }
-    console.log(`[getFRTranslation] Cache hit — returning stored FR synopsis for ${key}`);
-    return cached.synopsis;
-  }
 
-  console.log(`[getFRTranslation] Scraping Nautiljon for ${key}...`);
-  const synopsis = await scrapeFRSynopsis(titleFrench, titleRomaji, type);
-  if (synopsis) {
-    console.log(`[getFRTranslation] Scraped synopsis (${synopsis.length} chars) for ${key}`);
-  } else {
-    console.log(`[getFRTranslation] No FR synopsis found on Nautiljon for ${key}`);
-  }
-  await writeTranslation(key, synopsis);
-  return synopsis;
+    console.log(`[getFRTranslation] Scraping Nautiljon for ${key}...`);
+    const synopsis = await scrapeFRSynopsis(titleFrench, titleRomaji, type);
+    if (synopsis) {
+        console.log(`[getFRTranslation] Scraped synopsis (${synopsis.length} chars) for ${key}`);
+    } else {
+        console.log(`[getFRTranslation] No FR synopsis found on Nautiljon for ${key}`);
+    }
+    await writeTranslation(key, synopsis);
+    return synopsis;
 });
 
 // ── Catalog ────────────────────────────────────────────────────────────────
 
 // Top anime or manga (trending/popular/upcoming)
 exports.getTopWorks = onCall({ cors: true }, async (request) => {
-  const { type, filter = 'bypopularity', limit = 24, nsfwMode = false } = request.data;
-  if (!type) throw new HttpsError('invalid-argument', 'type is required');
-  const key = `top_${type}_${filter}_${limit}_nsfw_${nsfwMode}`;
-  return cachedFetch(key, TTL_MS.SEARCH, () =>
-    jikanFetch(`/top/${type}?filter=${filter}&limit=${limit}&sfw=${!nsfwMode}`)
-  );
+    const { type, filter = 'bypopularity', limit = 24, nsfwMode = false } = request.data;
+    if (!type) throw new HttpsError('invalid-argument', 'type is required');
+    const key = `top_${type}_${filter}_${limit}_nsfw_${nsfwMode}`;
+    return cachedFetch(key, TTL_MS.SEARCH, () =>
+        jikanFetch(`/top/${type}?filter=${filter}&limit=${limit}&sfw=${!nsfwMode}`)
+    );
 });
 
 // Current season anime
 exports.getSeasonalAnime = onCall({ cors: true }, async (request) => {
-  const { limit = 24, nsfwMode = false } = request.data;
-  const key = `seasonal_${limit}_nsfw_${nsfwMode}`;
-  return cachedFetch(key, TTL_MS.SEARCH, () =>
-    jikanFetch(`/seasons/now?limit=${limit}&sfw=${!nsfwMode}`)
-  );
+    const { limit = 24, nsfwMode = false } = request.data;
+    const key = `seasonal_${limit}_nsfw_${nsfwMode}`;
+    return cachedFetch(key, TTL_MS.SEARCH, () =>
+        jikanFetch(`/seasons/now?limit=${limit}&sfw=${!nsfwMode}`)
+    );
 });
 
 // Weekly broadcast schedule
 exports.getAnimeSchedule = onCall({ cors: true }, async (request) => {
-  const { filter, nsfwMode = false } = request.data;
-  const key = `schedule_${filter || 'all'}_nsfw_${nsfwMode}`;
-  const url = filter
-    ? `/schedules?filter=${filter}&sfw=${!nsfwMode}`
-    : `/schedules?sfw=${!nsfwMode}`;
-  return cachedFetch(key, TTL_MS.SEARCH, () => jikanFetch(url));
+    const { filter, nsfwMode = false } = request.data;
+    const key = `schedule_${filter || 'all'}_nsfw_${nsfwMode}`;
+    const url = filter
+        ? `/schedules?filter=${filter}&sfw=${!nsfwMode}`
+        : `/schedules?sfw=${!nsfwMode}`;
+    return cachedFetch(key, TTL_MS.SEARCH, () => jikanFetch(url));
 });
 
 // ── Characters ─────────────────────────────────────────────────────────────
 
 exports.getCharacterById = onCall({ cors: true }, async (request) => {
-  const { id } = request.data;
-  if (!id) throw new HttpsError('invalid-argument', 'id is required');
-  const key = `character_${id}`;
-  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/characters/${id}`));
+    const { id } = request.data;
+    if (!id) throw new HttpsError('invalid-argument', 'id is required');
+    const key = `character_${id}`;
+    return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/characters/${id}`));
 });
 
 exports.getCharacterFull = onCall({ cors: true }, async (request) => {
-  const { id } = request.data;
-  if (!id) throw new HttpsError('invalid-argument', 'id is required');
-  const key = `character_full_${id}`;
-  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/characters/${id}/full`));
+    const { id } = request.data;
+    if (!id) throw new HttpsError('invalid-argument', 'id is required');
+    const key = `character_full_${id}`;
+    return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/characters/${id}/full`));
 });
 
 exports.searchCharacters = onCall({ cors: true }, async (request) => {
-  const { query, limit = 25 } = request.data;
-  if (!query) throw new HttpsError('invalid-argument', 'query is required');
-  const key = `search_chars_${Buffer.from(query).toString('base64').slice(0, 40)}_${limit}`;
-  return cachedFetch(key, TTL_MS.SEARCH, () =>
-    jikanFetch(`/characters?q=${encodeURIComponent(query)}&limit=${limit}`)
-  );
+    const { query, limit = 25 } = request.data;
+    if (!query) throw new HttpsError('invalid-argument', 'query is required');
+    const key = `search_chars_${Buffer.from(query).toString('base64').slice(0, 40)}_${limit}`;
+    return cachedFetch(key, TTL_MS.SEARCH, () =>
+        jikanFetch(`/characters?q=${encodeURIComponent(query)}&limit=${limit}`)
+    );
 });
 
 // ── People ─────────────────────────────────────────────────────────────────
 
 exports.getPersonById = onCall({ cors: true }, async (request) => {
-  const { id } = request.data;
-  if (!id) throw new HttpsError('invalid-argument', 'id is required');
-  const key = `person_${id}`;
-  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/people/${id}`));
+    const { id } = request.data;
+    if (!id) throw new HttpsError('invalid-argument', 'id is required');
+    const key = `person_${id}`;
+    return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/people/${id}`));
 });
 
 exports.getPersonFull = onCall({ cors: true }, async (request) => {
-  const { id } = request.data;
-  if (!id) throw new HttpsError('invalid-argument', 'id is required');
-  const key = `person_full_${id}`;
-  return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/people/${id}/full`));
+    const { id } = request.data;
+    if (!id) throw new HttpsError('invalid-argument', 'id is required');
+    const key = `person_full_${id}`;
+    return cachedFetch(key, TTL_MS.SECONDARY, () => jikanFetch(`/people/${id}/full`));
 });
 
 exports.searchPeople = onCall({ cors: true }, async (request) => {
-  const { query, limit = 15 } = request.data;
-  if (!query) throw new HttpsError('invalid-argument', 'query is required');
-  const key = `search_people_${Buffer.from(query).toString('base64').slice(0, 40)}_${limit}`;
-  return cachedFetch(key, TTL_MS.SEARCH, () =>
-    jikanFetch(`/people?q=${encodeURIComponent(query)}&limit=${limit}`)
-  );
+    const { query, limit = 15 } = request.data;
+    if (!query) throw new HttpsError('invalid-argument', 'query is required');
+    const key = `search_people_${Buffer.from(query).toString('base64').slice(0, 40)}_${limit}`;
+    return cachedFetch(key, TTL_MS.SEARCH, () =>
+        jikanFetch(`/people?q=${encodeURIComponent(query)}&limit=${limit}`)
+    );
 });
 
 // ── Misc ───────────────────────────────────────────────────────────────────
 
 // Single episode details
 exports.getAnimeEpisodeDetails = onCall({ cors: true }, async (request) => {
-  const { id, episodeId } = request.data;
-  if (!id || !episodeId) throw new HttpsError('invalid-argument', 'id and episodeId are required');
-  const key = `anime_episode_detail_${id}_${episodeId}`;
-  return cachedFetch(key, TTL_MS.EPISODES, () =>
-    jikanFetch(`/anime/${id}/episodes/${episodeId}`)
-  );
+    const { id, episodeId } = request.data;
+    if (!id || !episodeId) throw new HttpsError('invalid-argument', 'id and episodeId are required');
+    const key = `anime_episode_detail_${id}_${episodeId}`;
+    return cachedFetch(key, TTL_MS.EPISODES, () =>
+        jikanFetch(`/anime/${id}/episodes/${episodeId}`)
+    );
 });
 
 // Random anime — no cache (result changes by nature)
 exports.getRandomAnime = onCall({ cors: true }, async (request) => {
-  const { nsfwMode = false } = request.data;
-  return jikanFetch(`/random/anime?sfw=${!nsfwMode}`);
+    const { nsfwMode = false } = request.data;
+    return jikanFetch(`/random/anime?sfw=${!nsfwMode}`);
 });
 
 // Jikan availability check — no cache
 exports.getJikanStatus = onCall({ cors: true }, async () => {
-  const startTime = Date.now();
-  try {
-    await jikanFetch('/anime/1');
-    return { status: 'online', responseTime: Date.now() - startTime, timestamp: Date.now() };
-  } catch (error) {
-    return {
-      status: 'offline',
-      responseTime: Date.now() - startTime,
-      message: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: Date.now(),
-    };
-  }
+    const startTime = Date.now();
+    try {
+        await jikanFetch('/anime/1');
+        return { status: 'online', responseTime: Date.now() - startTime, timestamp: Date.now() };
+    } catch (error) {
+        return {
+            status: 'offline',
+            responseTime: Date.now() - startTime,
+            message: error instanceof Error ? error.message : 'Unknown error',
+            timestamp: Date.now(),
+        };
+    }
 });
 
 // Scheduled background sync — refresh stale cache entries (runs daily at 3am UTC)
 exports.syncStaleCache = onSchedule('0 3 * * *', async () => {
-  const db = admin.firestore();
-  const now = Date.now();
-  // Refresh details entries older than 20h (before 24h TTL expires)
-  const staleThreshold = Timestamp.fromMillis(now - 20 * 60 * 60 * 1000);
+    const db = admin.firestore();
+    const now = Date.now();
+    // Refresh details entries older than 20h (before 24h TTL expires)
+    const staleThreshold = Timestamp.fromMillis(now - 20 * 60 * 60 * 1000);
 
-  const snapshot = await db.collection('apiCache')
-    .where('fetchedAt', '<', staleThreshold)
-    .limit(50)
-    .get();
+    const snapshot = await db.collection('apiCache')
+        .where('fetchedAt', '<', staleThreshold)
+        .limit(50)
+        .get();
 
-  const refreshPromises = snapshot.docs.map(async (doc) => {
-    const key = doc.id;
-    const match = key.match(/^(anime|manga)_details_(\d+)$/);
-    if (!match) return;
-    const [, type, id] = match;
-    try {
-      const data = await jikanFetch(`/${type}/${id}/full`);
-      if (data) await writeCache(key, data);
-    } catch (err) {
-      console.warn(`[SyncStale] Failed to refresh ${key}:`, err.message);
-    }
-  });
+    const refreshPromises = snapshot.docs.map(async (doc) => {
+        const key = doc.id;
+        const match = key.match(/^(anime|manga)_details_(\d+)$/);
+        if (!match) return;
+        const [, type, id] = match;
+        try {
+            const data = await jikanFetch(`/${type}/${id}/full`);
+            if (data) await writeCache(key, data);
+        } catch (err) {
+            console.warn(`[SyncStale] Failed to refresh ${key}:`, err.message);
+        }
+    });
 
-  await Promise.allSettled(refreshPromises);
-  console.log(`[SyncStale] Refreshed ${snapshot.docs.length} entries`);
+    await Promise.allSettled(refreshPromises);
+    console.log(`[SyncStale] Refreshed ${snapshot.docs.length} entries`);
 });
