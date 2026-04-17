@@ -99,14 +99,13 @@ function calculateUserStats(libraryWorks, bonusXp = 0) {
 
         totalXpFromLibrary += XP_REWARDS.ADD_WORK;
 
-        let effectiveProgress = 0;
-        if (total && total > 0) {
-            effectiveProgress = Math.min(progress, total);
-        }
+        const typeCap = type === 'anime' ? MAX_EPISODES : MAX_CHAPTERS;
+        let effectiveProgress = (total > 0)
+            ? Math.min(progress, total, typeCap)
+            : Math.min(progress, typeCap);
 
         if (type === 'anime' || type === 'manga') {
-            const cap = type === 'anime' ? MAX_EPISODES : MAX_CHAPTERS;
-            effectiveProgress = Math.min(effectiveProgress, cap);
+            const cap = typeCap;
 
             if (type === 'anime') {
                 if (w.format === 'Movie') {

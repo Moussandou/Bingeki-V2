@@ -211,13 +211,10 @@ export const useGamificationStore = create<GamificationState>()(
                     const total = w.totalChapters || w.totalEpisodes || 0;
                     const type = w.type ? w.type.toLowerCase() : 'manga';
 
-                    // Skip progress XP when total is unknown (anti-cheat)
-                    let effectiveProgress = 0;
-                    if (total && total > 0) {
-                        effectiveProgress = Math.min(progress, total);
-                    } else if (progress > 0) {
-                        effectiveProgress = 0;
-                    }
+                    const typeCap = type === 'anime' ? 2500 : 5000;
+                    const effectiveProgress = (total > 0)
+                        ? Math.min(progress, total, typeCap)
+                        : Math.min(progress, typeCap);
 
                     if (type === 'manga') {
                         chapters += progress;
