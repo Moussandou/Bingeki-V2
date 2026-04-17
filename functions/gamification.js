@@ -13,6 +13,7 @@ const XP_REWARDS = {
     ADD_WORK: 15,
     UPDATE_PROGRESS: 5,
     COMPLETE_WORK: 50,
+    WATCH_MOVIE: 20,
 };
 
 const MAX_EPISODES = 2500;
@@ -110,7 +111,7 @@ function calculateUserStats(libraryWorks, bonusXp = 0) {
             if (type === 'anime') {
                 if (w.format === 'Movie') {
                     totalMoviesWatched += (w.status === 'completed' ? 1 : 0);
-                    totalXpFromLibrary += (w.status === 'completed' ? 20 : 0);
+                    totalXpFromLibrary += (w.status === 'completed' ? XP_REWARDS.WATCH_MOVIE : 0);
                 } else {
                     totalAnimeEpisodesWatched += effectiveProgress;
                     totalXpFromLibrary += Math.min(effectiveProgress * XP_REWARDS.UPDATE_PROGRESS, MAX_XP_PER_WORK);
@@ -175,7 +176,8 @@ exports.onLibraryUpdate = onDocumentWritten('users/{userId}/data/library', async
             .get();
 
         const gamData = gamificationSnap.exists ? gamificationSnap.data() : {};
-        const bonusXp = Math.min(gamData.bonusXp || 0, 50000);
+        const rawBonus = Number(gamData.bonusXp) || 0;
+        const bonusXp = Math.min(rawBonus, 50000);
         const streak = gamData.streak || 0;
         const lastActivityDate = gamData.lastActivityDate || null;
         const existingBadges = gamData.badges || [];
@@ -298,7 +300,8 @@ exports.recalculateAllUserStats = onCall({
             const gamificationSnap = await admin.firestore()
                 .collection('users').doc(userId).collection('data').doc('gamification').get();
             const gamData = gamificationSnap.exists ? gamificationSnap.data() : {};
-            const bonusXp = gamData.bonusXp || 0;
+            const rawBonus = Number(gamData.bonusXp) || 0;
+            const bonusXp = Math.min(rawBonus, 50000);
             const streak = gamData.streak || 0;
             const existingBadges = gamData.badges || [];
 
