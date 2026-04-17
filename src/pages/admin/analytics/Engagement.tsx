@@ -24,7 +24,7 @@ export default function EngagementAnalytics() {
                     getEngagementBreakdown(),
                     getTopContentStats(10)
                 ]);
-                setEngagementData(engagement as Record<string, number>);
+                setEngagementData(engagement as unknown as Record<string, number>);
                 setTopContent(top);
             } catch (e) {
                 console.error("Failed to load engagement analytics", e);

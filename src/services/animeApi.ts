@@ -30,7 +30,7 @@ import {
     getRandomAnimeFn,
     getJikanStatusFn,
 } from '@/firebase/functions';
-import type { HttpsCallable } from 'firebase/functions';
+
 
 export type CallOptions = QueueOptions;
 
@@ -155,8 +155,9 @@ const setCache = <T>(key: string, data: T, isError: boolean = false) => {
 const inflight = new Map<string, Promise<unknown>>();
 
 
-async function callProxy<T, I = unknown>(
-    fn: HttpsCallable<I, unknown>,
+async function callProxy<T, I = any>(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    fn: any,
     args: I,
     cacheKey: string,
     ttl: number,

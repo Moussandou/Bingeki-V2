@@ -327,7 +327,7 @@ export const useGamificationStore = create<GamificationState>()(
                     }
                 }
 
-                const totalXp = profile.totalXp || calculateCumulativeXp(level, xp);
+                const totalXp = (profile.totalXp as number) || calculateCumulativeXp(level, xp);
 
                 // Anti-regression: don't overwrite if local XP is ahead
                 if (state.totalXp > totalXp) {
@@ -348,7 +348,7 @@ export const useGamificationStore = create<GamificationState>()(
                     state.totalMoviesWatched === totalMoviesWatched &&
                     state.totalWorksAdded === totalWorksAdded &&
                     state.totalWorksCompleted === totalWorksCompleted &&
-                    JSON.stringify(state.badges) === JSON.stringify(profile.badges || [])
+                    JSON.stringify(state.badges) === JSON.stringify((profile.badges as Badge[]) || [])
                 ) {
                     return;
                 }
@@ -367,7 +367,7 @@ export const useGamificationStore = create<GamificationState>()(
                     streak: streak,
                     lastActivityDate,
                     bonusXp,
-                    badges: profile.badges || [],
+                    badges: (profile.badges as Badge[]) || [],
                     totalChaptersRead,
                     totalAnimeEpisodesWatched,
                     totalMoviesWatched,

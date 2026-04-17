@@ -181,7 +181,7 @@ export default function AdminHealth() {
             ]);
             setReport(healthReport);
             setAdminStats(stats);
-            setScoreHistory(history as ScoreHistoryEntry[]);
+            setScoreHistory(history as unknown as ScoreHistoryEntry[]);
             setRepairHistory(repairLog);
             setHasPermissionError(false);
             setLastRefresh(new Date());
@@ -201,7 +201,7 @@ export default function AdminHealth() {
             }
         } catch (error: unknown) {
             console.error('[Health] Failed to fetch health data:', error);
-            if (error?.code === 'permission-denied' || error?.message?.includes('permissions')) {
+            if ((error as any)?.code === 'permission-denied' || (error as any)?.message?.includes('permissions')) {
                 setHasPermissionError(true);
             }
         } finally {
@@ -937,7 +937,7 @@ export default function AdminHealth() {
                                         >
                                             <div className={styles.sessionMain}>
                                                 <span className={styles.sessionTime}>
-                                                    {new Date(session.timestamp).toLocaleString()}
+                                                    {new Date(session.timestamp as number).toLocaleString()}
                                                 </span>
                                                 <span className={styles.sessionAdmin}>
                                                     by <strong>{session.adminName}</strong>
@@ -1009,25 +1009,25 @@ export default function AdminHealth() {
                         ) : (
                             <div className={styles.historyTimeline}>
                                 {[...scoreHistory].reverse().map((entry, index) => (
-                                    <div key={entry.id || index} className={styles.snapshotCard}>
+                                    <div key={(entry as any).id || index} className={styles.snapshotCard}>
                                         <div className={styles.snapshotInfo}>
                                             <span className={styles.snapshotDate}>
-                                                {new Date(entry.timestamp).toLocaleString()}
+                                                {new Date((entry.timestamp as any).seconds ? (entry.timestamp as any).seconds * 1000 : entry.timestamp as number).toLocaleString()}
                                             </span>
                                             <div className={styles.snapshotSummary}>
                                                 <div className={styles.summaryItem}>
                                                     <div className={`${styles.statusIndicator} ${
-                                                        entry.summary?.infraStatus === 'operational' 
+                                                        (entry as any).summary?.infraStatus === 'operational' 
                                                             ? styles.statusOperational 
                                                             : styles.statusDegraded
                                                     }`} />
-                                                    {entry.summary?.infraStatus === 'operational' ? 'Infra OK' : 'Degraded'}
+                                                    {(entry as any).summary?.infraStatus === 'operational' ? 'Infra OK' : 'Degraded'}
                                                 </div>
                                                 <div className={styles.summaryItem}>
-                                                    <UserCheck size={12} /> {entry.summary?.users || 0} users
+                                                    <UserCheck size={12} /> {(entry as any).summary?.users || 0} users
                                                 </div>
                                                 <div className={styles.summaryItem}>
-                                                    <AlertTriangle size={12} /> {entry.summary?.issues || 0} issues
+                                                    <AlertTriangle size={12} /> {(entry as any).summary?.issues || 0} issues
                                                 </div>
                                             </div>
                                         </div>

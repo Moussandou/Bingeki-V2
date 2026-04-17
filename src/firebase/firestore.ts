@@ -546,7 +546,7 @@ export function subscribeToUserProfile(uid: string, callback: (profile: UserProf
 }
 
 // Send Friend Request (via Cloud Function)
-export async function sendFriendRequest(currentUserId: string, currentUserData: { displayName: string, photoURL: string }, targetUser: UserProfile): Promise<void> {
+export async function sendFriendRequest(_currentUserId: string, _currentUserData: { displayName: string, photoURL: string }, targetUser: UserProfile): Promise<void> {
     try {
         const { httpsCallable } = await import('firebase/functions');
         const { functions } = await import('./config');
@@ -560,7 +560,7 @@ export async function sendFriendRequest(currentUserId: string, currentUserData: 
 }
 
 // Accept Friend Request (via Cloud Function)
-export async function acceptFriendRequest(currentUserId: string, friendUid: string): Promise<void> {
+export async function acceptFriendRequest(_currentUserId: string, friendUid: string): Promise<void> {
     try {
         const { httpsCallable } = await import('firebase/functions');
         const { functions } = await import('./config');
@@ -574,7 +574,7 @@ export async function acceptFriendRequest(currentUserId: string, friendUid: stri
 }
 
 // Reject/Remove Friend Request (via Cloud Function)
-export async function rejectFriendRequest(currentUserId: string, friendUid: string): Promise<void> {
+export async function rejectFriendRequest(_currentUserId: string, friendUid: string): Promise<void> {
     try {
         const { httpsCallable } = await import('firebase/functions');
         const { functions } = await import('./config');

@@ -97,7 +97,7 @@ export default function AdminDashboard() {
                 if (Array.isArray(weeklyStats)) {
                     setChartData(weeklyStats.filter((item): item is ChartData => item !== undefined));
                 }
-                setEngagementData(engagement as Record<string, number>);
+                setEngagementData(engagement as unknown as Record<string, number>);
                 setTopContent(top);
                 setFunnelData(funnel);
 
