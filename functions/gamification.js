@@ -175,7 +175,7 @@ exports.onLibraryUpdate = onDocumentWritten('users/{userId}/data/library', async
             .get();
 
         const gamData = gamificationSnap.exists ? gamificationSnap.data() : {};
-        const bonusXp = gamData.bonusXp || 0;
+        const bonusXp = Math.min(gamData.bonusXp || 0, 50000);
         const streak = gamData.streak || 0;
         const lastActivityDate = gamData.lastActivityDate || null;
         const existingBadges = gamData.badges || [];
