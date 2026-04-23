@@ -4,7 +4,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { initializeFirestore, memoryLocalCache, connectFirestoreEmulator } from 'firebase/firestore';
-import { getAnalytics } from 'firebase/analytics';
+// getAnalytics is imported dynamically below for safe initialization
 import { getStorage } from 'firebase/storage';
 import { getMessaging } from 'firebase/messaging';
 import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
@@ -26,7 +26,38 @@ export const db = initializeFirestore(app, {
     localCache: memoryLocalCache()
 });
 export const storage = getStorage(app);
-export const analytics = getAnalytics(app);
+
+// Safe Analytics initialization
+export let analytics: any;
+if (typeof window !== 'undefined') {
+    import('firebase/analytics').then(({ getAnalytics, isSupported }) => {
+        isSupported().then(supported => {
+            if (supported) {
+                try {
+                    analytics = getAnalytics(app);
+                } catch (e) {
+                    // Silently fail if blocked by ad-blocker
+                }
+            }
+        });
+    }).catch(() => {
+        // Script itself might be blocked
+    });
+
+    // Dynamic AdSense loader to prevent hard errors in index.html
+    const loadAdSense = () => {
+        if (import.meta.env.DEV) return;
+        const script = document.createElement('script');
+        script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4069337726482631";
+        script.async = true;
+        script.crossOrigin = "anonymous";
+        document.head.appendChild(script);
+    };
+    
+    // Use a small delay to prioritize main content
+    setTimeout(loadAdSense, 2000);
+}
+
 export const messaging = getMessaging(app);
 export const functions = getFunctions(app);
 

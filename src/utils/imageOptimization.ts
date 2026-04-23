@@ -98,6 +98,11 @@ export function getFirebaseThumbnail(
     return originalUrl || '';
   }
 
+  // Skip thumbnails for user avatars and personal folders as they often don't have thumbnails generated
+  if (originalUrl.includes('%2Fusers%2F') || originalUrl.includes('%2Favatars%2F')) {
+    return originalUrl;
+  }
+
   try {
     // 1. Inject 'thumbnails%2F' into the storage path
     let thumbUrl = originalUrl.replace('/o/', '/o/thumbnails%2F');
