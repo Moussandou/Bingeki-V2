@@ -39,6 +39,7 @@ export function AdminLayout() {
             <AdminSidebar
                 isOpen={isMobileMenuOpen}
                 onClose={() => setIsMobileMenuOpen(false)}
+                onOpenCommandPalette={() => setIsPaletteOpen(true)}
             />
 
             <main className={styles.main}>

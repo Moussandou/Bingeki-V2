@@ -12,9 +12,10 @@ import styles from './AdminSidebar.module.css';
 interface AdminSidebarProps {
     isOpen: boolean;
     onClose: () => void;
+    onOpenCommandPalette?: () => void;
 }
 
-export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
+export function AdminSidebar({ isOpen, onClose, onOpenCommandPalette }: AdminSidebarProps) {
     const { logout } = useAuthStore();
     const [isHovered, setIsHovered] = useState(false);
     const { t } = useTranslation();
@@ -85,6 +86,45 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                         <X size={24} />
                     </button>
                 </div>
+
+                {/* Search Trigger */}
+                {onOpenCommandPalette && (
+                    <div style={{ padding: '0.5rem 1rem' }}>
+                        <button
+                            onClick={onOpenCommandPalette}
+                            style={{
+                                width: '100%',
+                                background: 'rgba(255, 255, 255, 0.05)',
+                                border: '1px solid var(--color-border)',
+                                color: 'var(--color-text-muted)',
+                                padding: '0.5rem',
+                                borderRadius: '4px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: isExpanded ? 'space-between' : 'center',
+                                cursor: 'pointer',
+                                transition: 'background 0.2s'
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                {isExpanded && <span style={{ fontSize: '0.8rem' }}>Rechercher...</span>}
+                            </div>
+                            {isExpanded && (
+                                <span style={{ 
+                                    fontSize: '0.65rem', 
+                                    background: 'var(--color-surface)', 
+                                    padding: '0.15rem 0.35rem', 
+                                    borderRadius: '3px',
+                                    fontWeight: 'bold',
+                                    opacity: 0.8
+                                }}>⌘K</span>
+                            )}
+                        </button>
+                    </div>
+                )}
 
                 {/* Navigation */}
                 <nav className={styles.nav}>

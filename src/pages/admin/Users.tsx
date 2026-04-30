@@ -2,6 +2,7 @@
  * Users page
  */
 import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Search, Shield, Ban, ExternalLink, Edit, Eye, Trash2, Clock, Circle, ArrowUpDown, LayoutGrid, List, Download, Copy, Check, Database } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Switch } from '@/components/ui/Switch';
@@ -20,6 +21,7 @@ export default function AdminUsers() {
     const [loading, setLoading] = useState(true);
     const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
     const [filter, setFilter] = useState<'all' | 'admin' | 'banned'>('all');
+    const [searchParams, setSearchParams] = useSearchParams();
 
     // Modal State
     const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
@@ -104,6 +106,20 @@ export default function AdminUsers() {
         };
         load();
     }, []);
+
+    // Auto-open highlighted user from Cmd+K palette
+    useEffect(() => {
+        const highlightUid = searchParams.get('highlight');
+        if (highlightUid && users.length > 0) {
+            const user = users.find(u => u.uid === highlightUid);
+            if (user) {
+                setSelectedUser(user);
+                setModalType('details');
+                // Optional: clear the URL so it doesn't reopen on refresh if intended as a one-off
+                setSearchParams({});
+            }
+        }
+    }, [searchParams, users, setSearchParams]);
 
     const filteredUsers = useMemo(() => {
         const filtered = users.filter(user => {
