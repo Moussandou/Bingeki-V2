@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import {
     Star, Trash2,
     MessageSquare, Send, ChevronDown, ChevronUp,
-    Image as ImageIcon, ExternalLink
+    Image as ImageIcon, ExternalLink, Copy, Check, Clipboard
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import {
@@ -26,6 +26,52 @@ export default function AdminFeedback() {
     const [responseText, setResponseText] = useState('');
     const [isSubmittingResponse, setIsSubmittingResponse] = useState(false);
     const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'resolved'>('open');
+    const [copiedId, setCopiedId] = useState<string | null>(null);
+    const [copiedImageIdx, setCopiedImageIdx] = useState<string | null>(null);
+
+    const generateAIPrompt = (item: FeedbackData) => {
+        const imageSection = item.attachments?.length > 0
+            ? `\n\n## Screenshots / Images jointes\n${item.attachments.map((url, i) => `- Image ${i + 1}: ${url}`).join('\n')}\n\n> Note: Ouvre les URLs ci-dessus pour voir les captures d'écran du problème.`
+            : '';
+
+        return `## Contexte\nTu es un développeur travaillant sur **Bingeki**, une plateforme web de suivi d'anime/manga (React + TypeScript + Firebase).\nUn utilisateur a soumis le feedback suivant. Analyse-le et propose une solution technique.\n\n## Feedback Utilisateur\n- **Catégorie**: ${item.category?.toUpperCase() || 'GENERAL'}\n- **Priorité**: ${item.priority?.toUpperCase() || 'MEDIUM'}\n- **Note**: ${item.rating}/10\n- **Date**: ${new Date(item.timestamp).toLocaleString()}\n- **User Agent**: ${item.userAgent || 'N/A'}\n\n### Message\n\`\`\`\n${item.message}\n\`\`\`${imageSection}\n\n## Instructions\n1. Identifie la cause probable du problème / de la demande\n2. Propose les fichiers à modifier et les changements nécessaires\n3. Si c'est un bug, explique comment le reproduire et le corriger\n4. Si c'est une feature request, propose une implémentation`;
+    };
+
+    const handleCopyForAI = async (item: FeedbackData) => {
+        try {
+            const prompt = generateAIPrompt(item);
+            await navigator.clipboard.writeText(prompt);
+            setCopiedId(item.id);
+            setTimeout(() => setCopiedId(null), 2000);
+        } catch {
+            // Fallback pour les navigateurs sans clipboard API
+            const textArea = document.createElement('textarea');
+            textArea.value = generateAIPrompt(item);
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            setCopiedId(item.id);
+            setTimeout(() => setCopiedId(null), 2000);
+        }
+    };
+
+    const handleCopyImage = async (imageUrl: string, key: string) => {
+        try {
+            const response = await fetch(imageUrl);
+            const blob = await response.blob();
+            await navigator.clipboard.write([
+                new ClipboardItem({ [blob.type]: blob })
+            ]);
+            setCopiedImageIdx(key);
+            setTimeout(() => setCopiedImageIdx(null), 2000);
+        } catch {
+            // Si la copie d'image échoue, copier l'URL
+            await navigator.clipboard.writeText(imageUrl);
+            setCopiedImageIdx(key);
+            setTimeout(() => setCopiedImageIdx(null), 2000);
+        }
+    };
 
     useEffect(() => {
         loadFeedback();
@@ -306,16 +352,79 @@ export default function AdminFeedback() {
                                         </p>
                                     </div>
 
+                                    {/* Copy for AI Button */}
+                                    <button
+                                        onClick={() => handleCopyForAI(item)}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem',
+                                            padding: '0.6rem 1.2rem',
+                                            background: copiedId === item.id
+                                                ? 'linear-gradient(135deg, #10b981, #059669)'
+                                                : 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
+                                            color: 'white',
+                                            border: '2px solid black',
+                                            boxShadow: '3px 3px 0 black',
+                                            cursor: 'pointer',
+                                            fontWeight: 900,
+                                            fontSize: '0.8rem',
+                                            textTransform: 'uppercase',
+                                            fontFamily: 'var(--font-heading)',
+                                            letterSpacing: '0.05em',
+                                            transition: 'all 0.2s ease',
+                                            alignSelf: 'flex-start'
+                                        }}
+                                    >
+                                        {copiedId === item.id ? (
+                                            <><Check size={16} /> Prompt copié !</>
+                                        ) : (
+                                            <><Clipboard size={16} /> Copier pour IA</>
+                                        )}
+                                    </button>
+
                                     {/* Attachments */}
                                     {item.attachments && item.attachments.length > 0 && (
                                         <div>
                                             <label style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', opacity: 0.5 }}>Pièces Jointes</label>
-                                            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-                                                {item.attachments.map((url, idx) => (
-                                                    <a key={idx} href={url} target="_blank" rel="noopener noreferrer" style={{ width: '100px', height: '100px', border: '2px solid black', overflow: 'hidden' }}>
-                                                        <OptimizedImage src={url} alt="Attachment" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                    </a>
-                                                ))}
+                                            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                                                {item.attachments.map((url, idx) => {
+                                                    const imageKey = `${item.id}-${idx}`;
+                                                    return (
+                                                        <div key={idx} style={{ position: 'relative' }}>
+                                                            <a href={url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100px', height: '100px', border: '2px solid black', overflow: 'hidden' }}>
+                                                                <OptimizedImage src={url} alt="Attachment" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                            </a>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    e.stopPropagation();
+                                                                    handleCopyImage(url, imageKey);
+                                                                }}
+                                                                title="Copier l'image"
+                                                                style={{
+                                                                    position: 'absolute',
+                                                                    top: '4px',
+                                                                    right: '4px',
+                                                                    width: '28px',
+                                                                    height: '28px',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    background: copiedImageIdx === imageKey ? '#10b981' : 'rgba(0,0,0,0.75)',
+                                                                    color: 'white',
+                                                                    border: 'none',
+                                                                    borderRadius: '4px',
+                                                                    cursor: 'pointer',
+                                                                    transition: 'all 0.2s ease',
+                                                                    zIndex: 2
+                                                                }}
+                                                            >
+                                                                {copiedImageIdx === imageKey ? <Check size={14} /> : <Copy size={14} />}
+                                                            </button>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     )}
