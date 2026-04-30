@@ -170,6 +170,12 @@ export function Footer() {
                         <Link to="/credits" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
                             {t('footer.credits')}
                         </Link>
+                        <a href="/robots.txt" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
+                            Robots.txt
+                        </a>
+                        <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, opacity: 0.8 }}>
+                            Sitemap
+                        </a>
                         <Link to="/donors" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 900, opacity: 1, textShadow: '0 0 10px var(--color-primary-glow)' }}>
                             {t('footer.donors')}
                         </Link>
