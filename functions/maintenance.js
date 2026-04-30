@@ -1,4 +1,4 @@
-const functions = require("firebase-functions");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const admin = require("firebase-admin");
 
 /**
@@ -8,9 +8,10 @@ const admin = require("firebase-admin");
  * - Purges deleted users
  * - Sends daily summary to Discord
  */
-exports.dailyMaintenance = functions.pubsub.schedule("0 2 * * *")
-    .timeZone("Europe/Paris")
-    .onRun(async (context) => {
+exports.dailyMaintenance = onSchedule({
+    schedule: "0 2 * * *",
+    timeZone: "Europe/Paris"
+}, async (event) => {
         console.log("🚀 Starting daily maintenance...");
         const db = admin.firestore();
         
