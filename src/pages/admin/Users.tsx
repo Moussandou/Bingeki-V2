@@ -380,14 +380,15 @@ export default function AdminUsers() {
                             filter: user.isBanned ? 'grayscale(100%)' : 'none'
                         }}>
                             {/* Header */}
-                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem', gap: '0.5rem' }}>
+                                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flex: 1, minWidth: 0 }}>
                                     <div style={{
                                         width: '48px', height: '48px',
                                         borderRadius: '50%',
                                         border: '2px solid var(--color-border)',
                                         overflow: 'hidden',
-                                        background: 'var(--color-surface-hover)'
+                                        background: 'var(--color-surface-hover)',
+                                        flexShrink: 0
                                     }}>
                                         {user.photoURL && (
                                             <OptimizedImage
@@ -666,15 +667,33 @@ export default function AdminUsers() {
                             </div>
                         </div>
 
-                        {/* Gamification */}
+                        {/* Gamification & Stats */}
                         <div style={{ background: 'var(--color-surface)', border: '2px solid var(--color-border)', padding: '1rem' }}>
-                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid var(--color-border)', paddingBottom: '0.5rem' }}>GAMIFICATION</h3>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid var(--color-border)', paddingBottom: '0.5rem' }}>STATISTIQUES & GAMIFICATION</h3>
                             <table style={{ width: '100%', fontSize: '0.9rem', fontFamily: 'monospace' }}>
                                 <tbody>
-                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>Level:</td><td>{selectedUser.level || 1}</td></tr>
-                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>XP:</td><td>{(selectedUser.xp || 0).toLocaleString()}</td></tr>
-                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Streak:</td><td>{selectedUser.streak || 0} days</td></tr>
-                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Last Login:</td><td>{selectedUser.lastLogin || 'N/A'}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>Niveau:</td><td>{selectedUser.level || 1}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>XP:</td><td>{(selectedUser.xp || 0).toLocaleString()} / {(selectedUser.totalXp || 0).toLocaleString()} (Total)</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Série (Streak):</td><td>{selectedUser.streak || 0} jours</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Badges Obtenus:</td><td>{selectedUser.badges?.length || 0}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Chapitres Lus:</td><td>{selectedUser.totalChaptersRead || 0}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Épisodes Vus:</td><td>{selectedUser.totalAnimeEpisodesWatched || 0}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Œuvres Complétées:</td><td>{selectedUser.totalWorksCompleted || 0}</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Profil & Modération */}
+                        <div style={{ background: 'var(--color-surface)', border: '2px solid var(--color-border)', padding: '1rem' }}>
+                            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid var(--color-border)', paddingBottom: '0.5rem' }}>PROFIL & MODÉRATION</h3>
+                            <table style={{ width: '100%', fontSize: '0.9rem', fontFamily: 'monospace' }}>
+                                <tbody>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>Dernière Connexion:</td><td>{selectedUser.lastLogin ? new Date(selectedUser.lastLogin).toLocaleString() : 'N/A'}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Date d'Inscription:</td><td>{selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleString() : 'N/A'}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Bio:</td><td style={{ opacity: selectedUser.bio ? 1 : 0.5, fontStyle: selectedUser.bio ? 'normal' : 'italic' }}>{selectedUser.bio || 'Non renseignée'}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Bannière Personnalisée:</td><td>{selectedUser.banner ? 'Oui' : 'Non'}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Status:</td><td>{selectedUser.isBanned ? <span style={{ color: '#ef4444', fontWeight: 'bold' }}>BANNI</span> : <span style={{ color: '#10b981', fontWeight: 'bold' }}>ACTIF</span>}</td></tr>
+                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Compte Supprimé:</td><td>{selectedUser.deletedAt ? <span style={{ color: '#ef4444', fontWeight: 'bold' }}>OUI ({new Date(selectedUser.deletedAt).toLocaleDateString()})</span> : 'Non'}</td></tr>
                                 </tbody>
                             </table>
                         </div>
