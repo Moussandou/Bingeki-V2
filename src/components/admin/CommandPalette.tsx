@@ -32,7 +32,7 @@ export function CommandPalette({ isOpen, onClose }: Props) {
     const [userResults, setUserResults] = useState<UserProfile[]>([]);
     const [searchingUsers, setSearchingUsers] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
-    const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const go = useCallback((path: string) => {
         navigate(path);
