@@ -75,6 +75,7 @@ export interface UserProfile {
     isSuperAdmin?: boolean; // New Super Admin role
     isBanned?: boolean;
     createdAt?: number;
+    deletedAt?: number;
 }
 
 // Types for analytics and charts
@@ -1275,6 +1276,7 @@ export interface AuditLogEntry {
     action: string;
     adminId: string;
     adminName: string;
+    adminEmail?: string;
     targetId?: string;
     targetName?: string;
     details?: string;
