@@ -105,7 +105,7 @@ export function getFirebaseThumbnail(
 
   try {
     // 1. Inject 'thumbnails%2F' into the storage path
-    let thumbUrl = originalUrl.replace('/o/', '/o/thumbnails%2F');
+    const thumbUrl = originalUrl.replace('/o/', '/o/thumbnails%2F');
     
     // 2. Extract path and handle the token (Solution A: Public Access)
     const queryIndex = thumbUrl.indexOf('?');

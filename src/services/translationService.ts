@@ -86,7 +86,10 @@ export function useTranslationData(
         const langCode = targetLang ? targetLang.split('-')[0].toLowerCase() : '';
         
         if (!text || !sourceId || !langCode || langCode === 'en') {
-            setTranslatedText(null);
+            setTimeout(() => {
+                setTranslatedText(null);
+                setLoading(false);
+            }, 0);
             return;
         }
 

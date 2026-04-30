@@ -6,7 +6,9 @@ import { Shield, Save, Database, Server, Terminal, Radio, Megaphone, Activity, C
 import { Card } from '@/components/ui/Card';
 import { Switch } from '@/components/ui/Switch';
 import { logDataBackup } from '@/utils/dataProtection';
-import { getAllActivities, setGlobalAnnouncement, setGlobalConfig, getGlobalConfig, type ActivityEvent } from '@/firebase/firestore';
+import { setGlobalAnnouncement, setGlobalConfig, getGlobalConfig } from '@/firebase/firestore';
+import { getAllActivities } from '@/firebase/misc';
+import type { ActivityEvent } from '@/types/activity';
 import { useTranslation } from 'react-i18next';
 import { checkJikanStatus, type JikanStatusResponse } from '@/services/animeApi';
 
