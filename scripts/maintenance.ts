@@ -1,4 +1,7 @@
 import * as admin from 'firebase-admin';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 import { resolve } from 'path';
 
 // This script should be run with a service account JSON path in FIREBASE_APPLICATION_CREDENTIALS
@@ -78,11 +81,96 @@ async function removeDeletedUsersData() {
     console.log(`🗑️  ${count} comptes utilisateurs purgés définitivement.`);
 }
 
+async function sendDailySummaryToDiscord() {
+    console.log('--- Envoi du résumé quotidien sur Discord ---');
+    
+    try {
+        const now = Date.now();
+        const startOfDay = new Date().setHours(0, 0, 0, 0);
+        const oneDayAgo = now - 24 * 60 * 60 * 1000;
+        const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+        const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
+
+        const usersSnapshot = await db.collection('users').get();
+        let newUsersToday = 0;
+        let dau = 0;
+        let wau = 0;
+        let mau = 0;
+
+        usersSnapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.createdAt && data.createdAt >= startOfDay) newUsersToday++;
+            if (data.lastLogin) {
+                if (data.lastLogin >= oneDayAgo) dau++;
+                if (data.lastLogin >= sevenDaysAgo) wau++;
+                if (data.lastLogin >= thirtyDaysAgo) mau++;
+            }
+        });
+
+        const totalUsers = usersSnapshot.size;
+        const engagementRate = mau > 0 ? ((dau / mau) * 100).toFixed(1) : '0';
+
+        const feedbacksSnapshot = await db.collection('feedback').get();
+        let pendingFeedback = 0;
+        feedbacksSnapshot.forEach(doc => {
+            if (doc.data().status === 'open') pendingFeedback++;
+        });
+        const totalFeedback = feedbacksSnapshot.size;
+
+        const webhookUrl = process.env.VITE_DISCORD_WEBHOOK_URL;
+        if (!webhookUrl) {
+            console.log('⚠️ Aucun webhook Discord configuré (VITE_DISCORD_WEBHOOK_URL). Ignoré.');
+            return;
+        }
+
+        const summaryText = `### 👥 Utilisateurs
+- Total : **${totalUsers}**
+- Nouveaux aujourd'hui : **+${newUsersToday}**
+- DAU / WAU / MAU : ${dau} / ${wau} / ${mau}
+- Taux d'engagement : **${engagementRate}%**
+
+### 💬 Feedback
+- En attente : **${pendingFeedback}**
+- Total : **${totalFeedback}**
+`;
+
+        const payload = {
+            content: null,
+            embeds: [
+                {
+                    title: "📊 Rapport Quotidien Bingeki",
+                    description: summaryText,
+                    color: 3447003,
+                    timestamp: new Date().toISOString(),
+                    footer: {
+                        text: "Bingeki V2 Maintenance Script"
+                    }
+                }
+            ]
+        };
+
+        const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            console.log('✅ Résumé envoyé avec succès sur Discord.');
+        } else {
+            console.error("❌ Erreur lors de l'envoi sur Discord:", await response.text());
+        }
+    } catch (e) {
+        console.error('❌ Erreur inattendue:', e);
+    }
+}
+
 async function runMaintenance() {
     console.log('🚀 Début de la maintenance programmée...');
     try {
         await cleanOldFeedbacks();
         await removeDeletedUsersData();
+        await sendDailySummaryToDiscord();
         console.log('✨ Maintenance terminée avec succès.');
         process.exit(0);
     } catch (error) {

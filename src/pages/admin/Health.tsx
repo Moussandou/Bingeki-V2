@@ -163,7 +163,10 @@ export default function AdminHealth() {
     const [showDiscordModal, setShowDiscordModal] = useState(false);
     const [discordConfig, setDiscordConfig] = useState<DiscordConfig>(() => {
         const saved = localStorage.getItem('bingeki_discord_health');
-        return saved ? JSON.parse(saved) : { webhookUrl: '', enabled: false };
+        return saved ? JSON.parse(saved) : { 
+            webhookUrl: import.meta.env.VITE_DISCORD_WEBHOOK_URL || '', 
+            enabled: !!import.meta.env.VITE_DISCORD_WEBHOOK_URL 
+        };
     });
     const [isTestingDiscord, setIsTestingDiscord] = useState(false);
     const [testStatus, setTestStatus] = useState<{ success?: boolean; message?: string } | null>(null);

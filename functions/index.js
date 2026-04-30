@@ -54,3 +54,7 @@ exports.getAnimeEpisodeDetails = jikanProxy.getAnimeEpisodeDetails;
 exports.getRandomAnime = jikanProxy.getRandomAnime;
 exports.getJikanStatus = jikanProxy.getJikanStatus;
 exports.syncStaleCache = jikanProxy.syncStaleCache;
+
+// 5. Maintenance & Cron Jobs
+const maintenance = require("./maintenance");
+exports.dailyMaintenance = maintenance.dailyMaintenance;
