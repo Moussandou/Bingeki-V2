@@ -1265,6 +1265,46 @@ export interface FeedbackData {
     attachments: string[]; // Storage URLs
     adminResponses: AdminResponse[];
     lastUpdated: number;
+    tags?: string[];
+}
+
+// ==================== ADMIN AUDIT LOG ====================
+
+export interface AuditLogEntry {
+    id: string;
+    action: string;
+    adminId: string;
+    adminName: string;
+    targetId?: string;
+    targetName?: string;
+    details?: string;
+    timestamp: number;
+}
+
+export async function logAdminAction(entry: Omit<AuditLogEntry, 'id' | 'timestamp'>): Promise<void> {
+    try {
+        await addDoc(collection(db, 'adminAuditLog'), {
+            ...entry,
+            timestamp: Date.now()
+        });
+    } catch (error) {
+        logger.error('[Firestore] Failed to log admin action:', error);
+    }
+}
+
+export async function getAuditLogs(limitCount = 50): Promise<AuditLogEntry[]> {
+    try {
+        const q = query(
+            collection(db, 'adminAuditLog'),
+            orderBy('timestamp', 'desc'),
+            limit(limitCount)
+        );
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as AuditLogEntry));
+    } catch (error) {
+        logger.error('[Firestore] Failed to get audit logs:', error);
+        return [];
+    }
 }
 
 export async function submitFeedback(feedback: Omit<FeedbackData, 'id' | 'timestamp' | 'status' | 'adminResponses' | 'lastUpdated'> & { attachments?: string[], priority?: FeedbackData['priority'] }): Promise<string | null> {
@@ -1360,7 +1400,7 @@ export async function addAdminResponse(feedbackId: string, response: Omit<AdminR
 // Update feedback status and/or priority
 export async function updateFeedbackDetails(
     feedbackId: string,
-    updates: { status?: FeedbackData['status']; priority?: FeedbackData['priority'] }
+    updates: { status?: FeedbackData['status']; priority?: FeedbackData['priority']; tags?: string[] }
 ): Promise<boolean> {
     try {
         await updateDoc(doc(db, 'feedback', feedbackId), {

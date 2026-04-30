@@ -2,7 +2,7 @@
  * Admin Sidebar component (admin)
  */
 import { NavLink } from '@/components/routing/LocalizedLink';
-import { LayoutDashboard, Users, MessageSquare, ShieldAlert, LogOut, Home, X, Palette, Clipboard, HeartPulse } from 'lucide-react';
+import { LayoutDashboard, Users, MessageSquare, ShieldAlert, LogOut, Home, X, Palette, Clipboard, HeartPulse, History } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { auth } from '@/firebase/config';
 import { useState } from 'react';
@@ -39,6 +39,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         { to: "/admin/assets", icon: Palette, label: "Assets", end: false },
         { to: "/admin/health", icon: HeartPulse, label: t('admin.sidebar.health', 'Health'), end: false },
         { to: "/admin/system", icon: ShieldAlert, label: t('admin.sidebar.system') },
+        { to: "/admin/audit", icon: History, label: "Audit Log" },
     ];
 
     return (

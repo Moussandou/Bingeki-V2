@@ -5,7 +5,8 @@ import { useState, useEffect } from 'react';
 import {
     Star, Trash2,
     MessageSquare, Send, ChevronDown, ChevronUp,
-    Image as ImageIcon, ExternalLink, Copy, Check, Clipboard
+    Image as ImageIcon, ExternalLink, Copy, Check, Clipboard,
+    CheckSquare, Square, Tag
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import {
@@ -28,6 +29,78 @@ export default function AdminFeedback() {
     const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'resolved'>('open');
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const [copiedImageIdx, setCopiedImageIdx] = useState<string | null>(null);
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [filterTag, setFilterTag] = useState<string | null>(null);
+
+    const AVAILABLE_TAGS = ['UI', 'Performance', 'Mobile', 'API', 'Bug', 'Feature'];
+
+    const toggleSelect = (id: string) => {
+        setSelectedIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.size === filteredFeedbacks.length) {
+            setSelectedIds(new Set());
+        } else {
+            setSelectedIds(new Set(filteredFeedbacks.map(f => f.id)));
+        }
+    };
+
+    const handleBulkResolve = async () => {
+        if (!window.confirm(`Résoudre ${selectedIds.size} feedbacks ?`)) return;
+        const promises = Array.from(selectedIds).map(id =>
+            updateFeedbackDetails(id, { status: 'resolved' })
+        );
+        await Promise.all(promises);
+        setFeedbacks(prev => prev.map(f =>
+            selectedIds.has(f.id) ? { ...f, status: 'resolved' as const, lastUpdated: Date.now() } : f
+        ));
+        setSelectedIds(new Set());
+    };
+
+    const handleBulkDelete = async () => {
+        if (!window.confirm(`Supprimer ${selectedIds.size} feedbacks ? Cette action est irréversible.`)) return;
+        const promises = Array.from(selectedIds).map(id => deleteFeedback(id));
+        await Promise.all(promises);
+        setFeedbacks(prev => prev.filter(f => !selectedIds.has(f.id)));
+        setSelectedIds(new Set());
+    };
+
+    const handleBulkCopyForAI = async () => {
+        const selected = feedbacks.filter(f => selectedIds.has(f.id));
+        const combined = selected.map((item, i) =>
+            `---\n### Feedback ${i + 1} / ${selected.length}\n${generateAIPrompt(item)}`
+        ).join('\n\n');
+        try {
+            await navigator.clipboard.writeText(combined);
+            alert(`${selected.length} feedbacks copiés pour l'IA !`);
+        } catch {
+            const ta = document.createElement('textarea');
+            ta.value = combined;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+        }
+    };
+
+    const handleToggleTag = async (feedbackId: string, tag: string) => {
+        const item = feedbacks.find(f => f.id === feedbackId);
+        if (!item) return;
+        const current = item.tags || [];
+        const next = current.includes(tag)
+            ? current.filter(t => t !== tag)
+            : [...current, tag];
+        await updateFeedbackDetails(feedbackId, { tags: next });
+        setFeedbacks(prev => prev.map(f =>
+            f.id === feedbackId ? { ...f, tags: next } : f
+        ));
+    };
 
     const generateAIPrompt = (item: FeedbackData) => {
         const imageSection = item.attachments?.length > 0
@@ -170,9 +243,9 @@ export default function AdminFeedback() {
     };
 
     const filteredFeedbacks = feedbacks.filter(f => {
-        if (filterStatus === 'all') return true;
-        if (filterStatus === 'open') return f.status === 'open' || f.status === 'in_progress';
-        if (filterStatus === 'resolved') return f.status === 'resolved' || f.status === 'closed';
+        if (filterStatus === 'open' && f.status !== 'open' && f.status !== 'in_progress') return false;
+        if (filterStatus === 'resolved' && f.status !== 'resolved' && f.status !== 'closed') return false;
+        if (filterTag && !(f.tags || []).includes(filterTag)) return false;
         return true;
     }).sort((a, b) => b.timestamp - a.timestamp);
 
@@ -244,6 +317,45 @@ export default function AdminFeedback() {
                 </button>
             </div>
 
+            {/* Tag Filter + Bulk Actions Bar */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <Tag size={14} style={{ opacity: 0.5 }} />
+                    {AVAILABLE_TAGS.map(tag => (
+                        <button
+                            key={tag}
+                            onClick={() => setFilterTag(filterTag === tag ? null : tag)}
+                            style={{
+                                padding: '2px 8px',
+                                fontSize: '0.7rem',
+                                fontWeight: 900,
+                                border: '1px solid var(--color-border)',
+                                background: filterTag === tag ? 'var(--color-text)' : 'transparent',
+                                color: filterTag === tag ? 'var(--color-background)' : 'var(--color-text)',
+                                cursor: 'pointer',
+                                textTransform: 'uppercase'
+                            }}
+                        >
+                            {tag}
+                        </button>
+                    ))}
+                </div>
+
+                {selectedIds.size > 0 && (
+                    <div style={{
+                        display: 'flex', alignItems: 'center', gap: '0.5rem',
+                        padding: '0.4rem 0.75rem', background: '#1e1b4b', color: 'white',
+                        border: '2px solid #312e81', fontSize: '0.75rem', fontWeight: 900
+                    }}>
+                        <span>{selectedIds.size} sélectionné{selectedIds.size > 1 ? 's' : ''}</span>
+                        <button onClick={handleBulkResolve} style={{ background: '#10b981', color: 'white', border: 'none', padding: '2px 8px', cursor: 'pointer', fontWeight: 900, fontSize: '0.7rem' }}>Résoudre</button>
+                        <button onClick={handleBulkCopyForAI} style={{ background: '#8b5cf6', color: 'white', border: 'none', padding: '2px 8px', cursor: 'pointer', fontWeight: 900, fontSize: '0.7rem' }}>Copier IA</button>
+                        <button onClick={handleBulkDelete} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '2px 8px', cursor: 'pointer', fontWeight: 900, fontSize: '0.7rem' }}>Supprimer</button>
+                        <button onClick={() => setSelectedIds(new Set())} style={{ background: 'transparent', color: '#94a3b8', border: 'none', cursor: 'pointer', fontSize: '0.7rem' }}>✕</button>
+                    </div>
+                )}
+            </div>
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {loading ? (
                     <p style={{ color: 'black' }}>{t('admin.feedback.loading')}</p>
@@ -252,7 +364,15 @@ export default function AdminFeedback() {
                         {t('admin.feedback.no_messages')}
                     </div>
                 ) : (
-                    filteredFeedbacks.map((item) => (
+                    <>
+                    {/* Select all */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0' }}>
+                        <button onClick={toggleSelectAll} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', fontWeight: 900, color: 'var(--color-text-dim)' }}>
+                            {selectedIds.size === filteredFeedbacks.length ? <CheckSquare size={16} /> : <Square size={16} />}
+                            {selectedIds.size === filteredFeedbacks.length ? 'Tout désélectionner' : 'Tout sélectionner'}
+                        </button>
+                    </div>
+                    {filteredFeedbacks.map((item) => (
                         <Card
                             key={item.id}
                             variant="manga"
@@ -260,8 +380,8 @@ export default function AdminFeedback() {
                                 padding: '1.5rem',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                background: 'var(--color-surface)',
-                                border: '3px solid var(--color-border)',
+                                background: selectedIds.has(item.id) ? 'color-mix(in srgb, var(--color-surface) 90%, #8b5cf6)' : 'var(--color-surface)',
+                                border: selectedIds.has(item.id) ? '3px solid #8b5cf6' : '3px solid var(--color-border)',
                                 boxShadow: expandedId === item.id ? '8px 8px 0 var(--color-shadow-strong)' : '4px 4px 0 var(--color-shadow-strong)',
                                 transition: 'all 0.2s ease',
                                 color: 'var(--color-text)'
@@ -273,6 +393,14 @@ export default function AdminFeedback() {
                                 onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1 }}>
+                                    {/* Checkbox */}
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); toggleSelect(item.id); }}
+                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'var(--color-text)' }}
+                                    >
+                                        {selectedIds.has(item.id) ? <CheckSquare size={18} /> : <Square size={18} />}
+                                    </button>
+
                                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '60px' }}>
                                         <StatusBadge status={item.status} />
                                         <span style={{ fontSize: '0.7rem', fontWeight: 900, marginTop: '4px', color: getPriorityColor(item.priority) }}>
@@ -485,6 +613,35 @@ export default function AdminFeedback() {
                                         </button>
                                     </div>
 
+                                    {/* Tags */}
+                                    <div>
+                                        <label style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', opacity: 0.5 }}>Tags</label>
+                                        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.4rem' }}>
+                                            {AVAILABLE_TAGS.map(tag => {
+                                                const active = (item.tags || []).includes(tag);
+                                                return (
+                                                    <button
+                                                        key={tag}
+                                                        onClick={() => handleToggleTag(item.id, tag)}
+                                                        style={{
+                                                            padding: '2px 8px',
+                                                            fontSize: '0.65rem',
+                                                            fontWeight: 900,
+                                                            background: active ? '#1e1b4b' : 'white',
+                                                            color: active ? 'white' : '#374151',
+                                                            border: '1px solid ' + (active ? '#312e81' : '#d1d5db'),
+                                                            cursor: 'pointer',
+                                                            textTransform: 'uppercase',
+                                                            transition: 'all 0.15s ease'
+                                                        }}
+                                                    >
+                                                        {tag}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
                                     {/* Response Section */}
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                         <label style={{
@@ -552,7 +709,8 @@ export default function AdminFeedback() {
                                 </div>
                             )}
                         </Card>
-                    ))
+                    ))}
+                    </>
                 )}
             </div>
         </div>

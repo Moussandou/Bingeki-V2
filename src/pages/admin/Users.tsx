@@ -2,7 +2,7 @@
  * Users page
  */
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Shield, Ban, ExternalLink, Edit, Eye, Trash2, Clock, Circle, ArrowUpDown, LayoutGrid, List } from 'lucide-react';
+import { Search, Shield, Ban, ExternalLink, Edit, Eye, Trash2, Clock, Circle, ArrowUpDown, LayoutGrid, List, Download, Copy, Check, Database } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Switch } from '@/components/ui/Switch';
 import { getAllUsers, toggleUserBan, toggleUserAdmin, adminUpdateUserGamification, deleteUserData, type UserProfile } from '@/firebase/firestore';
@@ -27,6 +27,50 @@ export default function AdminUsers() {
     const [editLevel, setEditLevel] = useState(1);
     const [editXp, setEditXp] = useState(0);
     const [sortBy, setSortBy] = useState<'lastLogin' | 'createdAt' | 'xp' | 'level' | 'name'>('lastLogin');
+    const [copiedUid, setCopiedUid] = useState(false);
+
+    const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID;
+
+    const handleCopyUid = async (uid: string) => {
+        try {
+            await navigator.clipboard.writeText(uid);
+            setCopiedUid(true);
+            setTimeout(() => setCopiedUid(false), 2000);
+        } catch {
+            const ta = document.createElement('textarea');
+            ta.value = uid;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            setCopiedUid(true);
+            setTimeout(() => setCopiedUid(false), 2000);
+        }
+    };
+
+    const exportCSV = () => {
+        const headers = ['displayName', 'email', 'uid', 'level', 'xp', 'createdAt', 'lastLogin', 'isAdmin', 'isBanned'];
+        const rows = filteredUsers.map(u => [
+            u.displayName || '',
+            u.email || '',
+            u.uid,
+            String(u.level || 1),
+            String(u.xp || 0),
+            u.createdAt ? new Date(u.createdAt).toISOString() : '',
+            u.lastLogin ? new Date(u.lastLogin).toISOString() : '',
+            u.isAdmin ? 'true' : 'false',
+            u.isBanned ? 'true' : 'false'
+        ].map(v => `"${v.replace(/"/g, '""')}"`).join(','));
+
+        const csv = [headers.join(','), ...rows].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `bingeki-users-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
 
     const formatRelativeDate = (timestamp: number | undefined) => {
         if (!timestamp) return '-';
@@ -244,41 +288,63 @@ export default function AdminUsers() {
                         ))}
                     </div>
 
-                    {/* View Toggle */}
-                    <div style={{ display: 'flex', border: '2px solid var(--color-border)', overflow: 'hidden', marginLeft: 'auto' }}>
+                    {/* View Toggle + Export */}
+                    <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto', alignItems: 'center' }}>
                         <button
-                            onClick={() => setViewMode('grid')}
+                            onClick={exportCSV}
+                            title="Exporter en CSV"
                             style={{
-                                padding: '0.4rem 0.6rem',
-                                background: viewMode === 'grid' ? 'var(--color-text)' : 'var(--color-surface)',
-                                color: viewMode === 'grid' ? 'var(--color-surface)' : 'var(--color-text)',
-                                border: 'none',
+                                padding: '0.4rem 0.7rem',
+                                border: '2px solid var(--color-border)',
+                                background: 'var(--color-surface)',
+                                color: 'var(--color-text)',
                                 cursor: 'pointer',
                                 display: 'flex',
-                                alignItems: 'center'
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontFamily: 'monospace',
+                                fontSize: '0.75rem',
+                                fontWeight: 900,
+                                textTransform: 'uppercase'
                             }}
-                            title="Vue Grille"
                         >
-                            <LayoutGrid size={16} />
+                            <Download size={14} /> CSV
                         </button>
-                        <button
-                            onClick={() => setViewMode('table')}
-                            style={{
-                                padding: '0.4rem 0.6rem',
-                                background: viewMode === 'table' ? 'var(--color-text)' : 'var(--color-surface)',
-                                color: viewMode === 'table' ? 'var(--color-surface)' : 'var(--color-text)',
-                                borderLeft: '2px solid var(--color-border)',
-                                borderTop: 'none',
-                                borderBottom: 'none',
-                                borderRight: 'none',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center'
-                            }}
-                            title="Vue Tableau"
-                        >
-                            <List size={16} />
-                        </button>
+                        <div style={{ display: 'flex', border: '2px solid var(--color-border)', overflow: 'hidden' }}>
+                            <button
+                                onClick={() => setViewMode('grid')}
+                                style={{
+                                    padding: '0.4rem 0.6rem',
+                                    background: viewMode === 'grid' ? 'var(--color-text)' : 'var(--color-surface)',
+                                    color: viewMode === 'grid' ? 'var(--color-surface)' : 'var(--color-text)',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}
+                                title="Vue Grille"
+                            >
+                                <LayoutGrid size={16} />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('table')}
+                                style={{
+                                    padding: '0.4rem 0.6rem',
+                                    background: viewMode === 'table' ? 'var(--color-text)' : 'var(--color-surface)',
+                                    color: viewMode === 'table' ? 'var(--color-surface)' : 'var(--color-text)',
+                                    borderLeft: '2px solid var(--color-border)',
+                                    borderTop: 'none',
+                                    borderBottom: 'none',
+                                    borderRight: 'none',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}
+                                title="Vue Tableau"
+                            >
+                                <List size={16} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -535,12 +601,53 @@ export default function AdminUsers() {
                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '2px solid var(--color-border)', paddingBottom: '0.5rem' }}>BASIC INFO</h3>
                             <table style={{ width: '100%', fontSize: '0.9rem', fontFamily: 'monospace' }}>
                                 <tbody>
-                                    <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>UID:</td><td style={{ wordBreak: 'break-all' }}>{selectedUser.uid}</td></tr>
+                                    <tr>
+                                        <td style={{ fontWeight: 'bold', padding: '0.25rem 0', width: '40%' }}>UID:</td>
+                                        <td style={{ wordBreak: 'break-all', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <span style={{ flex: 1 }}>{selectedUser.uid}</span>
+                                            <button
+                                                onClick={() => handleCopyUid(selectedUser.uid)}
+                                                title="Copier l'UID"
+                                                style={{
+                                                    background: copiedUid ? '#10b981' : 'var(--color-text)',
+                                                    color: 'var(--color-surface)',
+                                                    border: 'none',
+                                                    padding: '2px 6px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '2px',
+                                                    fontSize: '0.7rem',
+                                                    fontWeight: 900,
+                                                    flexShrink: 0,
+                                                    transition: 'background 0.2s'
+                                                }}
+                                            >
+                                                {copiedUid ? <><Check size={10} /> Copié</> : <><Copy size={10} /> UID</>}
+                                            </button>
+                                        </td>
+                                    </tr>
                                     <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Display Name:</td><td>{selectedUser.displayName || 'N/A'}</td></tr>
                                     <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Email:</td><td>{selectedUser.email || 'N/A'}</td></tr>
                                     <tr><td style={{ fontWeight: 'bold', padding: '0.25rem 0' }}>Photo URL:</td><td style={{ wordBreak: 'break-all', fontSize: '0.75rem' }}>{selectedUser.photoURL || 'N/A'}</td></tr>
                                 </tbody>
                             </table>
+                            {/* Quick links */}
+                            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+                                <a
+                                    href={`https://console.firebase.google.com/project/${projectId}/firestore/data/users/${selectedUser.uid}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: '4px',
+                                        padding: '4px 10px', background: '#f59e0b', color: 'white',
+                                        fontSize: '0.7rem', fontWeight: 900, textDecoration: 'none',
+                                        textTransform: 'uppercase', border: '1px solid #d97706'
+                                    }}
+                                >
+                                    <Database size={12} /> Firestore
+                                </a>
+                            </div>
                         </div>
 
                         {/* Gamification */}

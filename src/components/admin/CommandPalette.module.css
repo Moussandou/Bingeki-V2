@@ -1,0 +1,113 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    padding-top: 15vh;
+    animation: fadeIn 0.15s ease;
+}
+
+.palette {
+    width: 560px;
+    max-width: 95vw;
+    max-height: 420px;
+    background: var(--color-surface);
+    border: 3px solid var(--color-text);
+    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideDown 0.2s ease;
+    align-self: flex-start;
+}
+
+.inputWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 2px solid var(--color-border);
+}
+
+.input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    font-family: var(--font-heading);
+    outline: none;
+    color: var(--color-text);
+}
+
+.input::placeholder {
+    color: var(--color-text-dim);
+    opacity: 0.5;
+}
+
+.results {
+    overflow-y: auto;
+    flex: 1;
+    padding: 0.5rem;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    color: var(--color-text);
+    font-size: 0.85rem;
+    transition: background 0.1s ease;
+}
+
+.item:hover,
+.itemActive {
+    background: var(--color-text);
+    color: var(--color-surface);
+}
+
+.itemLabel {
+    flex: 1;
+    font-weight: 700;
+}
+
+.itemHint {
+    font-size: 0.7rem;
+    opacity: 0.5;
+    font-family: monospace;
+}
+
+.footer {
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    border-top: 2px solid var(--color-border);
+    font-size: 0.65rem;
+    font-family: monospace;
+    color: var(--color-text-dim);
+}
+
+.kbd {
+    background: var(--color-border);
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-weight: 900;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}

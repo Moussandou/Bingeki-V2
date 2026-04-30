@@ -4,11 +4,24 @@
 import { Outlet } from 'react-router-dom';
 import { AdminSidebar } from './AdminSidebar';
 import styles from './AdminLayout.module.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
+import { CommandPalette } from './CommandPalette';
 
 export function AdminLayout() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                setIsPaletteOpen(prev => !prev);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     return (
         <div className={styles.container}>
@@ -33,6 +46,11 @@ export function AdminLayout() {
                     <Outlet />
                 </div>
             </main>
+
+            <CommandPalette 
+                isOpen={isPaletteOpen} 
+                onClose={() => setIsPaletteOpen(false)} 
+            />
         </div>
     );
 }

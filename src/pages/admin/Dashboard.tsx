@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { 
     Users, TrendingUp, Activity, ExternalLink, Clipboard, Info, 
-    Calendar, RefreshCw, Wrench
+    Calendar, RefreshCw, Wrench, Copy, Check, FileText
 } from 'lucide-react';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/firebase/config';
@@ -57,6 +57,47 @@ export default function AdminDashboard() {
     const [recalculating, setRecalculating] = useState(false);
     const [recalcResult, setRecalcResult] = useState<{ total: number; updated: number; errors: number } | null>(null);
     const [recalcError, setRecalcError] = useState<string | null>(null);
+    const [copiedConfig, setCopiedConfig] = useState(false);
+
+    const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID;
+
+    const handleCopyConfig = async () => {
+        const config = [
+            `## Firebase Config — ${projectId}`,
+            `- **Project ID**: ${projectId}`,
+            `- **Auth Domain**: ${import.meta.env.VITE_FIREBASE_AUTH_DOMAIN}`,
+            `- **Storage Bucket**: ${import.meta.env.VITE_FIREBASE_STORAGE_BUCKET}`,
+            `- **Users**: ${stats.totalUsers}`,
+            `- **DAU/WAU/MAU**: ${stats.dau}/${stats.wau}/${stats.mau}`,
+            `- **Date**: ${new Date().toISOString()}`
+        ].join('\n');
+        try {
+            await navigator.clipboard.writeText(config);
+            setCopiedConfig(true);
+            setTimeout(() => setCopiedConfig(false), 2000);
+        } catch { /* silent */ }
+    };
+
+    const generateWeeklySummary = () => {
+        const lines = [
+            `## Résumé Hebdomadaire — Bingeki`,
+            `**Date**: ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`,
+            '',
+            `### Utilisateurs`,
+            `- Total : **${stats.totalUsers}**`,
+            `- Nouveaux aujourd'hui : **+${stats.newUsersToday}**`,
+            `- DAU / WAU / MAU : ${stats.dau} / ${stats.wau} / ${stats.mau}`,
+            `- Taux d'engagement : **${Math.round(stats.engagementRate)}%**`,
+            '',
+            `### Feedback`,
+            `- En attente : **${stats.pendingFeedback}**`,
+            `- Total : **${stats.totalFeedback}**`,
+            '',
+            `### Top Contenu`,
+            ...topContent.slice(0, 3).map((c, i) => `${i + 1}. ${c.title} (${c.count} interactions)`),
+        ];
+        return lines.join('\n');
+    };
 
     const handleRecalculateStats = async () => {
         if (recalculating) return;
@@ -197,28 +238,52 @@ export default function AdminDashboard() {
                         {t('admin.dashboard.subtitle')}
                     </p>
                 </div>
-                
-                <div style={{ display: 'flex', background: 'var(--color-surface)', border: '2px solid black', padding: '0.25rem', borderRadius: '4px', alignItems: 'center', gap: '0.5rem' }}>
-                    <Calendar size={16} style={{ marginLeft: '0.5rem' }} />
-                    {[7, 30, 90].map(p => (
-                        <button 
-                            key={p}
-                            onClick={() => setPeriod(p)}
-                            style={{ 
-                                padding: '0.4rem 0.8rem', 
-                                border: 'none', 
-                                background: period === p ? 'black' : 'transparent',
-                                color: period === p ? 'white' : 'var(--color-text)',
-                                fontWeight: 900,
-                                cursor: 'pointer',
-                                textTransform: 'uppercase',
-                                fontSize: '0.7rem',
-                                borderRadius: '2px'
-                            }}
-                        >
-                            {p} Jours
-                        </button>
-                    ))}
+
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <button
+                        onClick={handleCopyConfig}
+                        title="Copier la config Firebase"
+                        style={{
+                            padding: '0.4rem 0.7rem',
+                            border: '2px solid var(--color-border)',
+                            background: copiedConfig ? '#10b981' : 'var(--color-surface)',
+                            color: copiedConfig ? 'white' : 'var(--color-text)',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontFamily: 'monospace',
+                            fontSize: '0.7rem',
+                            fontWeight: 900,
+                            textTransform: 'uppercase',
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        {copiedConfig ? <><Check size={12} /> Copié</> : <><Copy size={12} /> Config</>}
+                    </button>
+
+                    <div style={{ display: 'flex', background: 'var(--color-surface)', border: '2px solid black', padding: '0.25rem', borderRadius: '4px', alignItems: 'center', gap: '0.5rem' }}>
+                        <Calendar size={16} style={{ marginLeft: '0.5rem' }} />
+                        {[7, 30, 90].map(p => (
+                            <button 
+                                key={p}
+                                onClick={() => setPeriod(p)}
+                                style={{ 
+                                    padding: '0.4rem 0.8rem', 
+                                    border: 'none', 
+                                    background: period === p ? 'black' : 'transparent',
+                                    color: period === p ? 'white' : 'var(--color-text)',
+                                    fontWeight: 900,
+                                    cursor: 'pointer',
+                                    textTransform: 'uppercase',
+                                    fontSize: '0.7rem',
+                                    borderRadius: '2px'
+                                }}
+                            >
+                                {p} Jours
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 
@@ -288,6 +353,42 @@ export default function AdminDashboard() {
                     </div>
                 </Card>
             </div>
+
+            {/* Weekly Summary */}
+            <Card variant="manga" style={{ padding: '1.25rem', background: 'var(--color-surface)', border: '2px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <FileText size={20} />
+                    <div>
+                        <div style={{ fontWeight: 900, fontSize: '0.85rem', textTransform: 'uppercase' }}>Résumé Hebdomadaire</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-dim)' }}>
+                            {stats.newUsersToday} nouveaux • {stats.pendingFeedback} feedbacks en attente • {Math.round(stats.engagementRate)}% engagement
+                        </div>
+                    </div>
+                </div>
+                <button
+                    onClick={async () => {
+                        try {
+                            await navigator.clipboard.writeText(generateWeeklySummary());
+                            alert('Résumé copié !');
+                        } catch { /* silent */ }
+                    }}
+                    style={{
+                        padding: '0.5rem 1rem',
+                        background: 'var(--color-text)',
+                        color: 'var(--color-surface)',
+                        border: 'none',
+                        fontWeight: 900,
+                        fontSize: '0.75rem',
+                        textTransform: 'uppercase',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                    }}
+                >
+                    <Clipboard size={14} /> Copier le résumé
+                </button>
+            </Card>
 
             {/* Row 2: Main Growth & Activity Curves */}
             <div className={styles.mainChartsGrid}>
