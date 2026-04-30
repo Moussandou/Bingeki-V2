@@ -20,7 +20,7 @@ interface QueuedTask {
 }
 
 const PRIORITY_ORDER: Priority[] = ['high', 'medium', 'low'];
-const DEFAULT_MAX_CONCURRENT = 4;
+const DEFAULT_MAX_CONCURRENT = 6;
 const MAX_RETRIES = 3;
 
 export class PriorityQueue {

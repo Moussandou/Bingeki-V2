@@ -44,17 +44,17 @@ export function FriendRecommendations() {
             const userLibrary = await getUserLibrary(user.uid);
             const userWorkIds = new Set(userLibrary.map(w => w.id));
 
-            // Collect works from friends' libraries
+            // Fetch all friend libraries in parallel
             const workCounts: Map<number, { work: Work; friends: { name: string; photo: string }[] }> = new Map();
+            const limitedFriends = acceptedFriends.slice(0, 10);
+            const friendLibraries = await Promise.all(
+                limitedFriends.map(f => getUserLibrary(f.uid))
+            );
 
-            for (const friend of acceptedFriends.slice(0, 10)) { // Limit to 10 friends
-                const friendLibrary = await getUserLibrary(friend.uid);
-                for (const work of friendLibrary) {
+            limitedFriends.forEach((friend, i) => {
+                for (const work of friendLibraries[i]) {
                     const workId = Number(work.id);
-                    // Skip if user already has this work
                     if (userWorkIds.has(workId)) continue;
-
-                    // Only include works being actively read/watched
                     if (work.status !== 'reading') continue;
 
                     if (workCounts.has(workId)) {
@@ -69,7 +69,7 @@ export function FriendRecommendations() {
                         });
                     }
                 }
-            }
+            });
 
             // Sort by number of friends watching and take top 6
             const sortedWorks = Array.from(workCounts.entries())

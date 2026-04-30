@@ -130,13 +130,13 @@ export default function Opening() {
                         mal_id: number; 
                         title: string; 
                         score?: number | null; 
-                        images: { jpg: { large_image_url?: string; image_url?: string } } 
+                        images: { jpg: { large_image_url?: string; image_url?: string; small_image_url?: string } } 
                     }) => ({
                         id: m.mal_id,
                         title: m.title,
                         type: 'Manga',
                         score: m.score || 0,
-                        image: m.images.jpg.large_image_url || m.images.jpg.image_url || ''
+                        image: m.images.jpg.image_url || m.images.jpg.small_image_url || ''
                     })));
                     dataFetched.current = true;
                 }
@@ -147,29 +147,29 @@ export default function Opening() {
             // Static "Top" results to ensure reliable display
             const staticResults: Record<string, SearchResult[]> = {
                 'Seinen': [
-                    { title: "Berserk", type: "Manga", score: 9.47, image: "https://cdn.myanimelist.net/images/manga/1/157897l.jpg" },
+                    { title: "Berserk", type: "Manga", score: 9.47, image: "https://cdn.myanimelist.net/images/manga/1/157897.jpg" },
                     { title: "Vinland Saga", type: "Manga", score: 9.05, image: "https://cdn.myanimelist.net/images/manga/2/188925.jpg" },
                     { title: "Vagabond", type: "Manga", score: 9.24, image: "https://cdn.myanimelist.net/images/manga/1/259070.jpg" }
                 ],
                 'Shonen': [
-                    { title: "One Piece", type: "Manga", score: 9.22, image: "https://cdn.myanimelist.net/images/manga/2/253146l.jpg" },
-                    { title: "Shingeki no Kyojin", type: "Manga", score: 8.55, image: "https://cdn.myanimelist.net/images/manga/2/37846l.jpg" },
-                    { title: "Chainsaw Man", type: "Manga", score: 8.69, image: "https://cdn.myanimelist.net/images/manga/3/216464l.jpg" }
+                    { title: "One Piece", type: "Manga", score: 9.22, image: "https://cdn.myanimelist.net/images/manga/2/253146.jpg" },
+                    { title: "Shingeki no Kyojin", type: "Manga", score: 8.55, image: "https://cdn.myanimelist.net/images/manga/2/37846.jpg" },
+                    { title: "Chainsaw Man", type: "Manga", score: 8.69, image: "https://cdn.myanimelist.net/images/manga/3/216464.jpg" }
                 ],
                 'Romance': [
-                    { title: "Kaguya-sama", type: "Manga", score: 8.89, image: "https://cdn.myanimelist.net/images/manga/3/188896l.jpg" },
-                    { title: "Horimiya", type: "Manga", score: 8.41, image: "https://cdn.myanimelist.net/images/manga/2/245008l.jpg" },
-                    { title: "Nisekoi", type: "Manga", score: 7.71, image: "https://cdn.myanimelist.net/images/manga/1/181212l.jpg" }
+                    { title: "Kaguya-sama", type: "Manga", score: 8.89, image: "https://cdn.myanimelist.net/images/manga/3/188896.jpg" },
+                    { title: "Horimiya", type: "Manga", score: 8.41, image: "https://cdn.myanimelist.net/images/manga/2/245008.jpg" },
+                    { title: "Nisekoi", type: "Manga", score: 7.71, image: "https://cdn.myanimelist.net/images/manga/1/181212.jpg" }
                 ],
                 'Horreur': [
-                    { title: "Berserk", type: "Manga", score: 9.47, image: "https://cdn.myanimelist.net/images/manga/1/157897l.jpg" },
-                    { title: "Tokyo Ghoul", type: "Manga", score: 8.54, image: "https://cdn.myanimelist.net/images/manga/3/114037l.jpg" },
-                    { title: "Gantz", type: "Manga", score: 8.56, image: "https://cdn.myanimelist.net/images/manga/1/278020l.jpg" }
+                    { title: "Berserk", type: "Manga", score: 9.47, image: "https://cdn.myanimelist.net/images/manga/1/157897.jpg" },
+                    { title: "Tokyo Ghoul", type: "Manga", score: 8.54, image: "https://cdn.myanimelist.net/images/manga/3/114037.jpg" },
+                    { title: "Gantz", type: "Manga", score: 8.56, image: "https://cdn.myanimelist.net/images/manga/1/278020.jpg" }
                 ],
                 'Isekai': [
-                    { title: "Mushoku Tensei", type: "Manga", score: 8.09, image: "https://cdn.myanimelist.net/images/manga/2/181049l.jpg" },
-                    { title: "Re:Zero", type: "Manga", score: 8.36, image: "https://cdn.myanimelist.net/images/manga/1/129447l.jpg" },
-                    { title: "Tensura (Slime)", type: "Manga", score: 8.36, image: "https://cdn.myanimelist.net/images/manga/3/167639l.jpg" }
+                    { title: "Mushoku Tensei", type: "Manga", score: 8.09, image: "https://cdn.myanimelist.net/images/manga/2/181049.jpg" },
+                    { title: "Re:Zero", type: "Manga", score: 8.36, image: "https://cdn.myanimelist.net/images/manga/1/129447.jpg" },
+                    { title: "Tensura (Slime)", type: "Manga", score: 8.36, image: "https://cdn.myanimelist.net/images/manga/3/167639.jpg" }
                 ]
             };
             setResultsByGenre(staticResults);

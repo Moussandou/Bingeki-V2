@@ -76,7 +76,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     const [isLoaded, setIsLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
     const startTimeRef = React.useRef(Date.now());
-    const [placeholderLoaded, setPlaceholderLoaded] = useState(false);
+    const [, setPlaceholderLoaded] = useState(false);
     const [placeholderError, setPlaceholderError] = useState(false);
     const [isVisible, setIsVisible] = useState(priority);
     const containerRef = React.useRef<HTMLDivElement>(null);
@@ -129,15 +129,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     };
 
     const handleLoad = () => {
-        const duration = Date.now() - startTimeRef.current;
         setIsLoaded(true);
-        
-        // Log timing and if it beat the placeholder
-        if (duration > 2500) {
-            console.warn(`[OptimizedImage] 🐢 Slow Main: ${finalSrc.substring(0, 50)}... took ${duration}ms (Placeholder: ${placeholderLoaded ? 'yes' : 'no'})`);
-        } else if (duration < 500) {
-            console.debug(`[OptimizedImage] ⚡ Fast load: ${duration}ms`);
-        }
     };
 
     return (
@@ -182,12 +174,13 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
                     onLoad={handleLoad}
                     onError={(e) => {
                         setHasError(true);
-                        console.error(`[OptimizedImage] ❌ Failed: ${finalSrc}`);
                         if (fallback && e.currentTarget.src !== fallback) {
                             e.currentTarget.src = fallback;
                         }
                     }}
                     loading={priority ? 'eager' : 'lazy'}
+                    fetchPriority={priority ? 'high' : 'auto'}
+                    decoding={priority ? 'sync' : 'async'}
                     referrerPolicy="no-referrer"
                     crossOrigin={crossOriginValue}
                     {...props}

@@ -94,31 +94,18 @@ export default function Discover() {
                     return Array.from(map.values());
                 };
 
-                // Fetch all sections in parallel — apiQueue handles rate limiting
-                console.debug('[Perf] Starting Anime batch fetch...');
-                const [season, topA] = await Promise.all([
+                // All 4 calls in parallel — apiQueue handles rate limiting
+                const [season, topA, popM, topM] = await Promise.all([
                     getSeasonalAnime(15),
-                    getTopWorks('anime', 'favorite', 15)
-                ]);
-
-                setSeasonalAnime(dedup(season));
-                setTopAnime(dedup(topA));
-                console.info('[Perf] Anime batch loaded');
-
-                // Wait 500ms before starting Manga batch to let the UI breathe
-                await new Promise(resolve => setTimeout(resolve, 500));
-
-                console.debug('[Perf] Starting Manga batch fetch...');
-                const [popM, topM] = await Promise.all([
+                    getTopWorks('anime', 'favorite', 15),
                     getTopWorks('manga', 'bypopularity', 15),
                     getTopWorks('manga', 'favorite', 15)
                 ]);
 
+                setSeasonalAnime(dedup(season));
+                setTopAnime(dedup(topA));
                 setPopularManga(dedup(popM));
                 setTopManga(dedup(topM));
-                console.info('[Perf] Manga batch loaded');
-                
-                console.info('[Perf] All home data loaded and deduplicated');
             } catch (error) {
                 console.error("[Discover] ❌ Failed to load discovery data", error);
             } finally {
@@ -262,7 +249,7 @@ export default function Discover() {
                         {/* Background */}
                         <div
                             className={styles.heroBackground}
-                            style={{ backgroundImage: `url(${heroWork.images.jpg.large_image_url})` }}
+                            style={{ backgroundImage: `url(${heroWork.images.jpg.image_url})` }}
                         />
 
                         <div className={`container ${styles.heroContainer}`}>
@@ -274,7 +261,8 @@ export default function Discover() {
                                 className={styles.heroImageContainer}
                             >
                                 <OptimizedImage
-                                    src={heroWork.images.jpg.large_image_url}
+                                    src={heroWork.images.jpg.image_url}
+                                    lowResSrc={heroWork.images.jpg.small_image_url}
                                     alt={heroWork.title}
                                     className={styles.heroImage}
                                     priority={true}
